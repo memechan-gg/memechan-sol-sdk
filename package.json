@@ -1,0 +1,37 @@
+{
+  "dependencies": {
+    "@solana/spl-token": "^0.4.6",
+    "@solana/web3.js": "^1.91.8"
+  },
+  "name": "memechan-sol-sdk",
+  "description": "Typescript SDK for memechan.gg",
+  "version": "1.0.0",
+  "main": "index.js",
+  "types": "dist/index.d.ts",
+  "directories": {
+    "test": "test"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.12",
+    "@typescript-eslint/eslint-plugin": "^7.8.0",
+    "@typescript-eslint/parser": "^7.8.0",
+    "eslint": "^8.57.0",
+    "jest": "^29.7.0",
+    "prettier": "3.2.5",
+    "ts-jest": "^29.1.2",
+    "tsup": "^8.0.2",
+    "typescript": "^5.4.5"
+  },
+  "scripts": {
+    "test": "jest",
+    "audit": "yarn audit --groups dependencies",
+    "format": "prettier --write src/**/*.ts",
+    "lint": "eslint './src/**/*.ts'",
+    "build": "yarn lint && tsup",
+    "build:watch": "tsc --watch",
+    "prettier-format": "prettier --config .prettierrc 'src/**/*.ts' --write"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
