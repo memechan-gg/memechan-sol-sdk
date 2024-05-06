@@ -1,9 +1,10 @@
-import { Connection, clusterApiUrl } from '@solana/web3.js';
+import { createSolanaConnection } from "../src";
 
-describe('Solana Connection', () => {
-  it('should connect to the devnet cluster', async () => {
-    const connection = new Connection(clusterApiUrl('devnet'), 'confirmed');
-    const version = await connection.getVersion();
-    expect(version).toBeDefined();
-  });
+describe('connectToService', () => {
+    it('should return connection', async () => {
+        const connection = createSolanaConnection();
+        const version = await connection.getVersion();
+        console.log('Connection details:', version);
+        expect(version).toBeDefined();
+    });
 });
