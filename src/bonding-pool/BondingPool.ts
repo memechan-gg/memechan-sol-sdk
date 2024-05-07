@@ -30,14 +30,14 @@ export class BondingPool {
     //
   }
 
-  public static findProgramAddressSync(publicKey: PublicKey, memechanProgram: Program<MemechanSol>): PublicKey {
+  public static findSignerPda(publicKey: PublicKey, memechanProgram: Program<MemechanSol>): PublicKey {
     return PublicKey.findProgramAddressSync([Buffer.from("signer"), publicKey.toBytes()], memechanProgram.programId)[0];
   }
 
   public static async new(args: BondingPoolArgs): Promise<BondingPool> {
     const id = Keypair.generate();
 
-    const poolSigner = BondingPool.findProgramAddressSync(id.publicKey, args.solanaContext.memechanProgram);
+    const poolSigner = BondingPool.findSignerPda(id.publicKey, args.solanaContext.memechanProgram);
 
     const { admin, payer, signer, solanaContext } = args;
     const { connection, memechanProgram } = solanaContext;
@@ -76,8 +76,8 @@ export class BondingPool {
     return this.solanaContext.memechanProgram.account.boundPool.fetch(this.id);
   }
 
-  public signerPda(): PublicKey {
-    return BondingPool.findProgramAddressSync(this.id, this.solanaContext.memechanProgram);
+  public findSignerPda(): PublicKey {
+    return BondingPool.findSignerPda(this.id, this.solanaContext.memechanProgram);
   }
 
   public static async airdropLiquidityTokens(
@@ -100,7 +100,7 @@ export class BondingPool {
     const id = Keypair.generate();
 
     const pool = input.pool ?? this.id;
-    const poolSignerPda = input.poolSignerPda ?? this.signerPda();
+    const poolSignerPda = input.poolSignerPda ?? this.findSignerPda();
     const sol_in = input.solAmountIn ?? 1 * 1e9;
     const meme_out = input.memeTokensOut ?? 1;
 
@@ -130,7 +130,7 @@ export class BondingPool {
     const user = input.user;
 
     const pool = input.pool ?? this.id;
-    const poolSigner = input.poolSignerPda ?? this.signerPda();
+    const poolSigner = input.poolSignerPda ?? this.findSignerPda();
     const meme_in = input.memeAmountIn ?? 9e6 * 1e6;
     const sol_out = input.solTokensOut ?? 1;
 
@@ -156,13 +156,13 @@ export class BondingPool {
     const ammId = Keypair.generate();
 
     const pool = input.pool ?? this.id;
-    const poolSigner = input.poolSignerPda ?? this.signerPda();
-    const ammPoolSigner = AmmPool.findProgramAddressSync(ammId.publicKey, this.solanaContext.ammProgram.programId);
+    const poolSigner = input.poolSignerPda ?? this.findSignerPda();
+    const ammPoolSigner = AmmPool.findSignerPda(ammId.publicKey, this.solanaContext.ammProgram.programId);
 
     const adminTicketId = Keypair.generate();
 
     const stakingId = Keypair.generate();
-    const stakingSigner = StakingPool.findProgramAddressSync(
+    const stakingSigner = StakingPool.findSignerPda(
       stakingId.publicKey,
       this.solanaContext.memechanProgram.programId,
     );

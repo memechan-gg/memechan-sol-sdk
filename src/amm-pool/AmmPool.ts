@@ -12,7 +12,7 @@ export class AmmPool {
     //
   }
 
-  public static findProgramAddressSync(publicKey: PublicKey, ammProgramId: PublicKey): PublicKey {
+  public static findSignerPda(publicKey: PublicKey, ammProgramId: PublicKey): PublicKey {
     return PublicKey.findProgramAddressSync([Buffer.from("signer"), publicKey.toBytes()], ammProgramId)[0];
   }
 
@@ -39,7 +39,7 @@ export class AmmPool {
         buyWallet,
         buyVault: await getVaultOfWallet(buyWallet),
         pool: this.id,
-        poolSigner: this.signerPda(),
+        poolSigner: this.findSignerPda(),
         programTollWallet: pool.programTollWallet,
         lpMint: pool.mint,
       })
@@ -47,8 +47,8 @@ export class AmmPool {
       .rpc();
   }
 
-  public signerPda(): PublicKey {
-    return AmmPool.findProgramAddressSync(this.id, this.solanaContext.ammProgram.programId);
+  public findSignerPda(): PublicKey {
+    return AmmPool.findSignerPda(this.id, this.solanaContext.ammProgram.programId);
   }
 
   public discountAddress(user: PublicKey): PublicKey {

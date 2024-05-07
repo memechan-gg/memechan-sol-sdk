@@ -10,7 +10,7 @@ export class StakingPool {
     private solanaContext: SolanaContext,
   ) {}
 
-  public static findProgramAddressSync(publicKey: PublicKey, memechanProgramId: PublicKey): PublicKey {
+  public static findSignerPda(publicKey: PublicKey, memechanProgramId: PublicKey): PublicKey {
     return PublicKey.findProgramAddressSync([Buffer.from("staking"), publicKey.toBytes()], memechanProgramId)[0];
   }
 
@@ -28,8 +28,8 @@ export class StakingPool {
         aldrinAmmProgram: this.solanaContext.ammProgram.programId,
         aldrinLpMint: ammInfo.mint,
         aldrinPoolLpWallet: ammInfo.programTollWallet,
-        aldrinPoolSigner: ammPool.signerPda(),
-        stakingSignerPda: this.signerPda(),
+        aldrinPoolSigner: ammPool.findSignerPda(),
+        stakingSignerPda: this.findSignerPda(),
         tokenProgram: TOKEN_PROGRAM_ID,
       })
       .remainingAccounts([
@@ -64,7 +64,7 @@ export class StakingPool {
       .accounts({
         memeTicket: args.ticket.id,
         signer: args.user.publicKey,
-        stakingSignerPda: this.signerPda(),
+        stakingSignerPda: this.findSignerPda(),
         memeVault: stakingInfo.memeVault,
         wsolVault: stakingInfo.wsolVault,
         staking: this.id,
@@ -101,7 +101,7 @@ export class StakingPool {
       .withdrawFees()
       .accounts({
         memeTicket: args.ticket.id,
-        stakingSignerPda: this.signerPda(),
+        stakingSignerPda: this.findSignerPda(),
         memeVault: stakingInfo.memeVault,
         wsolVault: stakingInfo.wsolVault,
         staking: this.id,
@@ -120,8 +120,8 @@ export class StakingPool {
     return this.solanaContext.memechanProgram.account.stakingPool.fetch(this.id);
   }
 
-  public signerPda(): PublicKey {
-    return StakingPool.findProgramAddressSync(this.id, this.solanaContext.memechanProgram.programId);
+  public findSignerPda(): PublicKey {
+    return StakingPool.findSignerPda(this.id, this.solanaContext.memechanProgram.programId);
   }
 
   private getAccountMeta(pubkey: PublicKey): AccountMeta {
