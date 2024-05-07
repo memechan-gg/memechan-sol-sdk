@@ -11,7 +11,7 @@ import {
 import { memechan, payer, amm, provider } from "./helpers";
 import { AmmPool } from "./pool";
 import { Address, BN } from "@project-serum/anchor";
-import { MemeTicket } from "./ticket";
+import { MemeTicket } from "../../src/memeticket/MemeTicket";
 
 export interface UnstakeArgs {
   ticket: MemeTicket;
