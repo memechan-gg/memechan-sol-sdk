@@ -123,7 +123,7 @@ export class BondingPool {
       .signers([input.user!, id])
       .rpc();
 
-    return new MemeTicket(id.publicKey);
+    return new MemeTicket(id.publicKey, this.solanaContext);
   }
 
   public async swapX(input: Partial<SwapXArgs>): Promise<void> {

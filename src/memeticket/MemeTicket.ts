@@ -1,20 +1,20 @@
 import { PublicKey } from "@solana/web3.js";
-import { memechan } from "../../test/reference/helpers";
 import { BondingMerge, CloseArgs, StakingMerge } from "./types";
+import { SolanaContext } from "../common/types";
 
 export class MemeTicket {
-  public constructor(public id: PublicKey) {
+  public constructor(public id: PublicKey, public solanaContext: SolanaContext) {
     //
   }
 
   public async fetch() {
-    return memechan.account.memeTicket.fetch(this.id);
+    return this.solanaContext.memechanProgram.account.memeTicket.fetch(this.id);
   }
 
   public async bound_merge(input: BondingMerge): Promise<MemeTicket> {
     const user = input.user;
 
-    await memechan.methods
+    await this.solanaContext.memechanProgram.methods
       .boundMergeTickets()
       .accounts({
         owner: user.publicKey,
@@ -31,7 +31,7 @@ export class MemeTicket {
   public async staking_merge(input: StakingMerge): Promise<MemeTicket> {
     const user = input.user;
 
-    await memechan.methods
+    await this.solanaContext.memechanProgram.methods
       .stakingMergeTickets()
       .accounts({
         owner: user.publicKey,
@@ -48,7 +48,7 @@ export class MemeTicket {
   public async close(input: CloseArgs): Promise<MemeTicket> {
     const user = input.user;
 
-    await memechan.methods
+    await this.solanaContext.memechanProgram.methods
       .closeTicket()
       .accounts({
         owner: user.publicKey,
