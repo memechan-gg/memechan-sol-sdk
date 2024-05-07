@@ -32,7 +32,7 @@
     "test": "jest",
     "audit": "yarn audit --groups dependencies",
     "format": "prettier --write src/**/*.ts",
-    "lint": "eslint './src/**/*.ts'",
+    "lint": "eslint --ext .ts",
     "build": "yarn lint && tsup",
     "build:watch": "tsc --watch",
     "prettier-format": "prettier --config .prettierrc 'src/**/*.ts' --write"
