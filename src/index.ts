@@ -1,1 +1,1 @@
-import "./MemechanClient";
+export * from "./MemechanClient";
