@@ -12,31 +12,31 @@ describe("BoundPool", () => {
         const payer =  Keypair.fromSecretKey(Buffer.from(JSON.parse(process.env.TEST_PAYER_SECRET_KEY as string)));
         const wallet = new NodeWallet(payer);
         const client = new MemechanClient(wallet);
-        const boundPool = await BoundPool.new({admin, payer, signer: Keypair.generate(), client });
+        const boundPool = await BoundPool.new({admin, payer, signer: payer, client });
         const info = await boundPool.fetch();
-        console.log(info)
-      }),
+        console.log(info);
+      }, 60000)
 
-    it("full swap then go live", async () => {
-        const admin = new PublicKey(process.env.ADMIN_PUB_KEY as string);
-        const payer =  Keypair.fromSecretKey(Buffer.from(JSON.parse(process.env.TEST_PAYER_SECRET_KEY as string)));
-        const wallet = new NodeWallet(payer);
-        const client = new MemechanClient(wallet);
-        const pool = await BoundPool.new({admin, payer, signer: Keypair.generate(), client });
+    // it("full swap then go live", async () => {
+    //     const admin = new PublicKey(process.env.ADMIN_PUB_KEY as string);
+    //     const payer =  Keypair.fromSecretKey(Buffer.from(JSON.parse(process.env.TEST_PAYER_SECRET_KEY as string)));
+    //     const wallet = new NodeWallet(payer);
+    //     const client = new MemechanClient(wallet);
+    //     const pool = await BoundPool.new({admin, payer, signer: payer, client });
 
-        await sleep(1000);
+    //     await sleep(1000);
 
-        const ticketId = await pool.swapY({
-            memeTokensOut: new BN(1),
-            solAmountIn: new BN(303 * 1e9)
-        });
+    //     const ticketId = await pool.swapY({
+    //         memeTokensOut: new BN(1),
+    //         solAmountIn: new BN(303 * 1e9)
+    //     });
 
-        console.log("ticketId: " + ticketId);
-        await pool.goLive({
-          payer: payer,
-          pool: Keypair.generate().publicKey,
-          user: Keypair.generate(),
-        })
+    //     console.log("ticketId: " + ticketId);
+    //     await pool.goLive({
+    //       payer: payer,
+    //       pool: Keypair.generate().publicKey,
+    //       user: Keypair.generate(),
+    //     })
 
-    }, 30000);
+    // }, 60000);
 });

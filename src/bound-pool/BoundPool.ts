@@ -42,17 +42,14 @@ export class BoundPool {
     const { connection, memechanProgram } = client;
 
     const memeMint = await createMint(connection, payer, poolSigner, null, 6);
-
-    console.log("memeMint", memeMint.toBase58());
     const adminSolVault = (await getOrCreateAssociatedTokenAccount(connection, payer, NATIVE_MINT, admin)).address;
-
-    console.log("adminSolVault", adminSolVault.toBase58());
     const poolSolVaultid = Keypair.generate();
     const poolSolVault = await createAccount(connection, payer, NATIVE_MINT, poolSigner, poolSolVaultid);
 
-    console.log("poolSolVault", poolSolVault.toBase58());
     const launchVaultid = Keypair.generate();
     const launchVault = await createAccount(connection, payer, memeMint, poolSigner, launchVaultid);
+
+    console.log(`memeMint: ${memeMint.toBase58()}, adminSolVault: ${adminSolVault.toBase58()}, poolSolVault: ${poolSolVault.toBase58()}, launchVault: ${launchVault.toBase58()}`);
 
     await memechanProgram.methods
       .new()

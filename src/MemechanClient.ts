@@ -13,7 +13,6 @@ export class MemechanClient {
     network: Cluster = process.env.NETWORK as Cluster,
   ) {
     this.wallet = wallet;
-
     const isTest = process.env.NODE_ENV === "test";
 
     this.connection = new Connection(clusterApiUrl(network), {
