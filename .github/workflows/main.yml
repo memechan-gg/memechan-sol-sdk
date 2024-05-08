@@ -37,6 +37,12 @@ jobs:
       - name: Run Tests
         run: |
           yarn test
+        env:
+          TEST_PAYER_SECRET_KEY: "[148,250,52,151,44,110,140,172,224,120,84,76,105,235,77,240,245,57,109,9,30,233,43,5,177,186,65,29,54,10,173,107,193,67,75,222,5,234,71,90,31,230,122,165,64,131,246,137,178,126,27,158,93,39,9,38,156,200,86,195,163,187,189,178]"
+          ADMIN_PUB_KEY: 8vBA2MzaQdt3UWimSkx1J4m2zMgp8A2iwtRKzXVurXP2
+          MEMECHAN_PROGRAM_ID: 3LpdC7WHSrw2d6mWm3Enfvpzy1u5zoHkysyH1WxdmpPB
+          AMM_PROGRAM_ID: 8MGDvwp4baAJ4y7rv3wYVw7g1cWVXehuhVoTes68jGxn
+          RPC_API_CLUSTER: devnet
 
       - name: Run Security Audit
         run: |
