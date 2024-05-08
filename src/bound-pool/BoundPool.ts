@@ -152,7 +152,7 @@ export class BoundPool {
       .rpc();
   }
 
-  public async go_live(input: Partial<GoLiveArgs>): Promise<[AmmPool, StakingPool]> {
+  public async goLive(input: Partial<GoLiveArgs>): Promise<[AmmPool, StakingPool]> {
     const ammId = Keypair.generate();
 
     const pool = input.pool ?? this.id;
