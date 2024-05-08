@@ -105,4 +105,5 @@
         "tests",
         "jest.config.js"
     ],
+    "exclude": ["node_modules", "dist", "test"]
 }
