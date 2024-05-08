@@ -1,7 +1,7 @@
 import { Keypair, PublicKey } from "@solana/web3.js";
 import { MemeTicket } from "./MemeTicket";
 
-export interface BondingMerge {
+export interface BoundMerge {
   pool: PublicKey;
   user: Keypair;
   ticketToMerge: MemeTicket;

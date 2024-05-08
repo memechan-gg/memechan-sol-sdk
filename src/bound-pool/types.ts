@@ -29,7 +29,7 @@ export interface GoLiveArgs {
   poolSignerPda: PublicKey;
 }
 
-export interface BondingPoolArgs {
+export interface BoundPoolArgs {
   admin: PublicKey;
   payer: Signer;
   signer: Keypair;

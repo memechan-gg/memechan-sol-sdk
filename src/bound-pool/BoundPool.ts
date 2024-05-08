@@ -10,7 +10,7 @@ import {
 } from "@solana/spl-token";
 import { PublicKey, Keypair, Signer, SystemProgram } from "@solana/web3.js";
 
-import { BondingPoolArgs, GoLiveArgs, SwapXArgs, SwapYArgs } from "./types";
+import { BoundPoolArgs, GoLiveArgs, SwapXArgs, SwapYArgs } from "./types";
 import { BN, Program, Provider } from "@coral-xyz/anchor";
 import { MemechanSol } from "../common/types/memechan_sol";
 import { MemeTicket } from "../memeticket/MemeTicket";
@@ -20,7 +20,7 @@ import { SolanaContext } from "../common/types";
 import { sleep } from "../common/helpers";
 import { createProgramToll, findProgramTollAddress } from "../amm-pool/ammHelpers";
 
-export class BondingPool {
+export class BoundPool {
   private constructor(
     public id: PublicKey,
     public admin: Keypair,
@@ -34,10 +34,10 @@ export class BondingPool {
     return PublicKey.findProgramAddressSync([Buffer.from("signer"), publicKey.toBytes()], memechanProgram.programId)[0];
   }
 
-  public static async new(args: BondingPoolArgs): Promise<BondingPool> {
+  public static async new(args: BoundPoolArgs): Promise<BoundPool> {
     const id = Keypair.generate();
 
-    const poolSigner = BondingPool.findSignerPda(id.publicKey, args.solanaContext.memechanProgram);
+    const poolSigner = BoundPool.findSignerPda(id.publicKey, args.solanaContext.memechanProgram);
 
     const { admin, payer, signer, solanaContext } = args;
     const { connection, memechanProgram } = solanaContext;
@@ -69,7 +69,7 @@ export class BondingPool {
       .signers([signer, id])
       .rpc();
 
-    return new BondingPool(id.publicKey, signer, poolSolVault, solanaContext);
+    return new BoundPool(id.publicKey, signer, poolSolVault, solanaContext);
   }
 
   public async fetch() {
@@ -77,7 +77,7 @@ export class BondingPool {
   }
 
   public findSignerPda(): PublicKey {
-    return BondingPool.findSignerPda(this.id, this.solanaContext.memechanProgram);
+    return BoundPool.findSignerPda(this.id, this.solanaContext.memechanProgram);
   }
 
   public static async airdropLiquidityTokens(
