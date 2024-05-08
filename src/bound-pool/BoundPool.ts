@@ -93,15 +93,19 @@ export class BoundPool {
   public async swapY(input: Partial<SwapYArgs>): Promise<MemeTicket> {
     const id = Keypair.generate();
     const user = input.user!;
+    const payer = input.payer!;
 
     const pool = input.pool ?? this.id;
     const poolSignerPda = BoundPool.findSignerPda(pool, this.client.memechanProgram.programId);
-    const sol_in = input.solAmountIn ?? 1 * 1e9;
-    const meme_out = input.memeTokensOut ?? 1;
+    const sol_in = input.solAmountIn;
+    const meme_out = input.memeTokensOut;
 
-    const userSolAcc =
-      input.userSolAcc ?? (await createWrappedNativeAccount(this.client.connection, user, user.publicKey, 500 * 10e9));
+    console.log("1");
+    const userSolAcc = input.userSolAcc ?? (await getOrCreateAssociatedTokenAccount(this.client.connection, payer, NATIVE_MINT, user.publicKey)).address;
+    //const userSolAcc = input.userSolAcc ?? (await createWrappedNativeAccount(this.client.connection, payer, user.publicKey, input.solAmountIn));
+    //const userSolAcc = input.userSolAcc ?? (await getOrCreateAssociatedTokenAccount(this.client.connection, input.payer!, NATIVE_MINT, user.publicKey)).address;
 
+    console.log("2 userSolAcc:" + userSolAcc.toBase58());
     await this.client.memechanProgram.methods
       .swapY(new BN(sol_in), new BN(meme_out))
       .accounts({
@@ -115,7 +119,11 @@ export class BoundPool {
         tokenProgram: TOKEN_PROGRAM_ID,
       })
       .signers([user, id])
-      .rpc();
+      .rpc()
+      .catch(e => console.error(e));
+
+    console.log("3");
+
 
     return new MemeTicket(id.publicKey, this.client);
   }
@@ -125,8 +133,8 @@ export class BoundPool {
 
     const pool = input.pool ?? this.id;
     const poolSigner = input.poolSignerPda ?? this.findSignerPda();
-    const meme_in = input.memeAmountIn ?? 9e6 * 1e6;
-    const sol_out = input.solTokensOut ?? 1;
+    const meme_in = input.memeAmountIn;
+    const sol_out = input.solTokensOut;
 
     const memeTicket = input.userMemeTicket;
     const userSolAcc = input.userSolAcc;

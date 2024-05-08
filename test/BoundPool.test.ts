@@ -30,9 +30,10 @@ describe("BoundPool", () => {
         await sleep(1000);
 
         const ticketId = await pool.swapY({
+            payer: payer,
             memeTokensOut: new BN(1),
-            solAmountIn: new BN(303 * 1e9),
-            user: user,
+            solAmountIn: new BN(1),
+            user: user
         });
 
         console.log("ticketId: " + ticketId);

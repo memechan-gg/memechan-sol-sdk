@@ -20,7 +20,7 @@ export class MemechanClient {
       commitment: "confirmed",
     });
 
-    const provider = new AnchorProvider(this.connection, wallet, { commitment: "processed" });
+    const provider = new AnchorProvider(this.connection, wallet, { commitment: "confirmed" });
     setProvider(provider);
 
     this.ammProgram = new Program<Amm>(AmmIDL, new PublicKey(process.env.AMM_PROGRAM_ID!), provider);

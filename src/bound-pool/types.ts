@@ -4,6 +4,7 @@ import { MemeTicket } from "../memeticket/MemeTicket";
 import { MemechanClient } from "../MemechanClient";
 
 export interface SwapYArgs {
+  payer: Signer;
   user: Keypair;
   pool: PublicKey;
   userSolAcc: PublicKey;
