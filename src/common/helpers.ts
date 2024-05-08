@@ -4,6 +4,8 @@
 // import { NATIVE_MINT, createWrappedNativeAccount } from "@solana/spl-token";
 // import { Amm } from "./types/amm";
 
+import { Connection, PublicKey } from "@solana/web3.js";
+
 // export const memechan = workspace.MemechanSol as Program<MemechanSol>;
 // export const amm = workspace.Amm as Program<Amm>;
 
@@ -26,12 +28,12 @@
 //   throw new Error("Expected promise to fail");
 // }
 
-// export async function airdrop(connection: Connection, to: PublicKey, amount: number = 100_000_000_000) {
-//   await connection.confirmTransaction(
-//     await connection.requestAirdrop(to, amount),
-//     "confirmed"
-//   );
-// }
+export async function airdrop(connection: Connection, to: PublicKey, amount: number = 100_000_000_000) {
+  await connection.confirmTransaction(
+    await connection.requestAirdrop(to, amount),
+    "confirmed"
+  );
+}
 
 export async function sleep(ms: number) {
   await new Promise((r) => setTimeout(r, ms));
