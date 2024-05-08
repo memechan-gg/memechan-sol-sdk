@@ -49,7 +49,9 @@ export class BoundPool {
     const launchVaultid = Keypair.generate();
     const launchVault = await createAccount(connection, payer, memeMint, poolSigner, launchVaultid);
 
-    console.log(`memeMint: ${memeMint.toBase58()}, adminSolVault: ${adminSolVault.toBase58()}, poolSolVault: ${poolSolVault.toBase58()}, launchVault: ${launchVault.toBase58()}`);
+    console.log(
+      `memeMint: ${memeMint.toBase58()}, adminSolVault: ${adminSolVault.toBase58()}, poolSolVault: ${poolSolVault.toBase58()}, launchVault: ${launchVault.toBase58()}`,
+    );
 
     await memechanProgram.methods
       .new()
@@ -101,7 +103,9 @@ export class BoundPool {
     const meme_out = input.memeTokensOut;
 
     console.log("1");
-    const userSolAcc = input.userSolAcc ?? (await getOrCreateAssociatedTokenAccount(this.client.connection, payer, NATIVE_MINT, user.publicKey)).address;
+    const userSolAcc =
+      input.userSolAcc ??
+      (await getOrCreateAssociatedTokenAccount(this.client.connection, payer, NATIVE_MINT, user.publicKey)).address;
     //const userSolAcc = input.userSolAcc ?? (await createWrappedNativeAccount(this.client.connection, payer, user.publicKey, input.solAmountIn));
     //const userSolAcc = input.userSolAcc ?? (await getOrCreateAssociatedTokenAccount(this.client.connection, input.payer!, NATIVE_MINT, user.publicKey)).address;
 
@@ -120,10 +124,9 @@ export class BoundPool {
       })
       .signers([user, id])
       .rpc()
-      .catch(e => console.error(e));
+      .catch((e) => console.error(e));
 
     console.log("3");
-
 
     return new MemeTicket(id.publicKey, this.client);
   }
