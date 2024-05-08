@@ -2,12 +2,12 @@ import { NATIVE_MINT, TOKEN_PROGRAM_ID, createAccount } from "@solana/spl-token"
 import { PublicKey, Keypair, AccountMeta } from "@solana/web3.js";
 import { AmmPool } from "../amm-pool/AmmPool";
 import { UnstakeArgs, WithdrawFeesArgs } from "./types";
-import { SolanaContext } from "../common/types";
+import { MemechanClient } from "../MemechanClient";
 
 export class StakingPool {
   constructor(
     public id: PublicKey,
-    private solanaContext: SolanaContext,
+    private client: MemechanClient,
   ) {}
 
   public static findSignerPda(publicKey: PublicKey, memechanProgramId: PublicKey): PublicKey {
@@ -18,14 +18,14 @@ export class StakingPool {
     const stakingInfo = await this.fetchStakingPool();
     const ammInfo = await ammPool.fetch();
 
-    await this.solanaContext.memechanProgram.methods
+    await this.client.memechanProgram.methods
       .addFees()
       .accounts({
         memeVault: stakingInfo.memeVault,
         wsolVault: stakingInfo.wsolVault,
         staking: this.id,
         aldrinPoolAcc: ammPool.id,
-        aldrinAmmProgram: this.solanaContext.ammProgram.programId,
+        aldrinAmmProgram: this.client.ammProgram.programId,
         aldrinLpMint: ammInfo.mint,
         aldrinPoolLpWallet: ammInfo.programTollWallet,
         aldrinPoolSigner: ammPool.findSignerPda(),
@@ -44,7 +44,7 @@ export class StakingPool {
     const stakingInfo = await this.fetchStakingPool();
 
     const memeAcc = await createAccount(
-      this.solanaContext.connection,
+      this.client.connection,
       args.user,
       stakingInfo.memeMint,
       args.user.publicKey,
@@ -52,14 +52,14 @@ export class StakingPool {
     );
 
     const wsolAcc = await createAccount(
-      this.solanaContext.connection,
+      this.client.connection,
       args.user,
       NATIVE_MINT,
       args.user.publicKey,
       Keypair.generate(),
     );
 
-    await this.solanaContext.memechanProgram.methods
+    await this.client.memechanProgram.methods
       .unstake(args.amount)
       .accounts({
         memeTicket: args.ticket.id,
@@ -82,7 +82,7 @@ export class StakingPool {
     const stakingInfo = await this.fetchStakingPool();
 
     const memeAcc = await createAccount(
-      this.solanaContext.connection,
+      this.client.connection,
       args.user,
       stakingInfo.memeMint,
       args.user.publicKey,
@@ -90,14 +90,14 @@ export class StakingPool {
     );
 
     const wsolAcc = await createAccount(
-      this.solanaContext.connection,
+      this.client.connection,
       args.user,
       NATIVE_MINT,
       args.user.publicKey,
       Keypair.generate(),
     );
 
-    await this.solanaContext.memechanProgram.methods
+    await this.client.memechanProgram.methods
       .withdrawFees()
       .accounts({
         memeTicket: args.ticket.id,
@@ -117,11 +117,11 @@ export class StakingPool {
   }
 
   private async fetchStakingPool() {
-    return this.solanaContext.memechanProgram.account.stakingPool.fetch(this.id);
+    return this.client.memechanProgram.account.stakingPool.fetch(this.id);
   }
 
   public findSignerPda(): PublicKey {
-    return StakingPool.findSignerPda(this.id, this.solanaContext.memechanProgram.programId);
+    return StakingPool.findSignerPda(this.id, this.client.memechanProgram.programId);
   }
 
   private getAccountMeta(pubkey: PublicKey): AccountMeta {

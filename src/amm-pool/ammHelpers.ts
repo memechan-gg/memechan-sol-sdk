@@ -1,5 +1,5 @@
 import { PublicKey, Signer } from "@solana/web3.js";
-import { SolanaContext } from "../common/types";
+import { MemechanClient } from "../MemechanClient";
 
 /**
  * This is a call to the dev version of this endpoint. Due to the way the anchor
@@ -7,10 +7,10 @@ import { SolanaContext } from "../common/types";
  * sign the program deploy), the programs on localnet don't have the same
  * structure in terms of having a data account as with normal deployment.
  */
-export async function createProgramToll(programTollAuthority: PublicKey, payer: Signer, solanaContext: SolanaContext) {
-  const programToll = findProgramTollAddress(programTollAuthority, solanaContext.ammProgram.programId);
+export async function createProgramToll(programTollAuthority: PublicKey, payer: Signer, client: MemechanClient) {
+  const programToll = findProgramTollAddress(programTollAuthority, client.ammProgram.programId);
 
-  await solanaContext.ammProgram.methods
+  await client.ammProgram.methods
     .createProgramToll()
     .accounts({
       signer: payer.publicKey,

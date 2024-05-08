@@ -1,13 +1,13 @@
 import { PublicKey, Keypair } from "@solana/web3.js";
 import { getAccount } from "@solana/spl-token";
 import { BN } from "@coral-xyz/anchor";
-import { SolanaContext } from "../common/types";
+import { MemechanClient } from "../MemechanClient";
 
 export class AmmPool {
   public constructor(
     public id: PublicKey,
     public tollAuthority: PublicKey,
-    public solanaContext: SolanaContext,
+    public client: MemechanClient,
   ) {
     //
   }
@@ -17,19 +17,19 @@ export class AmmPool {
   }
 
   public async fetch() {
-    return this.solanaContext.ammProgram.account.pool.fetch(this.id);
+    return this.client.ammProgram.account.pool.fetch(this.id);
   }
 
   public async swap(user: Keypair, sellWallet: PublicKey, buyWallet: PublicKey, sell: number, minBuy: number) {
     const pool = await this.fetch();
     const getVaultOfWallet = async (wallet: PublicKey) => {
-      const { mint } = await getAccount(this.solanaContext.connection, wallet);
+      const { mint } = await getAccount(this.client.connection, wallet);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const reserves = pool.reserves as any[];
       return reserves.find((r) => r.mint.toBase58() === mint.toBase58()).vault;
     };
 
-    await this.solanaContext.ammProgram.methods
+    await this.client.ammProgram.methods
       .swap({ amount: new BN(sell) }, { amount: new BN(minBuy) })
       .accounts({
         user: user.publicKey,
@@ -48,13 +48,13 @@ export class AmmPool {
   }
 
   public findSignerPda(): PublicKey {
-    return AmmPool.findSignerPda(this.id, this.solanaContext.ammProgram.programId);
+    return AmmPool.findSignerPda(this.id, this.client.ammProgram.programId);
   }
 
   public discountAddress(user: PublicKey): PublicKey {
     const [discountSettings] = PublicKey.findProgramAddressSync(
       [Buffer.from("discount"), user.toBuffer()],
-      this.solanaContext.ammProgram.programId,
+      this.client.ammProgram.programId,
     );
     return discountSettings;
   }
