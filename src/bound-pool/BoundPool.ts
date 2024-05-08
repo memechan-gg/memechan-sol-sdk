@@ -13,10 +13,8 @@ import { PublicKey, Keypair, Signer, SystemProgram } from "@solana/web3.js";
 import { BoundPoolArgs, GoLiveArgs, SwapXArgs, SwapYArgs } from "./types";
 import { BN, Provider } from "@coral-xyz/anchor";
 import { MemeTicket } from "../memeticket/MemeTicket";
-import { AmmPool } from "../amm-pool/AmmPool";
 import { StakingPool } from "../staking-pool/StakingPool";
 import { sleep } from "../common/helpers";
-import { createProgramToll, findProgramTollAddress } from "../amm-pool/ammHelpers";
 import { MemechanClient } from "../MemechanClient";
 
 export class BoundPool {
@@ -162,7 +160,6 @@ export class BoundPool {
 
     const pool = input.pool ?? this.id;
     const poolSigner = BoundPool.findSignerPda(pool, this.client.memechanProgram.programId);
-    const ammPoolSigner = AmmPool.findSignerPda(ammId.publicKey, this.client.ammProgram.programId);
 
     const adminTicketId = Keypair.generate();
 
@@ -173,31 +170,31 @@ export class BoundPool {
 
     const user = input.user!;
     const payer = input.payer!;
-    const lpMint = await createMint(this.client.connection, user, ammPoolSigner, null, 9);
+    //const lpMint = await createMint(this.client.connection, user, ammPoolSigner, null, 9);
 
-    console.log("lpMint", lpMint.toBase58());
+    //console.log("lpMint", lpMint.toBase58());
 
-    const lpTokenWalletId = Keypair.generate();
-    const lpTokenWallet = await createAccount(this.client.connection, user, lpMint, poolSigner, lpTokenWalletId);
+    //const lpTokenWalletId = Keypair.generate();
+    //const lpTokenWallet = await createAccount(this.client.connection, user, lpMint, poolSigner, lpTokenWalletId);
 
-    let tollAuthority = stakingSigner;
+    //let tollAuthority = stakingSigner;
 
-    const toll = findProgramTollAddress(tollAuthority, this.client.ammProgram.programId);
-    try {
-      const info = await this.client.ammProgram.account.programToll.fetch(toll);
-      tollAuthority = info.authority;
-    } catch {
-      await createProgramToll(tollAuthority, payer, this.client);
-    }
+    // const toll = findProgramTollAddress(tollAuthority, this.client.ammProgram.programId);
+    // try {
+    //   const info = await this.client.ammProgram.account.programToll.fetch(toll);
+    //   tollAuthority = info.authority;
+    // } catch {
+    //   await createProgramToll(tollAuthority, payer, this.client);
+    // }
 
-    const aldrinProgramTollWalletId = Keypair.generate();
-    const aldrinProgramTollWallet = await createAccount(
-      this.client.connection,
-      payer,
-      lpMint,
-      tollAuthority,
-      aldrinProgramTollWalletId,
-    );
+    // const aldrinProgramTollWalletId = Keypair.generate();
+    // const aldrinProgramTollWallet = await createAccount(
+    //   this.client.connection,
+    //   payer,
+    //   lpMint,
+    //   tollAuthority,
+    //   aldrinProgramTollWalletId,
+    // );
 
     const stakingMemeVaultId = Keypair.generate();
     await createAccount(this.client.connection, payer, poolInfo.memeMint, stakingSigner, stakingMemeVaultId);
@@ -236,6 +233,7 @@ export class BoundPool {
         poolWsolVault: poolInfo.solReserve.vault,
         staking: stakingId.publicKey,
         stakingPoolSignerPda: stakingSigner,
+        
         aldrinLpMint: lpMint,
         aldrinPoolAcc: ammId.publicKey,
         aldrinPoolSigner: ammPoolSigner,
@@ -250,7 +248,7 @@ export class BoundPool {
       .rpc();
 
     return [
-      new AmmPool(ammId.publicKey, tollAuthority, this.client),
+      //new AmmPool(ammId.publicKey, tollAuthority, this.client),
       new StakingPool(stakingId.publicKey, this.client),
     ];
   }

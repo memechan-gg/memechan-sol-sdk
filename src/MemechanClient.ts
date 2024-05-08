@@ -1,11 +1,9 @@
 import { AnchorProvider, Program, Wallet, setProvider } from "@coral-xyz/anchor";
-import { Amm, IDL as AmmIDL } from "./common/types/amm";
-import { MemechanSol, IDL as MemechanSolIDL } from "./common/types/memechan_sol";
 import { Cluster, Connection, PublicKey, clusterApiUrl } from "@solana/web3.js";
+import { MemechanSol, IDL as MemechanSolIDL } from "./schema/types/memechan_sol";
 
 export class MemechanClient {
   public connection: Connection;
-  public ammProgram: Program<Amm>;
   public memechanProgram: Program<MemechanSol>;
 
   constructor(
@@ -23,7 +21,6 @@ export class MemechanClient {
     const provider = new AnchorProvider(this.connection, wallet, { commitment: "confirmed" });
     setProvider(provider);
 
-    this.ammProgram = new Program<Amm>(AmmIDL, new PublicKey(process.env.AMM_PROGRAM_ID!), provider);
     this.memechanProgram = new Program<MemechanSol>(
       MemechanSolIDL,
       new PublicKey(process.env.MEMECHAN_PROGRAM_ID!),
