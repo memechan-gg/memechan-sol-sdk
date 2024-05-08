@@ -155,7 +155,7 @@ export class BoundPool {
       .rpc();
   }
 
-  public async goLive(input: Partial<GoLiveArgs>): Promise<[AmmPool, StakingPool]> {
+  public async goLive(input: Partial<GoLiveArgs>): Promise<[ StakingPool]> {
     const ammId = Keypair.generate();
 
     const pool = input.pool ?? this.id;
@@ -166,7 +166,7 @@ export class BoundPool {
     const stakingId = Keypair.generate();
     const stakingSigner = StakingPool.findSignerPda(stakingId.publicKey, this.client.memechanProgram.programId);
 
-    const poolInfo = await this.client.memechanProgram.account.boundPool.fetch(pool);
+    const boundPoolInfo = await this.client.memechanProgram.account.boundPool.fetch(pool);
 
     const user = input.user!;
     const payer = input.payer!;
@@ -197,7 +197,7 @@ export class BoundPool {
     // );
 
     const stakingMemeVaultId = Keypair.generate();
-    await createAccount(this.client.connection, payer, poolInfo.memeMint, stakingSigner, stakingMemeVaultId);
+    await createAccount(this.client.connection, payer, boundPoolInfo.memeMint, stakingSigner, stakingMemeVaultId);
 
     const nkey = Keypair.generate();
     const userSolAcc = await createWrappedNativeAccount(this.client.connection, payer, user.publicKey, 1e9, nkey);
@@ -207,9 +207,9 @@ export class BoundPool {
     await sleep(1000);
 
     const vaults = await Promise.all(
-      [poolInfo.memeMint, poolInfo.solReserve.mint].map(async (mint) => {
+      [boundPoolInfo.memeMint, boundPoolInfo.solReserve.mint].map(async (mint) => {
         const kp = Keypair.generate();
-        await createAccount(this.client.connection, payer, mint, ammPoolSigner, kp);
+        //await createAccount(this.client.connection, payer, mint, ammPoolSigner, kp);
         return {
           isSigner: false,
           isWritable: true,
@@ -218,34 +218,34 @@ export class BoundPool {
       }),
     );
 
-    await this.client.memechanProgram.methods
-      .goLive()
-      .accounts({
-        pool: pool,
-        signer: user.publicKey,
-        adminVaultSol: poolInfo.adminVaultSol,
-        boundPoolSignerPda: poolSigner,
-        lpTokenWallet,
-        launchTokenVault: poolInfo.launchTokenVault,
-        memeMint: poolInfo.memeMint,
-        memeTicket: adminTicketId.publicKey,
-        solMint: NATIVE_MINT,
-        poolWsolVault: poolInfo.solReserve.vault,
-        staking: stakingId.publicKey,
-        stakingPoolSignerPda: stakingSigner,
+    // await this.client.memechanProgram.methods
+    //   .goLive()
+    //   .accounts({
+    //     pool: pool,
+    //     signer: user.publicKey,
+    //     adminVaultSol: boundPoolInfo.adminVaultSol,
+    //     boundPoolSignerPda: poolSigner,
+    //     lpTokenWallet,
+    //     launchTokenVault: boundPoolInfo.launchTokenVault,
+    //     memeMint: boundPoolInfo.memeMint,
+    //     memeTicket: adminTicketId.publicKey,
+    //     solMint: NATIVE_MINT,
+    //     poolWsolVault: boundPoolInfo.solReserve.vault,
+    //     staking: stakingId.publicKey,
+    //     stakingPoolSignerPda: stakingSigner,
         
-        aldrinLpMint: lpMint,
-        aldrinPoolAcc: ammId.publicKey,
-        aldrinPoolSigner: ammPoolSigner,
-        aldrinProgramToll: toll,
-        aldrinProgramTollWallet,
-        aldrinAmmProgram: this.client.ammProgram.programId,
-        systemProgram: SystemProgram.programId,
-        tokenProgram: TOKEN_PROGRAM_ID,
-      })
-      .remainingAccounts(vaults)
-      .signers([user, ammId, adminTicketId, stakingId])
-      .rpc();
+    //     aldrinLpMint: lpMint,
+    //     aldrinPoolAcc: ammId.publicKey,
+    //     aldrinPoolSigner: ammPoolSigner,
+    //     aldrinProgramToll: toll,
+    //     aldrinProgramTollWallet,
+    //     aldrinAmmProgram: this.client.ammProgram.programId,
+    //     systemProgram: SystemProgram.programId,
+    //     tokenProgram: TOKEN_PROGRAM_ID,
+    //   })
+    //   .remainingAccounts(vaults)
+    //   .signers([user, ammId, adminTicketId, stakingId])
+    //   .rpc();
 
     return [
       //new AmmPool(ammId.publicKey, tollAuthority, this.client),

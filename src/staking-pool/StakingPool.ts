@@ -1,6 +1,5 @@
 import { NATIVE_MINT, TOKEN_PROGRAM_ID, createAccount } from "@solana/spl-token";
 import { PublicKey, Keypair, AccountMeta } from "@solana/web3.js";
-import { AmmPool } from "../amm-pool/AmmPool";
 import { UnstakeArgs, WithdrawFeesArgs } from "./types";
 import { MemechanClient } from "../MemechanClient";
 
@@ -14,9 +13,9 @@ export class StakingPool {
     return PublicKey.findProgramAddressSync([Buffer.from("staking"), publicKey.toBytes()], memechanProgramId)[0];
   }
 
-  public async addFees(ammPool: AmmPool, payer: Keypair) {
+  public async addFees(ammPool: undefined, payer: Keypair) {
     const stakingInfo = await this.fetchStakingPool();
-    const ammInfo = await ammPool.fetch();
+    //const ammInfo = await ammPool.fetch();
 
     await this.client.memechanProgram.methods
       .addFees()
@@ -24,17 +23,17 @@ export class StakingPool {
         memeVault: stakingInfo.memeVault,
         wsolVault: stakingInfo.wsolVault,
         staking: this.id,
-        aldrinPoolAcc: ammPool.id,
-        aldrinAmmProgram: this.client.ammProgram.programId,
-        aldrinLpMint: ammInfo.mint,
-        aldrinPoolLpWallet: ammInfo.programTollWallet,
-        aldrinPoolSigner: ammPool.findSignerPda(),
+        // aldrinPoolAcc: ammPool.id,
+        // aldrinAmmProgram: this.client.ammProgram.programId,
+        // aldrinLpMint: ammInfo.mint,
+        // aldrinPoolLpWallet: ammInfo.programTollWallet,
+        // aldrinPoolSigner: ammPool.findSignerPda(),
         stakingSignerPda: this.findSignerPda(),
         tokenProgram: TOKEN_PROGRAM_ID,
       })
       .remainingAccounts([
-        this.getAccountMeta(ammInfo.reserves[0].vault),
-        this.getAccountMeta(ammInfo.reserves[1].vault),
+        //this.getAccountMeta(ammInfo.reserves[0].vault),
+       // this.getAccountMeta(ammInfo.reserves[1].vault),
       ])
       .signers([payer])
       .rpc();
