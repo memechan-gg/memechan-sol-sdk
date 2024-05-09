@@ -54,7 +54,7 @@ type TestTxInputInfo = LiquidityPairTargetInfo &
     connection: Connection
   }
 
-async function ammCreatePool(input: TestTxInputInfo): Promise<{ txids: string[] }> {
+export async function ammCreatePool(input: TestTxInputInfo): Promise<{ txids: string[] }> {
   // -------- step 1: make instructions --------
   const initPoolInstructionResponse = await Liquidity.makeCreatePoolV4InstructionV2Simple({
     connecction: input.connection,

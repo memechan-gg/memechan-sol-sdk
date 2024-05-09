@@ -3,6 +3,7 @@ import {
   DEVNET_PROGRAM_ID,
   RAYDIUM_DEVNET,
   TxVersion,
+  //LOOKUP_TABLE_CACHE
 } from '@raydium-io/raydium-sdk';
 
 export const PROGRAMIDS = DEVNET_PROGRAM_ID;

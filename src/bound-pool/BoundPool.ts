@@ -9,6 +9,11 @@ import {
   TOKEN_PROGRAM_ID,
 } from "@solana/spl-token";
 import { PublicKey, Keypair, Signer, SystemProgram } from "@solana/web3.js";
+import {
+  MarketV2,
+  Token,
+  DEVNET_PROGRAM_ID,
+} from '@raydium-io/raydium-sdk';
 
 import { BoundPoolArgs, GoLiveArgs, SwapXArgs, SwapYArgs } from "./types";
 import { BN, Provider } from "@coral-xyz/anchor";
@@ -16,6 +21,9 @@ import { MemeTicket } from "../memeticket/MemeTicket";
 import { StakingPool } from "../staking-pool/StakingPool";
 import { sleep } from "../common/helpers";
 import { MemechanClient } from "../MemechanClient";
+import { getWalletTokenAccount } from "../utils/util";
+import { ammCreatePool }  from "../raydium/ammCreatePool";
+import { createMarket, createMarketTest } from "../raydium/openBookCreateMarket";
 
 export class BoundPool {
   private constructor(
@@ -156,19 +164,29 @@ export class BoundPool {
   }
 
   public async goLive(input: Partial<GoLiveArgs>): Promise<[ StakingPool]> {
-
+    const user = input.user!;
     const pool = input.pool ?? this.id;
     const boundPoolInfo = await this.client.memechanProgram.account.boundPool.fetch(pool);
 
-    console.log("boundPoolInfo", boundPoolInfo);
+    const baseTokenInfo = { mint: boundPoolInfo.memeMint, decimals: 6 };
+    const quoteTokenInfo = { mint: NATIVE_MINT , decimals: 6 };
 
-    const baseToken = NATIVE_MINT;
-    const quoteToken = boundPoolInfo.memeMint;
+    await createMarketTest({
+      baseToken: baseTokenInfo,
+      quoteToken: quoteTokenInfo,
+      wallet: user,
+      connection: this.client.connection,
+    }).then(({ txids, marketId }) => {
+      /** continue with txids */
+      console.log('marketid', marketId)
+      console.log('txids', txids)
+    });
+
     const targetMarketId = Keypair.generate().publicKey
     const addBaseAmount = boundPoolInfo.memeAmt; //new BN(10000) // 10000 / 10 ** 6,
-  // const addQuoteAmount = new BN(10000) // 10000 / 10 ** 6,
-  // const startTime = Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 7 // start from 7 days later
-  // const walletTokenAccounts = await getWalletTokenAccount(connection, wallet.publicKey)
+    const addQuoteAmount = new BN(10000) // 10000 / 10 ** 6,
+    const startTime = Date.now() / 1000;
+    const walletTokenAccounts = await getWalletTokenAccount(this.client.connection, user.publicKey);
 
   // /* do something with start price if needed */
   // const startPrice = calcMarketStartPrice({ addBaseAmount, addQuoteAmount })
@@ -180,19 +198,20 @@ export class BoundPool {
   //   targetMarketId,
   // })
 
-  // ammCreatePool({
-  //   startTime,
-  //   addBaseAmount,
-  //   addQuoteAmount,
-  //   baseToken,
-  //   quoteToken,
-  //   targetMarketId,
-  //   wallet,
-  //   walletTokenAccounts,
-  // }).then(({ txids }) => {
-  //   /** continue with txids */
-  //   console.log('txids', txids)
-  // })
+    ammCreatePool({
+      startTime,
+      addBaseAmount,
+      addQuoteAmount,
+      baseToken: baseTokenInfo,
+      quoteToken: quoteTokenInfo,
+      targetMarketId,
+      wallet: user,
+      walletTokenAccounts,
+      connection: this.client.connection,
+    }).then(({ txids }) => {
+      /** continue with txids */
+      console.log('txids', txids)
+    })
 
 
     // const ammId = Keypair.generate();
@@ -211,8 +230,6 @@ export class BoundPool {
     const stakingId = Keypair.generate();
     const stakingSigner = StakingPool.findSignerPda(stakingId.publicKey, this.client.memechanProgram.programId);
 
-
-    const user = input.user!;
     const payer = input.payer!;
     //const lpMint = await createMint(this.client.connection, user, ammPoolSigner, null, 9);
 
@@ -297,3 +314,4 @@ export class BoundPool {
     ];
   }
 }
+
