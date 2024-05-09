@@ -19,14 +19,13 @@ type TestTxInputInfo = {
 export async function createMarketTest(input: TestTxInputInfo) {
   // -------- step 1: make instructions --------
 
-  const USDC = new Token(TOKEN_PROGRAM_ID, new PublicKey('EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'), 6, 'USDC', 'USDC');
-  const RAY = new Token(TOKEN_PROGRAM_ID, new PublicKey('4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R'), 6, 'RAY', 'RAY');
+  const MEME = new Token(TOKEN_PROGRAM_ID, new PublicKey('4Hb2rTk5aW5edBa64Ycgo7RG6Xsc3rcgijmiJaRcJZzX'), 6, 'MEME', 'MEME');
 
   const createMarketInstruments = await MarketV2.makeCreateMarketInstructionSimple({
     connection: input.connection,
     wallet: input.wallet.publicKey,
-    baseInfo: RAY,
-    quoteInfo: USDC,
+    baseInfo: MEME,
+    quoteInfo: Token.WSOL,
     lotSize: 1, // default 1
     tickSize: 0.000001, // default 0.01
     dexProgramId: DEVNET_PROGRAM_ID.OPENBOOK_MARKET,
