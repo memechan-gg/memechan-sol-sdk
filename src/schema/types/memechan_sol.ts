@@ -677,6 +677,86 @@ export type MemechanSol = {
       }
     },
     {
+      "name": "memeTicket",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "owner",
+            "type": "publicKey"
+          },
+          {
+            "name": "pool",
+            "type": "publicKey"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "withdrawsMeme",
+            "type": "u64"
+          },
+          {
+            "name": "withdrawsWsol",
+            "type": "u64"
+          },
+          {
+            "name": "untilTimestamp",
+            "type": "i64"
+          },
+          {
+            "name": "vesting",
+            "type": {
+              "defined": "VestingData"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "stakingPool",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "pool",
+            "type": "publicKey"
+          },
+          {
+            "name": "memeVault",
+            "type": "publicKey"
+          },
+          {
+            "name": "memeMint",
+            "type": "publicKey"
+          },
+          {
+            "name": "wsolVault",
+            "type": "publicKey"
+          },
+          {
+            "name": "vestingConfig",
+            "type": {
+              "defined": "VestingConfig"
+            }
+          },
+          {
+            "name": "stakesTotal",
+            "type": "u64"
+          },
+          {
+            "name": "feesXTotal",
+            "type": "u64"
+          },
+          {
+            "name": "feesYTotal",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
       "name": "ammConfig",
       "type": {
         "kind": "struct",
@@ -856,7 +936,7 @@ export type MemechanSol = {
               "All fee information"
             ],
             "type": {
-              "defined": "Fees"
+              "defined": "RaydiumFees"
             }
           },
           {
@@ -978,86 +1058,6 @@ export type MemechanSol = {
           }
         ]
       }
-    },
-    {
-      "name": "memeTicket",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "owner",
-            "type": "publicKey"
-          },
-          {
-            "name": "pool",
-            "type": "publicKey"
-          },
-          {
-            "name": "amount",
-            "type": "u64"
-          },
-          {
-            "name": "withdrawsMeme",
-            "type": "u64"
-          },
-          {
-            "name": "withdrawsWsol",
-            "type": "u64"
-          },
-          {
-            "name": "untilTimestamp",
-            "type": "i64"
-          },
-          {
-            "name": "vesting",
-            "type": {
-              "defined": "VestingData"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "name": "stakingPool",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "pool",
-            "type": "publicKey"
-          },
-          {
-            "name": "memeVault",
-            "type": "publicKey"
-          },
-          {
-            "name": "memeMint",
-            "type": "publicKey"
-          },
-          {
-            "name": "wsolVault",
-            "type": "publicKey"
-          },
-          {
-            "name": "vestingConfig",
-            "type": {
-              "defined": "VestingConfig"
-            }
-          },
-          {
-            "name": "stakesTotal",
-            "type": "u64"
-          },
-          {
-            "name": "feesXTotal",
-            "type": "u64"
-          },
-          {
-            "name": "feesYTotal",
-            "type": "u64"
-          }
-        ]
-      }
     }
   ],
   "types": [
@@ -1110,7 +1110,57 @@ export type MemechanSol = {
       }
     },
     {
-      "name": "Fees",
+      "name": "TokenLimit",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "mint",
+            "type": "publicKey"
+          },
+          {
+            "name": "tokens",
+            "type": {
+              "defined": "TokenAmount"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "TokenAmount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "amount",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Reserve",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "tokens",
+            "type": "u64"
+          },
+          {
+            "name": "mint",
+            "type": "publicKey"
+          },
+          {
+            "name": "vault",
+            "type": "publicKey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "RaydiumFees",
       "type": {
         "kind": "struct",
         "fields": [
@@ -1279,56 +1329,6 @@ export type MemechanSol = {
       }
     },
     {
-      "name": "TokenLimit",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "mint",
-            "type": "publicKey"
-          },
-          {
-            "name": "tokens",
-            "type": {
-              "defined": "TokenAmount"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "name": "TokenAmount",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "amount",
-            "type": "u64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "Reserve",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "tokens",
-            "type": "u64"
-          },
-          {
-            "name": "mint",
-            "type": "publicKey"
-          },
-          {
-            "name": "vault",
-            "type": "publicKey"
-          }
-        ]
-      }
-    },
-    {
       "name": "VestingConfig",
       "type": {
         "kind": "struct",
@@ -1360,130 +1360,6 @@ export type MemechanSol = {
           {
             "name": "notional",
             "type": "u64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "AmmInstruction",
-      "docs": [
-        "Instructions supported by the AmmInfo program."
-      ],
-      "type": {
-        "kind": "enum",
-        "variants": [
-          {
-            "name": "Initialize",
-            "fields": [
-              {
-                "defined": "InitializeInstruction"
-              }
-            ]
-          },
-          {
-            "name": "Initialize2",
-            "fields": [
-              {
-                "defined": "InitializeInstruction2"
-              }
-            ]
-          },
-          {
-            "name": "MonitorStep",
-            "fields": [
-              {
-                "defined": "MonitorStepInstruction"
-              }
-            ]
-          },
-          {
-            "name": "Deposit",
-            "fields": [
-              {
-                "defined": "DepositInstruction"
-              }
-            ]
-          },
-          {
-            "name": "Withdraw",
-            "fields": [
-              {
-                "defined": "WithdrawInstruction"
-              }
-            ]
-          },
-          {
-            "name": "MigrateToOpenBook"
-          },
-          {
-            "name": "SetParams",
-            "fields": [
-              {
-                "defined": "SetParamsInstruction"
-              }
-            ]
-          },
-          {
-            "name": "WithdrawPnl"
-          },
-          {
-            "name": "WithdrawSrm",
-            "fields": [
-              {
-                "defined": "WithdrawSrmInstruction"
-              }
-            ]
-          },
-          {
-            "name": "SwapBaseIn",
-            "fields": [
-              {
-                "defined": "SwapInstructionBaseIn"
-              }
-            ]
-          },
-          {
-            "name": "PreInitialize",
-            "fields": [
-              {
-                "defined": "PreInitializeInstruction"
-              }
-            ]
-          },
-          {
-            "name": "SwapBaseOut",
-            "fields": [
-              {
-                "defined": "SwapInstructionBaseOut"
-              }
-            ]
-          },
-          {
-            "name": "SimulateInfo",
-            "fields": [
-              {
-                "defined": "SimulateInstruction"
-              }
-            ]
-          },
-          {
-            "name": "AdminCancelOrders",
-            "fields": [
-              {
-                "defined": "AdminCancelOrdersInstruction"
-              }
-            ]
-          },
-          {
-            "name": "CreateConfigAccount"
-          },
-          {
-            "name": "UpdateConfigAccount",
-            "fields": [
-              {
-                "defined": "ConfigArgs"
-              }
-            ]
           }
         ]
       }
@@ -2259,6 +2135,86 @@ export const IDL: MemechanSol = {
       }
     },
     {
+      "name": "memeTicket",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "owner",
+            "type": "publicKey"
+          },
+          {
+            "name": "pool",
+            "type": "publicKey"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "withdrawsMeme",
+            "type": "u64"
+          },
+          {
+            "name": "withdrawsWsol",
+            "type": "u64"
+          },
+          {
+            "name": "untilTimestamp",
+            "type": "i64"
+          },
+          {
+            "name": "vesting",
+            "type": {
+              "defined": "VestingData"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "stakingPool",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "pool",
+            "type": "publicKey"
+          },
+          {
+            "name": "memeVault",
+            "type": "publicKey"
+          },
+          {
+            "name": "memeMint",
+            "type": "publicKey"
+          },
+          {
+            "name": "wsolVault",
+            "type": "publicKey"
+          },
+          {
+            "name": "vestingConfig",
+            "type": {
+              "defined": "VestingConfig"
+            }
+          },
+          {
+            "name": "stakesTotal",
+            "type": "u64"
+          },
+          {
+            "name": "feesXTotal",
+            "type": "u64"
+          },
+          {
+            "name": "feesYTotal",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
       "name": "ammConfig",
       "type": {
         "kind": "struct",
@@ -2438,7 +2394,7 @@ export const IDL: MemechanSol = {
               "All fee information"
             ],
             "type": {
-              "defined": "Fees"
+              "defined": "RaydiumFees"
             }
           },
           {
@@ -2560,86 +2516,6 @@ export const IDL: MemechanSol = {
           }
         ]
       }
-    },
-    {
-      "name": "memeTicket",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "owner",
-            "type": "publicKey"
-          },
-          {
-            "name": "pool",
-            "type": "publicKey"
-          },
-          {
-            "name": "amount",
-            "type": "u64"
-          },
-          {
-            "name": "withdrawsMeme",
-            "type": "u64"
-          },
-          {
-            "name": "withdrawsWsol",
-            "type": "u64"
-          },
-          {
-            "name": "untilTimestamp",
-            "type": "i64"
-          },
-          {
-            "name": "vesting",
-            "type": {
-              "defined": "VestingData"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "name": "stakingPool",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "pool",
-            "type": "publicKey"
-          },
-          {
-            "name": "memeVault",
-            "type": "publicKey"
-          },
-          {
-            "name": "memeMint",
-            "type": "publicKey"
-          },
-          {
-            "name": "wsolVault",
-            "type": "publicKey"
-          },
-          {
-            "name": "vestingConfig",
-            "type": {
-              "defined": "VestingConfig"
-            }
-          },
-          {
-            "name": "stakesTotal",
-            "type": "u64"
-          },
-          {
-            "name": "feesXTotal",
-            "type": "u64"
-          },
-          {
-            "name": "feesYTotal",
-            "type": "u64"
-          }
-        ]
-      }
     }
   ],
   "types": [
@@ -2692,7 +2568,57 @@ export const IDL: MemechanSol = {
       }
     },
     {
-      "name": "Fees",
+      "name": "TokenLimit",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "mint",
+            "type": "publicKey"
+          },
+          {
+            "name": "tokens",
+            "type": {
+              "defined": "TokenAmount"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "TokenAmount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "amount",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Reserve",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "tokens",
+            "type": "u64"
+          },
+          {
+            "name": "mint",
+            "type": "publicKey"
+          },
+          {
+            "name": "vault",
+            "type": "publicKey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "RaydiumFees",
       "type": {
         "kind": "struct",
         "fields": [
@@ -2861,56 +2787,6 @@ export const IDL: MemechanSol = {
       }
     },
     {
-      "name": "TokenLimit",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "mint",
-            "type": "publicKey"
-          },
-          {
-            "name": "tokens",
-            "type": {
-              "defined": "TokenAmount"
-            }
-          }
-        ]
-      }
-    },
-    {
-      "name": "TokenAmount",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "amount",
-            "type": "u64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "Reserve",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "tokens",
-            "type": "u64"
-          },
-          {
-            "name": "mint",
-            "type": "publicKey"
-          },
-          {
-            "name": "vault",
-            "type": "publicKey"
-          }
-        ]
-      }
-    },
-    {
       "name": "VestingConfig",
       "type": {
         "kind": "struct",
@@ -2942,130 +2818,6 @@ export const IDL: MemechanSol = {
           {
             "name": "notional",
             "type": "u64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "AmmInstruction",
-      "docs": [
-        "Instructions supported by the AmmInfo program."
-      ],
-      "type": {
-        "kind": "enum",
-        "variants": [
-          {
-            "name": "Initialize",
-            "fields": [
-              {
-                "defined": "InitializeInstruction"
-              }
-            ]
-          },
-          {
-            "name": "Initialize2",
-            "fields": [
-              {
-                "defined": "InitializeInstruction2"
-              }
-            ]
-          },
-          {
-            "name": "MonitorStep",
-            "fields": [
-              {
-                "defined": "MonitorStepInstruction"
-              }
-            ]
-          },
-          {
-            "name": "Deposit",
-            "fields": [
-              {
-                "defined": "DepositInstruction"
-              }
-            ]
-          },
-          {
-            "name": "Withdraw",
-            "fields": [
-              {
-                "defined": "WithdrawInstruction"
-              }
-            ]
-          },
-          {
-            "name": "MigrateToOpenBook"
-          },
-          {
-            "name": "SetParams",
-            "fields": [
-              {
-                "defined": "SetParamsInstruction"
-              }
-            ]
-          },
-          {
-            "name": "WithdrawPnl"
-          },
-          {
-            "name": "WithdrawSrm",
-            "fields": [
-              {
-                "defined": "WithdrawSrmInstruction"
-              }
-            ]
-          },
-          {
-            "name": "SwapBaseIn",
-            "fields": [
-              {
-                "defined": "SwapInstructionBaseIn"
-              }
-            ]
-          },
-          {
-            "name": "PreInitialize",
-            "fields": [
-              {
-                "defined": "PreInitializeInstruction"
-              }
-            ]
-          },
-          {
-            "name": "SwapBaseOut",
-            "fields": [
-              {
-                "defined": "SwapInstructionBaseOut"
-              }
-            ]
-          },
-          {
-            "name": "SimulateInfo",
-            "fields": [
-              {
-                "defined": "SimulateInstruction"
-              }
-            ]
-          },
-          {
-            "name": "AdminCancelOrders",
-            "fields": [
-              {
-                "defined": "AdminCancelOrdersInstruction"
-              }
-            ]
-          },
-          {
-            "name": "CreateConfigAccount"
-          },
-          {
-            "name": "UpdateConfigAccount",
-            "fields": [
-              {
-                "defined": "ConfigArgs"
-              }
-            ]
           }
         ]
       }
