@@ -22,7 +22,7 @@ export async function buildAndSendTx(connection: Connection, payer: Signer, inne
   const willSendTx = await buildSimpleTransaction({
     connection,
     makeTxVersion,
-    payer: payer,
+    payer: payer.publicKey,
     innerTransactions: innerSimpleV0Transaction,
     addLookupTableInfo: addLookupTableInfo,
   })
