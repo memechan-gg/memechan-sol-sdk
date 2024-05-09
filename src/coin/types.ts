@@ -5,20 +5,14 @@ export interface CoinDetails {
   type: string;
   decimals: number;
   symbol: string;
-  objectId: string;
-  treasureCapId: string;
-  objectType: string;
   description: string;
   image: string;
-  metadataObjectId: string;
-  lastReply: number;
   marketcap: number;
-  creator: number;
+  creatorAddress: string;
   status: number;
   socialLinks: string[];
-  txDigest: string;
   creationTime: number;
-  contractAddress: string;
+  coinAddress: string;
 }
 
 export interface QueryCoinsResponse {
