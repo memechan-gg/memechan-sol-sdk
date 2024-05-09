@@ -156,17 +156,61 @@ export class BoundPool {
   }
 
   public async goLive(input: Partial<GoLiveArgs>): Promise<[ StakingPool]> {
-    const ammId = Keypair.generate();
 
     const pool = input.pool ?? this.id;
-    const poolSigner = BoundPool.findSignerPda(pool, this.client.memechanProgram.programId);
+    const boundPoolInfo = await this.client.memechanProgram.account.boundPool.fetch(pool);
 
-    const adminTicketId = Keypair.generate();
+    console.log("boundPoolInfo", boundPoolInfo);
+
+    const baseToken = NATIVE_MINT;
+    const quoteToken = boundPoolInfo.memeMint;
+    const targetMarketId = Keypair.generate().publicKey
+    const addBaseAmount = boundPoolInfo.memeAmt; //new BN(10000) // 10000 / 10 ** 6,
+  // const addQuoteAmount = new BN(10000) // 10000 / 10 ** 6,
+  // const startTime = Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 7 // start from 7 days later
+  // const walletTokenAccounts = await getWalletTokenAccount(connection, wallet.publicKey)
+
+  // /* do something with start price if needed */
+  // const startPrice = calcMarketStartPrice({ addBaseAmount, addQuoteAmount })
+
+  // /* do something with market associated pool keys if needed */
+  // const associatedPoolKeys = getMarketAssociatedPoolKeys({
+  //   baseToken,
+  //   quoteToken,
+  //   targetMarketId,
+  // })
+
+  // ammCreatePool({
+  //   startTime,
+  //   addBaseAmount,
+  //   addQuoteAmount,
+  //   baseToken,
+  //   quoteToken,
+  //   targetMarketId,
+  //   wallet,
+  //   walletTokenAccounts,
+  // }).then(({ txids }) => {
+  //   /** continue with txids */
+  //   console.log('txids', txids)
+  // })
+
+
+    // const ammId = Keypair.generate();
+
+    // 
+    // const poolSigner = BoundPool.findSignerPda(pool, this.client.memechanProgram.programId);
+
+
+
+
+
+    // const adminTicketId = Keypair.generate();
+
+
 
     const stakingId = Keypair.generate();
     const stakingSigner = StakingPool.findSignerPda(stakingId.publicKey, this.client.memechanProgram.programId);
 
-    const boundPoolInfo = await this.client.memechanProgram.account.boundPool.fetch(pool);
 
     const user = input.user!;
     const payer = input.payer!;
@@ -196,27 +240,27 @@ export class BoundPool {
     //   aldrinProgramTollWalletId,
     // );
 
-    const stakingMemeVaultId = Keypair.generate();
-    await createAccount(this.client.connection, payer, boundPoolInfo.memeMint, stakingSigner, stakingMemeVaultId);
+    // const stakingMemeVaultId = Keypair.generate();
+    // await createAccount(this.client.connection, payer, boundPoolInfo.memeMint, stakingSigner, stakingMemeVaultId);
 
-    const nkey = Keypair.generate();
-    const userSolAcc = await createWrappedNativeAccount(this.client.connection, payer, user.publicKey, 1e9, nkey);
+    // const nkey = Keypair.generate();
+    // const userSolAcc = await createWrappedNativeAccount(this.client.connection, payer, user.publicKey, 1e9, nkey);
 
-    await closeAccount(this.client.connection, payer, userSolAcc, stakingSigner, user);
+    // await closeAccount(this.client.connection, payer, userSolAcc, stakingSigner, user);
 
-    await sleep(1000);
+    // await sleep(1000);
 
-    const vaults = await Promise.all(
-      [boundPoolInfo.memeMint, boundPoolInfo.solReserve.mint].map(async (mint) => {
-        const kp = Keypair.generate();
-        //await createAccount(this.client.connection, payer, mint, ammPoolSigner, kp);
-        return {
-          isSigner: false,
-          isWritable: true,
-          pubkey: kp.publicKey,
-        };
-      }),
-    );
+    // const vaults = await Promise.all(
+    //   [boundPoolInfo.memeMint, boundPoolInfo.solReserve.mint].map(async (mint) => {
+    //     const kp = Keypair.generate();
+    //     //await createAccount(this.client.connection, payer, mint, ammPoolSigner, kp);
+    //     return {
+    //       isSigner: false,
+    //       isWritable: true,
+    //       pubkey: kp.publicKey,
+    //     };
+    //   }),
+    // );
 
     // await this.client.memechanProgram.methods
     //   .goLive()
