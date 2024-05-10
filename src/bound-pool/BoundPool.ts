@@ -13,9 +13,6 @@ import {
   SystemProgram,
   SYSVAR_CLOCK_PUBKEY,
   SYSVAR_RENT_PUBKEY,
-  Connection,
-  clusterApiUrl,
-  Cluster,
 } from "@solana/web3.js";
 import { Token } from "@raydium-io/raydium-sdk";
 
@@ -23,7 +20,6 @@ import { BoundPoolArgs, GoLiveArgs, SwapXArgs, SwapYArgs } from "./types";
 import { BN, Provider } from "@coral-xyz/anchor";
 import { MemeTicket } from "../memeticket/MemeTicket";
 import { StakingPool } from "../staking-pool/StakingPool";
-import { sleep } from "../common/helpers";
 import { MemechanClient } from "../MemechanClient";
 import { getATAAddress, getWalletTokenAccount } from "../utils/util";
 import { ammCreatePool } from "../raydium/ammCreatePool";
@@ -45,15 +41,28 @@ export class BoundPool {
     return PublicKey.findProgramAddressSync([Buffer.from("signer"), publicKey.toBytes()], memechanProgramId)[0];
   }
 
+  public static findBoundPoolPda(memeMintPubkey: PublicKey, solMintPubkey: PublicKey, memechanProgramId: PublicKey): PublicKey {
+    return PublicKey.findProgramAddressSync([Buffer.from("bound_pool"), memeMintPubkey.toBytes(), solMintPubkey.toBytes()], memechanProgramId)[0];
+  }
+
+  public static findStakinglPda(memeMintPubkey: PublicKey, memechanProgramId: PublicKey): PublicKey {
+    return PublicKey.findProgramAddressSync([Buffer.from("staking_pool"), memeMintPubkey.toBytes()], memechanProgramId)[0];
+  }
+
+  public static findMemeTicketPda(stakingPubKey: PublicKey, memechanProgramId: PublicKey): PublicKey {
+    return PublicKey.findProgramAddressSync([Buffer.from("admin_ticket"), stakingPubKey.toBytes()], memechanProgramId)[0];
+  }
+
   public static async new(args: BoundPoolArgs): Promise<BoundPool> {
-    const id = Keypair.generate();
-
-    const poolSigner = BoundPool.findSignerPda(id.publicKey, args.client.memechanProgram.programId);
-
-    const { admin, payer, signer, client } = args;
+     const { admin, payer, signer, client } = args;
     const { connection, memechanProgram } = client;
 
-    const memeMint = await createMint(connection, payer, poolSigner, null, 6);
+    const memeMintKeypair = Keypair.generate();
+    const id = this.findBoundPoolPda(memeMintKeypair.publicKey, NATIVE_MINT, args.client.memechanProgram.programId);
+    const poolSigner = BoundPool.findSignerPda(id, args.client.memechanProgram.programId);
+
+    const memeMint = await createMint(connection, payer, poolSigner, null, 6, memeMintKeypair);
+    
     const adminSolVault = (await getOrCreateAssociatedTokenAccount(connection, payer, NATIVE_MINT, admin)).address;
     const poolSolVaultid = Keypair.generate();
     const poolSolVault = await createAccount(connection, payer, NATIVE_MINT, poolSigner, poolSolVaultid);
@@ -61,28 +70,32 @@ export class BoundPool {
     const launchVaultid = Keypair.generate();
     const launchVault = await createAccount(connection, payer, memeMint, poolSigner, launchVaultid);
 
+
+
     console.log(
       `memeMint: ${memeMint.toBase58()}, adminSolVault: ${adminSolVault.toBase58()}, poolSolVault: ${poolSolVault.toBase58()}, launchVault: ${launchVault.toBase58()}`,
     );
 
-    await memechanProgram.methods
+    const result = await memechanProgram.methods
       .new()
       .accounts({
         adminSolVault: adminSolVault,
         launchVault: launchVault,
         solVault: poolSolVault,
         memeMint: memeMint,
-        pool: id.publicKey,
+        pool: id,
         poolSigner: poolSigner,
         sender: signer.publicKey,
         solMint: NATIVE_MINT,
         tokenProgram: TOKEN_PROGRAM_ID,
         systemProgram: SystemProgram.programId,
       })
-      .signers([signer, id])
+      .signers([signer])
       .rpc();
 
-    return new BoundPool(id.publicKey, signer, poolSolVault, client);
+    console.log("new pool tx result: " + result);
+
+    return new BoundPool(id, signer, poolSolVault, client);
   }
 
   public async fetch() {
@@ -172,7 +185,6 @@ export class BoundPool {
   public async goLive(input: Partial<GoLiveArgs>): Promise<[StakingPool]> {
     const user = input.user!;
     const pool = input.pool ?? this.id;
-    const boundPoolInfo = await this.client.memechanProgram.account.boundPool.fetch(pool);
 
     // tmp new test token
     const testTokenMint = await createMint(this.client.connection, user, user.publicKey, null, 6);
@@ -187,13 +199,6 @@ export class BoundPool {
     //const baseTokenInfo = { mint: boundPoolInfo.memeMint, decimals: 6 };
     const baseTokenInfo = { mint: testTokenMint, decimals: 6 };
     const quoteTokenInfo = Token.WSOL;
-
-    const memeATA = await getOrCreateAssociatedTokenAccount(
-      this.client.connection,
-      user,
-      baseTokenInfo.mint,
-      user.publicKey,
-    );
 
     const { txids: createMarketTxIds, marketId } = await createMarket({
       baseToken: baseTokenInfo,
@@ -286,13 +291,9 @@ export class BoundPool {
       .accounts({
         pool: pool,
         signer: user.publicKey,
-        adminVaultSol: boundPoolInfo.adminVaultSol,
         boundPoolSignerPda: boundPoolSigner,
-        poolMemeVault: boundPoolInfo.poolMemeVault,
-        memeMint: boundPoolInfo.memeMint,
         memeTicket: adminTicketId.publicKey,
         solMint: NATIVE_MINT,
-        poolWsolVault: boundPoolInfo.solReserve.vault,
         staking: stakingId.publicKey,
         stakingPoolSignerPda: stakingSigner,
         raydiumLpMint: ammPool.lpMint,
@@ -310,8 +311,6 @@ export class BoundPool {
         marketAccount: marketId,
         clock: SYSVAR_CLOCK_PUBKEY,
         rent: SYSVAR_RENT_PUBKEY,
-        poolLpWallet: memeATA.address,
-        marketEventQueue: poolInfo2.marketEventQueue,
         openOrders: poolInfo2.openOrders,
         targetOrders: poolInfo2.targetOrders,
       })
