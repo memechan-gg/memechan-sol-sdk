@@ -1,35 +1,27 @@
-import {
-  Liquidity,
-  MAINNET_PROGRAM_ID,
-  Token,
-} from '@raydium-io/raydium-sdk';
-import {
-  Connection,
-  Keypair,
-  PublicKey,
-} from '@solana/web3.js';
+import { Liquidity, MAINNET_PROGRAM_ID, Token } from "@raydium-io/raydium-sdk";
+import { Connection, Keypair, PublicKey } from "@solana/web3.js";
 
-import { BN } from '@coral-xyz/anchor';
-import { PROGRAMIDS, makeTxVersion } from './config';
-import { buildAndSendTx, getWalletTokenAccount } from '../utils/util';
+import { BN } from "@coral-xyz/anchor";
+import { PROGRAMIDS, makeTxVersion } from "./config";
+import { buildAndSendTx, getWalletTokenAccount } from "../utils/util";
 
-const ZERO = new BN(0)
-type BN = typeof ZERO
+const ZERO = new BN(0);
+type BN = typeof ZERO;
 
 type CalcStartPrice = {
-  addBaseAmount: BN
-  addQuoteAmount: BN
-}
+  addBaseAmount: BN;
+  addQuoteAmount: BN;
+};
 
 function calcMarketStartPrice(input: CalcStartPrice) {
-  return input.addBaseAmount.toNumber() / 10 ** 6 / (input.addQuoteAmount.toNumber() / 10 ** 6)
+  return input.addBaseAmount.toNumber() / 10 ** 6 / (input.addQuoteAmount.toNumber() / 10 ** 6);
 }
 
 type LiquidityPairTargetInfo = {
-  baseToken: Token
-  quoteToken: Token
-  targetMarketId: PublicKey
-}
+  baseToken: Token;
+  quoteToken: Token;
+  targetMarketId: PublicKey;
+};
 
 function getMarketAssociatedPoolKeys(input: LiquidityPairTargetInfo) {
   return Liquidity.getAssociatedPoolKeys({
@@ -42,17 +34,17 @@ function getMarketAssociatedPoolKeys(input: LiquidityPairTargetInfo) {
     marketId: input.targetMarketId,
     programId: PROGRAMIDS.AmmV4,
     marketProgramId: MAINNET_PROGRAM_ID.OPENBOOK_MARKET,
-  })
+  });
 }
 
-type WalletTokenAccounts = Awaited<ReturnType<typeof getWalletTokenAccount>>
+type WalletTokenAccounts = Awaited<ReturnType<typeof getWalletTokenAccount>>;
 type TestTxInputInfo = LiquidityPairTargetInfo &
   CalcStartPrice & {
-    startTime: number // seconds
-    walletTokenAccounts: WalletTokenAccounts
-    wallet: Keypair
-    connection: Connection
-  }
+    startTime: number; // seconds
+    walletTokenAccounts: WalletTokenAccounts;
+    wallet: Keypair;
+    connection: Connection;
+  };
 
 export async function ammCreatePool(input: TestTxInputInfo) {
   // -------- step 1: make instructions --------
@@ -79,12 +71,17 @@ export async function ammCreatePool(input: TestTxInputInfo) {
     makeTxVersion,
     //feeDestinationId: new PublicKey('7YttLkHDoNj9wyDur5pM1ejNaAvT9X4eqaYcHQqtj2G5'), // only mainnet use this
     feeDestinationId: new PublicKey(process.env.FEE_DESTINATION_ID as string),
-
-  })
+  });
 
   const poolInfo = getMarketAssociatedPoolKeys(input);
 
-  return { txids: await buildAndSendTx(input.connection, input.wallet, initPoolInstructionResponse.innerTransactions, { skipPreflight: true } ), ammPool: initPoolInstructionResponse.address, poolInfo}
+  return {
+    txids: await buildAndSendTx(input.connection, input.wallet, initPoolInstructionResponse.innerTransactions, {
+      skipPreflight: true,
+    }),
+    ammPool: initPoolInstructionResponse.address,
+    poolInfo,
+  };
 }
 
 // async function howToUse() {

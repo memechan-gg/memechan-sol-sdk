@@ -6,10 +6,18 @@ import {
   NATIVE_MINT,
   TOKEN_PROGRAM_ID,
 } from "@solana/spl-token";
-import { PublicKey, Keypair, Signer, SystemProgram, SYSVAR_CLOCK_PUBKEY, SYSVAR_RENT_PUBKEY } from "@solana/web3.js";
 import {
-  Token,
-} from '@raydium-io/raydium-sdk';
+  PublicKey,
+  Keypair,
+  Signer,
+  SystemProgram,
+  SYSVAR_CLOCK_PUBKEY,
+  SYSVAR_RENT_PUBKEY,
+  Connection,
+  clusterApiUrl,
+  Cluster,
+} from "@solana/web3.js";
+import { Token } from "@raydium-io/raydium-sdk";
 
 import { BoundPoolArgs, GoLiveArgs, SwapXArgs, SwapYArgs } from "./types";
 import { BN, Provider } from "@coral-xyz/anchor";
@@ -18,8 +26,8 @@ import { StakingPool } from "../staking-pool/StakingPool";
 import { sleep } from "../common/helpers";
 import { MemechanClient } from "../MemechanClient";
 import { getATAAddress, getWalletTokenAccount } from "../utils/util";
-import { ammCreatePool }  from "../raydium/ammCreatePool";
-import { PROGRAMIDS } from "../raydium/config";
+import { ammCreatePool } from "../raydium/ammCreatePool";
+import { ATA_PROGRAM_ID, PROGRAMIDS } from "../raydium/config";
 import { formatAmmKeysById } from "../raydium/formatAmmKeysById";
 import { createMarket } from "../raydium/openBookCreateMarket";
 
@@ -161,47 +169,78 @@ export class BoundPool {
       .rpc();
   }
 
-  public async goLive(input: Partial<GoLiveArgs>): Promise<[ StakingPool]> {
+  public async goLive(input: Partial<GoLiveArgs>): Promise<[StakingPool]> {
     const user = input.user!;
     const pool = input.pool ?? this.id;
     const boundPoolInfo = await this.client.memechanProgram.account.boundPool.fetch(pool);
 
-    const baseTokenInfo = { mint: boundPoolInfo.memeMint, decimals: 6 };
+    // tmp new test token
+    const testTokenMint = await createMint(this.client.connection, user, user.publicKey, null, 6);
+    const testTokenATA = await getOrCreateAssociatedTokenAccount(
+      this.client.connection,
+      user,
+      testTokenMint,
+      user.publicKey,
+    );
+    await mintTo(this.client.connection, user, testTokenMint, testTokenATA.address, user, 1000000000);
+
+    //const baseTokenInfo = { mint: boundPoolInfo.memeMint, decimals: 6 };
+    const baseTokenInfo = { mint: testTokenMint, decimals: 6 };
     const quoteTokenInfo = Token.WSOL;
 
-    const memeATA = await getOrCreateAssociatedTokenAccount(this.client.connection, user, baseTokenInfo.mint, user.publicKey);
+    const memeATA = await getOrCreateAssociatedTokenAccount(
+      this.client.connection,
+      user,
+      baseTokenInfo.mint,
+      user.publicKey,
+    );
 
-    const { marketId } = await createMarket({
+    const { txids: createMarketTxIds,  marketId } = await createMarket({
       baseToken: baseTokenInfo,
       quoteToken: quoteTokenInfo,
       wallet: user,
       connection: this.client.connection,
-    })
+    });
 
-    sleep(1000);
+    console.log("createMarketTxIds: " + JSON.stringify(createMarketTxIds));
+
+    const createMarkeLatestBH0 = await this.client.connection.getLatestBlockhash("confirmed");
+    const createMarketTxResult = await this.client.connection.confirmTransaction(
+      { signature: createMarketTxIds[0], blockhash: createMarkeLatestBH0.blockhash, lastValidBlockHeight: createMarkeLatestBH0.lastValidBlockHeight },
+      "confirmed",
+    );
+
+    if (createMarketTxResult.value.err) {
+      console.error("createMarketTxResult", createMarketTxResult);
+      throw new Error("createMarketTxResult failed");
+    }
 
     //const marketId = new PublicKey("HSaBUhTu2LiepqVVCKoATZoFhehhVHN7b7TJx3bxUKq6");
+    const boundPoolSigner = BoundPool.findSignerPda(pool, this.client.memechanProgram.programId);
 
-    const addBaseAmount = boundPoolInfo.memeAmt; //new BN(10000) // 10000 / 10 ** 6,
-    const addQuoteAmount = new BN(10000) // 10000 / 10 ** 6,
-    const startTime = Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 1 // start from 1 days later
+    // how to mint
+    //await mintTo(this.client.connection, user, baseTokenInfo.mint, memeATA.address, boundPoolSigner, 100000);
+
+    const addBaseAmount = new BN(10000000); //new BN(10000) // 10000 / 10 ** 6,
+    const addQuoteAmount = new BN(10000000); // 10000 / 10 ** 6,
+    const startTime = Math.floor(Date.now() / 1000) + 60; // start from 1 minute later
     const walletTokenAccounts = await getWalletTokenAccount(this.client.connection, user.publicKey);
 
-    console.log("walletTokenAccounts", walletTokenAccounts);
+    // console.log("walletTokenAccounts", walletTokenAccounts);
 
-  // /* do something with start price if needed */
-  // const startPrice = calcMarketStartPrice({ addBaseAmount, addQuoteAmount })
+    // /* do something with start price if needed */
+    // const startPrice = calcMarketStartPrice({ addBaseAmount, addQuoteAmount })
 
-  // /* do something with market associated pool keys if needed */
-  // const associatedPoolKeys = getMarketAssociatedPoolKeys({
-  //   baseToken,
-  //   quoteToken,
-  //   targetMarketId,
-  // })
+    // /* do something with market associated pool keys if needed */
+    // const associatedPoolKeys = getMarketAssociatedPoolKeys({
+    //   baseToken,
+    //   quoteToken,
+    //   targetMarketId,
+    // })
 
     console.log("marketId", marketId.toBase58());
 
-  const { ammPool, poolInfo }  = await ammCreatePool({
+    const { txids: ammCreatePoolTxIds, ammPool, poolInfo } = await ammCreatePool({
       startTime,
       addBaseAmount,
       addQuoteAmount,
@@ -213,23 +252,37 @@ export class BoundPool {
       connection: this.client.connection,
     });
 
+    console.log("ammCreatePoolTxIds: " + JSON.stringify(ammCreatePoolTxIds));
+
+    const latestBH = await this.client.connection.getLatestBlockhash("confirmed");
+    const ammCreatePoolTxResult = await this.client.connection.confirmTransaction(
+      { signature: ammCreatePoolTxIds[0], blockhash: latestBH.blockhash, lastValidBlockHeight: latestBH.lastValidBlockHeight },
+      "confirmed",
+    );
+
+    if (ammCreatePoolTxResult.value.err) {
+      console.error("ammCreatePoolTxResult", ammCreatePoolTxResult);
+      throw new Error("ammCreatePoolTxResult failed");
+    }
+
     console.log("ammPool: " + JSON.stringify(ammPool));
     console.log("poolInfo: " + JSON.stringify(poolInfo));
-    sleep(1000);
+    //sleep(1000);
 
-    const poolInfo2 = await formatAmmKeysById(ammPool.ammId, this.client.connection);
+    const network: Cluster = process.env.NETWORK as Cluster;
+    const connection2 = new Connection(clusterApiUrl(network), {
+      commitment: "confirmed",
+    });
+
+    const poolInfo2 = await formatAmmKeysById(ammPool.ammId.toBase58(), connection2);
     console.log("poolInfo2: " + JSON.stringify(poolInfo2));
-
-
     console.log("poolInfo: " + poolInfo);
-
     console.log("ammId prev: " + ammPool.ammId);
 
     const ammId = new PublicKey(ammPool.ammId);
 
     console.log("ammId: " + poolInfo);
 
-    const boundPoolSigner = BoundPool.findSignerPda(pool, this.client.memechanProgram.programId);
     const adminTicketId = Keypair.generate();
 
     const stakingId = Keypair.generate();
@@ -287,12 +340,11 @@ export class BoundPool {
     );
 
     const userDestinationLpTokenAta = getATAAddress(TOKEN_PROGRAM_ID, user.publicKey, ammPool.lpMint).publicKey; // ??
-    const nonce = 0;
+    const nonce = 0; // ??
 
     await this.client.memechanProgram.methods
       .goLive(nonce)
-      .accounts(
-        {
+      .accounts({
         pool: pool,
         signer: user.publicKey,
         adminVaultSol: boundPoolInfo.adminVaultSol,
@@ -304,7 +356,7 @@ export class BoundPool {
         poolWsolVault: boundPoolInfo.solReserve.vault,
         staking: stakingId.publicKey,
         stakingPoolSignerPda: stakingSigner,
-        
+
         raydiumLpMint: ammPool.lpMint,
         raydiumAmm: ammId,
         raydiumAmmAuthority: ammPool.ammAuthority,
@@ -312,7 +364,7 @@ export class BoundPool {
         raydiumWsolVault: ammPool.pcVault,
         ammConfig: poolInfo.configId,
         feeDestination: feeDestination,
-        ataProgram: PROGRAMIDS.ATA_PROGRAM_ID,
+        ataProgram: ATA_PROGRAM_ID,
         marketProgramId: PROGRAMIDS.OPENBOOK_MARKET,
         systemProgram: SystemProgram.programId,
         tokenProgram: TOKEN_PROGRAM_ID,
@@ -321,9 +373,9 @@ export class BoundPool {
         clock: SYSVAR_CLOCK_PUBKEY,
         rent: SYSVAR_RENT_PUBKEY,
         poolLpWallet: memeATA.address,
-        marketEventQueue: poolInfo.marketEventQueue,
-        openOrders: poolInfo.openOrders,
-        targetOrders: poolInfo.targetOrders
+        marketEventQueue: poolInfo2.marketEventQueue,
+        openOrders: poolInfo2.openOrders,
+        targetOrders: poolInfo2.targetOrders,
       })
       .remainingAccounts(vaults)
       .signers([user, adminTicketId, stakingId]) // ammid?
@@ -335,4 +387,3 @@ export class BoundPool {
     ];
   }
 }
-

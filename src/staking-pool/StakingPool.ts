@@ -33,7 +33,7 @@ export class StakingPool {
       })
       .remainingAccounts([
         //this.getAccountMeta(ammInfo.reserves[0].vault),
-       // this.getAccountMeta(ammInfo.reserves[1].vault),
+        // this.getAccountMeta(ammInfo.reserves[1].vault),
       ])
       .signers([payer])
       .rpc();

@@ -21,7 +21,7 @@ export class MemechanClient {
     const provider = new AnchorProvider(this.connection, wallet, { commitment: "confirmed" });
     setProvider(provider);
 
-    console.log(process.env.MEMECHAN_PROGRAM_ID);
+    console.log("program id: " + process.env.MEMECHAN_PROGRAM_ID);
     this.memechanProgram = new Program<MemechanSol>(
       MemechanSolIDL,
       new PublicKey(process.env.MEMECHAN_PROGRAM_ID!),

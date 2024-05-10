@@ -5,7 +5,7 @@ import {
   TOKEN_PROGRAM_ID,
   InnerSimpleV0Transaction,
   TokenAccount,
-} from '@raydium-io/raydium-sdk';
+} from "@raydium-io/raydium-sdk";
 
 import {
   Connection,
@@ -15,26 +15,31 @@ import {
   Signer,
   Transaction,
   VersionedTransaction,
-} from '@solana/web3.js';
-import { addLookupTableInfo, makeTxVersion } from '../raydium/config';
+} from "@solana/web3.js";
+import { addLookupTableInfo, makeTxVersion } from "../raydium/config";
 
-export async function buildAndSendTx(connection: Connection, payer: Signer, innerSimpleV0Transaction: InnerSimpleV0Transaction[], options?: SendOptions) {
+export async function buildAndSendTx(
+  connection: Connection,
+  payer: Signer,
+  innerSimpleV0Transaction: InnerSimpleV0Transaction[],
+  options?: SendOptions,
+) {
   const willSendTx = await buildSimpleTransaction({
     connection,
     makeTxVersion,
     payer: payer.publicKey,
     innerTransactions: innerSimpleV0Transaction,
     addLookupTableInfo: addLookupTableInfo,
-  })
+  });
 
-  return await sendTx(connection, payer, willSendTx, options)
+  return await sendTx(connection, payer, willSendTx, options);
 }
 
 export async function sendTx(
   connection: Connection,
   payer: Keypair | Signer,
   txs: (VersionedTransaction | Transaction)[],
-  options?: SendOptions
+  options?: SendOptions,
 ): Promise<string[]> {
   const txids: string[] = [];
   for (const iTx of txs) {
@@ -62,12 +67,12 @@ export async function getWalletTokenAccount(connection: Connection, wallet: Publ
 export function getATAAddress(programId: PublicKey, owner: PublicKey, mint: PublicKey) {
   const { publicKey, nonce } = findProgramAddress(
     [owner.toBuffer(), programId.toBuffer(), mint.toBuffer()],
-    new PublicKey("ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL")
+    new PublicKey("ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"),
   );
   return { publicKey, nonce };
 }
 
 export async function sleepTime(ms: number) {
-  console.log((new Date()).toLocaleString(), 'sleepTime', ms)
-  return new Promise(resolve => setTimeout(resolve, ms))
+  console.log(new Date().toLocaleString(), "sleepTime", ms);
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }

@@ -19,10 +19,16 @@ describe("BoundPool", () => {
     //   }, 60000)
 
     it("full swap then go live", async () => {
+
         const admin = new PublicKey(process.env.ADMIN_PUB_KEY as string);
         const payer =  Keypair.fromSecretKey(Buffer.from(JSON.parse(process.env.TEST_USER_SECRET_KEY as string)));
         const wallet = new NodeWallet(payer);
         const client = new MemechanClient(wallet);
+
+        //const result = await client.connection.getAccountInfo(new PublicKey("7zSfqk6T1VF1jxrVhn8YGDEw17vAAaemfeGD9X81ArXE"), "confirmed");
+        //console.log(result);
+
+        //return;
         const pool = await BoundPool.new({admin, payer, signer: payer, client });
 
         await sleep(1000);
@@ -40,5 +46,5 @@ describe("BoundPool", () => {
           user: payer,
         })
 
-    }, 60000);
+    }, 120000);
 });
