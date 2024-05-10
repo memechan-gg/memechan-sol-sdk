@@ -25,10 +25,6 @@ describe("BoundPool", () => {
         const wallet = new NodeWallet(payer);
         const client = new MemechanClient(wallet);
 
-        //const result = await client.connection.getAccountInfo(new PublicKey("7zSfqk6T1VF1jxrVhn8YGDEw17vAAaemfeGD9X81ArXE"), "confirmed");
-        //console.log(result);
-
-        //return;
         const pool = await BoundPool.new({admin, payer, signer: payer, client });
 
         await sleep(1000);

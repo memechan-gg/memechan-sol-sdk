@@ -174,7 +174,7 @@ export type MemechanSol = {
         {
           name: "staking";
           isMut: true;
-          isSigner: true;
+          isSigner: false;
         },
         {
           name: "poolMemeVault";
@@ -194,7 +194,7 @@ export type MemechanSol = {
         {
           name: "memeTicket";
           isMut: true;
-          isSigner: true;
+          isSigner: false;
         },
         {
           name: "boundPoolSignerPda";
@@ -1502,7 +1502,7 @@ export const IDL: MemechanSol = {
         {
           name: "staking",
           isMut: true,
-          isSigner: true,
+          isSigner: false,
         },
         {
           name: "poolMemeVault",
@@ -1522,7 +1522,7 @@ export const IDL: MemechanSol = {
         {
           name: "memeTicket",
           isMut: true,
-          isSigner: true,
+          isSigner: false,
         },
         {
           name: "boundPoolSignerPda",

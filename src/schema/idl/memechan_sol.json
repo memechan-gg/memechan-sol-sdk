@@ -174,7 +174,7 @@
         {
           "name": "staking",
           "isMut": true,
-          "isSigner": true
+          "isSigner": false
         },
         {
           "name": "poolMemeVault",
@@ -194,7 +194,7 @@
         {
           "name": "memeTicket",
           "isMut": true,
-          "isSigner": true
+          "isSigner": false
         },
         {
           "name": "boundPoolSignerPda",
