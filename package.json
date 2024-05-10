@@ -6,9 +6,9 @@
     "@solana/web3.js": "^1.91.8",
     "dotenv": "^16.4.5"
   },
-  "name": "memechan-sol-sdk",
+  "name": "@0xunreal/memechan-sol-sdk",
   "description": "Typescript SDK for memechan.gg",
-  "version": "1.0.2",
+  "version": "1.0.0",
   "main": "index.js",
   "types": "dist/index.d.ts",
   "directories": {
