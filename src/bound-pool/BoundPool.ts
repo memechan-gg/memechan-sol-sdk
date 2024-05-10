@@ -288,6 +288,7 @@ export class BoundPool {
     const result = await this.client.memechanProgram.methods
       .goLive(nonce)
       .accounts({
+
         pool: pool,
         signer: user.publicKey,
         boundPoolSignerPda: boundPoolSigner,
@@ -303,19 +304,17 @@ export class BoundPool {
         raydiumAmmAuthority: ammPool.ammAuthority,
         raydiumMemeVault: ammPool.coinVault,
         raydiumWsolVault: ammPool.pcVault,
-        ammConfig: poolInfo.configId,
-        feeDestination: feeDestination,
-        ataProgram: ATA_PROGRAM_ID,
         marketProgramId: PROGRAMIDS.OPENBOOK_MARKET,
         systemProgram: SystemProgram.programId,
         tokenProgram: TOKEN_PROGRAM_ID,
-        userDestinationLpTokenAta, // ??
         marketAccount: marketId,
         clock: SYSVAR_CLOCK_PUBKEY,
         rent: SYSVAR_RENT_PUBKEY,
         openOrders: poolInfo2.openOrders,
         targetOrders: poolInfo2.targetOrders,
-        memeMint: boundPoolInfo.memeReserve.mint
+        memeMint: boundPoolInfo.memeReserve.mint,
+        marketEventQueue: poolInfo2.marketEventQueue,
+        poolLpWallet: userDestinationLpTokenAta,
       })
       .signers([user]) // ammid?
       .rpc({ skipPreflight: true });
