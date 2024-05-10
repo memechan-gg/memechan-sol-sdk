@@ -54,10 +54,10 @@ type TestTxInputInfo = LiquidityPairTargetInfo &
     connection: Connection
   }
 
-export async function ammCreatePool(input: TestTxInputInfo): Promise<{ txids: string[] }> {
+export async function ammCreatePool(input: TestTxInputInfo) {
   // -------- step 1: make instructions --------
   const initPoolInstructionResponse = await Liquidity.makeCreatePoolV4InstructionV2Simple({
-    connecction: input.connection,
+    connection: input.connection,
     programId: PROGRAMIDS.AmmV4,
     marketInfo: {
       marketId: input.targetMarketId,
@@ -82,7 +82,9 @@ export async function ammCreatePool(input: TestTxInputInfo): Promise<{ txids: st
 
   })
 
-  return { txids: await buildAndSendTx(input.connection, input.wallet, initPoolInstructionResponse.innerTransactions) }
+  const poolInfo = getMarketAssociatedPoolKeys(input);
+
+  return { txids: await buildAndSendTx(input.connection, input.wallet, initPoolInstructionResponse.innerTransactions, { skipPreflight: true } ), ammPool: initPoolInstructionResponse.address, poolInfo}
 }
 
 // async function howToUse() {
