@@ -45,7 +45,7 @@ export class BoundPool {
     return PublicKey.findProgramAddressSync([Buffer.from("bound_pool"), memeMintPubkey.toBytes(), solMintPubkey.toBytes()], memechanProgramId)[0];
   }
 
-  public static findStakinglPda(memeMintPubkey: PublicKey, memechanProgramId: PublicKey): PublicKey {
+  public static findStakingPda(memeMintPubkey: PublicKey, memechanProgramId: PublicKey): PublicKey {
     return PublicKey.findProgramAddressSync([Buffer.from("staking_pool"), memeMintPubkey.toBytes()], memechanProgramId)[0];
   }
 
@@ -186,6 +186,7 @@ export class BoundPool {
     const user = input.user!;
     const pool = input.pool ?? this.id;
 
+
     // tmp new test token
     const testTokenMint = await createMint(this.client.connection, user, user.publicKey, null, 6);
     const testTokenATA = await getOrCreateAssociatedTokenAccount(
@@ -277,9 +278,11 @@ export class BoundPool {
 
     const ammId = new PublicKey(ammPool.ammId);
 
+    const boundPoolInfo = await this.fetch();
+
     const adminTicketId = Keypair.generate();
-    const stakingId = Keypair.generate();
-    const stakingSigner = StakingPool.findSignerPda(stakingId.publicKey, this.client.memechanProgram.programId);
+    const stakingId = BoundPool.findStakingPda(boundPoolInfo.memeReserve.mint, this.client.memechanProgram.programId);
+    const stakingSigner = StakingPool.findSignerPda(stakingId, this.client.memechanProgram.programId);
 
     const feeDestination = new PublicKey(process.env.FEE_DESTINATION_ID as string);
 
@@ -293,10 +296,13 @@ export class BoundPool {
         signer: user.publicKey,
         boundPoolSignerPda: boundPoolSigner,
         memeTicket: adminTicketId.publicKey,
+        poolMemeVault: ammPool.coinVault,
+        poolWsolVault: ammPool.pcVault,
         solMint: NATIVE_MINT,
-        staking: stakingId.publicKey,
+        staking: stakingId,
         stakingPoolSignerPda: stakingSigner,
         raydiumLpMint: ammPool.lpMint,
+        adminVaultSol: boundPoolInfo.adminVaultSol,
         raydiumAmm: ammId,
         raydiumAmmAuthority: ammPool.ammAuthority,
         raydiumMemeVault: ammPool.coinVault,
@@ -313,6 +319,7 @@ export class BoundPool {
         rent: SYSVAR_RENT_PUBKEY,
         openOrders: poolInfo2.openOrders,
         targetOrders: poolInfo2.targetOrders,
+        memeMint: boundPoolInfo.memeReserve.mint
       })
       .signers([user]) // ammid?
       .rpc({ skipPreflight: true });
@@ -321,7 +328,7 @@ export class BoundPool {
 
     return [
       //new AmmPool(ammId.publicKey, tollAuthority, this.client),
-      new StakingPool(stakingId.publicKey, this.client),
+      new StakingPool(stakingId, this.client),
     ];
   }
 }

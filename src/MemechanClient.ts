@@ -1,6 +1,6 @@
 import { AnchorProvider, Program, Wallet, setProvider } from "@coral-xyz/anchor";
 import { Cluster, Connection, PublicKey, clusterApiUrl } from "@solana/web3.js";
-import { MemechanSol, IDL as MemechanSolIDL } from "./schema/types/memechan_sol";
+import { IDL, MemechanSol } from "./schema/types/memechan_sol";
 
 export class MemechanClient {
   public connection: Connection;
@@ -23,7 +23,7 @@ export class MemechanClient {
 
     console.log("program id: " + process.env.MEMECHAN_PROGRAM_ID);
     this.memechanProgram = new Program<MemechanSol>(
-      MemechanSolIDL,
+      IDL,
       new PublicKey(process.env.MEMECHAN_PROGRAM_ID!),
       provider,
     );
