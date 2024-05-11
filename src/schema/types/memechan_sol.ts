@@ -164,7 +164,7 @@ export type MemechanSol = {
       ]
     },
     {
-      "name": "goLive",
+      "name": "initStakingPool",
       "accounts": [
         {
           "name": "signer",
@@ -252,6 +252,98 @@ export type MemechanSol = {
           ]
         },
         {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "clock",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ataProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "marketProgramId",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "goLive",
+      "accounts": [
+        {
+          "name": "signer",
+          "isMut": true,
+          "isSigner": true,
+          "docs": [
+            "Signer"
+          ]
+        },
+        {
+          "name": "staking",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Staking Pool Account"
+          ]
+        },
+        {
+          "name": "stakingPoolSignerPda",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Staking Pool Signer"
+          ]
+        },
+        {
+          "name": "poolMemeVault",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Staking Pool Meme vault"
+          ]
+        },
+        {
+          "name": "poolWsolVault",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Staking Pool WSOL vault"
+          ]
+        },
+        {
+          "name": "memeMint",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "Mint Account for Meme"
+          ]
+        },
+        {
+          "name": "solMint",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "Mint Account for WSOL"
+          ]
+        },
+        {
           "name": "openOrders",
           "isMut": true,
           "isSigner": false,
@@ -274,11 +366,6 @@ export type MemechanSol = {
           "docs": [
             "Market Orders Account"
           ]
-        },
-        {
-          "name": "marketEventQueue",
-          "isMut": true,
-          "isSigner": false
         },
         {
           "name": "raydiumAmm",
@@ -305,18 +392,11 @@ export type MemechanSol = {
           ]
         },
         {
-          "name": "poolLpWallet",
-          "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "Raydium LP Token Account"
-          ]
-        },
-        {
           "name": "raydiumMemeVault",
           "isMut": true,
           "isSigner": false,
           "docs": [
+            "Raydium LP Token Account",
             "Raydium Meme Token Account"
           ]
         },
@@ -329,12 +409,32 @@ export type MemechanSol = {
           ]
         },
         {
+          "name": "ammConfig",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "feeDestinationInfo",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "userDestinationLpTokenAta",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "rent",
           "isMut": false,
           "isSigner": false
         },
         {
           "name": "clock",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ataProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -2030,7 +2130,7 @@ export const IDL: MemechanSol = {
       ]
     },
     {
-      "name": "goLive",
+      "name": "initStakingPool",
       "accounts": [
         {
           "name": "signer",
@@ -2118,6 +2218,98 @@ export const IDL: MemechanSol = {
           ]
         },
         {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "clock",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ataProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "marketProgramId",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "goLive",
+      "accounts": [
+        {
+          "name": "signer",
+          "isMut": true,
+          "isSigner": true,
+          "docs": [
+            "Signer"
+          ]
+        },
+        {
+          "name": "staking",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Staking Pool Account"
+          ]
+        },
+        {
+          "name": "stakingPoolSignerPda",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Staking Pool Signer"
+          ]
+        },
+        {
+          "name": "poolMemeVault",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Staking Pool Meme vault"
+          ]
+        },
+        {
+          "name": "poolWsolVault",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Staking Pool WSOL vault"
+          ]
+        },
+        {
+          "name": "memeMint",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "Mint Account for Meme"
+          ]
+        },
+        {
+          "name": "solMint",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "Mint Account for WSOL"
+          ]
+        },
+        {
           "name": "openOrders",
           "isMut": true,
           "isSigner": false,
@@ -2140,11 +2332,6 @@ export const IDL: MemechanSol = {
           "docs": [
             "Market Orders Account"
           ]
-        },
-        {
-          "name": "marketEventQueue",
-          "isMut": true,
-          "isSigner": false
         },
         {
           "name": "raydiumAmm",
@@ -2171,18 +2358,11 @@ export const IDL: MemechanSol = {
           ]
         },
         {
-          "name": "poolLpWallet",
-          "isMut": true,
-          "isSigner": false,
-          "docs": [
-            "Raydium LP Token Account"
-          ]
-        },
-        {
           "name": "raydiumMemeVault",
           "isMut": true,
           "isSigner": false,
           "docs": [
+            "Raydium LP Token Account",
             "Raydium Meme Token Account"
           ]
         },
@@ -2195,12 +2375,32 @@ export const IDL: MemechanSol = {
           ]
         },
         {
+          "name": "ammConfig",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "feeDestinationInfo",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "userDestinationLpTokenAta",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "rent",
           "isMut": false,
           "isSigner": false
         },
         {
           "name": "clock",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "ataProgram",
           "isMut": false,
           "isSigner": false
         },
