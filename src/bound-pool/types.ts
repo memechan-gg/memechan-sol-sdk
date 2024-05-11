@@ -28,6 +28,12 @@ export interface GoLiveArgs {
   payer: Signer;
 }
 
+export interface InitStakingPoolArgs {
+  pool: PublicKey;
+  user: Keypair;
+  payer: Signer;
+}
+
 export interface BoundPoolArgs {
   admin: PublicKey;
   payer: Signer;

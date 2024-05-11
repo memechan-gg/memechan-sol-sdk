@@ -16,7 +16,7 @@ import {
 } from "@solana/web3.js";
 import { Token } from "@raydium-io/raydium-sdk";
 
-import { BoundPoolArgs, GoLiveArgs, SwapXArgs, SwapYArgs } from "./types";
+import { BoundPoolArgs, GoLiveArgs, InitStakingPoolArgs, SwapXArgs, SwapYArgs } from "./types";
 import { BN, Provider } from "@coral-xyz/anchor";
 import { MemeTicket } from "../memeticket/MemeTicket";
 import { StakingPool } from "../staking-pool/StakingPool";
@@ -178,6 +178,51 @@ export class BoundPool {
       .rpc();
   }
 
+  public async initStakingPool(input: Partial<InitStakingPoolArgs>): Promise<string> {
+    const user = input.user!;
+    const pool = input.pool ?? this.id;
+
+    const boundPoolInfo = await this.fetch();
+
+    const stakingId = BoundPool.findStakingPda(boundPoolInfo.memeReserve.mint, this.client.memechanProgram.programId);
+    const stakingSigner = StakingPool.findSignerPda(stakingId, this.client.memechanProgram.programId);
+
+    const adminTicketId = Keypair.generate();
+
+    const feeDestination = new PublicKey(process.env.FEE_DESTINATION_ID as string);
+
+    const userDestinationLpTokenAta = getATAAddress(TOKEN_PROGRAM_ID, user.publicKey, boundPoolInfo.lpMint).publicKey;
+
+    const result = await this.client.memechanProgram.methods
+      .initStakingPool()
+      .accounts({
+        pool: pool,
+        signer: user.publicKey,
+        boundPoolSignerPda: this.findSignerPda(),
+        memeTicket: adminTicketId.publicKey,
+        poolMemeVault: boundPoolInfo.memeVault,
+        poolWsolVault: boundPoolInfo.solVault,
+        solMint: NATIVE_MINT,
+        staking: stakingId,
+        stakingPoolSignerPda: stakingSigner,
+        raydiumLpMint: boundPoolInfo.lpMint,
+        adminVaultSol: boundPoolInfo.adminVaultSol,
+        marketProgramId: PROGRAMIDS.OPENBOOK_MARKET,
+        systemProgram: SystemProgram.programId,
+        tokenProgram: TOKEN_PROGRAM_ID,
+        clock: SYSVAR_CLOCK_PUBKEY,
+        rent: SYSVAR_RENT_PUBKEY,
+        openOrders: boundPoolInfo.openOrders,
+        targetOrders: boundPoolInfo.targetOrders,
+        memeMint: boundPoolInfo.memeReserve.mint,
+        poolLpWallet: userDestinationLpTokenAta,
+      })
+      .signers([user])
+      .rpc({ skipPreflight: true });
+
+      return result;
+  }
+
   public async goLive(input: Partial<GoLiveArgs>): Promise<[StakingPool]> {
     const user = input.user!;
     const pool = input.pool ?? this.id;
@@ -277,7 +322,7 @@ export class BoundPool {
     const boundPoolInfo = await this.fetch();
 
     const adminTicketId = Keypair.generate();
-    const stakingId = BoundPool.findStakingPda(boundPoolInfo.memeReserve.mint, this.client.memechanProgram.programId);
+    const stakingId = BoundPool.findStakingPda(boundPoolInfo.mint, this.client.memechanProgram.programId);
     const stakingSigner = StakingPool.findSignerPda(stakingId, this.client.memechanProgram.programId);
 
     const feeDestination = new PublicKey(process.env.FEE_DESTINATION_ID as string);
