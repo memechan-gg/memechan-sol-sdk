@@ -189,9 +189,9 @@ export class BoundPool {
 
     const adminTicketId = Keypair.generate();
 
-    const feeDestination = new PublicKey(process.env.FEE_DESTINATION_ID as string);
+    //const feeDestination = new PublicKey(process.env.FEE_DESTINATION_ID as string);
 
-    const userDestinationLpTokenAta = getATAAddress(TOKEN_PROGRAM_ID, user.publicKey, boundPoolInfo.lpMint).publicKey;
+    //const userDestinationLpTokenAta = getATAAddress(TOKEN_PROGRAM_ID, user.publicKey, boundPoolInfo.lpMint).publicKey;
 
     const result = await this.client.memechanProgram.methods
       .initStakingPool()
@@ -200,22 +200,19 @@ export class BoundPool {
         signer: user.publicKey,
         boundPoolSignerPda: this.findSignerPda(),
         memeTicket: adminTicketId.publicKey,
-        poolMemeVault: boundPoolInfo.memeVault,
-        poolWsolVault: boundPoolInfo.solVault,
+        poolMemeVault: boundPoolInfo.memeReserve.vault,
+        poolWsolVault: boundPoolInfo.solReserve.vault,
         solMint: NATIVE_MINT,
         staking: stakingId,
         stakingPoolSignerPda: stakingSigner,
-        raydiumLpMint: boundPoolInfo.lpMint,
         adminVaultSol: boundPoolInfo.adminVaultSol,
         marketProgramId: PROGRAMIDS.OPENBOOK_MARKET,
         systemProgram: SystemProgram.programId,
         tokenProgram: TOKEN_PROGRAM_ID,
         clock: SYSVAR_CLOCK_PUBKEY,
         rent: SYSVAR_RENT_PUBKEY,
-        openOrders: boundPoolInfo.openOrders,
-        targetOrders: boundPoolInfo.targetOrders,
         memeMint: boundPoolInfo.memeReserve.mint,
-        poolLpWallet: userDestinationLpTokenAta,
+        ataProgram: ATA_PROGRAM_ID,
       })
       .signers([user])
       .rpc({ skipPreflight: true });
@@ -225,7 +222,7 @@ export class BoundPool {
 
   public async goLive(input: Partial<GoLiveArgs>): Promise<[StakingPool]> {
     const user = input.user!;
-    const pool = input.pool ?? this.id;
+   // const pool = input.pool ?? this.id;
 
 
     // tmp new test token
@@ -266,7 +263,7 @@ export class BoundPool {
       throw new Error("createMarketTxResult failed");
     }
 
-    const boundPoolSigner = BoundPool.findSignerPda(pool, this.client.memechanProgram.programId);
+   // const boundPoolSigner = BoundPool.findSignerPda(pool, this.client.memechanProgram.programId);
 
     // how to mint
     //await mintTo(this.client.connection, user, baseTokenInfo.mint, memeATA.address, boundPoolSigner, 100000);
@@ -321,8 +318,8 @@ export class BoundPool {
 
     const boundPoolInfo = await this.fetch();
 
-    const adminTicketId = Keypair.generate();
-    const stakingId = BoundPool.findStakingPda(boundPoolInfo.mint, this.client.memechanProgram.programId);
+   // const adminTicketId = Keypair.generate();
+    const stakingId = BoundPool.findStakingPda(boundPoolInfo.memeReserve.mint, this.client.memechanProgram.programId);
     const stakingSigner = StakingPool.findSignerPda(stakingId, this.client.memechanProgram.programId);
 
     const feeDestination = new PublicKey(process.env.FEE_DESTINATION_ID as string);
@@ -333,18 +330,13 @@ export class BoundPool {
     const result = await this.client.memechanProgram.methods
       .goLive(nonce)
       .accounts({
-
-        pool: pool,
         signer: user.publicKey,
-        boundPoolSignerPda: boundPoolSigner,
-        memeTicket: adminTicketId.publicKey,
         poolMemeVault: ammPool.coinVault,
         poolWsolVault: ammPool.pcVault,
         solMint: NATIVE_MINT,
         staking: stakingId,
         stakingPoolSignerPda: stakingSigner,
         raydiumLpMint: ammPool.lpMint,
-        adminVaultSol: boundPoolInfo.adminVaultSol,
         raydiumAmm: ammId,
         raydiumAmmAuthority: ammPool.ammAuthority,
         raydiumMemeVault: ammPool.coinVault,
@@ -358,8 +350,10 @@ export class BoundPool {
         openOrders: poolInfo2.openOrders,
         targetOrders: poolInfo2.targetOrders,
         memeMint: boundPoolInfo.memeReserve.mint,
-        marketEventQueue: poolInfo2.marketEventQueue,
-        poolLpWallet: userDestinationLpTokenAta,
+        ammConfig: poolInfo2.ammConfig,
+        ataProgram: ATA_PROGRAM_ID,
+        feeDestinationInfo: feeDestination,
+        userDestinationLpTokenAta: userDestinationLpTokenAta,
       })
       .signers([user]) // ammid?
       .rpc({ skipPreflight: true });
