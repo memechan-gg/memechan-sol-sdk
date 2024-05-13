@@ -279,7 +279,7 @@ describe("BoundPool", () => {
       expect(memesTotal).toBe(new BN(9e14)) // "total sum of memetokens with fees should amount to 9e14")
 
       const solAmt = poolInfo.solReserve.tokens;
-      expect(solAmt.toBe(new BN(3e11)); // "pool should have 300 sol")
+      expect(solAmt.toBe(new BN(3e11))); // "pool should have 300 sol")
 
       const solVault = await getAccount(
         client.connection,
