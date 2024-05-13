@@ -1,6 +1,9 @@
 import {
   createAccount,
   createMint,
+  createSyncNativeInstruction,
+  createWrappedNativeAccount,
+  getAccount,
   getOrCreateAssociatedTokenAccount,
   mintTo,
   NATIVE_MINT,
@@ -13,6 +16,9 @@ import {
   SystemProgram,
   SYSVAR_CLOCK_PUBKEY,
   SYSVAR_RENT_PUBKEY,
+  Transaction,
+  sendAndConfirmTransaction,
+  LAMPORTS_PER_SOL,
 } from "@solana/web3.js";
 import { Token } from "@raydium-io/raydium-sdk";
 
@@ -126,11 +132,34 @@ export class BoundPool {
     const meme_out = input.memeTokensOut;
 
     console.log("1");
+
     const userSolAcc =
-      input.userSolAcc ??
-      (await getOrCreateAssociatedTokenAccount(this.client.connection, payer, NATIVE_MINT, user.publicKey)).address;
-    
+      input.userSolAcc ?? (await getOrCreateAssociatedTokenAccount(this.client.connection, payer, NATIVE_MINT, user.publicKey)).address;
+
     console.log("2 userSolAcc:" + userSolAcc.toBase58());
+    console.log("payer.publicKey: " + payer.publicKey.toBase58());
+    console.log("user.publicKey: " + user.publicKey.toBase58());
+    console.log("sol_in: " + sol_in);
+
+    console.log("this.client.connection.rpc " + this.client.connection.rpcEndpoint)
+    const balance = await this.client.connection.getBalance(payer.publicKey);
+    console.log(`${balance / LAMPORTS_PER_SOL} SOL`);
+
+    const transferTx = new Transaction().add(SystemProgram.transfer({
+                fromPubkey: payer.publicKey,
+                toPubkey: userSolAcc,
+                lamports: sol_in,
+            }),
+            createSyncNativeInstruction(userSolAcc)
+        );
+
+    const transferResult = await sendAndConfirmTransaction(this.client.connection, transferTx, [payer]);
+
+    console.log("3 transferResult: " + transferResult);
+
+    const accountInfo = await getAccount(this.client.connection, userSolAcc);
+    console.log(`Native: ${accountInfo.isNative}, Lamports: ${accountInfo.amount}`);
+
     await this.client.memechanProgram.methods
       .swapY(new BN(sol_in), new BN(meme_out))
       .accounts({
@@ -144,10 +173,10 @@ export class BoundPool {
         tokenProgram: TOKEN_PROGRAM_ID,
       })
       .signers([user, id])
-      .rpc()
+      .rpc({skipPreflight: true})
       .catch((e) => console.error(e));
 
-    console.log("3");
+    console.log("4");
 
     return new MemeTicket(id.publicKey, this.client);
   }
@@ -187,7 +216,7 @@ export class BoundPool {
     const stakingId = BoundPool.findStakingPda(boundPoolInfo.memeReserve.mint, this.client.memechanProgram.programId);
     const stakingSigner = StakingPool.findSignerPda(stakingId, this.client.memechanProgram.programId);
 
-    const adminTicketId = Keypair.generate();
+    const adminTicketId = BoundPool.findMemeTicketPda(stakingId, this.client.memechanProgram.programId);
 
     //const feeDestination = new PublicKey(process.env.FEE_DESTINATION_ID as string);
 
@@ -199,23 +228,27 @@ export class BoundPool {
         pool: pool,
         signer: user.publicKey,
         boundPoolSignerPda: this.findSignerPda(),
-        memeTicket: adminTicketId.publicKey,
+        memeTicket: adminTicketId,
         poolMemeVault: boundPoolInfo.memeReserve.vault,
         poolWsolVault: boundPoolInfo.solReserve.vault,
         solMint: NATIVE_MINT,
         staking: stakingId,
         stakingPoolSignerPda: stakingSigner,
         adminVaultSol: boundPoolInfo.adminVaultSol,
-        marketProgramId: PROGRAMIDS.OPENBOOK_MARKET,
+        //marketProgramId: PROGRAMIDS.OPENBOOK_MARKET,
+        marketProgramId: new PublicKey("EoTcMgcDRTJVZDMZWBoU6rhYHZfkNTVEAfz3uUJRcYGj"),
         systemProgram: SystemProgram.programId,
         tokenProgram: TOKEN_PROGRAM_ID,
         clock: SYSVAR_CLOCK_PUBKEY,
         rent: SYSVAR_RENT_PUBKEY,
         memeMint: boundPoolInfo.memeReserve.mint,
         ataProgram: ATA_PROGRAM_ID,
+        //ataProgram: new PublicKey("7JQfu5CSBhjTr8RYP5fsRt8v66GskSgw7M8E6b1AthhU"),
       })
       .signers([user])
       .rpc({ skipPreflight: true });
+
+      console.log("initStakingPool tx result: " + result);
 
       return result;
   }
@@ -342,6 +375,7 @@ export class BoundPool {
         raydiumMemeVault: ammPool.coinVault,
         raydiumWsolVault: ammPool.pcVault,
         marketProgramId: PROGRAMIDS.OPENBOOK_MARKET,
+        //      marketProgramId: new PublicKey("GQHDSwdKi6QYcTZoZXoHRaEPtPanWESwQuTATz8WY5Ep"),
         systemProgram: SystemProgram.programId,
         tokenProgram: TOKEN_PROGRAM_ID,
         marketAccount: marketId,
@@ -352,6 +386,7 @@ export class BoundPool {
         memeMint: boundPoolInfo.memeReserve.mint,
         ammConfig: poolInfo2.ammConfig,
         ataProgram: ATA_PROGRAM_ID,
+       //ataProgram: new PublicKey("7JQfu5CSBhjTr8RYP5fsRt8v66GskSgw7M8E6b1AthhU"),
         feeDestinationInfo: feeDestination,
         userDestinationLpTokenAta: userDestinationLpTokenAta,
       })

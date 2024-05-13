@@ -13,7 +13,8 @@ export class MemechanClient {
     this.wallet = wallet;
     const isTest = process.env.NODE_ENV === "test";
 
-    this.connection = new Connection(clusterApiUrl(network), {
+    //this.connection = new Connection(clusterApiUrl(network), {
+    this.connection = new Connection(process.env.RPC_API_CLUSTER, {
       httpAgent: isTest ? false : undefined,
       commitment: "confirmed",
     });
