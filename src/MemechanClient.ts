@@ -23,10 +23,6 @@ export class MemechanClient {
     setProvider(provider);
 
     console.log("program id: " + process.env.MEMECHAN_PROGRAM_ID);
-    this.memechanProgram = new Program<MemechanSol>(
-      IDL,
-      new PublicKey(process.env.MEMECHAN_PROGRAM_ID!),
-      provider,
-    );
+    this.memechanProgram = new Program<MemechanSol>(IDL, new PublicKey(process.env.MEMECHAN_PROGRAM_ID!), provider);
   }
 }

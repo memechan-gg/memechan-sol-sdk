@@ -247,6 +247,7 @@ describe("BoundPool", () => {
       await sleep(1000);
 
       const userMemeTicket = await pool.swapY({
+        payer: payer,
         user,
         memeTokensOut: new BN(1),
         solAmountIn: new BN(30 * 1e9),
@@ -262,6 +263,8 @@ describe("BoundPool", () => {
       })
 
       const ticketId = await pool.swapY({
+        payer: payer,
+        user: user,
         memeTokensOut: new BN(1),
         solAmountIn: new BN(303 * 1e9),
       });

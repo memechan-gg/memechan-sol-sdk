@@ -47,20 +47,33 @@ export class BoundPool {
     return PublicKey.findProgramAddressSync([Buffer.from("signer"), publicKey.toBytes()], memechanProgramId)[0];
   }
 
-  public static findBoundPoolPda(memeMintPubkey: PublicKey, solMintPubkey: PublicKey, memechanProgramId: PublicKey): PublicKey {
-    return PublicKey.findProgramAddressSync([Buffer.from("bound_pool"), memeMintPubkey.toBytes(), solMintPubkey.toBytes()], memechanProgramId)[0];
+  public static findBoundPoolPda(
+    memeMintPubkey: PublicKey,
+    solMintPubkey: PublicKey,
+    memechanProgramId: PublicKey,
+  ): PublicKey {
+    return PublicKey.findProgramAddressSync(
+      [Buffer.from("bound_pool"), memeMintPubkey.toBytes(), solMintPubkey.toBytes()],
+      memechanProgramId,
+    )[0];
   }
 
   public static findStakingPda(memeMintPubkey: PublicKey, memechanProgramId: PublicKey): PublicKey {
-    return PublicKey.findProgramAddressSync([Buffer.from("staking_pool"), memeMintPubkey.toBytes()], memechanProgramId)[0];
+    return PublicKey.findProgramAddressSync(
+      [Buffer.from("staking_pool"), memeMintPubkey.toBytes()],
+      memechanProgramId,
+    )[0];
   }
 
   public static findMemeTicketPda(stakingPubKey: PublicKey, memechanProgramId: PublicKey): PublicKey {
-    return PublicKey.findProgramAddressSync([Buffer.from("admin_ticket"), stakingPubKey.toBytes()], memechanProgramId)[0];
+    return PublicKey.findProgramAddressSync(
+      [Buffer.from("admin_ticket"), stakingPubKey.toBytes()],
+      memechanProgramId,
+    )[0];
   }
 
   public static async new(args: BoundPoolArgs): Promise<BoundPool> {
-     const { admin, payer, signer, client } = args;
+    const { admin, payer, signer, client } = args;
     const { connection, memechanProgram } = client;
 
     const memeMintKeypair = Keypair.generate();
@@ -68,7 +81,7 @@ export class BoundPool {
     const poolSigner = BoundPool.findSignerPda(id, args.client.memechanProgram.programId);
 
     const memeMint = await createMint(connection, payer, poolSigner, null, 6, memeMintKeypair);
-    
+
     const adminSolVault = (await getOrCreateAssociatedTokenAccount(connection, payer, NATIVE_MINT, admin)).address;
     const poolSolVaultid = Keypair.generate();
     const poolSolVault = await createAccount(connection, payer, NATIVE_MINT, poolSigner, poolSolVaultid);
@@ -134,24 +147,26 @@ export class BoundPool {
     console.log("1");
 
     const userSolAcc =
-      input.userSolAcc ?? (await getOrCreateAssociatedTokenAccount(this.client.connection, payer, NATIVE_MINT, user.publicKey)).address;
+      input.userSolAcc ??
+      (await getOrCreateAssociatedTokenAccount(this.client.connection, payer, NATIVE_MINT, user.publicKey)).address;
 
     console.log("2 userSolAcc:" + userSolAcc.toBase58());
     console.log("payer.publicKey: " + payer.publicKey.toBase58());
     console.log("user.publicKey: " + user.publicKey.toBase58());
     console.log("sol_in: " + sol_in);
 
-    console.log("this.client.connection.rpc " + this.client.connection.rpcEndpoint)
+    console.log("this.client.connection.rpc " + this.client.connection.rpcEndpoint);
     const balance = await this.client.connection.getBalance(payer.publicKey);
     console.log(`${balance / LAMPORTS_PER_SOL} SOL`);
 
-    const transferTx = new Transaction().add(SystemProgram.transfer({
-                fromPubkey: payer.publicKey,
-                toPubkey: userSolAcc,
-                lamports: sol_in,
-            }),
-            createSyncNativeInstruction(userSolAcc)
-        );
+    const transferTx = new Transaction().add(
+      SystemProgram.transfer({
+        fromPubkey: payer.publicKey,
+        toPubkey: userSolAcc,
+        lamports: sol_in,
+      }),
+      createSyncNativeInstruction(userSolAcc),
+    );
 
     const transferResult = await sendAndConfirmTransaction(this.client.connection, transferTx, [payer]);
 
@@ -173,7 +188,7 @@ export class BoundPool {
         tokenProgram: TOKEN_PROGRAM_ID,
       })
       .signers([user, id])
-      .rpc({skipPreflight: true})
+      .rpc({ skipPreflight: true })
       .catch((e) => console.error(e));
 
     console.log("4");
@@ -248,15 +263,14 @@ export class BoundPool {
       .signers([user])
       .rpc({ skipPreflight: true });
 
-      console.log("initStakingPool tx result: " + result);
+    console.log("initStakingPool tx result: " + result);
 
-      return result;
+    return result;
   }
 
   public async goLive(input: Partial<GoLiveArgs>): Promise<[StakingPool]> {
     const user = input.user!;
-   // const pool = input.pool ?? this.id;
-
+    // const pool = input.pool ?? this.id;
 
     // tmp new test token
     const testTokenMint = await createMint(this.client.connection, user, user.publicKey, null, 6);
@@ -296,7 +310,7 @@ export class BoundPool {
       throw new Error("createMarketTxResult failed");
     }
 
-   // const boundPoolSigner = BoundPool.findSignerPda(pool, this.client.memechanProgram.programId);
+    // const boundPoolSigner = BoundPool.findSignerPda(pool, this.client.memechanProgram.programId);
 
     // how to mint
     //await mintTo(this.client.connection, user, baseTokenInfo.mint, memeATA.address, boundPoolSigner, 100000);
@@ -351,7 +365,7 @@ export class BoundPool {
 
     const boundPoolInfo = await this.fetch();
 
-   // const adminTicketId = Keypair.generate();
+    // const adminTicketId = Keypair.generate();
     const stakingId = BoundPool.findStakingPda(boundPoolInfo.memeReserve.mint, this.client.memechanProgram.programId);
     const stakingSigner = StakingPool.findSignerPda(stakingId, this.client.memechanProgram.programId);
 
@@ -386,7 +400,7 @@ export class BoundPool {
         memeMint: boundPoolInfo.memeReserve.mint,
         ammConfig: poolInfo2.ammConfig,
         ataProgram: ATA_PROGRAM_ID,
-       //ataProgram: new PublicKey("7JQfu5CSBhjTr8RYP5fsRt8v66GskSgw7M8E6b1AthhU"),
+        //ataProgram: new PublicKey("7JQfu5CSBhjTr8RYP5fsRt8v66GskSgw7M8E6b1AthhU"),
         feeDestinationInfo: feeDestination,
         userDestinationLpTokenAta: userDestinationLpTokenAta,
       })
