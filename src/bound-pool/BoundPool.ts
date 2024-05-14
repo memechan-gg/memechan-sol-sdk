@@ -250,15 +250,13 @@ export class BoundPool {
         staking: stakingId,
         stakingPoolSignerPda: stakingSigner,
         adminVaultSol: boundPoolInfo.adminVaultSol,
-        //marketProgramId: PROGRAMIDS.OPENBOOK_MARKET,
-        marketProgramId: new PublicKey("EoTcMgcDRTJVZDMZWBoU6rhYHZfkNTVEAfz3uUJRcYGj"),
+        marketProgramId: PROGRAMIDS.OPENBOOK_MARKET,
         systemProgram: SystemProgram.programId,
         tokenProgram: TOKEN_PROGRAM_ID,
         clock: SYSVAR_CLOCK_PUBKEY,
         rent: SYSVAR_RENT_PUBKEY,
         memeMint: boundPoolInfo.memeReserve.mint,
         ataProgram: ATA_PROGRAM_ID,
-        //ataProgram: new PublicKey("7JQfu5CSBhjTr8RYP5fsRt8v66GskSgw7M8E6b1AthhU"),
       })
       .signers([user])
       .rpc({ skipPreflight: true });
@@ -389,7 +387,6 @@ export class BoundPool {
         raydiumMemeVault: ammPool.coinVault,
         raydiumWsolVault: ammPool.pcVault,
         marketProgramId: PROGRAMIDS.OPENBOOK_MARKET,
-        //      marketProgramId: new PublicKey("GQHDSwdKi6QYcTZoZXoHRaEPtPanWESwQuTATz8WY5Ep"),
         systemProgram: SystemProgram.programId,
         tokenProgram: TOKEN_PROGRAM_ID,
         marketAccount: marketId,
@@ -400,7 +397,6 @@ export class BoundPool {
         memeMint: boundPoolInfo.memeReserve.mint,
         ammConfig: poolInfo2.ammConfig,
         ataProgram: ATA_PROGRAM_ID,
-        //ataProgram: new PublicKey("7JQfu5CSBhjTr8RYP5fsRt8v66GskSgw7M8E6b1AthhU"),
         feeDestinationInfo: feeDestination,
         userDestinationLpTokenAta: userDestinationLpTokenAta,
       })
