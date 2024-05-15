@@ -26,7 +26,7 @@ import { AnchorError, BN, Provider } from "@coral-xyz/anchor";
 import { MemeTicket } from "../memeticket/MemeTicket";
 import { StakingPool } from "../staking-pool/StakingPool";
 import { MemechanClient } from "../MemechanClient";
-import { getATAAddress, getWalletTokenAccount } from "../utils/util";
+import { getWalletTokenAccount } from "../utils/util";
 import { ammCreatePool } from "../raydium/ammCreatePool";
 import { ATA_PROGRAM_ID, PROGRAMIDS } from "../raydium/config";
 import { formatAmmKeysById } from "../raydium/formatAmmKeysById";
@@ -583,24 +583,27 @@ export class BoundPool {
 
     //console.log("ammConfig vs ammConfigId " + ammConfig.toBase58() + " vs " + ammConfigId.toBase58());
 
-    const raydiumMemeVault = await createAccount(
-      this.client.connection,
-      user,
-      testTokenMint,
-      raydiumAmmAuthority.publicKey,
-      Keypair.generate(),
-      { commitment: "confirmed" },
-    );
-    const raydiumWsolVault = await createAccount(
-      this.client.connection,
-      user,
-      testTokenMint,
-      raydiumAmmAuthority.publicKey,
-      Keypair.generate(),
-      { commitment: "confirmed" },
-    );
+    // const raydiumMemeVault = await createAccount(
+    //   this.client.connection,
+    //   user,
+    //   testTokenMint,
+    //   raydiumAmmAuthority.publicKey,
+    //   Keypair.generate(),
+    //   { commitment: "confirmed" },
+    // );
+    // const raydiumWsolVault = await createAccount(
+    //   this.client.connection,
+    //   user,
+    //   testTokenMint,
+    //   raydiumAmmAuthority.publicKey,
+    //   Keypair.generate(),
+    //   { commitment: "confirmed" },
+    // );
 
-    const userDestinationLpTokenAta = getATAAddress(TOKEN_PROGRAM_ID, user.publicKey, raydiumLpMint).publicKey;
+    const raydiumMemeVault = BoundPool.getAssociatedBaseVault({ programId: PROGRAMIDS.AmmV4, marketId });
+    const raydiumWsolVault = BoundPool.getAssociatedQuoteVault({ programId: PROGRAMIDS.AmmV4, marketId });
+
+    const userDestinationLpTokenAta = BoundPool.getATAAddress(user.publicKey, raydiumLpMint, TOKEN_PROGRAM_ID).publicKey;
 
     try {
       const result = await this.client.memechanProgram.methods
@@ -654,6 +657,13 @@ export class BoundPool {
       throw error;
     }
   }
+
+static getATAAddress(owner: PublicKey, mint: PublicKey, programId: PublicKey) {
+  return findProgramAddress(
+    [owner.toBuffer(), programId.toBuffer(), mint.toBuffer()],
+    new PublicKey('ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL'),
+  )
+}
 
   static getAssociatedId({ programId, marketId }: { programId: PublicKey; marketId: PublicKey }) {
     const { publicKey } = findProgramAddress(
