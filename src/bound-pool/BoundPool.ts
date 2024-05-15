@@ -45,6 +45,7 @@ import {
   PC_VAULT_ASSOCIATED_SEED,
   TARGET_ASSOCIATED_SEED,
 } from "../raydium/pdaHelper";
+import { findProgramAddress } from "../common/helpers";
 
 export class BoundPool {
   private constructor(
@@ -572,36 +573,13 @@ export class BoundPool {
 
     //console.log("derived: ammConfigId: " + ammConfigId.toBase58());
 
-    const infoId = this.client.memechanProgram.programId;
-    const marketAddress = marketId;
-    const programId = this.client.memechanProgram.programId;
+    const ammId = BoundPool.getAssociatedId({ programId: PROGRAMIDS.AmmV4, marketId });
+    const raydiumAmmAuthority = BoundPool.getAssociatedAuthority({ programId: PROGRAMIDS.AmmV4 });
+    const openOrders = BoundPool.getAssociatedOpenOrders({ programId: PROGRAMIDS.AmmV4, marketId });
+    const targetOrders = BoundPool.getAssociatedTargetOrders({ programId: PROGRAMIDS.AmmV4, marketId });
+    const ammConfig = BoundPool.getAssociatedConfigId({ programId: PROGRAMIDS.AmmV4 });
+    const raydiumLpMint = BoundPool.getAssociatedLpMint({ programId: PROGRAMIDS.AmmV4, marketId });
 
-    const [ammId] = getAssociatedAddressAndBumpSeed(infoId, marketAddress, AMM_ASSOCIATED_SEED, PROGRAMIDS.AmmV4);
-    const [raydiumAmmAuthority] = getAssociatedAddressAndBumpSeed(
-      infoId,
-      marketAddress,
-      AUTHORITY_AMM,
-      PROGRAMIDS.AmmV4,
-    );
-    const [openOrders] = getAssociatedAddressAndBumpSeed(
-      infoId,
-      marketAddress,
-      OPEN_ORDER_ASSOCIATED_SEED,
-      PROGRAMIDS.AmmV4,
-    );
-    const [targetOrders] = getAssociatedAddressAndBumpSeed(
-      infoId,
-      marketAddress,
-      TARGET_ASSOCIATED_SEED,
-      PROGRAMIDS.AmmV4,
-    );
-    const [ammConfig] = getAssociatedAddressAndBumpSeed(infoId, marketAddress, AMM_CONFIG_SEED, PROGRAMIDS.AmmV4);
-    const [raydiumLpMint] = getAssociatedAddressAndBumpSeed(
-      infoId,
-      marketAddress,
-      LP_MINT_ASSOCIATED_SEED,
-      PROGRAMIDS.AmmV4,
-    );
 
     //console.log("ammConfig vs ammConfigId " + ammConfig.toBase58() + " vs " + ammConfigId.toBase58());
 
@@ -609,7 +587,7 @@ export class BoundPool {
       this.client.connection,
       user,
       testTokenMint,
-      raydiumAmmAuthority,
+      raydiumAmmAuthority.publicKey,
       Keypair.generate(),
       { commitment: "confirmed" },
     );
@@ -617,25 +595,16 @@ export class BoundPool {
       this.client.connection,
       user,
       testTokenMint,
-      raydiumAmmAuthority,
+      raydiumAmmAuthority.publicKey,
       Keypair.generate(),
       { commitment: "confirmed" },
     );
-
-    // await createAssociatedAccountIfNeeded(this.client.connection, user, ammId, marketAddress, AMM_ASSOCIATED_SEED, programId);
-    // await createAssociatedAccountIfNeeded(this.client.connection, user, poolMemeVault, marketAddress, COIN_VAULT_ASSOCIATED_SEED, programId);
-    // await createAssociatedAccountIfNeeded(this.client.connection, user, poolWsolVault, marketAddress, PC_VAULT_ASSOCIATED_SEED, programId);
-    // await createAssociatedAccountIfNeeded(this.client.connection, user, raydiumAmmAuthority, marketAddress, AUTHORITY_AMM, programId);
-    // await createAssociatedAccountIfNeeded(this.client.connection, user, openOrders, marketAddress, OPEN_ORDER_ASSOCIATED_SEED, programId);
-    // await createAssociatedAccountIfNeeded(this.client.connection, user, targetOrders, marketAddress, TARGET_ASSOCIATED_SEED, programId);
-    // await createAssociatedAccountIfNeeded(this.client.connection, user, ammConfig, marketAddress, AMM_CONFIG_SEED, programId);
-    // await createAssociatedAccountIfNeeded(this.client.connection, user, raydiumLpMint, marketAddress, LP_MINT_ASSOCIATED_SEED, programId);
 
     const userDestinationLpTokenAta = getATAAddress(TOKEN_PROGRAM_ID, user.publicKey, raydiumLpMint).publicKey;
 
     try {
       const result = await this.client.memechanProgram.methods
-        .goLive(nonce)
+        .goLive(raydiumAmmAuthority.nonce)
         .accounts({
           signer: user.publicKey,
           poolMemeVault: input.memeVault,
@@ -645,7 +614,7 @@ export class BoundPool {
           stakingPoolSignerPda: stakingSigner,
           raydiumLpMint: raydiumLpMint,
           raydiumAmm: ammId,
-          raydiumAmmAuthority: raydiumAmmAuthority,
+          raydiumAmmAuthority: raydiumAmmAuthority.publicKey,
           raydiumMemeVault: raydiumMemeVault,
           raydiumWsolVault: raydiumWsolVault,
           marketProgramId: PROGRAMIDS.OPENBOOK_MARKET,
@@ -661,6 +630,7 @@ export class BoundPool {
           ataProgram: ATA_PROGRAM_ID,
           feeDestinationInfo: feeDestination,
           userDestinationLpTokenAta: userDestinationLpTokenAta,
+          raydiumProgram: PROGRAMIDS.AmmV4,
         })
         .signers([user]) // ammid?
         .rpc({ skipPreflight: true });
@@ -673,7 +643,6 @@ export class BoundPool {
       ];
     } catch (error) {
       if (error instanceof AnchorError) {
-        console.error("AnchorError: Account ownership mismatch");
         console.error("Error details:", error);
         if (error.logs) {
           error.logs.forEach((log) => console.log("Program log:", log));
@@ -684,5 +653,82 @@ export class BoundPool {
 
       throw error;
     }
+  }
+
+  static getAssociatedId({ programId, marketId }: { programId: PublicKey; marketId: PublicKey }) {
+    const { publicKey } = findProgramAddress(
+      [programId.toBuffer(), marketId.toBuffer(), Buffer.from('amm_associated_seed', 'utf-8')],
+      programId,
+    )
+    return publicKey
+  }
+
+  static getAssociatedAuthority({ programId }: { programId: PublicKey }) {
+    return findProgramAddress(
+      // new Uint8Array(Buffer.from('amm authority'.replace('\u00A0', ' '), 'utf-8'))
+      [Buffer.from([97, 109, 109, 32, 97, 117, 116, 104, 111, 114, 105, 116, 121])],
+      programId,
+    )
+  }
+
+  static getAssociatedBaseVault({ programId, marketId }: { programId: PublicKey; marketId: PublicKey }) {
+    const { publicKey } = findProgramAddress(
+      [programId.toBuffer(), marketId.toBuffer(), Buffer.from('coin_vault_associated_seed', 'utf-8')],
+      programId,
+    )
+    return publicKey
+  }
+
+  static getAssociatedQuoteVault({ programId, marketId }: { programId: PublicKey; marketId: PublicKey }) {
+    const { publicKey } = findProgramAddress(
+      [programId.toBuffer(), marketId.toBuffer(), Buffer.from('pc_vault_associated_seed', 'utf-8')],
+      programId,
+    )
+    return publicKey
+  }
+
+  static getAssociatedLpMint({ programId, marketId }: { programId: PublicKey; marketId: PublicKey }) {
+    const { publicKey } = findProgramAddress(
+      [programId.toBuffer(), marketId.toBuffer(), Buffer.from('lp_mint_associated_seed', 'utf-8')],
+      programId,
+    )
+    return publicKey
+  }
+
+  static getAssociatedLpVault({ programId, marketId }: { programId: PublicKey; marketId: PublicKey }) {
+    const { publicKey } = findProgramAddress(
+      [programId.toBuffer(), marketId.toBuffer(), Buffer.from('temp_lp_token_associated_seed', 'utf-8')],
+      programId,
+    )
+    return publicKey
+  }
+
+  static getAssociatedTargetOrders({ programId, marketId }: { programId: PublicKey; marketId: PublicKey }) {
+    const { publicKey } = findProgramAddress(
+      [programId.toBuffer(), marketId.toBuffer(), Buffer.from('target_associated_seed', 'utf-8')],
+      programId,
+    )
+    return publicKey
+  }
+
+  static getAssociatedWithdrawQueue({ programId, marketId }: { programId: PublicKey; marketId: PublicKey }) {
+    const { publicKey } = findProgramAddress(
+      [programId.toBuffer(), marketId.toBuffer(), Buffer.from('withdraw_associated_seed', 'utf-8')],
+      programId,
+    )
+    return publicKey
+  }
+
+  static getAssociatedOpenOrders({ programId, marketId }: { programId: PublicKey; marketId: PublicKey }) {
+    const { publicKey } = findProgramAddress(
+      [programId.toBuffer(), marketId.toBuffer(), Buffer.from('open_order_associated_seed', 'utf-8')],
+      programId,
+    )
+    return publicKey
+  }
+
+  static getAssociatedConfigId({ programId }: { programId: PublicKey }) {
+    const { publicKey } = findProgramAddress([Buffer.from('amm_config_account_seed', 'utf-8')], programId)
+    return publicKey
   }
 }

@@ -46,34 +46,32 @@ describe("BoundPool", () => {
 
     await sleep(1000);
 
-    // const ticketId = await pool.swapY({
-    //   payer: payer,
-    //   user: payer,
-    //   memeTokensOut: new BN(1),
-    //   solAmountIn: new BN(1 * 1e9),
-    // });
+    const ticketId = await pool.swapY({
+      payer: payer,
+      user: payer,
+      memeTokensOut: new BN(1),
+      solAmountIn: new BN(1 * 1e9),
+    });
 
-    // console.log("swapY ticketId: " + ticketId);
+    console.log("swapY ticketId: " + ticketId);
 
-    // const boundPoolInfo = await pool.fetch();
+    const boundPoolInfo = await pool.fetch();
 
-    // await pool.initStakingPool({
-    //   payer: payer,
-    //   user: payer,
-    //   boundPoolInfo,
-    // });
+    await pool.initStakingPool({
+      payer: payer,
+      user: payer,
+      boundPoolInfo,
+    });
 
-    // await sleep(1000);
+    await sleep(1000);
 
-    console.log("OINK1");
-
-    // await pool.goLive({
-    //   payer: payer,
-    //   user: payer,
-    //   boundPoolInfo,
-    //   memeVault: pool.memeVault,
-    //   wSolVault: pool.solVault,
-    // });
+    await pool.goLive({
+      payer: payer,
+      user: payer,
+      boundPoolInfo,
+      memeVault: pool.memeVault,
+      wSolVault: pool.solVault,
+    });
 
     console.log("OINK");
   }, 320000);

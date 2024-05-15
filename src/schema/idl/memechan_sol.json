@@ -434,6 +434,11 @@
           "isSigner": false
         },
         {
+          "name": "raydiumProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "ataProgram",
           "isMut": false,
           "isSigner": false
@@ -756,158 +761,9 @@
         }
       ],
       "args": []
-    },
-    {
-      "name": "mintTokenWithMetadata",
-      "accounts": [
-        {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "counter",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "mint",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "metadata",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "rent",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "tokenProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "metadataProgram",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "splAtaProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": [
-        {
-          "name": "name",
-          "type": "string"
-        },
-        {
-          "name": "symbol",
-          "type": "string"
-        },
-        {
-          "name": "uri",
-          "type": "string"
-        },
-        {
-          "name": "description",
-          "type": "string"
-        },
-        {
-          "name": "twitter",
-          "type": {
-            "option": "string"
-          }
-        },
-        {
-          "name": "discord",
-          "type": {
-            "option": "string"
-          }
-        }
-      ]
-    },
-    {
-      "name": "initializeCounter",
-      "accounts": [
-        {
-          "name": "counter",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "payer",
-          "isMut": true,
-          "isSigner": true
-        },
-        {
-          "name": "systemProgram",
-          "isMut": false,
-          "isSigner": false
-        }
-      ],
-      "args": []
     }
   ],
   "accounts": [
-    {
-      "name": "Counter",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "value",
-            "type": "u64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "TokenMetadata",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "name",
-            "type": "string"
-          },
-          {
-            "name": "symbol",
-            "type": "string"
-          },
-          {
-            "name": "uri",
-            "type": "string"
-          },
-          {
-            "name": "description",
-            "type": "string"
-          },
-          {
-            "name": "twitter",
-            "type": {
-              "option": "string"
-            }
-          },
-          {
-            "name": "discord",
-            "type": {
-              "option": "string"
-            }
-          }
-        ]
-      }
-    },
     {
       "name": "BoundPool",
       "type": {
@@ -2110,8 +1966,5 @@
       "code": 6018,
       "name": "BondingCurveInterceptMustBePositive"
     }
-  ],
-  "metadata": {
-    "address": "CXkuDmMcnCAme9aMHzDqhnyuXvD7q6UUBFMupuVxLPZt"
-  }
+  ]
 }
