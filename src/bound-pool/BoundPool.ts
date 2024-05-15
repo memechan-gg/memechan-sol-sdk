@@ -568,25 +568,26 @@ export class BoundPool {
     const programId = this.client.memechanProgram.programId;
 
   
-    const [ammId] = getAssociatedAddressAndBumpSeed(infoId, marketAddress, AMM_ASSOCIATED_SEED, programId);
-    const [poolMemeVault] = getAssociatedAddressAndBumpSeed(infoId, marketAddress, COIN_VAULT_ASSOCIATED_SEED, programId);
-    const [poolWsolVault] = getAssociatedAddressAndBumpSeed(infoId, marketAddress, PC_VAULT_ASSOCIATED_SEED, programId);
-    const [raydiumAmmAuthority] = getAssociatedAddressAndBumpSeed(infoId, marketAddress, AUTHORITY_AMM, programId);
-    const [openOrders] = getAssociatedAddressAndBumpSeed(infoId, marketAddress, OPEN_ORDER_ASSOCIATED_SEED, programId);
-    const [targetOrders] = getAssociatedAddressAndBumpSeed(infoId, marketAddress, TARGET_ASSOCIATED_SEED, programId);
-    const [ammConfig] = getAssociatedAddressAndBumpSeed(infoId, marketAddress, AMM_CONFIG_SEED, programId);
-    const [raydiumLpMint] = getAssociatedAddressAndBumpSeed(infoId, marketAddress, LP_MINT_ASSOCIATED_SEED, programId);
+    const [ammId] = getAssociatedAddressAndBumpSeed(infoId, marketAddress, AMM_ASSOCIATED_SEED, PROGRAMIDS.AmmV4);
+    const [raydiumAmmAuthority] = getAssociatedAddressAndBumpSeed(infoId, marketAddress, AUTHORITY_AMM, PROGRAMIDS.AmmV4);
+    const [openOrders] = getAssociatedAddressAndBumpSeed(infoId, marketAddress, OPEN_ORDER_ASSOCIATED_SEED, PROGRAMIDS.AmmV4);
+    const [targetOrders] = getAssociatedAddressAndBumpSeed(infoId, marketAddress, TARGET_ASSOCIATED_SEED, PROGRAMIDS.AmmV4);
+    const [ammConfig] = getAssociatedAddressAndBumpSeed(infoId, marketAddress, AMM_CONFIG_SEED, PROGRAMIDS.AmmV4);
+    const [raydiumLpMint] = getAssociatedAddressAndBumpSeed(infoId, marketAddress, LP_MINT_ASSOCIATED_SEED, PROGRAMIDS.AmmV4);
 
     //console.log("ammConfig vs ammConfigId " + ammConfig.toBase58() + " vs " + ammConfigId.toBase58());
 
-    await createAssociatedAccountIfNeeded(this.client.connection, user, ammId, marketAddress, AMM_ASSOCIATED_SEED, programId);
-    await createAssociatedAccountIfNeeded(this.client.connection, user, poolMemeVault, marketAddress, COIN_VAULT_ASSOCIATED_SEED, programId);
-    await createAssociatedAccountIfNeeded(this.client.connection, user, poolWsolVault, marketAddress, PC_VAULT_ASSOCIATED_SEED, programId);
-    await createAssociatedAccountIfNeeded(this.client.connection, user, raydiumAmmAuthority, marketAddress, AUTHORITY_AMM, programId);
-    await createAssociatedAccountIfNeeded(this.client.connection, user, openOrders, marketAddress, OPEN_ORDER_ASSOCIATED_SEED, programId);
-    await createAssociatedAccountIfNeeded(this.client.connection, user, targetOrders, marketAddress, TARGET_ASSOCIATED_SEED, programId);
-    await createAssociatedAccountIfNeeded(this.client.connection, user, ammConfig, marketAddress, AMM_CONFIG_SEED, programId);
-    await createAssociatedAccountIfNeeded(this.client.connection, user, raydiumLpMint, marketAddress, LP_MINT_ASSOCIATED_SEED, programId);
+    const memeVault = await createAccount(this.client.connection, user, testTokenMint,  raydiumAmmAuthority, Keypair.generate(),  {commitment: "confirmed"});
+    const wsolVault = await createAccount(this.client.connection, user, testTokenMint,  raydiumAmmAuthority,  Keypair.generate(),  {commitment: "confirmed"});
+
+    // await createAssociatedAccountIfNeeded(this.client.connection, user, ammId, marketAddress, AMM_ASSOCIATED_SEED, programId);
+     //await createAssociatedAccountIfNeeded(this.client.connection, user, poolMemeVault, marketAddress, COIN_VAULT_ASSOCIATED_SEED, programId);
+    // await createAssociatedAccountIfNeeded(this.client.connection, user, poolWsolVault, marketAddress, PC_VAULT_ASSOCIATED_SEED, programId);
+    // await createAssociatedAccountIfNeeded(this.client.connection, user, raydiumAmmAuthority, marketAddress, AUTHORITY_AMM, programId);
+    // await createAssociatedAccountIfNeeded(this.client.connection, user, openOrders, marketAddress, OPEN_ORDER_ASSOCIATED_SEED, programId);
+    // await createAssociatedAccountIfNeeded(this.client.connection, user, targetOrders, marketAddress, TARGET_ASSOCIATED_SEED, programId);
+    // await createAssociatedAccountIfNeeded(this.client.connection, user, ammConfig, marketAddress, AMM_CONFIG_SEED, programId);
+    // await createAssociatedAccountIfNeeded(this.client.connection, user, raydiumLpMint, marketAddress, LP_MINT_ASSOCIATED_SEED, programId);
 
 
     const userDestinationLpTokenAta = getATAAddress(TOKEN_PROGRAM_ID, user.publicKey, raydiumLpMint).publicKey;
@@ -596,16 +597,16 @@ export class BoundPool {
       .goLive(nonce)
       .accounts({
         signer: user.publicKey,
-        poolMemeVault: poolMemeVault,
-        poolWsolVault: poolWsolVault,
+        poolMemeVault: memeVault,
+        poolWsolVault: wsolVault,
         solMint: NATIVE_MINT,
         staking: stakingId,
         stakingPoolSignerPda: stakingSigner,
         raydiumLpMint: raydiumLpMint,
         raydiumAmm: ammId,
         raydiumAmmAuthority: raydiumAmmAuthority,
-        raydiumMemeVault: poolMemeVault,
-        raydiumWsolVault: poolWsolVault,
+        raydiumMemeVault: memeVault,
+        raydiumWsolVault: wsolVault,
         marketProgramId: PROGRAMIDS.OPENBOOK_MARKET,
         systemProgram: SystemProgram.programId,
         tokenProgram: TOKEN_PROGRAM_ID,

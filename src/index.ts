@@ -1,2 +1,2 @@
 export * from "./MemechanClient";
-export * from "./token/initializeCounter";
+export * from "./token/mintTokenWithMetadata";

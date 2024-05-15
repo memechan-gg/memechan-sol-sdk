@@ -1,6 +1,7 @@
-// import NodeWallet from "@coral-xyz/anchor/dist/cjs/nodewallet";
-// import { Keypair, PublicKey } from "@solana/web3.js";
-// import { MemechanClient } from "../src/MemechanClient";
+import NodeWallet from "@coral-xyz/anchor/dist/cjs/nodewallet";
+import { Keypair, PublicKey } from "@solana/web3.js";
+import { MemechanClient } from "../src/MemechanClient";
+import { mintTokenWithMetadata } from "../src/token/mintTokenWithMetadata";
 
 // describe("Token", () => {
 
@@ -9,7 +10,7 @@
 //         const wallet = new NodeWallet(payer);
 //         const client = new MemechanClient(wallet);
        
-//         initializeCounter(client, payer)
+//         const result = await mintTokenWithMetadata(client, payer);
 
 //       }, 60000);
 // });
