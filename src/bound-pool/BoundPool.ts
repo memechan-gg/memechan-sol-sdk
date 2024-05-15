@@ -168,7 +168,7 @@ export class BoundPool {
       createSyncNativeInstruction(userSolAcc),
     );
 
-    const transferResult = await sendAndConfirmTransaction(this.client.connection, transferTx, [payer]);
+    const transferResult = await sendAndConfirmTransaction(this.client.connection, transferTx, [payer], { skipPreflight: true });
 
     console.log("3 transferResult: " + transferResult);
 
@@ -188,7 +188,7 @@ export class BoundPool {
         tokenProgram: TOKEN_PROGRAM_ID,
       })
       .signers([user, id])
-      .rpc({ skipPreflight: true })
+      .rpc({ skipPreflight: true, maxRetries: 3 })
       .catch((e) => console.error(e));
 
     console.log("4");
