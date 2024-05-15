@@ -18,6 +18,7 @@ import {
   Transaction,
   sendAndConfirmTransaction,
   LAMPORTS_PER_SOL,
+  Connection,
 } from "@solana/web3.js";
 import { Token } from "@raydium-io/raydium-sdk";
 
@@ -416,29 +417,6 @@ export class BoundPool {
     const user = input.user!;
     // const pool = input.pool ?? this.id;
 
-    // console.log("goLive fetch: " + this.id.toBase58());
-
-    // const isTest = process.env.NODE_ENV === "test";
-    // const connection = new Connection(clusterApiUrl('devnet'), {
-    // //this.connection = new Connection(process.env.RPC_API_CLUSTER, {
-    //   httpAgent: isTest ? false : undefined,
-    //   commitment: "confirmed",
-    // });
-
-    // const payer =  Keypair.fromSecretKey(Buffer.from(JSON.parse(process.env.TEST_USER_SECRET_KEY as string)));
-    // // console.log("payer: " + payer.publicKey.toString());
-    // // return;
-
-    // const wallet = new NodeWallet(payer);
-
-    // const provider = new AnchorProvider(connection, wallet, { commitment: "confirmed" });
-    // //setProvider(provider);
-
-    // console.log("program id: " + process.env.MEMECHAN_PROGRAM_ID);
-    // const memechanProgram = new Program<MemechanSol>(IDL, new PublicKey(process.env.MEMECHAN_PROGRAM_ID!), provider);
-
-    //const boundPoolInfo = await this.fetch(memechanProgram);
-
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const boundPoolInfo = input.boundPoolInfo as any;
     console.log("goLive.boundPoolInfo: " + JSON.stringify(boundPoolInfo));
@@ -481,124 +459,53 @@ export class BoundPool {
       throw new Error("createMarketTxResult failed");
     }
 
-    // const boundPoolSigner = BoundPool.findSignerPda(pool, this.client.memechanProgram.programId);
-
-    // how to mint
-    //await mintTo(this.client.connection, user, baseTokenInfo.mint, memeATA.address, boundPoolSigner, 100000);
-
-    const addBaseAmount = new BN(10000000); //new BN(10000) // 10000 / 10 ** 6,
-    const addQuoteAmount = new BN(10000000); // 10000 / 10 ** 6,
-    const startTime = Math.floor(Date.now() / 1000) + 60; // start from 1 minute later
-    const walletTokenAccounts = await getWalletTokenAccount(this.client.connection, user.publicKey);
-
     console.log("marketId", marketId.toBase58());
 
-    // const {
-    //   txids: ammCreatePoolTxIds,
-    //   ammPool,
-    //   poolInfo,
-    // } = await ammCreatePool({
-    //   startTime,
-    //   addBaseAmount,
-    //   addQuoteAmount,
-    //   baseToken: baseTokenInfo,
-    //   quoteToken: quoteTokenInfo,
-    //   targetMarketId: marketId,
-    //   wallet: user,
-    //   walletTokenAccounts,
-    //   connection: this.client.connection,
-    // });
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    // let retryResult: { ammPool: any; poolInfo: any; };
-    // try {
-    //   retryResult = await this.retryAmmCreatePool({
-    //     startTime,
-    //     addBaseAmount,
-    //     addQuoteAmount,
-    //     baseToken: baseTokenInfo,
-    //     quoteToken: quoteTokenInfo,
-    //     targetMarketId: marketId,
-    //     wallet: user,
-    //     walletTokenAccounts,
-    //     connection: this.client.connection,
-    //   }, 3); // Retry up to 3 times
-
-    //   console.log("AMM Pool created successfully:", JSON.stringify(retryResult));
-    // } catch (error) {
-    //   console.error("Failed to create AMM Pool after retries:", error);
-    // }
-
-    //console.log("ammCreatePoolTxIds: " + JSON.stringify(ammCreatePoolTxIds));
-
-    // const latestBH = await this.client.connection.getLatestBlockhash("confirmed");
-    // const ammCreatePoolTxResult = await this.client.connection.confirmTransaction(
-    //   {
-    //     signature: ammCreatePoolTxIds[0],
-    //     blockhash: latestBH.blockhash,
-    //     lastValidBlockHeight: latestBH.lastValidBlockHeight,
-    //   },
-    //   "confirmed",
-    // );
-
-    // if (ammCreatePoolTxResult.value.err) {
-    //   console.error("ammCreatePoolTxResult", ammCreatePoolTxResult);
-    //   throw new Error("ammCreatePoolTxResult failed");
-    // }
-
-    //const { ammPool, poolInfo } = retryResult;
-
-    // console.log("ammPool: " + JSON.stringify(ammPool));
-    // console.log("poolInfo: " + JSON.stringify(poolInfo));
-
-    // const poolInfo2 = await formatAmmKeysById(ammPool.ammId.toBase58(), this.client.connection);
-    // console.log("poolInfo2: " + JSON.stringify(poolInfo2));
-
-    // const poolInfo3 = await formatAmmKeys(this.client.connection, ammPool.ammId.toBase58());
-    // console.log("poolInfo3: " + JSON.stringify(poolInfo3));
-
-    // const ammId = new PublicKey(ammPool.ammId);
-
-    // const adminTicketId = Keypair.generate();
     const stakingId = BoundPool.findStakingPda(boundPoolInfo.memeReserve.mint, this.client.memechanProgram.programId);
     const stakingSigner = StakingPool.findSignerPda(stakingId, this.client.memechanProgram.programId);
 
+    console.log("stakingId: " + stakingId.toBase58());
+
+     const transferTx = new Transaction().add(
+      SystemProgram.transfer({
+        fromPubkey: user.publicKey,
+        toPubkey: stakingSigner,
+        lamports: 1_000_000_000,
+      })
+    );
+
+    const transferSignature = await sendAndConfirmTransaction(this.client.connection, transferTx, [user], {
+      skipPreflight: true,
+    });
+
+    console.log("transferSignature: " + transferSignature);
+
+    const transferTxBH0 = await this.client.connection.getLatestBlockhash("confirmed");
+    const transferTxSyncResult = await this.client.connection.confirmTransaction(
+      {
+        signature: transferSignature,
+        blockhash: transferTxBH0.blockhash,
+        lastValidBlockHeight: transferTxBH0.lastValidBlockHeight,
+      },
+      "confirmed",
+    );
+
+    if (transferTxSyncResult.value.err) {
+      console.error("transferTxSyncResult error: ", JSON.stringify(createMarketTxResult));
+      throw new Error("transferTxSyncResult failed");
+    }
+    else
+    {
+      console.log("transferTxSyncResult: " + JSON.stringify(transferTxSyncResult));
+    }
+
     const feeDestination = new PublicKey(process.env.FEE_DESTINATION_ID as string);
-
-    //const userDestinationLpTokenAta = getATAAddress(TOKEN_PROGRAM_ID, user.publicKey, ammPool.lpMint).publicKey; // ??
-    const nonce = 0; // ??
-
-    //const ammConfigId = getAmmConfigId(PROGRAMIDS.AmmV4);
-    //const ammConfigId = getAmmConfigId(this.client.memechanProgram.programId);
-
-    //console.log("derived: ammConfigId: " + ammConfigId.toBase58());
-
     const ammId = BoundPool.getAssociatedId({ programId: PROGRAMIDS.AmmV4, marketId });
     const raydiumAmmAuthority = BoundPool.getAssociatedAuthority({ programId: PROGRAMIDS.AmmV4 });
     const openOrders = BoundPool.getAssociatedOpenOrders({ programId: PROGRAMIDS.AmmV4, marketId });
     const targetOrders = BoundPool.getAssociatedTargetOrders({ programId: PROGRAMIDS.AmmV4, marketId });
     const ammConfig = BoundPool.getAssociatedConfigId({ programId: PROGRAMIDS.AmmV4 });
     const raydiumLpMint = BoundPool.getAssociatedLpMint({ programId: PROGRAMIDS.AmmV4, marketId });
-
-
-    //console.log("ammConfig vs ammConfigId " + ammConfig.toBase58() + " vs " + ammConfigId.toBase58());
-
-    // const raydiumMemeVault = await createAccount(
-    //   this.client.connection,
-    //   user,
-    //   testTokenMint,
-    //   raydiumAmmAuthority.publicKey,
-    //   Keypair.generate(),
-    //   { commitment: "confirmed" },
-    // );
-    // const raydiumWsolVault = await createAccount(
-    //   this.client.connection,
-    //   user,
-    //   testTokenMint,
-    //   raydiumAmmAuthority.publicKey,
-    //   Keypair.generate(),
-    //   { commitment: "confirmed" },
-    // );
 
     const raydiumMemeVault = BoundPool.getAssociatedBaseVault({ programId: PROGRAMIDS.AmmV4, marketId });
     const raydiumWsolVault = BoundPool.getAssociatedQuoteVault({ programId: PROGRAMIDS.AmmV4, marketId });
@@ -641,7 +548,6 @@ export class BoundPool {
       console.log("goLive Transaction successful:", result);
 
       return [
-        //new AmmPool(ammId.publicKey, tollAuthority, this.client),
         new StakingPool(stakingId, this.client),
       ];
     } catch (error) {
@@ -741,4 +647,11 @@ static getATAAddress(owner: PublicKey, mint: PublicKey, programId: PublicKey) {
     const { publicKey } = findProgramAddress([Buffer.from('amm_config_account_seed', 'utf-8')], programId)
     return publicKey
   }
+
+  async airdrop(connection: Connection, to: PublicKey, amount: number = 5_000_000_000) {
+  await connection.confirmTransaction(
+    await connection.requestAirdrop(to, amount),
+    "confirmed"
+  );
+}
 }
