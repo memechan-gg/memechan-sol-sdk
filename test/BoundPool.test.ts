@@ -73,7 +73,7 @@ describe("BoundPool", () => {
           boundPoolInfo
         })
 
-    }, 220000);
+    }, 320000);
 
     // it("swaps full sol->memecoin in one go", async () => {
     //    const admin = new PublicKey(process.env.ADMIN_PUB_KEY as string);

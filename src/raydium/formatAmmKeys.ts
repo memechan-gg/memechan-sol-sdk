@@ -32,6 +32,7 @@ export async function formatAmmKeys(connection: Connection, programId: string, f
   } = {}
   for (const itemMarketProgram of allMarketProgram) {
     const allMarketInfo = await connection.getProgramAccounts(new PublicKey(itemMarketProgram), { filters: [{ dataSize: MARKET_STATE_LAYOUT_V3.span }] })
+    console.log("allMarketInfo: " + JSON.stringify(allMarketInfo));
     for (const itemAccount of allMarketInfo) {
       const itemMarketInfo = MARKET_STATE_LAYOUT_V3.decode(itemAccount.account.data)
       marketInfo[itemAccount.pubkey.toString()] = {
@@ -75,20 +76,20 @@ export async function formatAmmKeys(connection: Connection, programId: string, f
     return format
   }).filter(i => i !== undefined) as ApiPoolInfoV4[]).reduce((a, b) => { a[b.id] = b; return a }, {} as { [id: string]: ApiPoolInfoV4 })
 
-  if (findLookupTableAddress) {
-    const ltas = await connection.getProgramAccounts(new PublicKey('AddressLookupTab1e1111111111111111111111111'), {
-      filters: [{ memcmp: { offset: 22, bytes: 'RayZuc5vEK174xfgNFdD9YADqbbwbFjVjY4NM8itSF9' } }]
-    })
-    for (const itemLTA of ltas) {
-      const keyStr = itemLTA.pubkey.toString()
-      const ltaForamt = new AddressLookupTableAccount({ key: itemLTA.pubkey, state: AddressLookupTableAccount.deserialize(itemLTA.account.data) })
-      for (const itemKey of ltaForamt.state.addresses) {
-        const itemKeyStr = itemKey.toString()
-        if (ammFormatData[itemKeyStr] === undefined) continue
-        ammFormatData[itemKeyStr].lookupTableAccount = keyStr
-      }
-    }
-  }
+  // if (findLookupTableAddress) {
+  //   const ltas = await connection.getProgramAccounts(new PublicKey('AddressLookupTab1e1111111111111111111111111'), {
+  //     filters: [{ memcmp: { offset: 22, bytes: 'RayZuc5vEK174xfgNFdD9YADqbbwbFjVjY4NM8itSF9' } }]
+  //   })
+  //   for (const itemLTA of ltas) {
+  //     const keyStr = itemLTA.pubkey.toString()
+  //     const ltaForamt = new AddressLookupTableAccount({ key: itemLTA.pubkey, state: AddressLookupTableAccount.deserialize(itemLTA.account.data) })
+  //     for (const itemKey of ltaForamt.state.addresses) {
+  //       const itemKeyStr = itemKey.toString()
+  //       if (ammFormatData[itemKeyStr] === undefined) continue
+  //       ammFormatData[itemKeyStr].lookupTableAccount = keyStr
+  //     }
+  //   }
+  // }
 
   return Object.values(ammFormatData)
 }

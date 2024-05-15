@@ -22,7 +22,7 @@ import {
 import { Token } from "@raydium-io/raydium-sdk";
 
 import { BoundPoolArgs, GoLiveArgs, InitStakingPoolArgs, SwapXArgs, SwapYArgs } from "./types";
-import { BN, Provider } from "@coral-xyz/anchor";
+import { AnchorError, BN, Provider } from "@coral-xyz/anchor";
 import { MemeTicket } from "../memeticket/MemeTicket";
 import { StakingPool } from "../staking-pool/StakingPool";
 import { MemechanClient } from "../MemechanClient";
@@ -33,6 +33,7 @@ import { formatAmmKeysById } from "../raydium/formatAmmKeysById";
 import { createMarket } from "../raydium/openBookCreateMarket";
 import { formatAmmKeys } from "../raydium/formatAmmKeys";
 import { getAmmConfigId } from "../raydium/getAmmConfigId";
+import { AMM_ASSOCIATED_SEED, AMM_CONFIG_SEED, AUTHORITY_AMM, COIN_VAULT_ASSOCIATED_SEED, createAssociatedAccountIfNeeded, getAssociatedAddressAndBumpSeed, LP_MINT_ASSOCIATED_SEED, OPEN_ORDER_ASSOCIATED_SEED, PC_VAULT_ASSOCIATED_SEED, TARGET_ASSOCIATED_SEED } from "../raydium/pdaHelper";
 
 export class BoundPool {
   private constructor(
@@ -498,24 +499,24 @@ export class BoundPool {
     // });
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let retryResult: { ammPool: any; poolInfo: any; };
-    try {
-      retryResult = await this.retryAmmCreatePool({
-        startTime,
-        addBaseAmount,
-        addQuoteAmount,
-        baseToken: baseTokenInfo,
-        quoteToken: quoteTokenInfo,
-        targetMarketId: marketId,
-        wallet: user,
-        walletTokenAccounts,
-        connection: this.client.connection,
-      }, 3); // Retry up to 3 times
+    // let retryResult: { ammPool: any; poolInfo: any; };
+    // try {
+    //   retryResult = await this.retryAmmCreatePool({
+    //     startTime,
+    //     addBaseAmount,
+    //     addQuoteAmount,
+    //     baseToken: baseTokenInfo,
+    //     quoteToken: quoteTokenInfo,
+    //     targetMarketId: marketId,
+    //     wallet: user,
+    //     walletTokenAccounts,
+    //     connection: this.client.connection,
+    //   }, 3); // Retry up to 3 times
 
-      console.log("AMM Pool created successfully:", JSON.stringify(retryResult));
-    } catch (error) {
-      console.error("Failed to create AMM Pool after retries:", error);
-    }
+    //   console.log("AMM Pool created successfully:", JSON.stringify(retryResult));
+    // } catch (error) {
+    //   console.error("Failed to create AMM Pool after retries:", error);
+    // }
 
     //console.log("ammCreatePoolTxIds: " + JSON.stringify(ammCreatePoolTxIds));
 
@@ -534,19 +535,18 @@ export class BoundPool {
     //   throw new Error("ammCreatePoolTxResult failed");
     // }
 
-    const { ammPool, poolInfo } = retryResult;
+    //const { ammPool, poolInfo } = retryResult;
 
-    console.log("ammPool: " + JSON.stringify(ammPool));
-    console.log("poolInfo: " + JSON.stringify(poolInfo));
+    // console.log("ammPool: " + JSON.stringify(ammPool));
+    // console.log("poolInfo: " + JSON.stringify(poolInfo));
 
-    const poolInfo2 = await formatAmmKeysById(ammPool.ammId.toBase58(), this.client.connection);
-    console.log("poolInfo2: " + JSON.stringify(poolInfo2));
+    // const poolInfo2 = await formatAmmKeysById(ammPool.ammId.toBase58(), this.client.connection);
+    // console.log("poolInfo2: " + JSON.stringify(poolInfo2));
 
-    const poolInfo3 = await formatAmmKeys(this.client.connection, ammPool.ammId.toBase58());
-    console.log("poolInfo3: " + JSON.stringify(poolInfo3));
+    // const poolInfo3 = await formatAmmKeys(this.client.connection, ammPool.ammId.toBase58());
+    // console.log("poolInfo3: " + JSON.stringify(poolInfo3));
 
-    const ammId = new PublicKey(ammPool.ammId);
-
+    // const ammId = new PublicKey(ammPool.ammId);
 
     // const adminTicketId = Keypair.generate();
     const stakingId = BoundPool.findStakingPda(boundPoolInfo.memeReserve.mint, this.client.memechanProgram.programId);
@@ -554,40 +554,68 @@ export class BoundPool {
 
     const feeDestination = new PublicKey(process.env.FEE_DESTINATION_ID as string);
 
-    const userDestinationLpTokenAta = getATAAddress(TOKEN_PROGRAM_ID, user.publicKey, ammPool.lpMint).publicKey; // ??
+    //const userDestinationLpTokenAta = getATAAddress(TOKEN_PROGRAM_ID, user.publicKey, ammPool.lpMint).publicKey; // ??
     const nonce = 0; // ??
 
-    const ammv4 = PROGRAMIDS.AmmV4;
-    console.log("ammv4: " + ammv4);
-   // const ammConfigId = getAmmConfigId(PROGRAMIDS.AmmV4);
-   const ammConfigId = getAmmConfigId(this.client.memechanProgram.programId);
+    //const ammConfigId = getAmmConfigId(PROGRAMIDS.AmmV4);
+   //const ammConfigId = getAmmConfigId(this.client.memechanProgram.programId);
 
-    console.log("ammConfigId: " + ammConfigId.toBase58());
+    //console.log("derived: ammConfigId: " + ammConfigId.toBase58());
 
+
+    const infoId = this.client.memechanProgram.programId;
+    const marketAddress = marketId;
+    const programId = this.client.memechanProgram.programId;
+
+  
+    const [ammId] = getAssociatedAddressAndBumpSeed(infoId, marketAddress, AMM_ASSOCIATED_SEED, programId);
+    const [poolMemeVault] = getAssociatedAddressAndBumpSeed(infoId, marketAddress, COIN_VAULT_ASSOCIATED_SEED, programId);
+    const [poolWsolVault] = getAssociatedAddressAndBumpSeed(infoId, marketAddress, PC_VAULT_ASSOCIATED_SEED, programId);
+    const [raydiumAmmAuthority] = getAssociatedAddressAndBumpSeed(infoId, marketAddress, AUTHORITY_AMM, programId);
+    const [openOrders] = getAssociatedAddressAndBumpSeed(infoId, marketAddress, OPEN_ORDER_ASSOCIATED_SEED, programId);
+    const [targetOrders] = getAssociatedAddressAndBumpSeed(infoId, marketAddress, TARGET_ASSOCIATED_SEED, programId);
+    const [ammConfig] = getAssociatedAddressAndBumpSeed(infoId, marketAddress, AMM_CONFIG_SEED, programId);
+    const [raydiumLpMint] = getAssociatedAddressAndBumpSeed(infoId, marketAddress, LP_MINT_ASSOCIATED_SEED, programId);
+
+    //console.log("ammConfig vs ammConfigId " + ammConfig.toBase58() + " vs " + ammConfigId.toBase58());
+
+    await createAssociatedAccountIfNeeded(this.client.connection, user, ammId, marketAddress, AMM_ASSOCIATED_SEED, programId);
+    await createAssociatedAccountIfNeeded(this.client.connection, user, poolMemeVault, marketAddress, COIN_VAULT_ASSOCIATED_SEED, programId);
+    await createAssociatedAccountIfNeeded(this.client.connection, user, poolWsolVault, marketAddress, PC_VAULT_ASSOCIATED_SEED, programId);
+    await createAssociatedAccountIfNeeded(this.client.connection, user, raydiumAmmAuthority, marketAddress, AUTHORITY_AMM, programId);
+    await createAssociatedAccountIfNeeded(this.client.connection, user, openOrders, marketAddress, OPEN_ORDER_ASSOCIATED_SEED, programId);
+    await createAssociatedAccountIfNeeded(this.client.connection, user, targetOrders, marketAddress, TARGET_ASSOCIATED_SEED, programId);
+    await createAssociatedAccountIfNeeded(this.client.connection, user, ammConfig, marketAddress, AMM_CONFIG_SEED, programId);
+    await createAssociatedAccountIfNeeded(this.client.connection, user, raydiumLpMint, marketAddress, LP_MINT_ASSOCIATED_SEED, programId);
+
+
+    const userDestinationLpTokenAta = getATAAddress(TOKEN_PROGRAM_ID, user.publicKey, raydiumLpMint).publicKey;
+
+    try {
     const result = await this.client.memechanProgram.methods
       .goLive(nonce)
       .accounts({
         signer: user.publicKey,
-        poolMemeVault: ammPool.coinVault,
-        poolWsolVault: ammPool.pcVault,
+        poolMemeVault: poolMemeVault,
+        poolWsolVault: poolWsolVault,
         solMint: NATIVE_MINT,
         staking: stakingId,
         stakingPoolSignerPda: stakingSigner,
-        raydiumLpMint: ammPool.lpMint,
+        raydiumLpMint: raydiumLpMint,
         raydiumAmm: ammId,
-        raydiumAmmAuthority: ammPool.ammAuthority,
-        raydiumMemeVault: ammPool.coinVault,
-        raydiumWsolVault: ammPool.pcVault,
+        raydiumAmmAuthority: raydiumAmmAuthority,
+        raydiumMemeVault: poolMemeVault,
+        raydiumWsolVault: poolWsolVault,
         marketProgramId: PROGRAMIDS.OPENBOOK_MARKET,
         systemProgram: SystemProgram.programId,
         tokenProgram: TOKEN_PROGRAM_ID,
         marketAccount: marketId,
         clock: SYSVAR_CLOCK_PUBKEY,
         rent: SYSVAR_RENT_PUBKEY,
-        openOrders: poolInfo2.openOrders,
-        targetOrders: poolInfo2.targetOrders,
+        openOrders: openOrders,
+        targetOrders: targetOrders,
         memeMint: boundPoolInfo.memeReserve.mint,
-        ammConfig: ammConfigId,
+        ammConfig: ammConfig,
         ataProgram: ATA_PROGRAM_ID,
         feeDestinationInfo: feeDestination,
         userDestinationLpTokenAta: userDestinationLpTokenAta,
@@ -595,11 +623,24 @@ export class BoundPool {
       .signers([user]) // ammid?
       .rpc({ skipPreflight: true });
 
-    console.log("goLive tx result: " + result);
+        console.log("goLive Transaction successful:", result);
 
-    return [
-      //new AmmPool(ammId.publicKey, tollAuthority, this.client),
-      new StakingPool(stakingId, this.client),
-    ];
+      return [
+        //new AmmPool(ammId.publicKey, tollAuthority, this.client),
+        new StakingPool(stakingId, this.client),
+      ];
+    } catch (error) {
+      if (error instanceof AnchorError) {
+        console.error("AnchorError: Account ownership mismatch");
+        console.error("Error details:", error);
+        if (error.logs) {
+          error.logs.forEach(log => console.log("Program log:", log));
+        }
+      } else {
+        console.error("Unexpected error:", error);
+      }
+
+      throw error;
+    }
   }
 }
