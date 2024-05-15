@@ -13,9 +13,9 @@ type CalcStartPrice = {
   addQuoteAmount: BN;
 };
 
-function calcMarketStartPrice(input: CalcStartPrice) {
-  return input.addBaseAmount.toNumber() / 10 ** 6 / (input.addQuoteAmount.toNumber() / 10 ** 6);
-}
+// function calcMarketStartPrice(input: CalcStartPrice) {
+//   return input.addBaseAmount.toNumber() / 10 ** 6 / (input.addQuoteAmount.toNumber() / 10 ** 6);
+// }
 
 type LiquidityPairTargetInfo = {
   baseToken: Token;

@@ -50,3 +50,8 @@ export async function sleep(ms: number) {
 // export function getCurrentSlot(connection: Connection): Promise<number> {
 //   return connection.getSlot();
 // }
+
+export function findProgramAddress(seeds: Array<Buffer | Uint8Array>, programId: PublicKey) {
+  const [publicKey, nonce] = PublicKey.findProgramAddressSync(seeds, programId)
+  return { publicKey, nonce }
+}

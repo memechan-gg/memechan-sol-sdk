@@ -2,7 +2,6 @@ import {
   createAccount,
   createMint,
   createSyncNativeInstruction,
-  createWrappedNativeAccount,
   getAccount,
   getOrCreateAssociatedTokenAccount,
   mintTo,
@@ -32,6 +31,8 @@ import { ammCreatePool } from "../raydium/ammCreatePool";
 import { ATA_PROGRAM_ID, PROGRAMIDS } from "../raydium/config";
 import { formatAmmKeysById } from "../raydium/formatAmmKeysById";
 import { createMarket } from "../raydium/openBookCreateMarket";
+import { formatAmmKeys } from "../raydium/formatAmmKeys";
+import { getAmmConfigId } from "../raydium/getAmmConfigId";
 
 export class BoundPool {
   private constructor(
@@ -90,7 +91,7 @@ export class BoundPool {
     const launchVault = await createAccount(connection, payer, memeMint, poolSigner, launchVaultid);
 
     console.log(
-      `memeMint: ${memeMint.toBase58()}, adminSolVault: ${adminSolVault.toBase58()}, poolSolVault: ${poolSolVault.toBase58()}, launchVault: ${launchVault.toBase58()}`,
+      `pool id: ${id.toBase58()} memeMint: ${memeMint.toBase58()}, adminSolVault: ${adminSolVault.toBase58()}, poolSolVault: ${poolSolVault.toBase58()}, launchVault: ${launchVault.toBase58()}`,
     );
 
     const result = await memechanProgram.methods
@@ -115,8 +116,22 @@ export class BoundPool {
     return new BoundPool(id, signer, poolSolVault, client);
   }
 
-  public async fetch() {
-    return this.client.memechanProgram.account.boundPool.fetch(this.id);
+  //  public async fetch() {
+  //    return this.client.memechanProgram.account.boundPool.fetch(this.id);
+  //  }
+
+  public async fetch(program = this.client.memechanProgram, accountId = this.id, retries = 3) {
+    for (let i = 0; i < retries; i++) {
+      try {
+        const accountInfo = await program.account.boundPool.fetch(accountId, "confirmed");
+        //const accountInfo = await this.client.connection.getAccountInfo(accountId);
+        
+        return accountInfo;
+      } catch (error) {
+        if (i === retries - 1) throw error;
+        await new Promise(resolve => setTimeout(resolve, 1000)); // wait 1 second before retrying
+      }
+    }
   }
 
   public findSignerPda(): PublicKey {
@@ -222,11 +237,54 @@ export class BoundPool {
       .rpc();
   }
 
+  async retryInitStakingPool(client, methodArgs, maxRetries, initialTimeout) {
+    let attempts = 0;
+    let timeout = initialTimeout;
+
+    while (attempts < maxRetries) {
+      try {
+        // Adjust the timeout for the RPC call
+        const options = {
+          skipPreflight: true,
+          commitment: "confirmed",
+          preflightCommitment: "confirmed",
+          timeout: timeout  // Timeout in milliseconds
+        };
+
+        const result = await client.memechanProgram.methods
+          .initStakingPool()
+          .accounts(methodArgs)
+          .signers([methodArgs.user])
+          .rpc(options);
+
+        console.log("Transaction successful:", result);
+        return result;
+      } catch (error) {
+        console.error(`Attempt ${attempts + 1} failed:`, error);
+        if (error.message.includes("Transaction was not confirmed in")) {
+          attempts++;
+          timeout += 30000;  // Increase timeout by 30 seconds for each retry
+          if (attempts >= maxRetries) {
+            throw new Error("All attempts to send transaction failed");
+          }
+        } else {
+          // If the error is not related to timeout, rethrow it
+          throw error;
+        }
+      }
+    }
+  }
+
   public async initStakingPool(input: Partial<InitStakingPoolArgs>): Promise<string> {
     const user = input.user!;
     const pool = input.pool ?? this.id;
 
-    const boundPoolInfo = await this.fetch();
+    //console.log("initStakingPool fetch: " + this.id.toBase58());
+    //const boundPoolInfo = await this.fetch();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const boundPoolInfo = input.boundPoolInfo as any;
+
+    console.log("initStakingPool.boundPoolInfo: " + JSON.stringify(boundPoolInfo));
 
     const stakingId = BoundPool.findStakingPda(boundPoolInfo.memeReserve.mint, this.client.memechanProgram.programId);
     const stakingSigner = StakingPool.findSignerPda(stakingId, this.client.memechanProgram.programId);
@@ -237,9 +295,8 @@ export class BoundPool {
 
     //const userDestinationLpTokenAta = getATAAddress(TOKEN_PROGRAM_ID, user.publicKey, boundPoolInfo.lpMint).publicKey;
 
-    const result = await this.client.memechanProgram.methods
-      .initStakingPool()
-      .accounts({
+    try {
+      const methodArgs = {
         pool: pool,
         signer: user.publicKey,
         boundPoolSignerPda: this.findSignerPda(),
@@ -257,18 +314,122 @@ export class BoundPool {
         rent: SYSVAR_RENT_PUBKEY,
         memeMint: boundPoolInfo.memeReserve.mint,
         ataProgram: ATA_PROGRAM_ID,
-      })
-      .signers([user])
-      .rpc({ skipPreflight: true });
+        user: user
+      };
 
-    console.log("initStakingPool tx result: " + result);
+      const result = await this.retryInitStakingPool(this.client, methodArgs, 3, 30000);  // Retry up to 3 times with an initial timeout of 30 seconds
+      console.log("initStakingPool Final result:", result);
 
-    return result;
+      return result;
+    } catch (error) {
+      console.error("Failed to initialize staking pool:", error);
+    }
+
+    // const result = await this.client.memechanProgram.methods
+    //   .initStakingPool()
+    //   .accounts({
+    //     pool: pool,
+    //     signer: user.publicKey,
+    //     boundPoolSignerPda: this.findSignerPda(),
+    //     memeTicket: adminTicketId,
+    //     poolMemeVault: boundPoolInfo.memeReserve.vault,
+    //     poolWsolVault: boundPoolInfo.solReserve.vault,
+    //     solMint: NATIVE_MINT,
+    //     staking: stakingId,
+    //     stakingPoolSignerPda: stakingSigner,
+    //     adminVaultSol: boundPoolInfo.adminVaultSol,
+    //     marketProgramId: PROGRAMIDS.OPENBOOK_MARKET,
+    //     systemProgram: SystemProgram.programId,
+    //     tokenProgram: TOKEN_PROGRAM_ID,
+    //     clock: SYSVAR_CLOCK_PUBKEY,
+    //     rent: SYSVAR_RENT_PUBKEY,
+    //     memeMint: boundPoolInfo.memeReserve.mint,
+    //     ataProgram: ATA_PROGRAM_ID,
+    //   })
+    //   .signers([user])
+    //   .rpc({ skipPreflight: true });
+
+    // console.log("initStakingPool tx result: " + result);
+
+    return "";
+  }
+
+  async retryAmmCreatePool(args, maxRetries) {
+    let attempts = 0;
+    while (attempts < maxRetries) {
+      try {
+        // Attempt to create the AMM pool
+        const {
+          txids: ammCreatePoolTxIds,
+          ammPool,
+          poolInfo,
+        } = await ammCreatePool(args);
+
+        console.log("ammCreatePoolTxIds: " + JSON.stringify(ammCreatePoolTxIds));
+
+        // Fetch the latest blockhash
+        const latestBH = await args.connection.getLatestBlockhash("confirmed");
+
+        // Confirm the transaction
+        const ammCreatePoolTxResult = await args.connection.confirmTransaction(
+          {
+            signature: ammCreatePoolTxIds[0],
+            blockhash: latestBH.blockhash,
+            lastValidBlockHeight: latestBH.lastValidBlockHeight,
+          },
+          "confirmed"
+        );
+
+        // Check for errors in the transaction result
+        if (ammCreatePoolTxResult.value.err) {
+          console.error("ammCreatePoolTxResult", ammCreatePoolTxResult);
+          throw new Error("ammCreatePoolTxResult failed");
+        }
+
+        // If everything is successful, return the results
+        return { ammPool, poolInfo };
+      } catch (error) {
+        console.error("Attempt " + (attempts + 1) + " failed: ", error);
+        attempts++;
+        if (attempts >= maxRetries) {
+          throw new Error("All attempts to create AMM pool failed");
+        }
+        // Optionally, add a delay here if needed
+        await new Promise(resolve => setTimeout(resolve, 1000)); // wait for 1 second before retrying
+      }
+    }
   }
 
   public async goLive(input: Partial<GoLiveArgs>): Promise<[StakingPool]> {
     const user = input.user!;
     // const pool = input.pool ?? this.id;
+
+    // console.log("goLive fetch: " + this.id.toBase58());
+
+    // const isTest = process.env.NODE_ENV === "test";
+    // const connection = new Connection(clusterApiUrl('devnet'), {
+    // //this.connection = new Connection(process.env.RPC_API_CLUSTER, {
+    //   httpAgent: isTest ? false : undefined,
+    //   commitment: "confirmed",
+    // });
+
+    // const payer =  Keypair.fromSecretKey(Buffer.from(JSON.parse(process.env.TEST_USER_SECRET_KEY as string)));
+    // // console.log("payer: " + payer.publicKey.toString());
+    // // return;
+
+    // const wallet = new NodeWallet(payer);
+
+    // const provider = new AnchorProvider(connection, wallet, { commitment: "confirmed" });
+    // //setProvider(provider);
+
+    // console.log("program id: " + process.env.MEMECHAN_PROGRAM_ID);
+    // const memechanProgram = new Program<MemechanSol>(IDL, new PublicKey(process.env.MEMECHAN_PROGRAM_ID!), provider);
+
+    //const boundPoolInfo = await this.fetch(memechanProgram);
+
+     // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const boundPoolInfo = input.boundPoolInfo as any;
+    console.log("goLive.boundPoolInfo: " + JSON.stringify(boundPoolInfo));
 
     // tmp new test token
     const testTokenMint = await createMint(this.client.connection, user, user.publicKey, null, 6);
@@ -320,38 +481,60 @@ export class BoundPool {
 
     console.log("marketId", marketId.toBase58());
 
-    const {
-      txids: ammCreatePoolTxIds,
-      ammPool,
-      poolInfo,
-    } = await ammCreatePool({
-      startTime,
-      addBaseAmount,
-      addQuoteAmount,
-      baseToken: baseTokenInfo,
-      quoteToken: quoteTokenInfo,
-      targetMarketId: marketId,
-      wallet: user,
-      walletTokenAccounts,
-      connection: this.client.connection,
-    });
+    // const {
+    //   txids: ammCreatePoolTxIds,
+    //   ammPool,
+    //   poolInfo,
+    // } = await ammCreatePool({
+    //   startTime,
+    //   addBaseAmount,
+    //   addQuoteAmount,
+    //   baseToken: baseTokenInfo,
+    //   quoteToken: quoteTokenInfo,
+    //   targetMarketId: marketId,
+    //   wallet: user,
+    //   walletTokenAccounts,
+    //   connection: this.client.connection,
+    // });
 
-    console.log("ammCreatePoolTxIds: " + JSON.stringify(ammCreatePoolTxIds));
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let retryResult: { ammPool: any; poolInfo: any; };
+    try {
+      retryResult = await this.retryAmmCreatePool({
+        startTime,
+        addBaseAmount,
+        addQuoteAmount,
+        baseToken: baseTokenInfo,
+        quoteToken: quoteTokenInfo,
+        targetMarketId: marketId,
+        wallet: user,
+        walletTokenAccounts,
+        connection: this.client.connection,
+      }, 3); // Retry up to 3 times
 
-    const latestBH = await this.client.connection.getLatestBlockhash("confirmed");
-    const ammCreatePoolTxResult = await this.client.connection.confirmTransaction(
-      {
-        signature: ammCreatePoolTxIds[0],
-        blockhash: latestBH.blockhash,
-        lastValidBlockHeight: latestBH.lastValidBlockHeight,
-      },
-      "confirmed",
-    );
-
-    if (ammCreatePoolTxResult.value.err) {
-      console.error("ammCreatePoolTxResult", ammCreatePoolTxResult);
-      throw new Error("ammCreatePoolTxResult failed");
+      console.log("AMM Pool created successfully:", JSON.stringify(retryResult));
+    } catch (error) {
+      console.error("Failed to create AMM Pool after retries:", error);
     }
+
+    //console.log("ammCreatePoolTxIds: " + JSON.stringify(ammCreatePoolTxIds));
+
+    // const latestBH = await this.client.connection.getLatestBlockhash("confirmed");
+    // const ammCreatePoolTxResult = await this.client.connection.confirmTransaction(
+    //   {
+    //     signature: ammCreatePoolTxIds[0],
+    //     blockhash: latestBH.blockhash,
+    //     lastValidBlockHeight: latestBH.lastValidBlockHeight,
+    //   },
+    //   "confirmed",
+    // );
+
+    // if (ammCreatePoolTxResult.value.err) {
+    //   console.error("ammCreatePoolTxResult", ammCreatePoolTxResult);
+    //   throw new Error("ammCreatePoolTxResult failed");
+    // }
+
+    const { ammPool, poolInfo } = retryResult;
 
     console.log("ammPool: " + JSON.stringify(ammPool));
     console.log("poolInfo: " + JSON.stringify(poolInfo));
@@ -359,9 +542,11 @@ export class BoundPool {
     const poolInfo2 = await formatAmmKeysById(ammPool.ammId.toBase58(), this.client.connection);
     console.log("poolInfo2: " + JSON.stringify(poolInfo2));
 
+    const poolInfo3 = await formatAmmKeys(this.client.connection, ammPool.ammId.toBase58());
+    console.log("poolInfo3: " + JSON.stringify(poolInfo3));
+
     const ammId = new PublicKey(ammPool.ammId);
 
-    const boundPoolInfo = await this.fetch();
 
     // const adminTicketId = Keypair.generate();
     const stakingId = BoundPool.findStakingPda(boundPoolInfo.memeReserve.mint, this.client.memechanProgram.programId);
@@ -371,6 +556,13 @@ export class BoundPool {
 
     const userDestinationLpTokenAta = getATAAddress(TOKEN_PROGRAM_ID, user.publicKey, ammPool.lpMint).publicKey; // ??
     const nonce = 0; // ??
+
+    const ammv4 = PROGRAMIDS.AmmV4;
+    console.log("ammv4: " + ammv4);
+   // const ammConfigId = getAmmConfigId(PROGRAMIDS.AmmV4);
+   const ammConfigId = getAmmConfigId(this.client.memechanProgram.programId);
+
+    console.log("ammConfigId: " + ammConfigId.toBase58());
 
     const result = await this.client.memechanProgram.methods
       .goLive(nonce)
@@ -395,7 +587,7 @@ export class BoundPool {
         openOrders: poolInfo2.openOrders,
         targetOrders: poolInfo2.targetOrders,
         memeMint: boundPoolInfo.memeReserve.mint,
-        ammConfig: poolInfo2.ammConfig,
+        ammConfig: ammConfigId,
         ataProgram: ATA_PROGRAM_ID,
         feeDestinationInfo: feeDestination,
         userDestinationLpTokenAta: userDestinationLpTokenAta,
