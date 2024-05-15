@@ -415,7 +415,7 @@ export type MemechanSol = {
         },
         {
           "name": "feeDestinationInfo",
-          "isMut": false,
+          "isMut": true,
           "isSigner": false
         },
         {
@@ -2386,7 +2386,7 @@ export const IDL: MemechanSol = {
         },
         {
           "name": "feeDestinationInfo",
-          "isMut": false,
+          "isMut": true,
           "isSigner": false
         },
         {
