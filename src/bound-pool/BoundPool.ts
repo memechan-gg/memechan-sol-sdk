@@ -33,13 +33,25 @@ import { formatAmmKeysById } from "../raydium/formatAmmKeysById";
 import { createMarket } from "../raydium/openBookCreateMarket";
 import { formatAmmKeys } from "../raydium/formatAmmKeys";
 import { getAmmConfigId } from "../raydium/getAmmConfigId";
-import { AMM_ASSOCIATED_SEED, AMM_CONFIG_SEED, AUTHORITY_AMM, COIN_VAULT_ASSOCIATED_SEED, createAssociatedAccountIfNeeded, getAssociatedAddressAndBumpSeed, LP_MINT_ASSOCIATED_SEED, OPEN_ORDER_ASSOCIATED_SEED, PC_VAULT_ASSOCIATED_SEED, TARGET_ASSOCIATED_SEED } from "../raydium/pdaHelper";
+import {
+  AMM_ASSOCIATED_SEED,
+  AMM_CONFIG_SEED,
+  AUTHORITY_AMM,
+  COIN_VAULT_ASSOCIATED_SEED,
+  createAssociatedAccountIfNeeded,
+  getAssociatedAddressAndBumpSeed,
+  LP_MINT_ASSOCIATED_SEED,
+  OPEN_ORDER_ASSOCIATED_SEED,
+  PC_VAULT_ASSOCIATED_SEED,
+  TARGET_ASSOCIATED_SEED,
+} from "../raydium/pdaHelper";
 
 export class BoundPool {
   private constructor(
     public id: PublicKey,
     public admin: Keypair,
     public solVault: PublicKey,
+    public memeVault: PublicKey,
     public client: MemechanClient,
   ) {
     //
@@ -114,7 +126,7 @@ export class BoundPool {
 
     console.log("new pool tx result: " + result);
 
-    return new BoundPool(id, signer, poolSolVault, client);
+    return new BoundPool(id, signer, poolSolVault, launchVault, client);
   }
 
   //  public async fetch() {
@@ -126,11 +138,11 @@ export class BoundPool {
       try {
         const accountInfo = await program.account.boundPool.fetch(accountId, "confirmed");
         //const accountInfo = await this.client.connection.getAccountInfo(accountId);
-        
+
         return accountInfo;
       } catch (error) {
         if (i === retries - 1) throw error;
-        await new Promise(resolve => setTimeout(resolve, 1000)); // wait 1 second before retrying
+        await new Promise((resolve) => setTimeout(resolve, 1000)); // wait 1 second before retrying
       }
     }
   }
@@ -184,7 +196,9 @@ export class BoundPool {
       createSyncNativeInstruction(userSolAcc),
     );
 
-    const transferResult = await sendAndConfirmTransaction(this.client.connection, transferTx, [payer], { skipPreflight: true });
+    const transferResult = await sendAndConfirmTransaction(this.client.connection, transferTx, [payer], {
+      skipPreflight: true,
+    });
 
     console.log("3 transferResult: " + transferResult);
 
@@ -249,7 +263,7 @@ export class BoundPool {
           skipPreflight: true,
           commitment: "confirmed",
           preflightCommitment: "confirmed",
-          timeout: timeout  // Timeout in milliseconds
+          timeout: timeout, // Timeout in milliseconds
         };
 
         const result = await client.memechanProgram.methods
@@ -264,7 +278,7 @@ export class BoundPool {
         console.error(`Attempt ${attempts + 1} failed:`, error);
         if (error.message.includes("Transaction was not confirmed in")) {
           attempts++;
-          timeout += 30000;  // Increase timeout by 30 seconds for each retry
+          timeout += 30000; // Increase timeout by 30 seconds for each retry
           if (attempts >= maxRetries) {
             throw new Error("All attempts to send transaction failed");
           }
@@ -315,10 +329,10 @@ export class BoundPool {
         rent: SYSVAR_RENT_PUBKEY,
         memeMint: boundPoolInfo.memeReserve.mint,
         ataProgram: ATA_PROGRAM_ID,
-        user: user
+        user: user,
       };
 
-      const result = await this.retryInitStakingPool(this.client, methodArgs, 3, 30000);  // Retry up to 3 times with an initial timeout of 30 seconds
+      const result = await this.retryInitStakingPool(this.client, methodArgs, 3, 30000); // Retry up to 3 times with an initial timeout of 30 seconds
       console.log("initStakingPool Final result:", result);
 
       return result;
@@ -360,11 +374,7 @@ export class BoundPool {
     while (attempts < maxRetries) {
       try {
         // Attempt to create the AMM pool
-        const {
-          txids: ammCreatePoolTxIds,
-          ammPool,
-          poolInfo,
-        } = await ammCreatePool(args);
+        const { txids: ammCreatePoolTxIds, ammPool, poolInfo } = await ammCreatePool(args);
 
         console.log("ammCreatePoolTxIds: " + JSON.stringify(ammCreatePoolTxIds));
 
@@ -378,7 +388,7 @@ export class BoundPool {
             blockhash: latestBH.blockhash,
             lastValidBlockHeight: latestBH.lastValidBlockHeight,
           },
-          "confirmed"
+          "confirmed",
         );
 
         // Check for errors in the transaction result
@@ -396,7 +406,7 @@ export class BoundPool {
           throw new Error("All attempts to create AMM pool failed");
         }
         // Optionally, add a delay here if needed
-        await new Promise(resolve => setTimeout(resolve, 1000)); // wait for 1 second before retrying
+        await new Promise((resolve) => setTimeout(resolve, 1000)); // wait for 1 second before retrying
       }
     }
   }
@@ -428,7 +438,7 @@ export class BoundPool {
 
     //const boundPoolInfo = await this.fetch(memechanProgram);
 
-     // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const boundPoolInfo = input.boundPoolInfo as any;
     console.log("goLive.boundPoolInfo: " + JSON.stringify(boundPoolInfo));
 
@@ -558,30 +568,62 @@ export class BoundPool {
     const nonce = 0; // ??
 
     //const ammConfigId = getAmmConfigId(PROGRAMIDS.AmmV4);
-   //const ammConfigId = getAmmConfigId(this.client.memechanProgram.programId);
+    //const ammConfigId = getAmmConfigId(this.client.memechanProgram.programId);
 
     //console.log("derived: ammConfigId: " + ammConfigId.toBase58());
-
 
     const infoId = this.client.memechanProgram.programId;
     const marketAddress = marketId;
     const programId = this.client.memechanProgram.programId;
 
-  
     const [ammId] = getAssociatedAddressAndBumpSeed(infoId, marketAddress, AMM_ASSOCIATED_SEED, PROGRAMIDS.AmmV4);
-    const [raydiumAmmAuthority] = getAssociatedAddressAndBumpSeed(infoId, marketAddress, AUTHORITY_AMM, PROGRAMIDS.AmmV4);
-    const [openOrders] = getAssociatedAddressAndBumpSeed(infoId, marketAddress, OPEN_ORDER_ASSOCIATED_SEED, PROGRAMIDS.AmmV4);
-    const [targetOrders] = getAssociatedAddressAndBumpSeed(infoId, marketAddress, TARGET_ASSOCIATED_SEED, PROGRAMIDS.AmmV4);
+    const [raydiumAmmAuthority] = getAssociatedAddressAndBumpSeed(
+      infoId,
+      marketAddress,
+      AUTHORITY_AMM,
+      PROGRAMIDS.AmmV4,
+    );
+    const [openOrders] = getAssociatedAddressAndBumpSeed(
+      infoId,
+      marketAddress,
+      OPEN_ORDER_ASSOCIATED_SEED,
+      PROGRAMIDS.AmmV4,
+    );
+    const [targetOrders] = getAssociatedAddressAndBumpSeed(
+      infoId,
+      marketAddress,
+      TARGET_ASSOCIATED_SEED,
+      PROGRAMIDS.AmmV4,
+    );
     const [ammConfig] = getAssociatedAddressAndBumpSeed(infoId, marketAddress, AMM_CONFIG_SEED, PROGRAMIDS.AmmV4);
-    const [raydiumLpMint] = getAssociatedAddressAndBumpSeed(infoId, marketAddress, LP_MINT_ASSOCIATED_SEED, PROGRAMIDS.AmmV4);
+    const [raydiumLpMint] = getAssociatedAddressAndBumpSeed(
+      infoId,
+      marketAddress,
+      LP_MINT_ASSOCIATED_SEED,
+      PROGRAMIDS.AmmV4,
+    );
 
     //console.log("ammConfig vs ammConfigId " + ammConfig.toBase58() + " vs " + ammConfigId.toBase58());
 
-    const memeVault = await createAccount(this.client.connection, user, testTokenMint,  raydiumAmmAuthority, Keypair.generate(),  {commitment: "confirmed"});
-    const wsolVault = await createAccount(this.client.connection, user, testTokenMint,  raydiumAmmAuthority,  Keypair.generate(),  {commitment: "confirmed"});
+    const raydiumMemeVault = await createAccount(
+      this.client.connection,
+      user,
+      testTokenMint,
+      raydiumAmmAuthority,
+      Keypair.generate(),
+      { commitment: "confirmed" },
+    );
+    const raydiumWsolVault = await createAccount(
+      this.client.connection,
+      user,
+      testTokenMint,
+      raydiumAmmAuthority,
+      Keypair.generate(),
+      { commitment: "confirmed" },
+    );
 
     // await createAssociatedAccountIfNeeded(this.client.connection, user, ammId, marketAddress, AMM_ASSOCIATED_SEED, programId);
-     //await createAssociatedAccountIfNeeded(this.client.connection, user, poolMemeVault, marketAddress, COIN_VAULT_ASSOCIATED_SEED, programId);
+    // await createAssociatedAccountIfNeeded(this.client.connection, user, poolMemeVault, marketAddress, COIN_VAULT_ASSOCIATED_SEED, programId);
     // await createAssociatedAccountIfNeeded(this.client.connection, user, poolWsolVault, marketAddress, PC_VAULT_ASSOCIATED_SEED, programId);
     // await createAssociatedAccountIfNeeded(this.client.connection, user, raydiumAmmAuthority, marketAddress, AUTHORITY_AMM, programId);
     // await createAssociatedAccountIfNeeded(this.client.connection, user, openOrders, marketAddress, OPEN_ORDER_ASSOCIATED_SEED, programId);
@@ -589,42 +631,41 @@ export class BoundPool {
     // await createAssociatedAccountIfNeeded(this.client.connection, user, ammConfig, marketAddress, AMM_CONFIG_SEED, programId);
     // await createAssociatedAccountIfNeeded(this.client.connection, user, raydiumLpMint, marketAddress, LP_MINT_ASSOCIATED_SEED, programId);
 
-
     const userDestinationLpTokenAta = getATAAddress(TOKEN_PROGRAM_ID, user.publicKey, raydiumLpMint).publicKey;
 
     try {
-    const result = await this.client.memechanProgram.methods
-      .goLive(nonce)
-      .accounts({
-        signer: user.publicKey,
-        poolMemeVault: memeVault,
-        poolWsolVault: wsolVault,
-        solMint: NATIVE_MINT,
-        staking: stakingId,
-        stakingPoolSignerPda: stakingSigner,
-        raydiumLpMint: raydiumLpMint,
-        raydiumAmm: ammId,
-        raydiumAmmAuthority: raydiumAmmAuthority,
-        raydiumMemeVault: memeVault,
-        raydiumWsolVault: wsolVault,
-        marketProgramId: PROGRAMIDS.OPENBOOK_MARKET,
-        systemProgram: SystemProgram.programId,
-        tokenProgram: TOKEN_PROGRAM_ID,
-        marketAccount: marketId,
-        clock: SYSVAR_CLOCK_PUBKEY,
-        rent: SYSVAR_RENT_PUBKEY,
-        openOrders: openOrders,
-        targetOrders: targetOrders,
-        memeMint: boundPoolInfo.memeReserve.mint,
-        ammConfig: ammConfig,
-        ataProgram: ATA_PROGRAM_ID,
-        feeDestinationInfo: feeDestination,
-        userDestinationLpTokenAta: userDestinationLpTokenAta,
-      })
-      .signers([user]) // ammid?
-      .rpc({ skipPreflight: true });
+      const result = await this.client.memechanProgram.methods
+        .goLive(nonce)
+        .accounts({
+          signer: user.publicKey,
+          poolMemeVault: input.memeVault,
+          poolWsolVault: input.wSolVault,
+          solMint: NATIVE_MINT,
+          staking: stakingId,
+          stakingPoolSignerPda: stakingSigner,
+          raydiumLpMint: raydiumLpMint,
+          raydiumAmm: ammId,
+          raydiumAmmAuthority: raydiumAmmAuthority,
+          raydiumMemeVault: raydiumMemeVault,
+          raydiumWsolVault: raydiumWsolVault,
+          marketProgramId: PROGRAMIDS.OPENBOOK_MARKET,
+          systemProgram: SystemProgram.programId,
+          tokenProgram: TOKEN_PROGRAM_ID,
+          marketAccount: marketId,
+          clock: SYSVAR_CLOCK_PUBKEY,
+          rent: SYSVAR_RENT_PUBKEY,
+          openOrders: openOrders,
+          targetOrders: targetOrders,
+          memeMint: boundPoolInfo.memeReserve.mint,
+          ammConfig: ammConfig,
+          ataProgram: ATA_PROGRAM_ID,
+          feeDestinationInfo: feeDestination,
+          userDestinationLpTokenAta: userDestinationLpTokenAta,
+        })
+        .signers([user]) // ammid?
+        .rpc({ skipPreflight: true });
 
-        console.log("goLive Transaction successful:", result);
+      console.log("goLive Transaction successful:", result);
 
       return [
         //new AmmPool(ammId.publicKey, tollAuthority, this.client),
@@ -635,7 +676,7 @@ export class BoundPool {
         console.error("AnchorError: Account ownership mismatch");
         console.error("Error details:", error);
         if (error.logs) {
-          error.logs.forEach(log => console.log("Program log:", log));
+          error.logs.forEach((log) => console.log("Program log:", log));
         }
       } else {
         console.error("Unexpected error:", error);

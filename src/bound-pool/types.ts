@@ -27,6 +27,8 @@ export interface GoLiveArgs {
   user: Keypair;
   payer: Signer;
   boundPoolInfo: object;
+  memeVault: PublicKey;
+  wSolVault: PublicKey;
 }
 
 export interface InitStakingPoolArgs {
