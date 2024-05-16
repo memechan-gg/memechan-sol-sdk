@@ -32,7 +32,7 @@ export async function createMintWithPriority(
     });
 
     const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
-      microLamports: 3000000,
+      microLamports: 6000000,
     });
 
     const transaction = new Transaction().add(
