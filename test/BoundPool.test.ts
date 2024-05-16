@@ -21,30 +21,17 @@ describe("BoundPool", () => {
   //   }, 60000)
 
   it("init staking pool then go live", async () => {
-    // const raydiumkp = Keypair.fromSecretKey(Buffer.from(JSON.parse("[11,63,99,38,79,49,253,45,205,89,6,148,111,194,129,235,207,25,238,87,106,178,75,235,71,17,67,163,210,72,47,211,3,207,201,4,73,43,8,191,154,91,241,223,80,204,53,60,15,16,240,204,136,152,51,51,70,161,64,167,77,126,212,131]")));
-    // console.log("raydium: " + raydiumkp.publicKey.toString());
-
-    // const openbookkp = Keypair.fromSecretKey(Buffer.from(JSON.parse("[250,223,201,253,182,245,189,248,215,189,232,89,83,27,240,8,202,229,229,95,52,96,100,10,14,194,34,93,138,237,227,148,64,138,99,86,118,183,211,245,244,117,158,207,79,208,42,164,211,55,0,173,7,221,248,140,5,229,117,193,47,132,45,253]")));
-    // console.log("openbook: " + openbookkp.publicKey.toString());
-
-    // const kp =  Keypair.fromSecretKey(Buffer.from(JSON.parse("[140,88,27,17,68,17,132,100,69,77,220,22,208,196,135,223,135,45,138,133,90,24,137,69,245,20,235,112,11,31,89,66,171,81,158,101,221,254,251,34,39,149,251,131,165,133,201,50,182,183,50,8,46,61,119,177,76,15,138,80,146,216,107,243]")));
-    // console.log("kp: " + kp.publicKey.toString());
-
-    // const adminkp =  Keypair.fromSecretKey(Buffer.from(JSON.parse("[80,239,181,197,248,185,58,19,215,210,131,26,3,183,94,9,129,1,105,246,46,103,129,228,93,177,231,112,199,187,244,121,110,68,66,192,182,118,18,95,192,154,120,228,122,51,31,211,174,13,150,37,117,138,50,246,238,61,71,100,122,150,186,237]")));
-    // console.log("admin: " + adminkp.publicKey.toString());
-    // return;
-
     const admin = new PublicKey(process.env.ADMIN_PUB_KEY as string);
     const payer = Keypair.fromSecretKey(Buffer.from(JSON.parse(process.env.TEST_USER_SECRET_KEY as string)));
     console.log("payer: " + payer.publicKey.toString());
-    // return;
 
     const wallet = new NodeWallet(payer);
     const client = new MemechanClient(wallet);
 
     const pool = await BoundPool.new({ admin, payer, signer: payer, client });
 
-    await sleep(1000);
+    console.log("==== pool id: " + pool.id.toString());
+    await sleep(2000);
 
     const ticketId = await pool.swapY({
       payer: payer,
@@ -53,28 +40,31 @@ describe("BoundPool", () => {
       solAmountIn: new BN(1 * 1e9),
     });
 
-    console.log("swapY ticketId: " + ticketId);
+    console.log("swapY ticketId: " + ticketId.id.toBase58());
 
     const boundPoolInfo = await pool.fetch();
 
-    await pool.initStakingPool({
+    const { stakingMemeVault, stakingWSolVault } = (await pool.initStakingPool({
       payer: payer,
       user: payer,
       boundPoolInfo,
-    });
+    }));
 
-    await sleep(1000);
+    console.log("stakingMemeVault: " + stakingMemeVault.toString());
+    console.log("stakingWSolVault: " + stakingWSolVault.toString());
+
+    await sleep(2000);
 
     await pool.goLive({
       payer: payer,
       user: payer,
       boundPoolInfo,
-      memeVault: pool.memeVault,
-      wSolVault: pool.solVault,
+      memeVault: stakingMemeVault,
+      wSolVault: stakingWSolVault,
     });
 
     console.log("OINK");
-  }, 320000);
+  }, 520000);
 
   // it("swaps full sol->memecoin in one go", async () => {
   //    const admin = new PublicKey(process.env.ADMIN_PUB_KEY as string);

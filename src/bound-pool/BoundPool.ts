@@ -16,6 +16,8 @@ import {
   Transaction,
   sendAndConfirmTransaction,
   Connection,
+  TransactionInstruction,
+  ComputeBudgetProgram,
 } from "@solana/web3.js";
 import { Token } from "@raydium-io/raydium-sdk";
 
@@ -425,6 +427,23 @@ export class BoundPool {
 
     const userDestinationLpTokenAta = BoundPool.getATAAddress(stakingSigner, raydiumLpMint, TOKEN_PROGRAM_ID).publicKey;
 
+    const modifyComputeUnits = ComputeBudgetProgram.setComputeUnitLimit({
+      units: 250000,
+    });
+
+    const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
+      microLamports: 5000000,
+    });
+
+    // const data = Buffer.from(
+    //   Uint8Array.of(0, ...new BN(500000).toArray("le", 4))
+    // );
+    // const additionalComputeBudgetInstruction = new TransactionInstruction({
+    //   keys: [],
+    //   programId: new PublicKey("ComputeBudget111111111111111111111111111111"),
+    //   data,
+    // });
+
     try {
       const result = await this.client.memechanProgram.methods
         .goLive(raydiumAmmAuthority.nonce)
@@ -456,7 +475,13 @@ export class BoundPool {
           raydiumProgram: PROGRAMIDS.AmmV4,
         })
         .signers([user]) // ammid?
-        .rpc({ skipPreflight: true, commitment: "confirmed"});
+    
+        .preInstructions([
+            modifyComputeUnits,
+            addPriorityFee
+        ])
+        .rpc({ skipPreflight: true, commitment: "confirmed", })
+        ;
 
       console.log("goLive Transaction successful:", result);
 
