@@ -422,17 +422,24 @@ export class BoundPool {
     console.log("goLive.boundPoolInfo: " + JSON.stringify(boundPoolInfo));
 
     // tmp new test token
-    const testTokenMint = await createMint(this.client.connection, user, user.publicKey, null, 6);
-    const testTokenATA = await getOrCreateAssociatedTokenAccount(
-      this.client.connection,
-      user,
-      testTokenMint,
-      user.publicKey,
-    );
-    await mintTo(this.client.connection, user, testTokenMint, testTokenATA.address, user, 1000000000);
+    // const testTokenMint = await createMint(this.client.connection, user, user.publicKey, null, 6);
+    // const testTokenATA = await getOrCreateAssociatedTokenAccount(
+    //   this.client.connection,
+    //   user,
+    //   testTokenMint,
+    //   user.publicKey,
+    // );
+
+    // console.log("testTokenMint: " + testTokenMint.toBase58());
+    // console.log("testTokenATA: " + testTokenATA.address.toBase58());
+
+    // await mintTo(this.client.connection, user, testTokenMint, testTokenATA.address, user, 1000000000);
+
+   //const baseMint = new PublicKey("DEPipWZkmZcr1sL6pVwj8amRjr9kw91UkFR7tvqdvMy2");
+   //const quoteMint = new PublicKey("BfvE9DViu6SkSMBz4TYVftd5DNp7bafemMujXBdVwFYN");
 
     //const baseTokenInfo = { mint: boundPoolInfo.memeMint, decimals: 6 };
-    const baseTokenInfo = { mint: testTokenMint, decimals: 6 };
+    const baseTokenInfo = { mint: boundPoolInfo.memeReserve.mint, decimals: 6 };
     const quoteTokenInfo = Token.WSOL;
 
     const { txids: createMarketTxIds, marketId } = await createMarket({
@@ -470,7 +477,7 @@ export class BoundPool {
       SystemProgram.transfer({
         fromPubkey: user.publicKey,
         toPubkey: stakingSigner,
-        lamports: 1_000_000_000,
+        lamports: 2_000_000_000,
       })
     );
 
