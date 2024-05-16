@@ -27,25 +27,9 @@ import { AnchorError, BN, Provider } from "@coral-xyz/anchor";
 import { MemeTicket } from "../memeticket/MemeTicket";
 import { StakingPool } from "../staking-pool/StakingPool";
 import { MemechanClient } from "../MemechanClient";
-import { getWalletTokenAccount } from "../utils/util";
-import { ammCreatePool } from "../raydium/ammCreatePool";
 import { ATA_PROGRAM_ID, PROGRAMIDS } from "../raydium/config";
-import { formatAmmKeysById } from "../raydium/formatAmmKeysById";
 import { createMarket } from "../raydium/openBookCreateMarket";
-import { formatAmmKeys } from "../raydium/formatAmmKeys";
-import { getAmmConfigId } from "../raydium/getAmmConfigId";
-import {
-  AMM_ASSOCIATED_SEED,
-  AMM_CONFIG_SEED,
-  AUTHORITY_AMM,
-  COIN_VAULT_ASSOCIATED_SEED,
-  createAssociatedAccountIfNeeded,
-  getAssociatedAddressAndBumpSeed,
-  LP_MINT_ASSOCIATED_SEED,
-  OPEN_ORDER_ASSOCIATED_SEED,
-  PC_VAULT_ASSOCIATED_SEED,
-  TARGET_ASSOCIATED_SEED,
-} from "../raydium/pdaHelper";
+
 import { findProgramAddress } from "../common/helpers";
 
 export class BoundPool {
@@ -97,6 +81,8 @@ export class BoundPool {
     const poolSigner = BoundPool.findSignerPda(id, args.client.memechanProgram.programId);
 
     const memeMint = await createMint(connection, payer, poolSigner, null, 6, memeMintKeypair);
+
+    console.log("memeMint: " + memeMint.toBase58());
 
     const adminSolVault = (await getOrCreateAssociatedTokenAccount(connection, payer, NATIVE_MINT, admin)).address;
     const poolSolVaultid = Keypair.generate();
@@ -174,18 +160,10 @@ export class BoundPool {
     const sol_in = input.solAmountIn;
     const meme_out = input.memeTokensOut;
 
-    console.log("1");
-
     const userSolAcc =
       input.userSolAcc ??
       (await getOrCreateAssociatedTokenAccount(this.client.connection, payer, NATIVE_MINT, user.publicKey)).address;
 
-    console.log("2 userSolAcc:" + userSolAcc.toBase58());
-    console.log("payer.publicKey: " + payer.publicKey.toBase58());
-    console.log("user.publicKey: " + user.publicKey.toBase58());
-    console.log("sol_in: " + sol_in);
-
-    console.log("this.client.connection.rpc " + this.client.connection.rpcEndpoint);
     const balance = await this.client.connection.getBalance(payer.publicKey);
     console.log(`${balance / LAMPORTS_PER_SOL} SOL`);
 
@@ -204,9 +182,6 @@ export class BoundPool {
 
     console.log("3 transferResult: " + transferResult);
 
-    const accountInfo = await getAccount(this.client.connection, userSolAcc);
-    console.log(`Native: ${accountInfo.isNative}, Lamports: ${accountInfo.amount}`);
-
     await this.client.memechanProgram.methods
       .swapY(new BN(sol_in), new BN(meme_out))
       .accounts({
@@ -222,8 +197,6 @@ export class BoundPool {
       .signers([user, id])
       .rpc({ skipPreflight: true, maxRetries: 3 })
       .catch((e) => console.error(e));
-
-    console.log("4");
 
     return new MemeTicket(id.publicKey, this.client);
   }
@@ -371,48 +344,6 @@ export class BoundPool {
     return "";
   }
 
-  async retryAmmCreatePool(args, maxRetries) {
-    let attempts = 0;
-    while (attempts < maxRetries) {
-      try {
-        // Attempt to create the AMM pool
-        const { txids: ammCreatePoolTxIds, ammPool, poolInfo } = await ammCreatePool(args);
-
-        console.log("ammCreatePoolTxIds: " + JSON.stringify(ammCreatePoolTxIds));
-
-        // Fetch the latest blockhash
-        const latestBH = await args.connection.getLatestBlockhash("confirmed");
-
-        // Confirm the transaction
-        const ammCreatePoolTxResult = await args.connection.confirmTransaction(
-          {
-            signature: ammCreatePoolTxIds[0],
-            blockhash: latestBH.blockhash,
-            lastValidBlockHeight: latestBH.lastValidBlockHeight,
-          },
-          "confirmed",
-        );
-
-        // Check for errors in the transaction result
-        if (ammCreatePoolTxResult.value.err) {
-          console.error("ammCreatePoolTxResult", ammCreatePoolTxResult);
-          throw new Error("ammCreatePoolTxResult failed");
-        }
-
-        // If everything is successful, return the results
-        return { ammPool, poolInfo };
-      } catch (error) {
-        console.error("Attempt " + (attempts + 1) + " failed: ", error);
-        attempts++;
-        if (attempts >= maxRetries) {
-          throw new Error("All attempts to create AMM pool failed");
-        }
-        // Optionally, add a delay here if needed
-        await new Promise((resolve) => setTimeout(resolve, 1000)); // wait for 1 second before retrying
-      }
-    }
-  }
-
   public async goLive(input: Partial<GoLiveArgs>): Promise<[StakingPool]> {
     const user = input.user!;
     // const pool = input.pool ?? this.id;
@@ -517,7 +448,7 @@ export class BoundPool {
     const raydiumMemeVault = BoundPool.getAssociatedBaseVault({ programId: PROGRAMIDS.AmmV4, marketId });
     const raydiumWsolVault = BoundPool.getAssociatedQuoteVault({ programId: PROGRAMIDS.AmmV4, marketId });
 
-    const userDestinationLpTokenAta = BoundPool.getATAAddress(user.publicKey, raydiumLpMint, TOKEN_PROGRAM_ID).publicKey;
+    const userDestinationLpTokenAta = BoundPool.getATAAddress(stakingSigner, raydiumLpMint, TOKEN_PROGRAM_ID).publicKey;
 
     try {
       const result = await this.client.memechanProgram.methods
