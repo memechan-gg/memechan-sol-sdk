@@ -1,19 +1,20 @@
 import { MarketV2, Token } from "@raydium-io/raydium-sdk";
-import { Connection, Keypair } from "@solana/web3.js";
+import { Connection, Keypair, PublicKey } from "@solana/web3.js";
 import { PROGRAMIDS, makeTxVersion } from "./config";
 import { buildAndSendTx } from "../utils/util";
 
-type TestTxInputInfo = {
+type CreateMarketTxInput = {
   baseToken: Token;
   quoteToken: Token;
-  wallet: Keypair;
+  wallet: PublicKey;
+  signer: Keypair;
   connection: Connection;
 };
 
-export async function createMarket(input: TestTxInputInfo) {
+export async function createMarket(input: CreateMarketTxInput) {
   const createMarketInstruments = await MarketV2.makeCreateMarketInstructionSimple({
     connection: input.connection,
-    wallet: input.wallet.publicKey,
+    wallet: input.wallet,
     baseInfo: input.baseToken,
     quoteInfo: input.quoteToken,
     lotSize: 1,
@@ -23,7 +24,7 @@ export async function createMarket(input: TestTxInputInfo) {
   });
 
   return {
-    txids: await buildAndSendTx(input.connection, input.wallet, createMarketInstruments.innerTransactions, {
+    txids: await buildAndSendTx(input.connection, input.signer, createMarketInstruments.innerTransactions, {
       skipPreflight: true,
     }),
     marketId: createMarketInstruments.address.marketId,

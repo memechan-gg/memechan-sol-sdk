@@ -375,7 +375,8 @@ export class BoundPool {
     const { txids: createMarketTxIds, marketId } = await createMarket({
       baseToken: baseTokenInfo,
       quoteToken: quoteTokenInfo,
-      wallet: user,
+      wallet: user.publicKey,
+      signer: user,
       connection: this.client.connection,
     });
 
