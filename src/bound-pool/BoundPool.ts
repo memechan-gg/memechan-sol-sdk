@@ -2,7 +2,6 @@ import {
   createAccount,
   createMint,
   createSyncNativeInstruction,
-  getAccount,
   getOrCreateAssociatedTokenAccount,
   mintTo,
   NATIVE_MINT,
