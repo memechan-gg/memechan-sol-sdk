@@ -244,6 +244,19 @@ export type MemechanSol = {
           ]
         },
         {
+          "name": "stakingMemeVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "stakingWsolVault",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Bonding Pool WSOL vault"
+          ]
+        },
+        {
           "name": "memeTicket",
           "isMut": true,
           "isSigner": false,
@@ -2212,6 +2225,19 @@ export const IDL: MemechanSol = {
           "isSigner": false,
           "docs": [
             "Staking Pool Signer"
+          ]
+        },
+        {
+          "name": "stakingMemeVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "stakingWsolVault",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Bonding Pool WSOL vault"
           ]
         },
         {

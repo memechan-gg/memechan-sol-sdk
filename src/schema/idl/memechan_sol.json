@@ -244,6 +244,19 @@
           ]
         },
         {
+          "name": "stakingMemeVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "stakingWsolVault",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Bonding Pool WSOL vault"
+          ]
+        },
+        {
           "name": "memeTicket",
           "isMut": true,
           "isSigner": false,

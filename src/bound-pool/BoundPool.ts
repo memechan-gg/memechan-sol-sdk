@@ -286,6 +286,12 @@ export class BoundPool {
 
     const adminTicketId = BoundPool.findMemeTicketPda(stakingId, this.client.memechanProgram.programId);
 
+    const stakingPoolSolVaultid = Keypair.generate();
+    const stakingPoolSolVault = await createAccount(this.client.connection, user, NATIVE_MINT, stakingSigner, stakingPoolSolVaultid, { skipPreflight: true, commitment: "confirmed" });
+
+    const stakingMemeVaultid = Keypair.generate();
+    const stakingMemeVault = await createAccount(this.client.connection, user, boundPoolInfo.memeReserve.mint, stakingSigner, stakingMemeVaultid, { skipPreflight: true, commitment: "confirmed" });
+
     try {
       const methodArgs = {
         pool: pool,
@@ -294,6 +300,8 @@ export class BoundPool {
         memeTicket: adminTicketId,
         poolMemeVault: boundPoolInfo.memeReserve.vault,
         poolWsolVault: boundPoolInfo.solReserve.vault,
+        stakingMemeVault: stakingMemeVault,
+        stakingWsolVault: stakingPoolSolVault,
         solMint: NATIVE_MINT,
         staking: stakingId,
         stakingPoolSignerPda: stakingSigner,
