@@ -1,6 +1,6 @@
 import { MarketV2, Token } from "@raydium-io/raydium-sdk";
 import { Connection, Keypair, PublicKey } from "@solana/web3.js";
-import { PROGRAMIDS, makeTxVersion } from "./config";
+import { PROGRAMIDS, addLookupTableInfo, makeTxVersion } from "./config";
 import { buildAndSendTx } from "../utils/util";
 
 type CreateMarketTxInput = {
@@ -20,15 +20,12 @@ export async function createMarket(input: CreateMarketTxInput) {
     lotSize: 1,
     tickSize: 0.000001,
     dexProgramId: PROGRAMIDS.OPENBOOK_MARKET,
-    makeTxVersion,
+    makeTxVersion
   });
-
-  console.log("createMarketInstruments: ", createMarketInstruments);
 
   return {
     txids: await buildAndSendTx(input.connection, input.signer, createMarketInstruments.innerTransactions, {
       skipPreflight: true,
-      maxRetries: 3,
     }),
     marketId: createMarketInstruments.address.marketId,
   };
