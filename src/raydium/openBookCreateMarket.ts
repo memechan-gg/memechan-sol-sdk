@@ -23,9 +23,12 @@ export async function createMarket(input: CreateMarketTxInput) {
     makeTxVersion,
   });
 
+  console.log("createMarketInstruments: ", createMarketInstruments);
+
   return {
     txids: await buildAndSendTx(input.connection, input.signer, createMarketInstruments.innerTransactions, {
       skipPreflight: true,
+      maxRetries: 3,
     }),
     marketId: createMarketInstruments.address.marketId,
   };
