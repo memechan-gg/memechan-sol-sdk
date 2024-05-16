@@ -15,9 +15,7 @@ import {
   SYSVAR_RENT_PUBKEY,
   Transaction,
   sendAndConfirmTransaction,
-  LAMPORTS_PER_SOL,
   Connection,
-  ComputeBudgetProgram,
 } from "@solana/web3.js";
 import { Token } from "@raydium-io/raydium-sdk";
 
@@ -80,11 +78,12 @@ export class BoundPool {
     const id = this.findBoundPoolPda(memeMintKeypair.publicKey, NATIVE_MINT, args.client.memechanProgram.programId);
     const poolSigner = BoundPool.findSignerPda(id, args.client.memechanProgram.programId);
 
+    console.log("connection rpc: " + connection.rpcEndpoint);
     const memeMint = await createMintWithPriority(connection, payer, poolSigner, null, 6, memeMintKeypair, { skipPreflight: true, commitment: "confirmed" });
 
     console.log("memeMint: " + memeMint.toBase58());
 
-    const adminSolVault = (await getOrCreateAssociatedTokenAccount(connection, payer, NATIVE_MINT, admin)).address;
+    const adminSolVault = (await getOrCreateAssociatedTokenAccount(connection, payer, NATIVE_MINT, admin, true, "confirmed", { skipPreflight: true })).address;
     const poolSolVaultid = Keypair.generate();
     const poolSolVault = await createAccount(connection, payer, NATIVE_MINT, poolSigner, poolSolVaultid, { skipPreflight: true, commitment: "confirmed" });
 
@@ -110,7 +109,7 @@ export class BoundPool {
         systemProgram: SystemProgram.programId,
       })
       .signers([signer])
-      .rpc({ skipPreflight: true, commitment: "confirmed" });
+      .rpc({ skipPreflight: true });
 
     console.log("new pool tx result: " + result);
 
@@ -162,18 +161,18 @@ export class BoundPool {
     // const balance = await this.client.connection.getBalance(payer.publicKey);
     // console.log(`${balance / LAMPORTS_PER_SOL} SOL`);
 
-    const modifyComputeUnits = ComputeBudgetProgram.setComputeUnitLimit({
-      units: 300,
-    });
+    // const modifyComputeUnits = ComputeBudgetProgram.setComputeUnitLimit({
+    //   units: 300,
+    // });
     
-    const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
-      microLamports: 20000,
-    });
+    // const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
+    //   microLamports: 20000,
+    // });
     
 
     const transferTx = new Transaction().add(
-      modifyComputeUnits,
-      addPriorityFee,
+    //  modifyComputeUnits,
+     // addPriorityFee,
       SystemProgram.transfer({
         fromPubkey: payer.publicKey,
         toPubkey: userSolAcc,
@@ -359,21 +358,20 @@ export class BoundPool {
       throw new Error("createMarketTxResult failed");
     }
 
-
     console.log("marketId", marketId.toBase58());
     console.log("stakingId: " + stakingId.toBase58());
+
+    // const modifyComputeUnits = ComputeBudgetProgram.setComputeUnitLimit({
+    //   units: 300,
+    // });
     
-    const modifyComputeUnits = ComputeBudgetProgram.setComputeUnitLimit({
-      units: 300,
-    });
-    
-    const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
-      microLamports: 20000,
-    });
+    // const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
+    //   microLamports: 20000,
+    // });
 
     const transferTx = new Transaction().add(
-      modifyComputeUnits,
-      addPriorityFee,
+     // modifyComputeUnits,
+     // addPriorityFee,
       SystemProgram.transfer({
         fromPubkey: user.publicKey,
         toPubkey: stakingSigner,
