@@ -280,10 +280,6 @@ export class BoundPool {
 
     const adminTicketId = BoundPool.findMemeTicketPda(stakingId, this.client.memechanProgram.programId);
 
-    //const feeDestination = new PublicKey(process.env.FEE_DESTINATION_ID as string);
-
-    //const userDestinationLpTokenAta = getATAAddress(TOKEN_PROGRAM_ID, user.publicKey, boundPoolInfo.lpMint).publicKey;
-
     try {
       const methodArgs = {
         pool: pool,
@@ -314,32 +310,6 @@ export class BoundPool {
       console.error("Failed to initialize staking pool:", error);
     }
 
-    // const result = await this.client.memechanProgram.methods
-    //   .initStakingPool()
-    //   .accounts({
-    //     pool: pool,
-    //     signer: user.publicKey,
-    //     boundPoolSignerPda: this.findSignerPda(),
-    //     memeTicket: adminTicketId,
-    //     poolMemeVault: boundPoolInfo.memeReserve.vault,
-    //     poolWsolVault: boundPoolInfo.solReserve.vault,
-    //     solMint: NATIVE_MINT,
-    //     staking: stakingId,
-    //     stakingPoolSignerPda: stakingSigner,
-    //     adminVaultSol: boundPoolInfo.adminVaultSol,
-    //     marketProgramId: PROGRAMIDS.OPENBOOK_MARKET,
-    //     systemProgram: SystemProgram.programId,
-    //     tokenProgram: TOKEN_PROGRAM_ID,
-    //     clock: SYSVAR_CLOCK_PUBKEY,
-    //     rent: SYSVAR_RENT_PUBKEY,
-    //     memeMint: boundPoolInfo.memeReserve.mint,
-    //     ataProgram: ATA_PROGRAM_ID,
-    //   })
-    //   .signers([user])
-    //   .rpc({ skipPreflight: true });
-
-    // console.log("initStakingPool tx result: " + result);
-
     return "";
   }
 
@@ -365,10 +335,7 @@ export class BoundPool {
 
     // await mintTo(this.client.connection, user, testTokenMint, testTokenATA.address, user, 1000000000);
 
-   //const baseMint = new PublicKey("DEPipWZkmZcr1sL6pVwj8amRjr9kw91UkFR7tvqdvMy2");
-   //const quoteMint = new PublicKey("BfvE9DViu6SkSMBz4TYVftd5DNp7bafemMujXBdVwFYN");
 
-    //const baseTokenInfo = { mint: boundPoolInfo.memeMint, decimals: 6 };
     const baseTokenInfo = { mint: boundPoolInfo.memeReserve.mint, decimals: 6 };
     const quoteTokenInfo = Token.WSOL;
 
@@ -398,13 +365,8 @@ export class BoundPool {
     }
 
     console.log("marketId", marketId.toBase58());
-
-    const stakingId = BoundPool.findStakingPda(boundPoolInfo.memeReserve.mint, this.client.memechanProgram.programId);
-    const stakingSigner = StakingPool.findSignerPda(stakingId, this.client.memechanProgram.programId);
-
     console.log("stakingId: " + stakingId.toBase58());
 
-     const transferTx = new Transaction().add(
       SystemProgram.transfer({
         fromPubkey: user.publicKey,
         toPubkey: stakingSigner,
