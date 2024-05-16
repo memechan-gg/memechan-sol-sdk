@@ -16,13 +16,12 @@ import {
   Transaction,
   sendAndConfirmTransaction,
   Connection,
-  TransactionInstruction,
   ComputeBudgetProgram,
 } from "@solana/web3.js";
 import { Token } from "@raydium-io/raydium-sdk";
 
 import { BoundPoolArgs, GoLiveArgs, InitStakingPoolArgs, InitStakingPoolResult, SwapXArgs, SwapYArgs } from "./types";
-import { AnchorError, BN, Provider } from "@coral-xyz/anchor";
+import { AnchorError, BN, Program, Provider } from "@coral-xyz/anchor";
 import { MemeTicket } from "../memeticket/MemeTicket";
 import { StakingPool } from "../staking-pool/StakingPool";
 import { MemechanClient } from "../MemechanClient";
@@ -31,6 +30,7 @@ import { createMarket } from "../raydium/openBookCreateMarket";
 
 import { findProgramAddress } from "../common/helpers";
 import { createMintWithPriority } from "../token/createMintWithPriority";
+import { MemechanSol } from "../schema/types/memechan_sol";
 
 export class BoundPool {
   private constructor(
@@ -128,6 +128,10 @@ export class BoundPool {
         await new Promise((resolve) => setTimeout(resolve, 1000)); // wait 1 second before retrying
       }
     }
+  }
+
+  public static async all(program: Program<MemechanSol>) {
+    return program.account.boundPool.all();
   }
 
   public findSignerPda(): PublicKey {

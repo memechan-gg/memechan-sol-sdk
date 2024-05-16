@@ -20,7 +20,24 @@ describe("BoundPool", () => {
   //     console.log(info);
   //   }, 60000)
 
+  it("all", async() => {
+    const payer = Keypair.fromSecretKey(Buffer.from(JSON.parse(process.env.TEST_USER_SECRET_KEY as string)));
+    console.log("payer: " + payer.publicKey.toString());
+
+    const wallet = new NodeWallet(payer);
+    const client = new MemechanClient(wallet);
+    const all = await BoundPool.all(client.memechanProgram);
+
+    for (const pool of all) {
+      console.log(pool.account);
+      console.log("==================================================");
+    }
+
+    console.log(all);
+  }, 30000)
+
   it("init staking pool then go live", async () => {
+    return;
     const admin = new PublicKey(process.env.ADMIN_PUB_KEY as string);
     const payer = Keypair.fromSecretKey(Buffer.from(JSON.parse(process.env.TEST_USER_SECRET_KEY as string)));
     console.log("payer: " + payer.publicKey.toString());
