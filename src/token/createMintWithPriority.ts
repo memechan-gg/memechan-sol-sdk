@@ -27,11 +27,16 @@ export async function createMintWithPriority(
 ): Promise<PublicKey> {
     const lamports = await getMinimumBalanceForRentExemptMint(connection);
 
+    const modifyComputeUnits = ComputeBudgetProgram.setComputeUnitLimit({
+      units: 30000,
+    });
+
     const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
-      microLamports: 30000,
+      microLamports: 3000000,
     });
 
     const transaction = new Transaction().add(
+       modifyComputeUnits,
         addPriorityFee,
         SystemProgram.createAccount({
             fromPubkey: payer.publicKey,
