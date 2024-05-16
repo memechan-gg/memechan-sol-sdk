@@ -24,6 +24,7 @@ export class MemechanClient {
     setProvider(provider);
 
     console.log("program id: " + process.env.MEMECHAN_PROGRAM_ID);
+    console.log("connection rpc: " + this.connection.rpcEndpoint);
     this.memechanProgram = new Program<MemechanSol>(IDL, new PublicKey(process.env.MEMECHAN_PROGRAM_ID!), provider);
   }
 }

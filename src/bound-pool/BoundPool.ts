@@ -78,7 +78,6 @@ export class BoundPool {
     const id = this.findBoundPoolPda(memeMintKeypair.publicKey, NATIVE_MINT, args.client.memechanProgram.programId);
     const poolSigner = BoundPool.findSignerPda(id, args.client.memechanProgram.programId);
 
-    console.log("connection rpc: " + connection.rpcEndpoint);
     const memeMint = await createMintWithPriority(connection, payer, poolSigner, null, 6, memeMintKeypair, { skipPreflight: true, commitment: "confirmed" });
 
     console.log("memeMint: " + memeMint.toBase58());
