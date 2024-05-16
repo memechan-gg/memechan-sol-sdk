@@ -116,15 +116,10 @@ export class BoundPool {
     return new BoundPool(id, signer, poolSolVault, launchVault, client);
   }
 
-  //  public async fetch() {
-  //    return this.client.memechanProgram.account.boundPool.fetch(this.id);
-  //  }
-
   public async fetch(program = this.client.memechanProgram, accountId = this.id, retries = 3) {
     for (let i = 0; i < retries; i++) {
       try {
         const accountInfo = await program.account.boundPool.fetch(accountId, "confirmed");
-        //const accountInfo = await this.client.connection.getAccountInfo(accountId);
 
         return accountInfo;
       } catch (error) {
@@ -315,26 +310,12 @@ export class BoundPool {
 
   public async goLive(input: Partial<GoLiveArgs>): Promise<[StakingPool]> {
     const user = input.user!;
-    // const pool = input.pool ?? this.id;
-
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const boundPoolInfo = input.boundPoolInfo as any;
+    const stakingId = BoundPool.findStakingPda(boundPoolInfo.memeReserve.mint, this.client.memechanProgram.programId);
+    const stakingSigner = StakingPool.findSignerPda(stakingId, this.client.memechanProgram.programId);
+   
     console.log("goLive.boundPoolInfo: " + JSON.stringify(boundPoolInfo));
-
-    // tmp new test token
-    // const testTokenMint = await createMint(this.client.connection, user, user.publicKey, null, 6);
-    // const testTokenATA = await getOrCreateAssociatedTokenAccount(
-    //   this.client.connection,
-    //   user,
-    //   testTokenMint,
-    //   user.publicKey,
-    // );
-
-    // console.log("testTokenMint: " + testTokenMint.toBase58());
-    // console.log("testTokenATA: " + testTokenATA.address.toBase58());
-
-    // await mintTo(this.client.connection, user, testTokenMint, testTokenATA.address, user, 1000000000);
-
 
     const baseTokenInfo = { mint: boundPoolInfo.memeReserve.mint, decimals: 6 };
     const quoteTokenInfo = Token.WSOL;
@@ -366,7 +347,7 @@ export class BoundPool {
 
     console.log("marketId", marketId.toBase58());
     console.log("stakingId: " + stakingId.toBase58());
-
+    const transferTx = new Transaction().add(
       SystemProgram.transfer({
         fromPubkey: user.publicKey,
         toPubkey: stakingSigner,
