@@ -44,3 +44,8 @@ export interface BoundPoolArgs {
   signer: Keypair;
   client: MemechanClient;
 }
+
+export interface InitStakingPoolResult {
+  stakingMemeVault: PublicKey;
+  stakingWSolVault: PublicKey;
+}

@@ -19,7 +19,7 @@ import {
 } from "@solana/web3.js";
 import { Token } from "@raydium-io/raydium-sdk";
 
-import { BoundPoolArgs, GoLiveArgs, InitStakingPoolArgs, SwapXArgs, SwapYArgs } from "./types";
+import { BoundPoolArgs, GoLiveArgs, InitStakingPoolArgs, InitStakingPoolResult, SwapXArgs, SwapYArgs } from "./types";
 import { AnchorError, BN, Provider } from "@coral-xyz/anchor";
 import { MemeTicket } from "../memeticket/MemeTicket";
 import { StakingPool } from "../staking-pool/StakingPool";
@@ -232,7 +232,7 @@ export class BoundPool {
       .rpc({ skipPreflight: true, commitment: "confirmed" });
   }
 
-  async retryInitStakingPool(client, methodArgs, maxRetries, initialTimeout) {
+  async retryInitStakingPool(client, methodArgs, maxRetries, initialTimeout) : Promise<InitStakingPoolResult> {
     let attempts = 0;
     let timeout = initialTimeout;
 
@@ -270,7 +270,7 @@ export class BoundPool {
     }
   }
 
-  public async initStakingPool(input: Partial<InitStakingPoolArgs>): Promise<string> {
+  public async initStakingPool(input: Partial<InitStakingPoolArgs>): Promise<InitStakingPoolResult> {
     const user = input.user!;
     const pool = input.pool ?? this.id;
 
@@ -287,7 +287,7 @@ export class BoundPool {
     const adminTicketId = BoundPool.findMemeTicketPda(stakingId, this.client.memechanProgram.programId);
 
     const stakingPoolSolVaultid = Keypair.generate();
-    const stakingPoolSolVault = await createAccount(this.client.connection, user, NATIVE_MINT, stakingSigner, stakingPoolSolVaultid, { skipPreflight: true, commitment: "confirmed" });
+    const stakingWSolVault = await createAccount(this.client.connection, user, NATIVE_MINT, stakingSigner, stakingPoolSolVaultid, { skipPreflight: true, commitment: "confirmed" });
 
     const stakingMemeVaultid = Keypair.generate();
     const stakingMemeVault = await createAccount(this.client.connection, user, boundPoolInfo.memeReserve.mint, stakingSigner, stakingMemeVaultid, { skipPreflight: true, commitment: "confirmed" });
@@ -301,7 +301,7 @@ export class BoundPool {
         poolMemeVault: boundPoolInfo.memeReserve.vault,
         poolWsolVault: boundPoolInfo.solReserve.vault,
         stakingMemeVault: stakingMemeVault,
-        stakingWsolVault: stakingPoolSolVault,
+        stakingWsolVault: stakingWSolVault,
         solMint: NATIVE_MINT,
         staking: stakingId,
         stakingPoolSignerPda: stakingSigner,
@@ -319,12 +319,12 @@ export class BoundPool {
       const result = await this.retryInitStakingPool(this.client, methodArgs, 3, 60000); // Retry up to 3 times with an initial timeout of 30 seconds
       console.log("initStakingPool Final result:", result);
 
-      return result;
+      return {stakingMemeVault, stakingWSolVault};
     } catch (error) {
       console.error("Failed to initialize staking pool:", error);
     }
 
-    return "";
+    return { stakingMemeVault, stakingWSolVault };
   }
 
   public async goLive(input: Partial<GoLiveArgs>): Promise<[StakingPool]> {
