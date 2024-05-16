@@ -1,6 +1,5 @@
 import {
   createAccount,
-  createMint,
   createSyncNativeInstruction,
   getOrCreateAssociatedTokenAccount,
   mintTo,
@@ -30,6 +29,7 @@ import { ATA_PROGRAM_ID, PROGRAMIDS } from "../raydium/config";
 import { createMarket } from "../raydium/openBookCreateMarket";
 
 import { findProgramAddress } from "../common/helpers";
+import { createMintWithPriority } from "../token/createMintWithPriority";
 
 export class BoundPool {
   private constructor(
@@ -79,7 +79,7 @@ export class BoundPool {
     const id = this.findBoundPoolPda(memeMintKeypair.publicKey, NATIVE_MINT, args.client.memechanProgram.programId);
     const poolSigner = BoundPool.findSignerPda(id, args.client.memechanProgram.programId);
 
-    const memeMint = await createMint(connection, payer, poolSigner, null, 6, memeMintKeypair);
+    const memeMint = await createMintWithPriority(connection, payer, poolSigner, null, 6, memeMintKeypair);
 
     console.log("memeMint: " + memeMint.toBase58());
 
