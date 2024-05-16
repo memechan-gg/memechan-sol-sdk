@@ -79,16 +79,16 @@ export class BoundPool {
     const id = this.findBoundPoolPda(memeMintKeypair.publicKey, NATIVE_MINT, args.client.memechanProgram.programId);
     const poolSigner = BoundPool.findSignerPda(id, args.client.memechanProgram.programId);
 
-    const memeMint = await createMintWithPriority(connection, payer, poolSigner, null, 6, memeMintKeypair);
+    const memeMint = await createMintWithPriority(connection, payer, poolSigner, null, 6, memeMintKeypair, { skipPreflight: true, commitment: "confirmed" });
 
     console.log("memeMint: " + memeMint.toBase58());
 
     const adminSolVault = (await getOrCreateAssociatedTokenAccount(connection, payer, NATIVE_MINT, admin)).address;
     const poolSolVaultid = Keypair.generate();
-    const poolSolVault = await createAccount(connection, payer, NATIVE_MINT, poolSigner, poolSolVaultid);
+    const poolSolVault = await createAccount(connection, payer, NATIVE_MINT, poolSigner, poolSolVaultid, { skipPreflight: true, commitment: "confirmed" });
 
     const launchVaultid = Keypair.generate();
-    const launchVault = await createAccount(connection, payer, memeMint, poolSigner, launchVaultid);
+    const launchVault = await createAccount(connection, payer, memeMint, poolSigner, launchVaultid, { skipPreflight: true, commitment: "confirmed" });
 
     console.log(
       `pool id: ${id.toBase58()} memeMint: ${memeMint.toBase58()}, adminSolVault: ${adminSolVault.toBase58()}, poolSolVault: ${poolSolVault.toBase58()}, launchVault: ${launchVault.toBase58()}`,
@@ -109,7 +109,7 @@ export class BoundPool {
         systemProgram: SystemProgram.programId,
       })
       .signers([signer])
-      .rpc();
+      .rpc({ skipPreflight: true, commitment: "confirmed" });
 
     console.log("new pool tx result: " + result);
 
@@ -158,8 +158,8 @@ export class BoundPool {
       input.userSolAcc ??
       (await getOrCreateAssociatedTokenAccount(this.client.connection, payer, NATIVE_MINT, user.publicKey)).address;
 
-    const balance = await this.client.connection.getBalance(payer.publicKey);
-    console.log(`${balance / LAMPORTS_PER_SOL} SOL`);
+    // const balance = await this.client.connection.getBalance(payer.publicKey);
+    // console.log(`${balance / LAMPORTS_PER_SOL} SOL`);
 
     const transferTx = new Transaction().add(
       SystemProgram.transfer({
@@ -172,6 +172,7 @@ export class BoundPool {
 
     const transferResult = await sendAndConfirmTransaction(this.client.connection, transferTx, [payer], {
       skipPreflight: true,
+      commitment: "confirmed",
     });
 
     console.log("3 transferResult: " + transferResult);
@@ -189,7 +190,7 @@ export class BoundPool {
         tokenProgram: TOKEN_PROGRAM_ID,
       })
       .signers([user, id])
-      .rpc({ skipPreflight: true, maxRetries: 3 })
+      .rpc({ skipPreflight: true, commitment: "confirmed"})
       .catch((e) => console.error(e));
 
     return new MemeTicket(id.publicKey, this.client);
@@ -218,7 +219,7 @@ export class BoundPool {
         tokenProgram: TOKEN_PROGRAM_ID,
       })
       .signers([user!])
-      .rpc();
+      .rpc({ skipPreflight: true, commitment: "confirmed" });
   }
 
   async retryInitStakingPool(client, methodArgs, maxRetries, initialTimeout) {
@@ -244,7 +245,7 @@ export class BoundPool {
         console.log("Transaction successful:", result);
         return result;
       } catch (error) {
-        console.error(`Attempt ${attempts + 1} failed:`, error);
+        console.log(`Attempt ${attempts + 1} failed:`, error);
         if (error.message.includes("Transaction was not confirmed in")) {
           attempts++;
           timeout += 30000; // Increase timeout by 30 seconds for each retry
@@ -297,7 +298,7 @@ export class BoundPool {
         user: user,
       };
 
-      const result = await this.retryInitStakingPool(this.client, methodArgs, 3, 30000); // Retry up to 3 times with an initial timeout of 30 seconds
+      const result = await this.retryInitStakingPool(this.client, methodArgs, 3, 60000); // Retry up to 3 times with an initial timeout of 30 seconds
       console.log("initStakingPool Final result:", result);
 
       return result;
@@ -318,32 +319,33 @@ export class BoundPool {
     console.log("goLive.boundPoolInfo: " + JSON.stringify(boundPoolInfo));
 
     const baseTokenInfo = { mint: boundPoolInfo.memeReserve.mint, decimals: 6 };
-    const quoteTokenInfo = Token.WSOL;
+    const marketId = new PublicKey("AHZCwnUuiB3CUEyk2nybsU5c85WVDTHVP2UwuQwpVaR1");
+    // const quoteTokenInfo = Token.WSOL;
 
-    const { txids: createMarketTxIds, marketId } = await createMarket({
-      baseToken: baseTokenInfo,
-      quoteToken: quoteTokenInfo,
-      wallet: user.publicKey,
-      signer: user,
-      connection: this.client.connection,
-    });
+    // const { txids: createMarketTxIds, marketId } = await createMarket({
+    //   baseToken: baseTokenInfo,
+    //   quoteToken: quoteTokenInfo,
+    //   wallet: user.publicKey,
+    //   signer: user,
+    //   connection: this.client.connection,
+    // });
 
-    console.log("createMarketTxIds: " + JSON.stringify(createMarketTxIds));
+    // console.log("createMarketTxIds: " + JSON.stringify(createMarketTxIds));
 
-    const createMarkeLatestBH0 = await this.client.connection.getLatestBlockhash("confirmed");
-    const createMarketTxResult = await this.client.connection.confirmTransaction(
-      {
-        signature: createMarketTxIds[0],
-        blockhash: createMarkeLatestBH0.blockhash,
-        lastValidBlockHeight: createMarkeLatestBH0.lastValidBlockHeight,
-      },
-      "confirmed",
-    );
+    // const createMarkeLatestBH0 = await this.client.connection.getLatestBlockhash("confirmed");
+    // const createMarketTxResult = await this.client.connection.confirmTransaction(
+    //   {
+    //     signature: createMarketTxIds[0],
+    //     blockhash: createMarkeLatestBH0.blockhash,
+    //     lastValidBlockHeight: createMarkeLatestBH0.lastValidBlockHeight,
+    //   },
+    //   "confirmed",
+    // );
 
-    if (createMarketTxResult.value.err) {
-      console.error("createMarketTxResult", createMarketTxResult);
-      throw new Error("createMarketTxResult failed");
-    }
+    // if (createMarketTxResult.value.err) {
+    //   console.error("createMarketTxResult", createMarketTxResult);
+    //   throw new Error("createMarketTxResult failed");
+    // }
 
     console.log("marketId", marketId.toBase58());
     console.log("stakingId: " + stakingId.toBase58());
@@ -357,6 +359,7 @@ export class BoundPool {
 
     const transferSignature = await sendAndConfirmTransaction(this.client.connection, transferTx, [user], {
       skipPreflight: true,
+      commitment: "confirmed",
     });
 
     console.log("transferSignature: " + transferSignature);
@@ -372,7 +375,7 @@ export class BoundPool {
     );
 
     if (transferTxSyncResult.value.err) {
-      console.error("transferTxSyncResult error: ", JSON.stringify(createMarketTxResult));
+      console.error("transferTxSyncResult error: ", JSON.stringify(transferTxSyncResult));
       throw new Error("transferTxSyncResult failed");
     }
     else
@@ -424,7 +427,7 @@ export class BoundPool {
           raydiumProgram: PROGRAMIDS.AmmV4,
         })
         .signers([user]) // ammid?
-        .rpc({ skipPreflight: true });
+        .rpc({ skipPreflight: true, commitment: "confirmed"});
 
       console.log("goLive Transaction successful:", result);
 
