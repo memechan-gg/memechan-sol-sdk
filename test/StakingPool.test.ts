@@ -19,8 +19,8 @@ describe("StakingPool", () => {
     const all = await StakingPool.all(client.memechanProgram);
 
     for (const pool of all) {
-      console.log(JSON.stringify(pool.account));
-      console.log("==================================================");
+      //console.log(JSON.stringify(pool.account));
+      //console.log("==================================================");
     }
   }, 30000);
 });
