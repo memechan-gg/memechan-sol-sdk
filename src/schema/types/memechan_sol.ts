@@ -377,7 +377,7 @@ export type MemechanSol = {
         },
         {
           "name": "raydiumAmmAuthority",
-          "isMut": false,
+          "isMut": true,
           "isSigner": false,
           "docs": [
             "Raydium AMM Signer"
@@ -2348,7 +2348,7 @@ export const IDL: MemechanSol = {
         },
         {
           "name": "raydiumAmmAuthority",
-          "isMut": false,
+          "isMut": true,
           "isSigner": false,
           "docs": [
             "Raydium AMM Signer"
