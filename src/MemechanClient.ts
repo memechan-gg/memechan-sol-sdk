@@ -8,7 +8,7 @@ export class MemechanClient {
 
   constructor(
     private wallet: Wallet,
-    network: Cluster = process.env.NETWORK as Cluster,
+    //network: Cluster = process.env.NETWORK as Cluster,
   ) {
     this.wallet = wallet;
     const isTest = process.env.NODE_ENV === "test";
@@ -17,6 +17,7 @@ export class MemechanClient {
     this.connection = new Connection(process.env.RPC_API_CLUSTER, {
       httpAgent: isTest ? false : undefined,
       commitment: "confirmed",
+      wsEndpoint: process.env.WSS_API_CLUSTER
     });
 
     const provider = new AnchorProvider(this.connection, wallet, { commitment: "confirmed" });
