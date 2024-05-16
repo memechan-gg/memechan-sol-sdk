@@ -17,6 +17,7 @@ import {
   sendAndConfirmTransaction,
   LAMPORTS_PER_SOL,
   Connection,
+  ComputeBudgetProgram,
 } from "@solana/web3.js";
 import { Token } from "@raydium-io/raydium-sdk";
 
@@ -156,12 +157,23 @@ export class BoundPool {
 
     const userSolAcc =
       input.userSolAcc ??
-      (await getOrCreateAssociatedTokenAccount(this.client.connection, payer, NATIVE_MINT, user.publicKey)).address;
+      (await getOrCreateAssociatedTokenAccount(this.client.connection, payer, NATIVE_MINT, user.publicKey, true, "confirmed", {  skipPreflight: true})).address;
 
     // const balance = await this.client.connection.getBalance(payer.publicKey);
     // console.log(`${balance / LAMPORTS_PER_SOL} SOL`);
 
+    const modifyComputeUnits = ComputeBudgetProgram.setComputeUnitLimit({
+      units: 300,
+    });
+    
+    const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
+      microLamports: 20000,
+    });
+    
+
     const transferTx = new Transaction().add(
+      modifyComputeUnits,
+      addPriorityFee,
       SystemProgram.transfer({
         fromPubkey: payer.publicKey,
         toPubkey: userSolAcc,
@@ -319,37 +331,49 @@ export class BoundPool {
     console.log("goLive.boundPoolInfo: " + JSON.stringify(boundPoolInfo));
 
     const baseTokenInfo = { mint: boundPoolInfo.memeReserve.mint, decimals: 6 };
-    const marketId = new PublicKey("AHZCwnUuiB3CUEyk2nybsU5c85WVDTHVP2UwuQwpVaR1");
-    // const quoteTokenInfo = Token.WSOL;
+    //const marketId = new PublicKey("AHZCwnUuiB3CUEyk2nybsU5c85WVDTHVP2UwuQwpVaR1");
+    const quoteTokenInfo = Token.WSOL;
 
-    // const { txids: createMarketTxIds, marketId } = await createMarket({
-    //   baseToken: baseTokenInfo,
-    //   quoteToken: quoteTokenInfo,
-    //   wallet: user.publicKey,
-    //   signer: user,
-    //   connection: this.client.connection,
-    // });
+    const { txids: createMarketTxIds, marketId } = await createMarket({
+      baseToken: baseTokenInfo,
+      quoteToken: quoteTokenInfo,
+      wallet: user.publicKey,
+      signer: user,
+      connection: this.client.connection,
+    });
 
-    // console.log("createMarketTxIds: " + JSON.stringify(createMarketTxIds));
+    console.log("createMarketTxIds: " + JSON.stringify(createMarketTxIds));
 
-    // const createMarkeLatestBH0 = await this.client.connection.getLatestBlockhash("confirmed");
-    // const createMarketTxResult = await this.client.connection.confirmTransaction(
-    //   {
-    //     signature: createMarketTxIds[0],
-    //     blockhash: createMarkeLatestBH0.blockhash,
-    //     lastValidBlockHeight: createMarkeLatestBH0.lastValidBlockHeight,
-    //   },
-    //   "confirmed",
-    // );
+    const createMarkeLatestBH0 = await this.client.connection.getLatestBlockhash("confirmed");
+    const createMarketTxResult = await this.client.connection.confirmTransaction(
+      {
+        signature: createMarketTxIds[0],
+        blockhash: createMarkeLatestBH0.blockhash,
+        lastValidBlockHeight: createMarkeLatestBH0.lastValidBlockHeight,
+      },
+      "confirmed",
+    );
 
-    // if (createMarketTxResult.value.err) {
-    //   console.error("createMarketTxResult", createMarketTxResult);
-    //   throw new Error("createMarketTxResult failed");
-    // }
+    if (createMarketTxResult.value.err) {
+      console.error("createMarketTxResult", createMarketTxResult);
+      throw new Error("createMarketTxResult failed");
+    }
+
 
     console.log("marketId", marketId.toBase58());
     console.log("stakingId: " + stakingId.toBase58());
+    
+    const modifyComputeUnits = ComputeBudgetProgram.setComputeUnitLimit({
+      units: 300,
+    });
+    
+    const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
+      microLamports: 20000,
+    });
+
     const transferTx = new Transaction().add(
+      modifyComputeUnits,
+      addPriorityFee,
       SystemProgram.transfer({
         fromPubkey: user.publicKey,
         toPubkey: stakingSigner,
