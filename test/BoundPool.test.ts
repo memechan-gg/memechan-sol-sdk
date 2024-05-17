@@ -4,8 +4,9 @@ import { airdrop, sleep } from "../src/common/helpers";
 import { BN } from "@coral-xyz/anchor";
 import { MemechanClient } from "../src/MemechanClient";
 import NodeWallet from "@coral-xyz/anchor/dist/cjs/nodewallet";
-import { createWrappedNativeAccount, getAccount } from "@solana/spl-token";
+import { NATIVE_MINT, createWrappedNativeAccount, getAccount } from "@solana/spl-token";
 import { MemeTicket } from "../src/memeticket/MemeTicket";
+import { Token } from "@raydium-io/raydium-sdk";
 
 describe("BoundPool", () => {
   // it("creates bound pool", async () => {
@@ -29,15 +30,14 @@ describe("BoundPool", () => {
     const all = await BoundPool.all(client.memechanProgram);
 
     for (const pool of all) {
-      console.log(pool.account);
-      console.log("==================================================");
+      //console.log(pool.account);
+      //console.log("==================================================");
     }
 
     console.log(all);
   }, 30000)
 
   it("init staking pool then go live", async () => {
-    return;
     const admin = new PublicKey(process.env.ADMIN_PUB_KEY as string);
     const payer = Keypair.fromSecretKey(Buffer.from(JSON.parse(process.env.TEST_USER_SECRET_KEY as string)));
     console.log("payer: " + payer.publicKey.toString());
@@ -45,7 +45,7 @@ describe("BoundPool", () => {
     const wallet = new NodeWallet(payer);
     const client = new MemechanClient(wallet);
 
-    const pool = await BoundPool.new({ admin, payer, signer: payer, client });
+    const pool = await BoundPool.new({ admin, payer, signer: payer, client, quoteToken: Token.WSOL});
 
     console.log("==== pool id: " + pool.id.toString());
     await sleep(2000);

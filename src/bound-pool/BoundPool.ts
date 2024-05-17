@@ -3,7 +3,6 @@ import {
   createSyncNativeInstruction,
   getOrCreateAssociatedTokenAccount,
   mintTo,
-  NATIVE_MINT,
   TOKEN_PROGRAM_ID,
 } from "@solana/spl-token";
 import {
@@ -39,6 +38,7 @@ export class BoundPool {
     public solVault: PublicKey,
     public memeVault: PublicKey,
     public client: MemechanClient,
+    public quoteToken: Token = Token.WSOL,
   ) {
     //
   }
@@ -73,20 +73,21 @@ export class BoundPool {
   }
 
   public static async new(args: BoundPoolArgs): Promise<BoundPool> {
-    const { admin, payer, signer, client } = args;
+    const { admin, payer, signer, client, quoteToken } = args;
     const { connection, memechanProgram } = client;
 
     const memeMintKeypair = Keypair.generate();
-    const id = this.findBoundPoolPda(memeMintKeypair.publicKey, NATIVE_MINT, args.client.memechanProgram.programId);
+    console.log("quoteToken.mint: " + quoteToken.mint);
+    const id = this.findBoundPoolPda(memeMintKeypair.publicKey, quoteToken.mint, args.client.memechanProgram.programId);
     const poolSigner = BoundPool.findSignerPda(id, args.client.memechanProgram.programId);
 
     const memeMint = await createMintWithPriority(connection, payer, poolSigner, null, 6, memeMintKeypair, { skipPreflight: true, commitment: "confirmed" });
 
     console.log("memeMint: " + memeMint.toBase58());
 
-    const adminSolVault = (await getOrCreateAssociatedTokenAccount(connection, payer, NATIVE_MINT, admin, true, "confirmed", { skipPreflight: true })).address;
+    const adminSolVault = (await getOrCreateAssociatedTokenAccount(connection, payer, quoteToken.mint, admin, true, "confirmed", { skipPreflight: true })).address;
     const poolSolVaultid = Keypair.generate();
-    const poolSolVault = await createAccount(connection, payer, NATIVE_MINT, poolSigner, poolSolVaultid, { skipPreflight: true, commitment: "confirmed" });
+    const poolSolVault = await createAccount(connection, payer, quoteToken.mint, poolSigner, poolSolVaultid, { skipPreflight: true, commitment: "confirmed" });
 
     const launchVaultid = Keypair.generate();
     const launchVault = await createAccount(connection, payer, memeMint, poolSigner, launchVaultid, { skipPreflight: true, commitment: "confirmed" });
@@ -105,7 +106,7 @@ export class BoundPool {
         pool: id,
         poolSigner: poolSigner,
         sender: signer.publicKey,
-        solMint: NATIVE_MINT,
+        solMint: quoteToken.mint,
         tokenProgram: TOKEN_PROGRAM_ID,
         systemProgram: SystemProgram.programId,
       })
@@ -161,7 +162,7 @@ export class BoundPool {
 
     const userSolAcc =
       input.userSolAcc ??
-      (await getOrCreateAssociatedTokenAccount(this.client.connection, payer, NATIVE_MINT, user.publicKey, true, "confirmed", {  skipPreflight: true})).address;
+      (await getOrCreateAssociatedTokenAccount(this.client.connection, payer, this.quoteToken.mint, user.publicKey, true, "confirmed", {  skipPreflight: true})).address;
 
     // const balance = await this.client.connection.getBalance(payer.publicKey);
     // console.log(`${balance / LAMPORTS_PER_SOL} SOL`);
@@ -293,7 +294,7 @@ export class BoundPool {
     const adminTicketId = BoundPool.findMemeTicketPda(stakingId, this.client.memechanProgram.programId);
 
     const stakingPoolSolVaultid = Keypair.generate();
-    const stakingWSolVault = await createAccount(this.client.connection, user, NATIVE_MINT, stakingSigner, stakingPoolSolVaultid, { skipPreflight: true, commitment: "confirmed" });
+    const stakingWSolVault = await createAccount(this.client.connection, user, this.quoteToken.mint, stakingSigner, stakingPoolSolVaultid, { skipPreflight: true, commitment: "confirmed" });
 
     const stakingMemeVaultid = Keypair.generate();
     const stakingMemeVault = await createAccount(this.client.connection, user, boundPoolInfo.memeReserve.mint, stakingSigner, stakingMemeVaultid, { skipPreflight: true, commitment: "confirmed" });
@@ -308,7 +309,7 @@ export class BoundPool {
         poolWsolVault: boundPoolInfo.solReserve.vault,
         stakingMemeVault: stakingMemeVault,
         stakingWsolVault: stakingWSolVault,
-        solMint: NATIVE_MINT,
+        solMint: this.quoteToken.mint,
         staking: stakingId,
         stakingPoolSignerPda: stakingSigner,
         adminVaultSol: boundPoolInfo.adminVaultSol,
@@ -455,7 +456,7 @@ export class BoundPool {
           signer: user.publicKey,
           poolMemeVault: input.memeVault,
           poolWsolVault: input.wSolVault,
-          solMint: NATIVE_MINT,
+          solMint: this.quoteToken.mint,
           staking: stakingId,
           stakingPoolSignerPda: stakingSigner,
           raydiumLpMint: raydiumLpMint,

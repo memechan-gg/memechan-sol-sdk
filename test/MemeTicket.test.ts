@@ -19,8 +19,8 @@ describe("MemeTicket", () => {
     const all = await MemeTicket.all(client.memechanProgram);
 
     for (const pool of all) {
-      console.log(JSON.stringify(pool.account));
-      console.log("==================================================");
+      //console.log(JSON.stringify(pool.account));
+      //console.log("==================================================");
     }
   }, 30000);
 });

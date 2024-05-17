@@ -2,6 +2,7 @@ import { BN } from "@coral-xyz/anchor";
 import { PublicKey, Keypair, Signer } from "@solana/web3.js";
 import { MemeTicket } from "../memeticket/MemeTicket";
 import { MemechanClient } from "../MemechanClient";
+import { Token } from "@raydium-io/raydium-sdk";
 
 export interface SwapYArgs {
   payer: Signer;
@@ -43,6 +44,7 @@ export interface BoundPoolArgs {
   payer: Signer;
   signer: Keypair;
   client: MemechanClient;
+  quoteToken: Token;
 }
 
 export interface InitStakingPoolResult {
