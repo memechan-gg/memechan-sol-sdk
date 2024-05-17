@@ -1,8 +1,13 @@
-import { MINT_SIZE, TOKEN_PROGRAM_ID, createInitializeMint2Instruction, getMinimumBalanceForRentExemptMint } from '@solana/spl-token';
-import type { ConfirmOptions, Connection, PublicKey, Signer } from '@solana/web3.js';
-import { ComputeBudgetProgram, Keypair, sendAndConfirmTransaction, SystemProgram, Transaction } from '@solana/web3.js';
+import {
+  MINT_SIZE,
+  TOKEN_PROGRAM_ID,
+  createInitializeMint2Instruction,
+  getMinimumBalanceForRentExemptMint,
+} from "@solana/spl-token";
+import type { ConfirmOptions, Connection, PublicKey, Signer } from "@solana/web3.js";
+import { ComputeBudgetProgram, Keypair, sendAndConfirmTransaction, SystemProgram, Transaction } from "@solana/web3.js";
 
- /* Create and initialize a new mint
+/* Create and initialize a new mint
  *
  * @param connection      Connection to use
  * @param payer           Payer of the transaction and initialization fees
@@ -16,39 +21,39 @@ import { ComputeBudgetProgram, Keypair, sendAndConfirmTransaction, SystemProgram
  * @return Address of the new mint
  */
 export async function createMintWithPriority(
-    connection: Connection,
-    payer: Signer,
-    mintAuthority: PublicKey,
-    freezeAuthority: PublicKey | null,
-    decimals: number,
-    keypair = Keypair.generate(),
-    confirmOptions?: ConfirmOptions,
-    programId = TOKEN_PROGRAM_ID
+  connection: Connection,
+  payer: Signer,
+  mintAuthority: PublicKey,
+  freezeAuthority: PublicKey | null,
+  decimals: number,
+  keypair = Keypair.generate(),
+  confirmOptions?: ConfirmOptions,
+  programId = TOKEN_PROGRAM_ID,
 ): Promise<PublicKey> {
-    const lamports = await getMinimumBalanceForRentExemptMint(connection);
+  const lamports = await getMinimumBalanceForRentExemptMint(connection);
 
-    const modifyComputeUnits = ComputeBudgetProgram.setComputeUnitLimit({
-      units: 30000,
-    });
+  const modifyComputeUnits = ComputeBudgetProgram.setComputeUnitLimit({
+    units: 30000,
+  });
 
-    const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
-      microLamports: 6000000,
-    });
+  const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
+    microLamports: 6000000,
+  });
 
-    const transaction = new Transaction().add(
-       modifyComputeUnits,
-        addPriorityFee,
-        SystemProgram.createAccount({
-            fromPubkey: payer.publicKey,
-            newAccountPubkey: keypair.publicKey,
-            space: MINT_SIZE,
-            lamports,
-            programId,
-        }),
-        createInitializeMint2Instruction(keypair.publicKey, decimals, mintAuthority, freezeAuthority, programId)
-    );
+  const transaction = new Transaction().add(
+    modifyComputeUnits,
+    addPriorityFee,
+    SystemProgram.createAccount({
+      fromPubkey: payer.publicKey,
+      newAccountPubkey: keypair.publicKey,
+      space: MINT_SIZE,
+      lamports,
+      programId,
+    }),
+    createInitializeMint2Instruction(keypair.publicKey, decimals, mintAuthority, freezeAuthority, programId),
+  );
 
-    await sendAndConfirmTransaction(connection, transaction, [payer, keypair], confirmOptions);
+  await sendAndConfirmTransaction(connection, transaction, [payer, keypair], confirmOptions);
 
-    return keypair.publicKey;
+  return keypair.publicKey;
 }
