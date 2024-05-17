@@ -23,7 +23,7 @@ export class StakingPool {
       .addFees()
       .accounts({
         memeVault: stakingInfo.memeVault,
-        wsolVault: stakingInfo.wsolVault,
+        quoteVault: stakingInfo.quoteVault,
         staking: this.id,
         stakingSignerPda: this.findSignerPda(),
         tokenProgram: TOKEN_PROGRAM_ID,
@@ -58,10 +58,10 @@ export class StakingPool {
         signer: args.user.publicKey,
         stakingSignerPda: this.findSignerPda(),
         memeVault: stakingInfo.memeVault,
-        wsolVault: stakingInfo.wsolVault,
+        quoteVault: stakingInfo.quoteVault,
         staking: this.id,
         userMeme: memeAcc,
-        userWsol: wsolAcc,
+        userQuote: wsolAcc,
         tokenProgram: TOKEN_PROGRAM_ID,
       })
       .signers([args.user])
@@ -95,10 +95,10 @@ export class StakingPool {
         memeTicket: args.ticket.id,
         stakingSignerPda: this.findSignerPda(),
         memeVault: stakingInfo.memeVault,
-        wsolVault: stakingInfo.wsolVault,
+        quoteVault: stakingInfo.quoteVault,
         staking: this.id,
         userMeme: memeAcc,
-        userWsol: wsolAcc,
+        userQuote: wsolAcc,
         signer: args.user.publicKey,
         tokenProgram: TOKEN_PROGRAM_ID,
       })
