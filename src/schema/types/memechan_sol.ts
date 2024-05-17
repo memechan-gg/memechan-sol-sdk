@@ -21,22 +21,22 @@ export type MemechanSol = {
           "isSigner": false
         },
         {
-          "name": "solVault",
+          "name": "quoteVault",
           "isMut": false,
           "isSigner": false
         },
         {
-          "name": "solMint",
+          "name": "quoteMint",
           "isMut": false,
           "isSigner": false
         },
         {
-          "name": "adminSolVault",
+          "name": "adminQuoteVault",
           "isMut": false,
           "isSigner": false
         },
         {
-          "name": "launchVault",
+          "name": "memeVault",
           "isMut": true,
           "isSigner": false
         },
@@ -59,6 +59,76 @@ export type MemechanSol = {
       "args": []
     },
     {
+      "name": "createMetadata",
+      "accounts": [
+        {
+          "name": "sender",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "pool",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "memeMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "memeMplMetadata",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "To store metaplex metadata. Created in the function scope"
+          ]
+        },
+        {
+          "name": "poolSigner",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "metadataProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "Program to create NFT metadata"
+          ]
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "name",
+          "type": "string"
+        },
+        {
+          "name": "symbol",
+          "type": "string"
+        },
+        {
+          "name": "uri",
+          "type": "string"
+        }
+      ]
+    },
+    {
       "name": "swapX",
       "accounts": [
         {
@@ -77,7 +147,7 @@ export type MemechanSol = {
           "isSigner": false
         },
         {
-          "name": "solVault",
+          "name": "quoteVault",
           "isMut": true,
           "isSigner": false
         },
@@ -117,7 +187,7 @@ export type MemechanSol = {
           "isSigner": false
         },
         {
-          "name": "solVault",
+          "name": "quoteVault",
           "isMut": true,
           "isSigner": false
         },
@@ -196,7 +266,7 @@ export type MemechanSol = {
           ]
         },
         {
-          "name": "poolWsolVault",
+          "name": "poolQuoteVault",
           "isMut": true,
           "isSigner": false,
           "docs": [
@@ -204,7 +274,7 @@ export type MemechanSol = {
           ]
         },
         {
-          "name": "adminVaultSol",
+          "name": "adminVaultQuote",
           "isMut": true,
           "isSigner": false,
           "docs": [
@@ -220,7 +290,7 @@ export type MemechanSol = {
           ]
         },
         {
-          "name": "solMint",
+          "name": "quoteMint",
           "isMut": false,
           "isSigner": false,
           "docs": [
@@ -249,7 +319,7 @@ export type MemechanSol = {
           "isSigner": false
         },
         {
-          "name": "stakingWsolVault",
+          "name": "stakingQuoteVault",
           "isMut": true,
           "isSigner": false,
           "docs": [
@@ -333,7 +403,7 @@ export type MemechanSol = {
           ]
         },
         {
-          "name": "poolWsolVault",
+          "name": "poolQuoteVault",
           "isMut": true,
           "isSigner": false,
           "docs": [
@@ -349,7 +419,7 @@ export type MemechanSol = {
           ]
         },
         {
-          "name": "solMint",
+          "name": "quoteMint",
           "isMut": false,
           "isSigner": false,
           "docs": [
@@ -414,7 +484,7 @@ export type MemechanSol = {
           ]
         },
         {
-          "name": "raydiumWsolVault",
+          "name": "raydiumQuoteVault",
           "isMut": true,
           "isSigner": false,
           "docs": [
@@ -493,7 +563,7 @@ export type MemechanSol = {
           "isSigner": false
         },
         {
-          "name": "wsolVault",
+          "name": "quoteVault",
           "isMut": true,
           "isSigner": false
         },
@@ -538,7 +608,7 @@ export type MemechanSol = {
           "isSigner": false
         },
         {
-          "name": "raydiumWsolVault",
+          "name": "raydiumQuoteVault",
           "isMut": true,
           "isSigner": false
         },
@@ -619,7 +689,7 @@ export type MemechanSol = {
           "isSigner": false
         },
         {
-          "name": "userWsol",
+          "name": "userQuote",
           "isMut": true,
           "isSigner": false
         },
@@ -629,7 +699,7 @@ export type MemechanSol = {
           "isSigner": false
         },
         {
-          "name": "wsolVault",
+          "name": "quoteVault",
           "isMut": true,
           "isSigner": false
         },
@@ -675,7 +745,7 @@ export type MemechanSol = {
           "isSigner": false
         },
         {
-          "name": "userWsol",
+          "name": "userQuote",
           "isMut": false,
           "isSigner": false
         },
@@ -685,7 +755,7 @@ export type MemechanSol = {
           "isSigner": false
         },
         {
-          "name": "wsolVault",
+          "name": "quoteVault",
           "isMut": true,
           "isSigner": false
         },
@@ -789,7 +859,7 @@ export type MemechanSol = {
             }
           },
           {
-            "name": "solReserve",
+            "name": "quoteReserve",
             "type": {
               "defined": "Reserve"
             }
@@ -799,11 +869,11 @@ export type MemechanSol = {
             "type": "u64"
           },
           {
-            "name": "adminFeesSol",
+            "name": "adminFeesQuote",
             "type": "u64"
           },
           {
-            "name": "adminVaultSol",
+            "name": "adminVaultQuote",
             "type": "publicKey"
           },
           {
@@ -847,7 +917,7 @@ export type MemechanSol = {
             "type": "u64"
           },
           {
-            "name": "withdrawsWsol",
+            "name": "withdrawsQuote",
             "type": "u64"
           },
           {
@@ -881,7 +951,7 @@ export type MemechanSol = {
             "type": "publicKey"
           },
           {
-            "name": "wsolVault",
+            "name": "quoteVault",
             "type": "publicKey"
           },
           {
@@ -2005,22 +2075,22 @@ export const IDL: MemechanSol = {
           "isSigner": false
         },
         {
-          "name": "solVault",
+          "name": "quoteVault",
           "isMut": false,
           "isSigner": false
         },
         {
-          "name": "solMint",
+          "name": "quoteMint",
           "isMut": false,
           "isSigner": false
         },
         {
-          "name": "adminSolVault",
+          "name": "adminQuoteVault",
           "isMut": false,
           "isSigner": false
         },
         {
-          "name": "launchVault",
+          "name": "memeVault",
           "isMut": true,
           "isSigner": false
         },
@@ -2043,6 +2113,76 @@ export const IDL: MemechanSol = {
       "args": []
     },
     {
+      "name": "createMetadata",
+      "accounts": [
+        {
+          "name": "sender",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "pool",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "memeMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "memeMplMetadata",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "To store metaplex metadata. Created in the function scope"
+          ]
+        },
+        {
+          "name": "poolSigner",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "metadataProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "Program to create NFT metadata"
+          ]
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "name",
+          "type": "string"
+        },
+        {
+          "name": "symbol",
+          "type": "string"
+        },
+        {
+          "name": "uri",
+          "type": "string"
+        }
+      ]
+    },
+    {
       "name": "swapX",
       "accounts": [
         {
@@ -2061,7 +2201,7 @@ export const IDL: MemechanSol = {
           "isSigner": false
         },
         {
-          "name": "solVault",
+          "name": "quoteVault",
           "isMut": true,
           "isSigner": false
         },
@@ -2101,7 +2241,7 @@ export const IDL: MemechanSol = {
           "isSigner": false
         },
         {
-          "name": "solVault",
+          "name": "quoteVault",
           "isMut": true,
           "isSigner": false
         },
@@ -2180,7 +2320,7 @@ export const IDL: MemechanSol = {
           ]
         },
         {
-          "name": "poolWsolVault",
+          "name": "poolQuoteVault",
           "isMut": true,
           "isSigner": false,
           "docs": [
@@ -2188,7 +2328,7 @@ export const IDL: MemechanSol = {
           ]
         },
         {
-          "name": "adminVaultSol",
+          "name": "adminVaultQuote",
           "isMut": true,
           "isSigner": false,
           "docs": [
@@ -2204,7 +2344,7 @@ export const IDL: MemechanSol = {
           ]
         },
         {
-          "name": "solMint",
+          "name": "quoteMint",
           "isMut": false,
           "isSigner": false,
           "docs": [
@@ -2233,7 +2373,7 @@ export const IDL: MemechanSol = {
           "isSigner": false
         },
         {
-          "name": "stakingWsolVault",
+          "name": "stakingQuoteVault",
           "isMut": true,
           "isSigner": false,
           "docs": [
@@ -2317,7 +2457,7 @@ export const IDL: MemechanSol = {
           ]
         },
         {
-          "name": "poolWsolVault",
+          "name": "poolQuoteVault",
           "isMut": true,
           "isSigner": false,
           "docs": [
@@ -2333,7 +2473,7 @@ export const IDL: MemechanSol = {
           ]
         },
         {
-          "name": "solMint",
+          "name": "quoteMint",
           "isMut": false,
           "isSigner": false,
           "docs": [
@@ -2398,7 +2538,7 @@ export const IDL: MemechanSol = {
           ]
         },
         {
-          "name": "raydiumWsolVault",
+          "name": "raydiumQuoteVault",
           "isMut": true,
           "isSigner": false,
           "docs": [
@@ -2477,7 +2617,7 @@ export const IDL: MemechanSol = {
           "isSigner": false
         },
         {
-          "name": "wsolVault",
+          "name": "quoteVault",
           "isMut": true,
           "isSigner": false
         },
@@ -2522,7 +2662,7 @@ export const IDL: MemechanSol = {
           "isSigner": false
         },
         {
-          "name": "raydiumWsolVault",
+          "name": "raydiumQuoteVault",
           "isMut": true,
           "isSigner": false
         },
@@ -2603,7 +2743,7 @@ export const IDL: MemechanSol = {
           "isSigner": false
         },
         {
-          "name": "userWsol",
+          "name": "userQuote",
           "isMut": true,
           "isSigner": false
         },
@@ -2613,7 +2753,7 @@ export const IDL: MemechanSol = {
           "isSigner": false
         },
         {
-          "name": "wsolVault",
+          "name": "quoteVault",
           "isMut": true,
           "isSigner": false
         },
@@ -2659,7 +2799,7 @@ export const IDL: MemechanSol = {
           "isSigner": false
         },
         {
-          "name": "userWsol",
+          "name": "userQuote",
           "isMut": false,
           "isSigner": false
         },
@@ -2669,7 +2809,7 @@ export const IDL: MemechanSol = {
           "isSigner": false
         },
         {
-          "name": "wsolVault",
+          "name": "quoteVault",
           "isMut": true,
           "isSigner": false
         },
@@ -2773,7 +2913,7 @@ export const IDL: MemechanSol = {
             }
           },
           {
-            "name": "solReserve",
+            "name": "quoteReserve",
             "type": {
               "defined": "Reserve"
             }
@@ -2783,11 +2923,11 @@ export const IDL: MemechanSol = {
             "type": "u64"
           },
           {
-            "name": "adminFeesSol",
+            "name": "adminFeesQuote",
             "type": "u64"
           },
           {
-            "name": "adminVaultSol",
+            "name": "adminVaultQuote",
             "type": "publicKey"
           },
           {
@@ -2831,7 +2971,7 @@ export const IDL: MemechanSol = {
             "type": "u64"
           },
           {
-            "name": "withdrawsWsol",
+            "name": "withdrawsQuote",
             "type": "u64"
           },
           {
@@ -2865,7 +3005,7 @@ export const IDL: MemechanSol = {
             "type": "publicKey"
           },
           {
-            "name": "wsolVault",
+            "name": "quoteVault",
             "type": "publicKey"
           },
           {
