@@ -30,6 +30,7 @@ import { createMarket } from "../raydium/openBookCreateMarket";
 import { findProgramAddress } from "../common/helpers";
 import { createMintWithPriority } from "../token/createMintWithPriority";
 import { MemechanSol } from "../schema/types/memechan_sol";
+import { createMetadata } from "../token/createMetadata";
 
 export class BoundPool {
   private constructor(
@@ -81,16 +82,29 @@ export class BoundPool {
     const id = this.findBoundPoolPda(memeMintKeypair.publicKey, quoteToken.mint, args.client.memechanProgram.programId);
     const poolSigner = BoundPool.findSignerPda(id, args.client.memechanProgram.programId);
 
-    const memeMint = await createMintWithPriority(connection, payer, poolSigner, null, 6, memeMintKeypair, { skipPreflight: true, commitment: "confirmed" });
-
+    const memeMint = await createMintWithPriority(connection, payer, poolSigner, null, 6, memeMintKeypair, {
+      skipPreflight: true,
+      commitment: "confirmed",
+    });
     console.log("memeMint: " + memeMint.toBase58());
 
-    const adminSolVault = (await getOrCreateAssociatedTokenAccount(connection, payer, quoteToken.mint, admin, true, "confirmed", { skipPreflight: true })).address;
+    
+    const adminSolVault = (
+      await getOrCreateAssociatedTokenAccount(connection, payer, quoteToken.mint, admin, true, "confirmed", {
+        skipPreflight: true,
+      })
+    ).address;
     const poolSolVaultid = Keypair.generate();
-    const poolSolVault = await createAccount(connection, payer, quoteToken.mint, poolSigner, poolSolVaultid, { skipPreflight: true, commitment: "confirmed" });
+    const poolSolVault = await createAccount(connection, payer, quoteToken.mint, poolSigner, poolSolVaultid, {
+      skipPreflight: true,
+      commitment: "confirmed",
+    });
 
     const launchVaultid = Keypair.generate();
-    const launchVault = await createAccount(connection, payer, memeMint, poolSigner, launchVaultid, { skipPreflight: true, commitment: "confirmed" });
+    const launchVault = await createAccount(connection, payer, memeMint, poolSigner, launchVaultid, {
+      skipPreflight: true,
+      commitment: "confirmed",
+    });
 
     console.log(
       `pool id: ${id.toBase58()} memeMint: ${memeMint.toBase58()}, adminSolVault: ${adminSolVault.toBase58()}, poolSolVault: ${poolSolVault.toBase58()}, launchVault: ${launchVault.toBase58()}`,
@@ -99,14 +113,14 @@ export class BoundPool {
     const result = await memechanProgram.methods
       .new()
       .accounts({
-        adminSolVault: adminSolVault,
-        launchVault: launchVault,
-        solVault: poolSolVault,
+        adminQuoteVault: adminSolVault,
+        memeVault: launchVault,
+        quoteVault: poolSolVault,
         memeMint: memeMint,
         pool: id,
         poolSigner: poolSigner,
         sender: signer.publicKey,
-        solMint: quoteToken.mint,
+        quoteMint: quoteToken.mint,
         tokenProgram: TOKEN_PROGRAM_ID,
         systemProgram: SystemProgram.programId,
       })
@@ -114,6 +128,10 @@ export class BoundPool {
       .rpc({ skipPreflight: true });
 
     console.log("new pool tx result: " + result);
+
+      const metadata = await createMetadata(client, payer, memeMint, id, poolSigner);
+    console.log("metadata: " + metadata);
+
 
     return new BoundPool(id, signer, poolSolVault, launchVault, client);
   }
@@ -162,7 +180,17 @@ export class BoundPool {
 
     const userSolAcc =
       input.userSolAcc ??
-      (await getOrCreateAssociatedTokenAccount(this.client.connection, payer, this.quoteToken.mint, user.publicKey, true, "confirmed", {  skipPreflight: true})).address;
+      (
+        await getOrCreateAssociatedTokenAccount(
+          this.client.connection,
+          payer,
+          this.quoteToken.mint,
+          user.publicKey,
+          true,
+          "confirmed",
+          { skipPreflight: true },
+        )
+      ).address;
 
     // const balance = await this.client.connection.getBalance(payer.publicKey);
     // console.log(`${balance / LAMPORTS_PER_SOL} SOL`);
@@ -170,15 +198,14 @@ export class BoundPool {
     // const modifyComputeUnits = ComputeBudgetProgram.setComputeUnitLimit({
     //   units: 300,
     // });
-    
+
     // const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
     //   microLamports: 20000,
     // });
-    
 
     const transferTx = new Transaction().add(
-    //  modifyComputeUnits,
-     // addPriorityFee,
+      //  modifyComputeUnits,
+      // addPriorityFee,
       SystemProgram.transfer({
         fromPubkey: payer.publicKey,
         toPubkey: userSolAcc,
@@ -201,13 +228,13 @@ export class BoundPool {
         owner: user.publicKey,
         pool: pool,
         poolSignerPda: poolSignerPda,
-        solVault: this.solVault,
+        quoteVault: this.solVault,
         userSol: userSolAcc,
         systemProgram: SystemProgram.programId,
         tokenProgram: TOKEN_PROGRAM_ID,
       })
       .signers([user, id])
-      .rpc({ skipPreflight: true, commitment: "confirmed"})
+      .rpc({ skipPreflight: true, commitment: "confirmed" })
       .catch((e) => console.error(e));
 
     return new MemeTicket(id.publicKey, this.client);
@@ -231,7 +258,7 @@ export class BoundPool {
         owner: user?.publicKey,
         pool: pool,
         poolSigner,
-        solVault: this.solVault,
+        quoteVault: this.solVault,
         userSol: userSolAcc,
         tokenProgram: TOKEN_PROGRAM_ID,
       })
@@ -239,7 +266,7 @@ export class BoundPool {
       .rpc({ skipPreflight: true, commitment: "confirmed" });
   }
 
-  async retryInitStakingPool(client, methodArgs, maxRetries, initialTimeout) : Promise<InitStakingPoolResult> {
+  async retryInitStakingPool(client, methodArgs, maxRetries, initialTimeout): Promise<InitStakingPoolResult> {
     let attempts = 0;
     let timeout = initialTimeout;
 
@@ -294,10 +321,24 @@ export class BoundPool {
     const adminTicketId = BoundPool.findMemeTicketPda(stakingId, this.client.memechanProgram.programId);
 
     const stakingPoolSolVaultid = Keypair.generate();
-    const stakingWSolVault = await createAccount(this.client.connection, user, this.quoteToken.mint, stakingSigner, stakingPoolSolVaultid, { skipPreflight: true, commitment: "confirmed" });
+    const stakingWSolVault = await createAccount(
+      this.client.connection,
+      user,
+      this.quoteToken.mint,
+      stakingSigner,
+      stakingPoolSolVaultid,
+      { skipPreflight: true, commitment: "confirmed" },
+    );
 
     const stakingMemeVaultid = Keypair.generate();
-    const stakingMemeVault = await createAccount(this.client.connection, user, boundPoolInfo.memeReserve.mint, stakingSigner, stakingMemeVaultid, { skipPreflight: true, commitment: "confirmed" });
+    const stakingMemeVault = await createAccount(
+      this.client.connection,
+      user,
+      boundPoolInfo.memeReserve.mint,
+      stakingSigner,
+      stakingMemeVaultid,
+      { skipPreflight: true, commitment: "confirmed" },
+    );
 
     try {
       const methodArgs = {
@@ -326,7 +367,7 @@ export class BoundPool {
       const result = await this.retryInitStakingPool(this.client, methodArgs, 3, 60000); // Retry up to 3 times with an initial timeout of 30 seconds
       console.log("initStakingPool Final result:", result);
 
-      return {stakingMemeVault, stakingWSolVault};
+      return { stakingMemeVault, stakingWSolVault };
     } catch (error) {
       console.error("Failed to initialize staking pool:", error);
     }
@@ -340,7 +381,7 @@ export class BoundPool {
     const boundPoolInfo = input.boundPoolInfo as any;
     const stakingId = BoundPool.findStakingPda(boundPoolInfo.memeReserve.mint, this.client.memechanProgram.programId);
     const stakingSigner = StakingPool.findSignerPda(stakingId, this.client.memechanProgram.programId);
-   
+
     console.log("goLive.boundPoolInfo: " + JSON.stringify(boundPoolInfo));
 
     const baseTokenInfo = { mint: boundPoolInfo.memeReserve.mint, decimals: 6 };
@@ -378,19 +419,19 @@ export class BoundPool {
     // const modifyComputeUnits = ComputeBudgetProgram.setComputeUnitLimit({
     //   units: 300,
     // });
-    
+
     // const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
     //   microLamports: 20000,
     // });
 
     const transferTx = new Transaction().add(
-     // modifyComputeUnits,
-     // addPriorityFee,
+      // modifyComputeUnits,
+      // addPriorityFee,
       SystemProgram.transfer({
         fromPubkey: user.publicKey,
         toPubkey: stakingSigner,
         lamports: 2_000_000_000,
-      })
+      }),
     );
 
     const transferSignature = await sendAndConfirmTransaction(this.client.connection, transferTx, [user], {
@@ -413,9 +454,7 @@ export class BoundPool {
     if (transferTxSyncResult.value.err) {
       console.error("transferTxSyncResult error: ", JSON.stringify(transferTxSyncResult));
       throw new Error("transferTxSyncResult failed");
-    }
-    else
-    {
+    } else {
       console.log("transferTxSyncResult: " + JSON.stringify(transferTxSyncResult));
     }
 
@@ -455,15 +494,15 @@ export class BoundPool {
         .accounts({
           signer: user.publicKey,
           poolMemeVault: input.memeVault,
-          poolWsolVault: input.wSolVault,
-          solMint: this.quoteToken.mint,
+          poolQuoteVault: input.wSolVault,
+          quoteMint: this.quoteToken.mint,
           staking: stakingId,
           stakingPoolSignerPda: stakingSigner,
           raydiumLpMint: raydiumLpMint,
           raydiumAmm: ammId,
           raydiumAmmAuthority: raydiumAmmAuthority.publicKey,
           raydiumMemeVault: raydiumMemeVault,
-          raydiumWsolVault: raydiumWsolVault,
+          raydiumQuoteVault: raydiumWsolVault,
           marketProgramId: PROGRAMIDS.OPENBOOK_MARKET,
           systemProgram: SystemProgram.programId,
           tokenProgram: TOKEN_PROGRAM_ID,
@@ -480,19 +519,12 @@ export class BoundPool {
           raydiumProgram: PROGRAMIDS.AmmV4,
         })
         .signers([user]) // ammid?
-    
-        .preInstructions([
-            modifyComputeUnits,
-            addPriorityFee
-        ])
-        .rpc({ skipPreflight: true, commitment: "confirmed", })
-        ;
 
+        .preInstructions([modifyComputeUnits, addPriorityFee])
+        .rpc({ skipPreflight: true, commitment: "confirmed" });
       console.log("goLive Transaction successful:", result);
 
-      return [
-        new StakingPool(stakingId, this.client),
-      ];
+      return [new StakingPool(stakingId, this.client)];
     } catch (error) {
       if (error instanceof AnchorError) {
         console.error("Error details:", error);
@@ -507,19 +539,19 @@ export class BoundPool {
     }
   }
 
-static getATAAddress(owner: PublicKey, mint: PublicKey, programId: PublicKey) {
-  return findProgramAddress(
-    [owner.toBuffer(), programId.toBuffer(), mint.toBuffer()],
-    new PublicKey('ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL'),
-  )
-}
+  static getATAAddress(owner: PublicKey, mint: PublicKey, programId: PublicKey) {
+    return findProgramAddress(
+      [owner.toBuffer(), programId.toBuffer(), mint.toBuffer()],
+      new PublicKey("ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"),
+    );
+  }
 
   static getAssociatedId({ programId, marketId }: { programId: PublicKey; marketId: PublicKey }) {
     const { publicKey } = findProgramAddress(
-      [programId.toBuffer(), marketId.toBuffer(), Buffer.from('amm_associated_seed', 'utf-8')],
+      [programId.toBuffer(), marketId.toBuffer(), Buffer.from("amm_associated_seed", "utf-8")],
       programId,
-    )
-    return publicKey
+    );
+    return publicKey;
   }
 
   static getAssociatedAuthority({ programId }: { programId: PublicKey }) {
@@ -527,74 +559,71 @@ static getATAAddress(owner: PublicKey, mint: PublicKey, programId: PublicKey) {
       // new Uint8Array(Buffer.from('amm authority'.replace('\u00A0', ' '), 'utf-8'))
       [Buffer.from([97, 109, 109, 32, 97, 117, 116, 104, 111, 114, 105, 116, 121])],
       programId,
-    )
+    );
   }
 
   static getAssociatedBaseVault({ programId, marketId }: { programId: PublicKey; marketId: PublicKey }) {
     const { publicKey } = findProgramAddress(
-      [programId.toBuffer(), marketId.toBuffer(), Buffer.from('coin_vault_associated_seed', 'utf-8')],
+      [programId.toBuffer(), marketId.toBuffer(), Buffer.from("coin_vault_associated_seed", "utf-8")],
       programId,
-    )
-    return publicKey
+    );
+    return publicKey;
   }
 
   static getAssociatedQuoteVault({ programId, marketId }: { programId: PublicKey; marketId: PublicKey }) {
     const { publicKey } = findProgramAddress(
-      [programId.toBuffer(), marketId.toBuffer(), Buffer.from('pc_vault_associated_seed', 'utf-8')],
+      [programId.toBuffer(), marketId.toBuffer(), Buffer.from("pc_vault_associated_seed", "utf-8")],
       programId,
-    )
-    return publicKey
+    );
+    return publicKey;
   }
 
   static getAssociatedLpMint({ programId, marketId }: { programId: PublicKey; marketId: PublicKey }) {
     const { publicKey } = findProgramAddress(
-      [programId.toBuffer(), marketId.toBuffer(), Buffer.from('lp_mint_associated_seed', 'utf-8')],
+      [programId.toBuffer(), marketId.toBuffer(), Buffer.from("lp_mint_associated_seed", "utf-8")],
       programId,
-    )
-    return publicKey
+    );
+    return publicKey;
   }
 
   static getAssociatedLpVault({ programId, marketId }: { programId: PublicKey; marketId: PublicKey }) {
     const { publicKey } = findProgramAddress(
-      [programId.toBuffer(), marketId.toBuffer(), Buffer.from('temp_lp_token_associated_seed', 'utf-8')],
+      [programId.toBuffer(), marketId.toBuffer(), Buffer.from("temp_lp_token_associated_seed", "utf-8")],
       programId,
-    )
-    return publicKey
+    );
+    return publicKey;
   }
 
   static getAssociatedTargetOrders({ programId, marketId }: { programId: PublicKey; marketId: PublicKey }) {
     const { publicKey } = findProgramAddress(
-      [programId.toBuffer(), marketId.toBuffer(), Buffer.from('target_associated_seed', 'utf-8')],
+      [programId.toBuffer(), marketId.toBuffer(), Buffer.from("target_associated_seed", "utf-8")],
       programId,
-    )
-    return publicKey
+    );
+    return publicKey;
   }
 
   static getAssociatedWithdrawQueue({ programId, marketId }: { programId: PublicKey; marketId: PublicKey }) {
     const { publicKey } = findProgramAddress(
-      [programId.toBuffer(), marketId.toBuffer(), Buffer.from('withdraw_associated_seed', 'utf-8')],
+      [programId.toBuffer(), marketId.toBuffer(), Buffer.from("withdraw_associated_seed", "utf-8")],
       programId,
-    )
-    return publicKey
+    );
+    return publicKey;
   }
 
   static getAssociatedOpenOrders({ programId, marketId }: { programId: PublicKey; marketId: PublicKey }) {
     const { publicKey } = findProgramAddress(
-      [programId.toBuffer(), marketId.toBuffer(), Buffer.from('open_order_associated_seed', 'utf-8')],
+      [programId.toBuffer(), marketId.toBuffer(), Buffer.from("open_order_associated_seed", "utf-8")],
       programId,
-    )
-    return publicKey
+    );
+    return publicKey;
   }
 
   static getAssociatedConfigId({ programId }: { programId: PublicKey }) {
-    const { publicKey } = findProgramAddress([Buffer.from('amm_config_account_seed', 'utf-8')], programId)
-    return publicKey
+    const { publicKey } = findProgramAddress([Buffer.from("amm_config_account_seed", "utf-8")], programId);
+    return publicKey;
   }
 
   async airdrop(connection: Connection, to: PublicKey, amount: number = 5_000_000_000) {
-  await connection.confirmTransaction(
-    await connection.requestAirdrop(to, amount),
-    "confirmed"
-  );
-}
+    await connection.confirmTransaction(await connection.requestAirdrop(to, amount), "confirmed");
+  }
 }
