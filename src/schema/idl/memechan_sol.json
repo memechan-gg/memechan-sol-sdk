@@ -68,12 +68,12 @@
         },
         {
           "name": "pool",
-          "isMut": true,
-          "isSigner": true
+          "isMut": false,
+          "isSigner": false
         },
         {
           "name": "memeMint",
-          "isMut": true,
+          "isMut": false,
           "isSigner": false
         },
         {
@@ -2049,5 +2049,8 @@
       "code": 6018,
       "name": "BondingCurveInterceptMustBePositive"
     }
-  ]
+  ],
+  "metadata": {
+    "address": "67aHQY6fHX8zWF1iKRGuotqgL7RKrSER2TDKsjab9CWx"
+  }
 }

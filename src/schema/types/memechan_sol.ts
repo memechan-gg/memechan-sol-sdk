@@ -68,12 +68,12 @@ export type MemechanSol = {
         },
         {
           "name": "pool",
-          "isMut": true,
-          "isSigner": true
+          "isMut": false,
+          "isSigner": false
         },
         {
           "name": "memeMint",
-          "isMut": true,
+          "isMut": false,
           "isSigner": false
         },
         {
@@ -2122,12 +2122,12 @@ export const IDL: MemechanSol = {
         },
         {
           "name": "pool",
-          "isMut": true,
-          "isSigner": true
+          "isMut": false,
+          "isSigner": false
         },
         {
           "name": "memeMint",
-          "isMut": true,
+          "isMut": false,
           "isSigner": false
         },
         {

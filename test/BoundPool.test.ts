@@ -7,6 +7,7 @@ import NodeWallet from "@coral-xyz/anchor/dist/cjs/nodewallet";
 import { NATIVE_MINT, createWrappedNativeAccount, getAccount } from "@solana/spl-token";
 import { MemeTicket } from "../src/memeticket/MemeTicket";
 import { Token } from "@raydium-io/raydium-sdk";
+import {SLERF_MINT} from "../src/common/consts";
 
 describe("BoundPool", () => {
   // it("creates bound pool", async () => {

@@ -3,6 +3,7 @@ import {
   createSyncNativeInstruction,
   getOrCreateAssociatedTokenAccount,
   mintTo,
+  NATIVE_MINT,
   TOKEN_PROGRAM_ID,
 } from "@solana/spl-token";
 import {
@@ -79,6 +80,7 @@ export class BoundPool {
 
     const memeMintKeypair = Keypair.generate();
     console.log("quoteToken.mint: " + quoteToken.mint);
+    console.log("nativeMint: " + NATIVE_MINT);
     const id = this.findBoundPoolPda(memeMintKeypair.publicKey, quoteToken.mint, args.client.memechanProgram.programId);
     const poolSigner = BoundPool.findSignerPda(id, args.client.memechanProgram.programId);
 
@@ -87,7 +89,6 @@ export class BoundPool {
       commitment: "confirmed",
     });
     console.log("memeMint: " + memeMint.toBase58());
-
     
     const adminSolVault = (
       await getOrCreateAssociatedTokenAccount(connection, payer, quoteToken.mint, admin, true, "confirmed", {
@@ -129,11 +130,10 @@ export class BoundPool {
 
     console.log("new pool tx result: " + result);
 
-      const metadata = await createMetadata(client, payer, memeMint, id, poolSigner);
+    const metadata = await createMetadata(client, payer, memeMint, id, poolSigner);
     console.log("metadata: " + metadata);
 
-
-    return new BoundPool(id, signer, poolSolVault, launchVault, client);
+    return new BoundPool(id, signer, poolSolVault, launchVault, client, quoteToken);
   }
 
   public async fetch(program = this.client.memechanProgram, accountId = this.id, retries = 3) {
