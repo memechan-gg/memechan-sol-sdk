@@ -18,7 +18,6 @@ import {
   Transaction,
   sendAndConfirmTransaction,
   Connection,
-  TransactionInstruction,
   ComputeBudgetProgram,
 } from "@solana/web3.js";
 import { Token } from "@raydium-io/raydium-sdk";
@@ -490,7 +489,7 @@ export class BoundPool {
     return { stakingMemeVault, stakingWSolVault };
   }
 
-  public async goLive(input: Partial<GoLiveArgs>): Promise<[StakingPool]> {
+  public async goLive(input: GoLiveArgs): Promise<[StakingPool]> {
     const user = input.user!;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const boundPoolInfo = input.boundPoolInfo as any;
@@ -573,7 +572,7 @@ export class BoundPool {
       console.log("transferTxSyncResult: " + JSON.stringify(transferTxSyncResult));
     }
 
-    const feeDestination = new PublicKey(process.env.FEE_DESTINATION_ID as string);
+    const feeDestination = new PublicKey(input.feeDestinationWalletAddress);
     const ammId = BoundPool.getAssociatedId({ programId: PROGRAMIDS.AmmV4, marketId });
     const raydiumAmmAuthority = BoundPool.getAssociatedAuthority({ programId: PROGRAMIDS.AmmV4 });
     const openOrders = BoundPool.getAssociatedOpenOrders({ programId: PROGRAMIDS.AmmV4, marketId });

@@ -47,6 +47,7 @@ export interface GoLiveArgs {
   boundPoolInfo: object;
   memeVault: PublicKey;
   wSolVault: PublicKey;
+  feeDestinationWalletAddress: string;
 }
 
 export interface InitStakingPoolArgs {

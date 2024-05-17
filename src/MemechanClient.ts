@@ -1,31 +1,39 @@
 import { AnchorProvider, Program, Wallet, setProvider } from "@coral-xyz/anchor";
-import { Cluster, Connection, PublicKey, clusterApiUrl } from "@solana/web3.js";
+import { Connection, ConnectionConfig, PublicKey } from "@solana/web3.js";
 import { IDL, MemechanSol } from "./schema/types/memechan_sol";
 
 export class MemechanClient {
   public connection: Connection;
   public memechanProgram: Program<MemechanSol>;
+  public anchorProvider: AnchorProvider;
 
   constructor(
     private wallet: Wallet,
-    //network: Cluster = process.env.NETWORK as Cluster,
+
+    private rpcConnectionConfig: ConnectionConfig,
+    private rpcApiUrl: string,
+    private wssApiUrl: string,
+
+    private memechanProgramId: string,
+    private isTest: boolean,
   ) {
     this.wallet = wallet;
-    const isTest = process.env.NODE_ENV === "test";
-
-    //this.connection = new Connection(clusterApiUrl('devnet'), {
-    this.connection = new Connection(process.env.RPC_API_CLUSTER, {
+    this.connection = new Connection(rpcApiUrl, {
       httpAgent: isTest ? false : undefined,
       commitment: "confirmed",
-      wsEndpoint: process.env.WSS_API_CLUSTER,
+      wsEndpoint: wssApiUrl,
       confirmTransactionInitialTimeout: 120000,
+
+      ...(rpcConnectionConfig ? rpcConnectionConfig : {}),
     });
 
     const provider = new AnchorProvider(this.connection, wallet, { commitment: "confirmed" });
     setProvider(provider);
+    this.anchorProvider = provider;
 
-    console.log("program id: " + process.env.MEMECHAN_PROGRAM_ID);
+    console.log("program id: " + memechanProgramId);
     console.log("connection rpc: " + this.connection.rpcEndpoint);
-    this.memechanProgram = new Program<MemechanSol>(IDL, new PublicKey(process.env.MEMECHAN_PROGRAM_ID!), provider);
+
+    this.memechanProgram = new Program<MemechanSol>(IDL, new PublicKey(memechanProgramId), provider);
   }
 }
