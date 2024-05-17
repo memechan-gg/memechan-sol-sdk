@@ -791,7 +791,7 @@
 
 "@raydium-io/raydium-sdk@^1.3.1-beta.52":
   version "1.3.1-beta.52"
-  resolved "https://registry.yarnpkg.com/@raydium-io/raydium-sdk/-/raydium-sdk-1.3.1-beta.52.tgz#1e1d45d9834bc6d92cfdd7ab4d0d78703205191c"
+  resolved "https://registry.npmjs.org/@raydium-io/raydium-sdk/-/raydium-sdk-1.3.1-beta.52.tgz#1e1d45d9834bc6d92cfdd7ab4d0d78703205191c"
   integrity sha512-NnCIfmFLT5QZLjeMhAwEofNuzZEPAU7q2O0P0o67O1fsGdVq5HJgLL8bI6UMKX2d2Ed4MEz7ip2bSng2tHp+5w==
   dependencies:
     "@solana/buffer-layout" "^4.0.1"
