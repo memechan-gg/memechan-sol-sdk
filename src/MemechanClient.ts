@@ -18,7 +18,7 @@ export class MemechanClient {
       httpAgent: isTest ? false : undefined,
       commitment: "confirmed",
       wsEndpoint: process.env.WSS_API_CLUSTER,
-      confirmTransactionInitialTimeout: 120000
+      confirmTransactionInitialTimeout: 120000,
     });
 
     const provider = new AnchorProvider(this.connection, wallet, { commitment: "confirmed" });
