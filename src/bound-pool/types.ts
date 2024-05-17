@@ -1,5 +1,5 @@
 import { BN } from "@coral-xyz/anchor";
-import { PublicKey, Keypair, Signer } from "@solana/web3.js";
+import { PublicKey, Keypair, Signer, Transaction } from "@solana/web3.js";
 import { MemeTicket } from "../memeticket/MemeTicket";
 import { MemechanClient } from "../MemechanClient";
 
@@ -7,10 +7,23 @@ export interface SwapYArgs {
   payer: Signer;
   user: Keypair;
   pool: PublicKey;
-  userSolAcc: PublicKey;
+  userSolAcc?: PublicKey;
   solAmountIn: BN;
   memeTokensOut: BN;
 }
+
+export type GetBuyMemeTransactionArgs = Omit<SwapYArgs, "user" | "payer" | "pool"> & {
+  user: { publicKey: PublicKey };
+  // inputToken: {
+  //   mint: PublicKey;
+  //   amount: string;
+  // };
+  // outputToken: {
+  //   mint: PublicKey;
+  //   minAmount: string;
+  // };
+  transaction?: Transaction;
+};
 
 export interface SwapXArgs {
   user: Keypair;
@@ -21,6 +34,11 @@ export interface SwapXArgs {
   userMemeTicket: MemeTicket;
   userSolAcc: PublicKey;
 }
+
+export type GetSellMemeTransactionArgs = Omit<SwapXArgs, "user" | "pool" | "poolSignerPda"> & {
+  user: { publicKey: PublicKey };
+  transaction?: Transaction;
+};
 
 export interface GoLiveArgs {
   pool: PublicKey;

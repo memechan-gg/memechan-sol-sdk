@@ -1,6 +1,8 @@
 import {
   createAccount,
+  createAssociatedTokenAccountInstruction,
   createSyncNativeInstruction,
+  getAssociatedTokenAddressSync,
   getOrCreateAssociatedTokenAccount,
   mintTo,
   NATIVE_MINT,
@@ -21,7 +23,16 @@ import {
 } from "@solana/web3.js";
 import { Token } from "@raydium-io/raydium-sdk";
 
-import { BoundPoolArgs, GoLiveArgs, InitStakingPoolArgs, InitStakingPoolResult, SwapXArgs, SwapYArgs } from "./types";
+import {
+  BoundPoolArgs,
+  GetBuyMemeTransactionArgs,
+  GetSellMemeTransactionArgs,
+  GoLiveArgs,
+  InitStakingPoolArgs,
+  InitStakingPoolResult,
+  SwapXArgs,
+  SwapYArgs,
+} from "./types";
 import { AnchorError, BN, Provider } from "@coral-xyz/anchor";
 import { MemeTicket } from "../memeticket/MemeTicket";
 import { StakingPool } from "../staking-pool/StakingPool";
@@ -80,16 +91,29 @@ export class BoundPool {
     const id = this.findBoundPoolPda(memeMintKeypair.publicKey, NATIVE_MINT, args.client.memechanProgram.programId);
     const poolSigner = BoundPool.findSignerPda(id, args.client.memechanProgram.programId);
 
-    const memeMint = await createMintWithPriority(connection, payer, poolSigner, null, 6, memeMintKeypair, { skipPreflight: true, commitment: "confirmed" });
+    const memeMint = await createMintWithPriority(connection, payer, poolSigner, null, 6, memeMintKeypair, {
+      skipPreflight: true,
+      commitment: "confirmed",
+    });
 
     console.log("memeMint: " + memeMint.toBase58());
 
-    const adminSolVault = (await getOrCreateAssociatedTokenAccount(connection, payer, NATIVE_MINT, admin, true, "confirmed", { skipPreflight: true })).address;
+    const adminSolVault = (
+      await getOrCreateAssociatedTokenAccount(connection, payer, NATIVE_MINT, admin, true, "confirmed", {
+        skipPreflight: true,
+      })
+    ).address;
     const poolSolVaultid = Keypair.generate();
-    const poolSolVault = await createAccount(connection, payer, NATIVE_MINT, poolSigner, poolSolVaultid, { skipPreflight: true, commitment: "confirmed" });
+    const poolSolVault = await createAccount(connection, payer, NATIVE_MINT, poolSigner, poolSolVaultid, {
+      skipPreflight: true,
+      commitment: "confirmed",
+    });
 
     const launchVaultid = Keypair.generate();
-    const launchVault = await createAccount(connection, payer, memeMint, poolSigner, launchVaultid, { skipPreflight: true, commitment: "confirmed" });
+    const launchVault = await createAccount(connection, payer, memeMint, poolSigner, launchVaultid, {
+      skipPreflight: true,
+      commitment: "confirmed",
+    });
 
     console.log(
       `pool id: ${id.toBase58()} memeMint: ${memeMint.toBase58()}, adminSolVault: ${adminSolVault.toBase58()}, poolSolVault: ${poolSolVault.toBase58()}, launchVault: ${launchVault.toBase58()}`,
@@ -157,7 +181,17 @@ export class BoundPool {
 
     const userSolAcc =
       input.userSolAcc ??
-      (await getOrCreateAssociatedTokenAccount(this.client.connection, payer, NATIVE_MINT, user.publicKey, true, "confirmed", {  skipPreflight: true})).address;
+      (
+        await getOrCreateAssociatedTokenAccount(
+          this.client.connection,
+          payer,
+          NATIVE_MINT,
+          user.publicKey,
+          true,
+          "confirmed",
+          { skipPreflight: true },
+        )
+      ).address;
 
     // const balance = await this.client.connection.getBalance(payer.publicKey);
     // console.log(`${balance / LAMPORTS_PER_SOL} SOL`);
@@ -165,15 +199,14 @@ export class BoundPool {
     // const modifyComputeUnits = ComputeBudgetProgram.setComputeUnitLimit({
     //   units: 300,
     // });
-    
+
     // const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
     //   microLamports: 20000,
     // });
-    
 
     const transferTx = new Transaction().add(
-    //  modifyComputeUnits,
-     // addPriorityFee,
+      //  modifyComputeUnits,
+      // addPriorityFee,
       SystemProgram.transfer({
         fromPubkey: payer.publicKey,
         toPubkey: userSolAcc,
@@ -202,39 +235,153 @@ export class BoundPool {
         tokenProgram: TOKEN_PROGRAM_ID,
       })
       .signers([user, id])
-      .rpc({ skipPreflight: true, commitment: "confirmed"})
+      .rpc({ skipPreflight: true, commitment: "confirmed" })
       .catch((e) => console.error(e));
 
     return new MemeTicket(id.publicKey, this.client);
   }
 
-  public async swapX(input: Partial<SwapXArgs>): Promise<void> {
+  /**
+   * Swaps a Y token (expecting SOL) for another asset by executing a buy meme transaction.
+   * @param {SwapYArgs} input - The input arguments required for the swap.
+   * @returns {Promise<string>} A promise that resolves to the transaction ID of the swap.
+   * @throws {Error} Throws an error if the transaction creation or confirmation fails.
+   * @untested This method is untested and may contain bugs.
+   */
+  public async swapY2(input: SwapYArgs): Promise<string> {
+    const buyMemeTransaction = await this.getBuyMemeTransaction(input);
+
+    const txId = await sendAndConfirmTransaction(this.client.connection, buyMemeTransaction, [input.user], {
+      skipPreflight: true,
+      commitment: "confirmed",
+    });
+
+    return txId;
+  }
+
+  /**
+   * Generates a transaction to buy a meme.
+   *
+   * @todo Implement the full functionality of this method (in regards of accepting different tokens).
+   * @todo Add comprehensive examples.
+   *
+   * @param {GetBuyMemeTransactionArgs} input - The input arguments required for the transaction.
+   * @returns {Promise<Transaction>} A promise that resolves to the transaction object.
+   *
+   * @work-in-progress This method is a work in progress and not yet ready for production use.
+   * @untested This method is untested and may contain bugs.
+   */
+  public async getBuyMemeTransaction(input: GetBuyMemeTransactionArgs): Promise<Transaction> {
+    const tx = input.transaction ?? new Transaction();
+
     const user = input.user;
 
-    const pool = input.pool ?? this.id;
-    const poolSigner = input.poolSignerPda ?? this.findSignerPda();
+    const pool = this.id;
+    const poolSignerPda = this.findSignerPda();
+
+    // TODO: Change that, we should allow to pass inputMint and outputMint
+    const tokenInMintPubkey = NATIVE_MINT;
+
+    const sol_in = input.solAmountIn;
+    const meme_out = input.memeTokensOut;
+
+    // TODO: ? We should handle SOL-based and non-SOL based swaps
+    let inputTokenUserAccountPubkey: undefined | PublicKey;
+
+    if (input.userSolAcc) {
+      inputTokenUserAccountPubkey = input.userSolAcc;
+    } else {
+      const associatedToken = getAssociatedTokenAddressSync(tokenInMintPubkey, user.publicKey, true);
+      inputTokenUserAccountPubkey = associatedToken;
+
+      const createAssociatedTokenAcouuntInstruction = createAssociatedTokenAccountInstruction(
+        user.publicKey,
+        associatedToken,
+        user.publicKey,
+        tokenInMintPubkey,
+      );
+
+      // Add creation of associated token account
+      tx.add(createAssociatedTokenAcouuntInstruction);
+
+      // TODO: We need to remove that once get rid of SOL-based pools
+      // Transfer SOL to wSOL
+      const transferSolToWSOLAccountInstruction = SystemProgram.transfer({
+        fromPubkey: user.publicKey,
+        toPubkey: inputTokenUserAccountPubkey,
+        lamports: sol_in,
+      });
+      tx.add(transferSolToWSOLAccountInstruction);
+
+      // TODO: We need to remove that once get rid of SOL-based pools
+      // TODO: Double-check do we really need that or not
+      // createSyncNativeInstruction(inputTokenUserAccountPubkey);
+    }
+
+    // TODO: Why?
+    const memeTicketId = Keypair.generate();
+
+    const buyMemeInstruction = await this.client.memechanProgram.methods
+      .swapY(new BN(sol_in), new BN(meme_out))
+      .accounts({
+        memeTicket: memeTicketId.publicKey,
+        owner: user.publicKey,
+        pool: pool,
+        poolSignerPda: poolSignerPda,
+        solVault: this.solVault,
+        userSol: inputTokenUserAccountPubkey,
+        systemProgram: SystemProgram.programId,
+        tokenProgram: TOKEN_PROGRAM_ID,
+      })
+      .instruction();
+
+    tx.add(buyMemeInstruction);
+
+    return tx;
+  }
+
+  public async swapX(input: SwapXArgs): Promise<string> {
+    const sellMemeCoinTransaction = await this.getSellMemeTransaction(input);
+
+    const txId = await sendAndConfirmTransaction(this.client.connection, sellMemeCoinTransaction, [input.user], {
+      skipPreflight: true,
+      commitment: "confirmed",
+    });
+
+    return txId;
+  }
+
+  public async getSellMemeTransaction(input: GetSellMemeTransactionArgs): Promise<Transaction> {
+    const tx = input.transaction ?? new Transaction();
+    const user = input.user;
+
+    const pool = this.id;
+    const poolSignerPda = this.findSignerPda();
     const meme_in = input.memeAmountIn;
     const sol_out = input.solTokensOut;
 
     const memeTicket = input.userMemeTicket;
     const userSolAcc = input.userSolAcc;
 
-    await this.client.memechanProgram.methods
+    const sellMemeTransactionInstruction = await this.client.memechanProgram.methods
       .swapX(new BN(meme_in), new BN(sol_out))
       .accounts({
-        memeTicket: memeTicket?.id,
-        owner: user?.publicKey,
+        memeTicket: memeTicket.id,
+        owner: user.publicKey,
         pool: pool,
-        poolSigner,
+        poolSigner: poolSignerPda,
         solVault: this.solVault,
         userSol: userSolAcc,
         tokenProgram: TOKEN_PROGRAM_ID,
       })
-      .signers([user!])
-      .rpc({ skipPreflight: true, commitment: "confirmed" });
+      .instruction();
+
+    tx.add(sellMemeTransactionInstruction);
+
+    return tx;
   }
 
-  async retryInitStakingPool(client, methodArgs, maxRetries, initialTimeout) : Promise<InitStakingPoolResult> {
+  async retryInitStakingPool(client, methodArgs, maxRetries, initialTimeout): Promise<InitStakingPoolResult> {
     let attempts = 0;
     let timeout = initialTimeout;
 
@@ -289,10 +436,24 @@ export class BoundPool {
     const adminTicketId = BoundPool.findMemeTicketPda(stakingId, this.client.memechanProgram.programId);
 
     const stakingPoolSolVaultid = Keypair.generate();
-    const stakingWSolVault = await createAccount(this.client.connection, user, NATIVE_MINT, stakingSigner, stakingPoolSolVaultid, { skipPreflight: true, commitment: "confirmed" });
+    const stakingWSolVault = await createAccount(
+      this.client.connection,
+      user,
+      NATIVE_MINT,
+      stakingSigner,
+      stakingPoolSolVaultid,
+      { skipPreflight: true, commitment: "confirmed" },
+    );
 
     const stakingMemeVaultid = Keypair.generate();
-    const stakingMemeVault = await createAccount(this.client.connection, user, boundPoolInfo.memeReserve.mint, stakingSigner, stakingMemeVaultid, { skipPreflight: true, commitment: "confirmed" });
+    const stakingMemeVault = await createAccount(
+      this.client.connection,
+      user,
+      boundPoolInfo.memeReserve.mint,
+      stakingSigner,
+      stakingMemeVaultid,
+      { skipPreflight: true, commitment: "confirmed" },
+    );
 
     try {
       const methodArgs = {
@@ -321,7 +482,7 @@ export class BoundPool {
       const result = await this.retryInitStakingPool(this.client, methodArgs, 3, 60000); // Retry up to 3 times with an initial timeout of 30 seconds
       console.log("initStakingPool Final result:", result);
 
-      return {stakingMemeVault, stakingWSolVault};
+      return { stakingMemeVault, stakingWSolVault };
     } catch (error) {
       console.error("Failed to initialize staking pool:", error);
     }
@@ -335,7 +496,7 @@ export class BoundPool {
     const boundPoolInfo = input.boundPoolInfo as any;
     const stakingId = BoundPool.findStakingPda(boundPoolInfo.memeReserve.mint, this.client.memechanProgram.programId);
     const stakingSigner = StakingPool.findSignerPda(stakingId, this.client.memechanProgram.programId);
-   
+
     console.log("goLive.boundPoolInfo: " + JSON.stringify(boundPoolInfo));
 
     const baseTokenInfo = { mint: boundPoolInfo.memeReserve.mint, decimals: 6 };
@@ -373,19 +534,19 @@ export class BoundPool {
     // const modifyComputeUnits = ComputeBudgetProgram.setComputeUnitLimit({
     //   units: 300,
     // });
-    
+
     // const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
     //   microLamports: 20000,
     // });
 
     const transferTx = new Transaction().add(
-     // modifyComputeUnits,
-     // addPriorityFee,
+      // modifyComputeUnits,
+      // addPriorityFee,
       SystemProgram.transfer({
         fromPubkey: user.publicKey,
         toPubkey: stakingSigner,
         lamports: 2_000_000_000,
-      })
+      }),
     );
 
     const transferSignature = await sendAndConfirmTransaction(this.client.connection, transferTx, [user], {
@@ -408,9 +569,7 @@ export class BoundPool {
     if (transferTxSyncResult.value.err) {
       console.error("transferTxSyncResult error: ", JSON.stringify(transferTxSyncResult));
       throw new Error("transferTxSyncResult failed");
-    }
-    else
-    {
+    } else {
       console.log("transferTxSyncResult: " + JSON.stringify(transferTxSyncResult));
     }
 
@@ -475,19 +634,12 @@ export class BoundPool {
           raydiumProgram: PROGRAMIDS.AmmV4,
         })
         .signers([user]) // ammid?
-    
-        .preInstructions([
-            modifyComputeUnits,
-            addPriorityFee
-        ])
-        .rpc({ skipPreflight: true, commitment: "confirmed", })
-        ;
 
+        .preInstructions([modifyComputeUnits, addPriorityFee])
+        .rpc({ skipPreflight: true, commitment: "confirmed" });
       console.log("goLive Transaction successful:", result);
 
-      return [
-        new StakingPool(stakingId, this.client),
-      ];
+      return [new StakingPool(stakingId, this.client)];
     } catch (error) {
       if (error instanceof AnchorError) {
         console.error("Error details:", error);
@@ -502,19 +654,19 @@ export class BoundPool {
     }
   }
 
-static getATAAddress(owner: PublicKey, mint: PublicKey, programId: PublicKey) {
-  return findProgramAddress(
-    [owner.toBuffer(), programId.toBuffer(), mint.toBuffer()],
-    new PublicKey('ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL'),
-  )
-}
+  static getATAAddress(owner: PublicKey, mint: PublicKey, programId: PublicKey) {
+    return findProgramAddress(
+      [owner.toBuffer(), programId.toBuffer(), mint.toBuffer()],
+      new PublicKey("ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"),
+    );
+  }
 
   static getAssociatedId({ programId, marketId }: { programId: PublicKey; marketId: PublicKey }) {
     const { publicKey } = findProgramAddress(
-      [programId.toBuffer(), marketId.toBuffer(), Buffer.from('amm_associated_seed', 'utf-8')],
+      [programId.toBuffer(), marketId.toBuffer(), Buffer.from("amm_associated_seed", "utf-8")],
       programId,
-    )
-    return publicKey
+    );
+    return publicKey;
   }
 
   static getAssociatedAuthority({ programId }: { programId: PublicKey }) {
@@ -522,74 +674,71 @@ static getATAAddress(owner: PublicKey, mint: PublicKey, programId: PublicKey) {
       // new Uint8Array(Buffer.from('amm authority'.replace('\u00A0', ' '), 'utf-8'))
       [Buffer.from([97, 109, 109, 32, 97, 117, 116, 104, 111, 114, 105, 116, 121])],
       programId,
-    )
+    );
   }
 
   static getAssociatedBaseVault({ programId, marketId }: { programId: PublicKey; marketId: PublicKey }) {
     const { publicKey } = findProgramAddress(
-      [programId.toBuffer(), marketId.toBuffer(), Buffer.from('coin_vault_associated_seed', 'utf-8')],
+      [programId.toBuffer(), marketId.toBuffer(), Buffer.from("coin_vault_associated_seed", "utf-8")],
       programId,
-    )
-    return publicKey
+    );
+    return publicKey;
   }
 
   static getAssociatedQuoteVault({ programId, marketId }: { programId: PublicKey; marketId: PublicKey }) {
     const { publicKey } = findProgramAddress(
-      [programId.toBuffer(), marketId.toBuffer(), Buffer.from('pc_vault_associated_seed', 'utf-8')],
+      [programId.toBuffer(), marketId.toBuffer(), Buffer.from("pc_vault_associated_seed", "utf-8")],
       programId,
-    )
-    return publicKey
+    );
+    return publicKey;
   }
 
   static getAssociatedLpMint({ programId, marketId }: { programId: PublicKey; marketId: PublicKey }) {
     const { publicKey } = findProgramAddress(
-      [programId.toBuffer(), marketId.toBuffer(), Buffer.from('lp_mint_associated_seed', 'utf-8')],
+      [programId.toBuffer(), marketId.toBuffer(), Buffer.from("lp_mint_associated_seed", "utf-8")],
       programId,
-    )
-    return publicKey
+    );
+    return publicKey;
   }
 
   static getAssociatedLpVault({ programId, marketId }: { programId: PublicKey; marketId: PublicKey }) {
     const { publicKey } = findProgramAddress(
-      [programId.toBuffer(), marketId.toBuffer(), Buffer.from('temp_lp_token_associated_seed', 'utf-8')],
+      [programId.toBuffer(), marketId.toBuffer(), Buffer.from("temp_lp_token_associated_seed", "utf-8")],
       programId,
-    )
-    return publicKey
+    );
+    return publicKey;
   }
 
   static getAssociatedTargetOrders({ programId, marketId }: { programId: PublicKey; marketId: PublicKey }) {
     const { publicKey } = findProgramAddress(
-      [programId.toBuffer(), marketId.toBuffer(), Buffer.from('target_associated_seed', 'utf-8')],
+      [programId.toBuffer(), marketId.toBuffer(), Buffer.from("target_associated_seed", "utf-8")],
       programId,
-    )
-    return publicKey
+    );
+    return publicKey;
   }
 
   static getAssociatedWithdrawQueue({ programId, marketId }: { programId: PublicKey; marketId: PublicKey }) {
     const { publicKey } = findProgramAddress(
-      [programId.toBuffer(), marketId.toBuffer(), Buffer.from('withdraw_associated_seed', 'utf-8')],
+      [programId.toBuffer(), marketId.toBuffer(), Buffer.from("withdraw_associated_seed", "utf-8")],
       programId,
-    )
-    return publicKey
+    );
+    return publicKey;
   }
 
   static getAssociatedOpenOrders({ programId, marketId }: { programId: PublicKey; marketId: PublicKey }) {
     const { publicKey } = findProgramAddress(
-      [programId.toBuffer(), marketId.toBuffer(), Buffer.from('open_order_associated_seed', 'utf-8')],
+      [programId.toBuffer(), marketId.toBuffer(), Buffer.from("open_order_associated_seed", "utf-8")],
       programId,
-    )
-    return publicKey
+    );
+    return publicKey;
   }
 
   static getAssociatedConfigId({ programId }: { programId: PublicKey }) {
-    const { publicKey } = findProgramAddress([Buffer.from('amm_config_account_seed', 'utf-8')], programId)
-    return publicKey
+    const { publicKey } = findProgramAddress([Buffer.from("amm_config_account_seed", "utf-8")], programId);
+    return publicKey;
   }
 
   async airdrop(connection: Connection, to: PublicKey, amount: number = 5_000_000_000) {
-  await connection.confirmTransaction(
-    await connection.requestAirdrop(to, amount),
-    "confirmed"
-  );
-}
+    await connection.confirmTransaction(await connection.requestAirdrop(to, amount), "confirmed");
+  }
 }
