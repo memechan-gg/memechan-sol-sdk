@@ -8,28 +8,7 @@ export class CoinAPI {
     return new Promise((resolve) => {
       setTimeout(() => {
         const response: QueryCoinsResponse = {
-          coins: [
-            {
-              name: "DummyCoin",
-              type: "Cryptocurrency",
-              decimals: 18,
-              symbol: "DMC",
-              objectId: "obj123",
-              treasureCapId: "tc123",
-              objectType: "coin",
-              description: "A dummy cryptocurrency for demonstration purposes.",
-              image: "https://example.com/dummycoin.jpg",
-              metadataObjectId: "meta123",
-              lastReply: 1622548800,
-              marketcap: 1000000,
-              creator: 1,
-              status: 0,
-              socialLinks: ["https://twitter.com/dummycoin", "https://github.com/dummycoin"],
-              txDigest: "0x123456789abcdef",
-              creationTime: 1622548800,
-              contractAddress: "0x123456789abcdef123456789abcdef12345678",
-            },
-          ],
+          coins: [],
         };
         resolve(response);
       }, 1000);
