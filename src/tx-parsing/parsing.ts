@@ -7,8 +7,9 @@ import { ParseSwapYInstruction, SwapYInstructionParsed } from "./parsers/swap-y-
 import { InitStakingPoolInstructionParsed, ParseInitStakingInstruction } from "./parsers/init-staking-parser";
 import { GoLiveInstructionParsed, ParseGoLiveInstruction } from "./parsers/go-live-parser";
 import { MemechanClient } from "../MemechanClient";
+import { ParseSwapXInstruction, SwapXInstructionParsed } from "./parsers/swap-x-parser";
 
-export async function ParseTx(txSig: TransactionSignature, client: MemechanClient): Promise<(NewBPInstructionParsed | SwapYInstructionParsed | InitStakingPoolInstructionParsed | GoLiveInstructionParsed)[] | undefined> {
+export async function ParseTx(txSig: TransactionSignature, client: MemechanClient): Promise<(NewBPInstructionParsed | SwapYInstructionParsed | SwapXInstructionParsed | InitStakingPoolInstructionParsed | GoLiveInstructionParsed)[] | undefined> {
     const pt = await client.connection.getParsedTransaction(txSig);
     //console.log(pt);
 
@@ -17,7 +18,7 @@ export async function ParseTx(txSig: TransactionSignature, client: MemechanClien
         return undefined
     }
 
-    const res: (NewBPInstructionParsed | SwapYInstructionParsed | InitStakingPoolInstructionParsed | GoLiveInstructionParsed)[] = [];
+    const res: (NewBPInstructionParsed | SwapYInstructionParsed | SwapXInstructionParsed | InitStakingPoolInstructionParsed | GoLiveInstructionParsed)[] = [];
 
     for (let i = 0; i < ixs.length; i++) {
         const ix = ixs[i];
@@ -35,11 +36,15 @@ export async function ParseTx(txSig: TransactionSignature, client: MemechanClien
     return res
 }
 
-async function ptx(ixBytes: Buffer, tx: solana.ParsedTransactionWithMeta, index: number, memechanProgram: MemechanClient): Promise<NewBPInstructionParsed | SwapYInstructionParsed | InitStakingPoolInstructionParsed | GoLiveInstructionParsed | undefined> {
+async function ptx(ixBytes: Buffer, tx: solana.ParsedTransactionWithMeta, index: number, memechanProgram: MemechanClient): Promise<NewBPInstructionParsed | SwapYInstructionParsed | SwapXInstructionParsed | InitStakingPoolInstructionParsed | GoLiveInstructionParsed | undefined> {
     const ixBytesSliced = ixBytes.subarray(0, 2);
     if (ixBytesSliced.equals(Buffer.from([0x87, 0x2C]))) {
         console.log("parsing ix: New")
         return await ParseNewBPInstruction(tx, index, memechanProgram)
+    }
+    if (ixBytesSliced.equals(Buffer.from([0x41, 0x3F]))) {
+        console.log("parsing ix: SwapX")
+        return await ParseSwapXInstruction(tx, index, memechanProgram)
     }
     if (ixBytesSliced.equals(Buffer.from([0x7E, 0xD0]))) {
         console.log("parsing ix: SwapY")
@@ -53,6 +58,7 @@ async function ptx(ixBytes: Buffer, tx: solana.ParsedTransactionWithMeta, index:
         console.log("parsing ix: GoLive")
         return await ParseGoLiveInstruction(tx, index)
     }
+
 
     return undefined
 }
