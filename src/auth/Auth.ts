@@ -1,5 +1,5 @@
 import { BE_URL } from "../common/consts";
-import { jsonFetch } from "../utils/fetch";
+import { jsonFetch } from "../utils/fetchs";
 import { IAMCredentials } from "./types";
 
 /**
