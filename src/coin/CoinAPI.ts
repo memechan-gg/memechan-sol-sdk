@@ -1,5 +1,5 @@
 import { Auth } from "../auth/Auth";
-import { signedJsonFetch, unsignedMultipartRequest } from "../utils/fetchs";
+import { signedJsonFetch, unsignedMultipartRequest } from "../utils/fetch";
 import { CreateCoinRequestBody, CreateCoinResponse, QueryCoinsResponse, UploadFileResponse } from "./types";
 
 export class CoinAPI {

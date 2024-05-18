@@ -8,7 +8,9 @@
     "@smithy/signature-v4": "^3.0.0",
     "@solana/spl-token": "^0.4.6",
     "@solana/web3.js": "^1.91.8",
-    "dotenv": "^16.4.5"
+    "dotenv": "^16.4.5",
+    "tweetnacl": "^1.0.3",
+    "tweetnacl-util": "^0.15.1"
   },
   "name": "@0xunreal/memechan-sol-sdk",
   "description": "Typescript SDK for memechan.gg",
