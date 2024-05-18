@@ -3,7 +3,6 @@ import {
   createSyncNativeInstruction,
   getOrCreateAssociatedTokenAccount,
   mintTo,
-  NATIVE_MINT,
   TOKEN_PROGRAM_ID,
 } from "@solana/spl-token";
 import {
@@ -130,8 +129,7 @@ export class BoundPool {
 
     console.log("new pool tx result: " + result);
 
-    const metadata = await createMetadata(client, payer, memeMint, id, poolSigner);
-    console.log("metadata: " + metadata);
+    await createMetadata(client, { payer, mint: memeMint, poolSigner, poolId: id, metadata: args.tokenMetadata });
 
     return new BoundPool(id, signer, poolSolVault, launchVault, client, quoteToken);
   }

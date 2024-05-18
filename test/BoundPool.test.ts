@@ -9,18 +9,27 @@ import { MemeTicket } from "../src/memeticket/MemeTicket";
 import { Token } from "@raydium-io/raydium-sdk";
 import {SLERF_MINT} from "../src/common/consts";
 
+const DUMMY_TOKEN_METADATA = {
+        name: "Best Token Ever",
+        symbol: "BTE",
+        image: "https://cf-ipfs.com/ipfs/QmVevMfxFpfgBu5kHuYUPmDMaV6pWkAn3zw5XaCXxKdaBh",
+        description: "This is the best token ever",
+        twitter: "https://twitter.com/BestTokenEver",
+        telegram: "https://t.me/BestTokenEver",
+        website: "https://besttokenever.com"
+      };
+
 describe("BoundPool", () => {
   it("creates bound pool", async () => {
-
       const admin = new PublicKey(process.env.ADMIN_PUB_KEY as string);
       const payer =  Keypair.fromSecretKey(Buffer.from(JSON.parse(process.env.TEST_USER_SECRET_KEY as string)));
       const wallet = new NodeWallet(payer);
       const client = new MemechanClient(wallet);
-      const boundPool = await BoundPool.new({admin, payer, signer: payer, client, quoteToken: Token.WSOL});
-      await sleep(1000);
-      const info = await boundPool.fetch();
-      console.log(info);
-    }, 60000)
+      const boundPool = await BoundPool.new({admin, payer, signer: payer, client, quoteToken: Token.WSOL, tokenMetadata: DUMMY_TOKEN_METADATA });
+      //await sleep(1000);
+      //const info = await boundPool.fetch();
+      //console.log(info);
+    }, 90000)
 
   it("all", async() => {
     return;
@@ -48,7 +57,7 @@ describe("BoundPool", () => {
     const wallet = new NodeWallet(payer);
     const client = new MemechanClient(wallet);
 
-    const pool = await BoundPool.new({ admin, payer, signer: payer, client, quoteToken: Token.WSOL});
+    const pool = await BoundPool.new({ admin, payer, signer: payer, client, quoteToken: Token.WSOL, tokenMetadata: DUMMY_TOKEN_METADATA});
 
     console.log("==== pool id: " + pool.id.toString());
     await sleep(2000);

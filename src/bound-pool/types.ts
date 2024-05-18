@@ -3,6 +3,7 @@ import { PublicKey, Keypair, Signer } from "@solana/web3.js";
 import { MemeTicket } from "../memeticket/MemeTicket";
 import { MemechanClient } from "../MemechanClient";
 import { Token } from "@raydium-io/raydium-sdk";
+import { TokenMetadata } from "../token/types";
 
 export interface SwapYArgs {
   payer: Signer;
@@ -45,6 +46,7 @@ export interface BoundPoolArgs {
   signer: Keypair;
   client: MemechanClient;
   quoteToken: Token;
+  tokenMetadata: TokenMetadata;
 }
 
 export interface InitStakingPoolResult {
