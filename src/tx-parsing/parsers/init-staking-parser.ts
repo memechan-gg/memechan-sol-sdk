@@ -1,4 +1,4 @@
-import { IdlAccounts, Program } from "@coral-xyz/anchor";
+import { IdlAccounts } from "@coral-xyz/anchor";
 import { ParsedTransactionWithMeta, PublicKey } from "@solana/web3.js";
 import { MemechanClient } from "../../MemechanClient";
 import { MemechanSol } from "../../schema/types/memechan_sol";

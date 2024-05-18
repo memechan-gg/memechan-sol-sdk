@@ -1,21 +1,17 @@
 import { ParsedTransactionWithMeta, PublicKey } from "@solana/web3.js";
-import { IdlAccounts } from "@coral-xyz/anchor";
 import { MemechanClient } from "../../MemechanClient";
-import { MemechanSol } from "../../schema/types/memechan_sol";
 
-export type MemeTicket = IdlAccounts<MemechanSol>["memeTicket"];
-
-export type SwapYInstructionParsed = {
+export type SwapXInstructionParsed = {
     sender: PublicKey,
     poolAddr: PublicKey,
-    ticket: MemeTicket,
-    quoteAmtSwapped: number,
-    baseAmtReceived: number,
+    ticketAddr: PublicKey,
+    baseAmtSwapped: number,
+    quoteAmtReceived: number,
     poolQuoteVault: number,
-};
+}
 
-export async function ParseSwapYInstruction(tx: ParsedTransactionWithMeta, index: number, client: MemechanClient): Promise<SwapYInstructionParsed | undefined> {
-    const ix = tx.transaction.message.instructions[index];
+export async function ParseSwapXInstruction(tx: ParsedTransactionWithMeta, index: number, client: MemechanClient): Promise<SwapXInstructionParsed | undefined> {
+    const ix = tx.transaction.message.instructions[index]
 
     if (!("accounts" in ix)) {
         return undefined
@@ -30,23 +26,23 @@ export async function ParseSwapYInstruction(tx: ParsedTransactionWithMeta, index
         return undefined
     }
 
-    const ticketAddr = ix.accounts[3];
+    const ticketAddr = ix.accounts[1];
     const ticket = await client.memechanProgram.account.memeTicket.fetchNullable(ticketAddr);
 
     const poolPrevPos = Number(preBalances[0].uiTokenAmount.amount);
     const poolQuoteVault = Number(postBalances[0].uiTokenAmount.amount);
-    const quoteAmtSwapped = poolQuoteVault - poolPrevPos;
-    const baseAmtReceived = ticket?.amount.toNumber();
+    const baseAmtSwapped = poolQuoteVault - poolPrevPos;
+    const quoteAmtReceived = ticket?.amount.toNumber();
 
-    const swyParsed: SwapYInstructionParsed = {
+    const swxParsed: SwapXInstructionParsed = {
         poolAddr,
-        ticket,
-        baseAmtReceived,
+        ticketAddr,
+        quoteAmtReceived,
         poolQuoteVault,
-        quoteAmtSwapped,
+        baseAmtSwapped,
         sender: tx.transaction.message.accountKeys[0].pubkey // In the `Message` structure, the first account is always the fee-payer
     };
 
-    return swyParsed
+    return swxParsed
 
 }

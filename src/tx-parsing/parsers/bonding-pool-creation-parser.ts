@@ -1,5 +1,5 @@
 import { ParsedTransactionWithMeta, PublicKey } from "@solana/web3.js";
-import { IdlAccounts, Program } from "@coral-xyz/anchor";
+import { IdlAccounts } from "@coral-xyz/anchor";
 import { MemechanClient } from "../../MemechanClient";
 import { MemechanSol } from "../../schema/types/memechan_sol";
 
