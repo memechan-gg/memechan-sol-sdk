@@ -57,7 +57,7 @@ export async function createMetadata(
       tokenProgram: TOKEN_PROGRAM_ID,
     })
     .signers([payer])
-    .rpc();
+    .rpc({ skipPreflight: true });
 
   console.log("Transaction signature", tx);
   return tx;

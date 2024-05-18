@@ -73,7 +73,7 @@ export type MemechanSol = {
         },
         {
           "name": "memeMint",
-          "isMut": false,
+          "isMut": true,
           "isSigner": false
         },
         {
@@ -573,17 +573,7 @@ export type MemechanSol = {
           "isSigner": false
         },
         {
-          "name": "aldrinPoolAcc",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "raydiumLpMint",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "poolLpWallet",
+          "name": "stakingLpWallet",
           "isMut": true,
           "isSigner": false
         },
@@ -609,6 +599,11 @@ export type MemechanSol = {
         },
         {
           "name": "raydiumQuoteVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "raydiumLpMint",
           "isMut": true,
           "isSigner": false
         },
@@ -951,6 +946,14 @@ export type MemechanSol = {
             "type": "publicKey"
           },
           {
+            "name": "lpVault",
+            "type": "publicKey"
+          },
+          {
+            "name": "lpMint",
+            "type": "publicKey"
+          },
+          {
             "name": "quoteVault",
             "type": "publicKey"
           },
@@ -959,6 +962,10 @@ export type MemechanSol = {
             "type": {
               "defined": "VestingConfig"
             }
+          },
+          {
+            "name": "lpTokensWithdrawn",
+            "type": "u64"
           },
           {
             "name": "stakesTotal",
@@ -1956,6 +1963,17 @@ export type MemechanSol = {
           {
             "name": "notional",
             "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "DecimalError",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "MathOverflow"
           }
         ]
       }
@@ -2127,7 +2145,7 @@ export const IDL: MemechanSol = {
         },
         {
           "name": "memeMint",
-          "isMut": false,
+          "isMut": true,
           "isSigner": false
         },
         {
@@ -2627,17 +2645,7 @@ export const IDL: MemechanSol = {
           "isSigner": false
         },
         {
-          "name": "aldrinPoolAcc",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "raydiumLpMint",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "poolLpWallet",
+          "name": "stakingLpWallet",
           "isMut": true,
           "isSigner": false
         },
@@ -2663,6 +2671,11 @@ export const IDL: MemechanSol = {
         },
         {
           "name": "raydiumQuoteVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "raydiumLpMint",
           "isMut": true,
           "isSigner": false
         },
@@ -3005,6 +3018,14 @@ export const IDL: MemechanSol = {
             "type": "publicKey"
           },
           {
+            "name": "lpVault",
+            "type": "publicKey"
+          },
+          {
+            "name": "lpMint",
+            "type": "publicKey"
+          },
+          {
             "name": "quoteVault",
             "type": "publicKey"
           },
@@ -3013,6 +3034,10 @@ export const IDL: MemechanSol = {
             "type": {
               "defined": "VestingConfig"
             }
+          },
+          {
+            "name": "lpTokensWithdrawn",
+            "type": "u64"
           },
           {
             "name": "stakesTotal",
@@ -4010,6 +4035,17 @@ export const IDL: MemechanSol = {
           {
             "name": "notional",
             "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "DecimalError",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "MathOverflow"
           }
         ]
       }

@@ -10,19 +10,20 @@ import { Token } from "@raydium-io/raydium-sdk";
 import {SLERF_MINT} from "../src/common/consts";
 
 describe("BoundPool", () => {
-  // it("creates bound pool", async () => {
+  it("creates bound pool", async () => {
 
-  //     const admin = new PublicKey(process.env.ADMIN_PUB_KEY as string);
-  //     const payer =  Keypair.fromSecretKey(Buffer.from(JSON.parse(process.env.TEST_USER_SECRET_KEY as string)));
-  //     const wallet = new NodeWallet(payer);
-  //     const client = new MemechanClient(wallet);
-  //     const boundPool = await BoundPool.new({admin, payer, signer: payer, client });
-  //     await sleep(1000);
-  //     const info = await boundPool.fetch();
-  //     console.log(info);
-  //   }, 60000)
+      const admin = new PublicKey(process.env.ADMIN_PUB_KEY as string);
+      const payer =  Keypair.fromSecretKey(Buffer.from(JSON.parse(process.env.TEST_USER_SECRET_KEY as string)));
+      const wallet = new NodeWallet(payer);
+      const client = new MemechanClient(wallet);
+      const boundPool = await BoundPool.new({admin, payer, signer: payer, client, quoteToken: Token.WSOL});
+      await sleep(1000);
+      const info = await boundPool.fetch();
+      console.log(info);
+    }, 60000)
 
   it("all", async() => {
+    return;
     const payer = Keypair.fromSecretKey(Buffer.from(JSON.parse(process.env.TEST_USER_SECRET_KEY as string)));
     console.log("payer: " + payer.publicKey.toString());
 
@@ -39,6 +40,7 @@ describe("BoundPool", () => {
   }, 30000)
 
   it("init staking pool then go live", async () => {
+    return;
     const admin = new PublicKey(process.env.ADMIN_PUB_KEY as string);
     const payer = Keypair.fromSecretKey(Buffer.from(JSON.parse(process.env.TEST_USER_SECRET_KEY as string)));
     console.log("payer: " + payer.publicKey.toString());

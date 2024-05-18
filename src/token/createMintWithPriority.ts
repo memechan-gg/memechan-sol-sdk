@@ -1,8 +1,7 @@
 import {
   MINT_SIZE,
   TOKEN_PROGRAM_ID,
-  createInitializeMint2Instruction,
-  getMinimumBalanceForRentExemptMint,
+  createInitializeMintInstruction,
 } from "@solana/spl-token";
 import type { ConfirmOptions, Connection, PublicKey, Signer } from "@solana/web3.js";
 import { ComputeBudgetProgram, Keypair, sendAndConfirmTransaction, SystemProgram, Transaction } from "@solana/web3.js";
@@ -28,10 +27,7 @@ export async function createMintWithPriority(
   decimals: number,
   keypair = Keypair.generate(),
   confirmOptions?: ConfirmOptions,
-  programId = TOKEN_PROGRAM_ID,
 ): Promise<PublicKey> {
-  const lamports = await getMinimumBalanceForRentExemptMint(connection);
-
   const modifyComputeUnits = ComputeBudgetProgram.setComputeUnitLimit({
     units: 30000,
   });
@@ -40,20 +36,32 @@ export async function createMintWithPriority(
     microLamports: 6000000,
   });
 
+  console.log("mintAuthority: " + mintAuthority.toBase58());
+
+  const createMintAccountInstruction = SystemProgram.createAccount({
+		fromPubkey: payer.publicKey,
+		newAccountPubkey: keypair.publicKey,
+		lamports: await connection.getMinimumBalanceForRentExemption(MINT_SIZE),
+		space: MINT_SIZE,
+		programId: TOKEN_PROGRAM_ID,
+	});
+
+  const initializeMintInstruction = createInitializeMintInstruction(
+		keypair.publicKey,
+		decimals,
+		mintAuthority,
+		null
+	);
+  
   const transaction = new Transaction().add(
     modifyComputeUnits,
     addPriorityFee,
-    SystemProgram.createAccount({
-      fromPubkey: payer.publicKey,
-      newAccountPubkey: keypair.publicKey,
-      space: MINT_SIZE,
-      lamports,
-      programId,
-    }),
-    createInitializeMint2Instruction(keypair.publicKey, decimals, mintAuthority, freezeAuthority, programId),
+    createMintAccountInstruction,
+    initializeMintInstruction
   );
 
-  await sendAndConfirmTransaction(connection, transaction, [payer, keypair], confirmOptions);
+  const result = await sendAndConfirmTransaction(connection, transaction, [payer, keypair], confirmOptions);
+  console.log("create mint result: " + result);
 
   return keypair.publicKey;
 }

@@ -73,7 +73,7 @@
         },
         {
           "name": "memeMint",
-          "isMut": false,
+          "isMut": true,
           "isSigner": false
         },
         {
@@ -573,17 +573,7 @@
           "isSigner": false
         },
         {
-          "name": "aldrinPoolAcc",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "raydiumLpMint",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "poolLpWallet",
+          "name": "stakingLpWallet",
           "isMut": true,
           "isSigner": false
         },
@@ -609,6 +599,11 @@
         },
         {
           "name": "raydiumQuoteVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "raydiumLpMint",
           "isMut": true,
           "isSigner": false
         },
@@ -951,6 +946,14 @@
             "type": "publicKey"
           },
           {
+            "name": "lpVault",
+            "type": "publicKey"
+          },
+          {
+            "name": "lpMint",
+            "type": "publicKey"
+          },
+          {
             "name": "quoteVault",
             "type": "publicKey"
           },
@@ -959,6 +962,10 @@
             "type": {
               "defined": "VestingConfig"
             }
+          },
+          {
+            "name": "lpTokensWithdrawn",
+            "type": "u64"
           },
           {
             "name": "stakesTotal",
@@ -1959,6 +1966,17 @@
           }
         ]
       }
+    },
+    {
+      "name": "DecimalError",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "MathOverflow"
+          }
+        ]
+      }
     }
   ],
   "errors": [
@@ -2051,6 +2069,6 @@
     }
   ],
   "metadata": {
-    "address": "67aHQY6fHX8zWF1iKRGuotqgL7RKrSER2TDKsjab9CWx"
+    "address": "DHkkfGmzePZfv2WjgwE5CZPNUdXuCeVGax4JgCA6Mwpr"
   }
 }
