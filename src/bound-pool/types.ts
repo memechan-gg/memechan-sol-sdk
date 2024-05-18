@@ -30,7 +30,7 @@ export interface GoLiveArgs {
   payer: Signer;
   boundPoolInfo: object;
   memeVault: PublicKey;
-  wSolVault: PublicKey;
+  quoteVault: PublicKey;
 }
 
 export interface InitStakingPoolArgs {

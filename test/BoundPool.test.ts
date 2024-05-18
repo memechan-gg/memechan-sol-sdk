@@ -21,14 +21,15 @@ const DUMMY_TOKEN_METADATA = {
 
 describe("BoundPool", () => {
   it("creates bound pool", async () => {
+      return;
       const admin = new PublicKey(process.env.ADMIN_PUB_KEY as string);
       const payer =  Keypair.fromSecretKey(Buffer.from(JSON.parse(process.env.TEST_USER_SECRET_KEY as string)));
       const wallet = new NodeWallet(payer);
       const client = new MemechanClient(wallet);
       const boundPool = await BoundPool.new({admin, payer, signer: payer, client, quoteToken: Token.WSOL, tokenMetadata: DUMMY_TOKEN_METADATA });
-      //await sleep(1000);
-      //const info = await boundPool.fetch();
-      //console.log(info);
+      await sleep(1000);
+      const info = await boundPool.fetch();
+      console.log(info);
     }, 90000)
 
   it("all", async() => {
@@ -49,7 +50,6 @@ describe("BoundPool", () => {
   }, 30000)
 
   it("init staking pool then go live", async () => {
-    return;
     const admin = new PublicKey(process.env.ADMIN_PUB_KEY as string);
     const payer = Keypair.fromSecretKey(Buffer.from(JSON.parse(process.env.TEST_USER_SECRET_KEY as string)));
     console.log("payer: " + payer.publicKey.toString());
@@ -89,7 +89,7 @@ describe("BoundPool", () => {
       user: payer,
       boundPoolInfo,
       memeVault: stakingMemeVault,
-      wSolVault: stakingWSolVault,
+      quoteVault: stakingWSolVault,
     });
 
     console.log("OINK");
