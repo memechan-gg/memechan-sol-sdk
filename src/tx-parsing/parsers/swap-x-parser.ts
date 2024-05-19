@@ -2,47 +2,54 @@ import { ParsedTransactionWithMeta, PublicKey } from "@solana/web3.js";
 import { MemechanClient } from "../../MemechanClient";
 
 export type SwapXInstructionParsed = {
-    sender: PublicKey,
-    poolAddr: PublicKey,
-    ticketAddr: PublicKey,
-    baseAmtSwapped: number,
-    quoteAmtReceived: number,
-    poolQuoteVault: number,
-}
+  sender: PublicKey;
+  poolAddr: PublicKey;
+  ticketAddr: PublicKey;
+  baseAmtSwapped: number;
+  quoteAmtReceived: number;
+  poolQuoteVault: number;
+};
 
-export async function ParseSwapXInstruction(tx: ParsedTransactionWithMeta, index: number, client: MemechanClient): Promise<SwapXInstructionParsed | undefined> {
-    const ix = tx.transaction.message.instructions[index]
+export async function ParseSwapXInstruction(
+  tx: ParsedTransactionWithMeta,
+  index: number,
+  client: MemechanClient,
+): Promise<SwapXInstructionParsed | undefined> {
+  const ix = tx.transaction.message.instructions[index];
 
-    if (!("accounts" in ix)) {
-        return undefined
-    }
+  if (!("accounts" in ix)) {
+    return undefined;
+  }
 
-    const poolAddr = ix.accounts[0];
+  const poolAddr = ix.accounts[0];
 
-    const preBalances = tx.meta?.preTokenBalances;
-    const postBalances = tx.meta?.postTokenBalances;
+  const preBalances = tx.meta?.preTokenBalances;
+  const postBalances = tx.meta?.postTokenBalances;
 
-    if (!preBalances || !postBalances) {
-        return undefined
-    }
+  if (!preBalances || !postBalances) {
+    return undefined;
+  }
 
-    const ticketAddr = ix.accounts[1];
-    const ticket = await client.memechanProgram.account.memeTicket.fetchNullable(ticketAddr);
+  const ticketAddr = ix.accounts[1];
+  const ticket = await client.memechanProgram.account.memeTicket.fetchNullable(ticketAddr);
 
-    const poolPrevPos = Number(preBalances[0].uiTokenAmount.amount);
-    const poolQuoteVault = Number(postBalances[0].uiTokenAmount.amount);
-    const baseAmtSwapped = poolQuoteVault - poolPrevPos;
-    const quoteAmtReceived = ticket?.amount.toNumber();
+  if (!ticket) {
+    throw new Error(`[ParseSwapXInstruction] No ticket found with ticket address ${ticketAddr}`);
+  }
 
-    const swxParsed: SwapXInstructionParsed = {
-        poolAddr,
-        ticketAddr,
-        quoteAmtReceived,
-        poolQuoteVault,
-        baseAmtSwapped,
-        sender: tx.transaction.message.accountKeys[0].pubkey // In the `Message` structure, the first account is always the fee-payer
-    };
+  const poolPrevPos = Number(preBalances[0].uiTokenAmount.amount);
+  const poolQuoteVault = Number(postBalances[0].uiTokenAmount.amount);
+  const baseAmtSwapped = poolQuoteVault - poolPrevPos;
+  const quoteAmtReceived = ticket?.amount.toNumber();
 
-    return swxParsed
+  const swxParsed: SwapXInstructionParsed = {
+    poolAddr,
+    ticketAddr,
+    quoteAmtReceived,
+    poolQuoteVault,
+    baseAmtSwapped,
+    sender: tx.transaction.message.accountKeys[0].pubkey, // In the `Message` structure, the first account is always the fee-payer
+  };
 
+  return swxParsed;
 }

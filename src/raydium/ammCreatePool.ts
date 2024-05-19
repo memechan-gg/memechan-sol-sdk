@@ -1,9 +1,8 @@
 import { Liquidity, MAINNET_PROGRAM_ID, Token } from "@raydium-io/raydium-sdk";
 import { Connection, Keypair, PublicKey } from "@solana/web3.js";
-
-import { BN } from "@coral-xyz/anchor";
-import { PROGRAMIDS, makeTxVersion } from "./config";
+import { BN } from "bn.js";
 import { buildAndSendTx, getWalletTokenAccount } from "../utils/util";
+import { PROGRAMIDS, makeTxVersion } from "./config";
 
 const ZERO = new BN(0);
 type BN = typeof ZERO;

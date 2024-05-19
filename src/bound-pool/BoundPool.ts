@@ -199,7 +199,7 @@ export class BoundPool {
     return mintTo(provider.connection, payer, mint, wallet, authority, amount);
   }
 
-  public async swapY(input: Partial<SwapYArgs>): Promise<MemeTicket> {
+  public async swapY(input: SwapYArgs): Promise<MemeTicket> {
     const id = Keypair.generate();
     const user = input.user!;
     const payer = input.payer!;
@@ -240,7 +240,7 @@ export class BoundPool {
       SystemProgram.transfer({
         fromPubkey: payer.publicKey,
         toPubkey: userSolAcc,
-        lamports: sol_in,
+        lamports: BigInt(sol_in.toString()),
       }),
       createSyncNativeInstruction(userSolAcc),
     );
@@ -339,7 +339,7 @@ export class BoundPool {
       const transferSolToWSOLAccountInstruction = SystemProgram.transfer({
         fromPubkey: user.publicKey,
         toPubkey: inputTokenUserAccountPubkey,
-        lamports: sol_in,
+        lamports: BigInt(sol_in.toString()),
       });
       tx.add(transferSolToWSOLAccountInstruction);
 
