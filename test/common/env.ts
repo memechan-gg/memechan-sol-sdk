@@ -19,9 +19,6 @@ if (!process.env.FEE_DESTINATION_ID?.length) {
 if (!process.env.USER_ID?.length) {
   throw new Error("Empty USER_ID");
 }
-if (!process.env.ADMIN_SECRET_KEY?.length) {
-  throw new Error("Empty ADMIN_SECRET_KEY");
-}
 
 export const TEST_PAYER_SECRET_KEY = process.env.TEST_PAYER_SECRET_KEY;
 export const TEST_USER_SECRET_KEY = process.env.TEST_USER_SECRET_KEY;
@@ -31,4 +28,3 @@ export const WSS_API_CLUSTER = process.env.WSS_API_CLUSTER;
 export const FEE_DESTINATION_ID = process.env.FEE_DESTINATION_ID;
 export const USER_ID = process.env.USER_ID;
 export const IS_TEST_ENV = process.env.NODE_ENV === "test";
-export const ADMIN_SECRET_KEY = process.env.ADMIN_SECRET_KEY;
