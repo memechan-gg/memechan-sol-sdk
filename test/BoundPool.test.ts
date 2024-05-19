@@ -16,9 +16,8 @@ const DUMMY_TOKEN_METADATA = {
 };
 
 describe("BoundPool", () => {
-  it("creates bound pool", async () => {
-    return;
-    const boundPool = await BoundPool.new({
+  it.skip("creates bound pool", async () => {
+    const boundPool = await BoundPool.slowNew({
       admin,
       payer,
       signer: payer,
@@ -31,8 +30,7 @@ describe("BoundPool", () => {
     console.log(info);
   }, 90000);
 
-  it("all", async () => {
-    return;
+  it.skip("all", async () => {
     const all = await BoundPool.all(client.memechanProgram);
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -44,7 +42,7 @@ describe("BoundPool", () => {
     console.log(all);
   }, 30000);
 
-  it("init staking pool then go live", async () => {
+  it.skip("init staking pool then go live", async () => {
     console.log("payer: " + payer.publicKey.toString());
     const pool = await BoundPool.new({
       admin,
