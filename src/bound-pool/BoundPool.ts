@@ -31,6 +31,7 @@ import { StakingPool } from "../staking-pool/StakingPool";
 import {
   BoundPoolArgs,
   GetBuyMemeTransactionArgs,
+  GetInitStakingPoolTransactionArgs,
   GetSellMemeTransactionArgs,
   GoLiveArgs,
   InitStakingPoolArgs,
@@ -44,6 +45,7 @@ import { MemechanSol } from "../schema/types/memechan_sol";
 import { createMetadata } from "../token/createMetadata";
 import { createMintWithPriority } from "../token/createMintWithPriority";
 import { retry } from "../utils/retry";
+import { getCreateAccountInstructions } from "../utils/getCreateAccountInstruction";
 
 export class BoundPool {
   private constructor(
@@ -408,108 +410,92 @@ export class BoundPool {
     return tx;
   }
 
-  async retryInitStakingPool(client, methodArgs, maxRetries, initialTimeout): Promise<InitStakingPoolResult> {
-    let attempts = 0;
-    let timeout = initialTimeout;
-
-    while (attempts < maxRetries) {
-      try {
-        // Adjust the timeout for the RPC call
-        const options = {
-          skipPreflight: true,
-          commitment: "confirmed",
-          preflightCommitment: "confirmed",
-          timeout: timeout, // Timeout in milliseconds
-        };
-
-        const result = await client.memechanProgram.methods
-          .initStakingPool()
-          .accounts(methodArgs)
-          .signers([methodArgs.user])
-          .rpc(options);
-
-        console.log("Transaction successful:", result);
-        return result;
-      } catch (error) {
-        console.log(`Attempt ${attempts + 1} failed:`, error);
-        if (error.message.includes("Transaction was not confirmed in")) {
-          attempts++;
-          timeout += 30000; // Increase timeout by 30 seconds for each retry
-          if (attempts >= maxRetries) {
-            throw new Error("All attempts to send transaction failed");
-          }
-        } else {
-          // If the error is not related to timeout, rethrow it
-          throw error;
-        }
-      }
-    }
-  }
-
-  public async initStakingPool(input: Partial<InitStakingPoolArgs>): Promise<InitStakingPoolResult> {
-    const user = input.user!;
-    const pool = input.pool ?? this.id;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const boundPoolInfo = input.boundPoolInfo as any;
-
-    console.log("initStakingPool.boundPoolInfo: " + JSON.stringify(boundPoolInfo));
+  public async getInitStakingPoolTransaction(
+    input: GetInitStakingPoolTransactionArgs,
+  ): Promise<{ transaction: Transaction; stakingWSolVault: PublicKey; stakingMemeVault: PublicKey }> {
+    const { user, pool = this.id, boundPoolInfo } = input;
+    const tx = input.transaction ?? new Transaction();
 
     const stakingId = BoundPool.findStakingPda(boundPoolInfo.memeReserve.mint, this.client.memechanProgram.programId);
     const stakingSigner = StakingPool.findSignerPda(stakingId, this.client.memechanProgram.programId);
-
     const adminTicketId = BoundPool.findMemeTicketPda(stakingId, this.client.memechanProgram.programId);
 
-    const stakingPoolSolVaultid = Keypair.generate();
-    const stakingWSolVault = await createAccount(
+    const stakingPoolSolVaultId = Keypair.generate();
+    const stakingWSolVault = stakingPoolSolVaultId.publicKey;
+    const createWSolAccountInstructions = await getCreateAccountInstructions(
       this.client.connection,
       user,
       this.quoteToken.mint,
       stakingSigner,
-      stakingPoolSolVaultid,
-      { skipPreflight: true, commitment: "confirmed" },
+      stakingPoolSolVaultId,
+      "confirmed",
     );
 
-    const stakingMemeVaultid = Keypair.generate();
-    const stakingMemeVault = await createAccount(
+    tx.add(...createWSolAccountInstructions);
+
+    const stakingMemeVaultId = Keypair.generate();
+    const stakingMemeVault = stakingMemeVaultId.publicKey;
+    const createMemeAccountInstructions = await getCreateAccountInstructions(
       this.client.connection,
       user,
       boundPoolInfo.memeReserve.mint,
       stakingSigner,
-      stakingMemeVaultid,
-      { skipPreflight: true, commitment: "confirmed" },
+      stakingMemeVaultId,
+      "confirmed",
     );
 
-    try {
-      const methodArgs = {
-        pool: pool,
-        signer: user.publicKey,
-        boundPoolSignerPda: this.findSignerPda(),
-        memeTicket: adminTicketId,
-        poolMemeVault: boundPoolInfo.memeReserve.vault,
-        poolQuoteVault: boundPoolInfo.quoteReserve.vault,
-        stakingMemeVault: stakingMemeVault,
-        stakingQuoteVault: stakingWSolVault,
-        quoteMint: this.quoteToken.mint,
-        staking: stakingId,
-        stakingPoolSignerPda: stakingSigner,
-        adminVaultQuote: boundPoolInfo.adminVaultQuote,
-        marketProgramId: PROGRAMIDS.OPENBOOK_MARKET,
-        systemProgram: SystemProgram.programId,
-        tokenProgram: TOKEN_PROGRAM_ID,
-        clock: SYSVAR_CLOCK_PUBKEY,
-        rent: SYSVAR_RENT_PUBKEY,
-        memeMint: boundPoolInfo.memeReserve.mint,
-        ataProgram: ATA_PROGRAM_ID,
-        user: user,
-      };
+    tx.add(...createMemeAccountInstructions);
 
-      const result = await this.retryInitStakingPool(this.client, methodArgs, 3, 60000); // Retry up to 3 times with an initial timeout of 30 seconds
-      console.log("initStakingPool Final result:", result);
+    const methodArgs = {
+      pool,
+      signer: user.publicKey,
+      boundPoolSignerPda: this.findSignerPda(),
+      memeTicket: adminTicketId,
+      poolMemeVault: boundPoolInfo.memeReserve.vault,
+      poolQuoteVault: boundPoolInfo.quoteReserve.vault,
+      stakingMemeVault,
+      stakingQuoteVault: stakingWSolVault,
+      quoteMint: this.quoteToken.mint,
+      staking: stakingId,
+      stakingPoolSignerPda: stakingSigner,
+      adminVaultQuote: boundPoolInfo.adminVaultQuote,
+      marketProgramId: PROGRAMIDS.OPENBOOK_MARKET,
+      systemProgram: SystemProgram.programId,
+      tokenProgram: TOKEN_PROGRAM_ID,
+      clock: SYSVAR_CLOCK_PUBKEY,
+      rent: SYSVAR_RENT_PUBKEY,
+      memeMint: boundPoolInfo.memeReserve.mint,
+      ataProgram: ATA_PROGRAM_ID,
+      user,
+    };
 
-      return { stakingMemeVault, stakingWSolVault };
-    } catch (error) {
-      console.error("Failed to initialize staking pool:", error);
-    }
+    const initStakingPoolInstruction = await this.client.memechanProgram.methods
+      .initStakingPool()
+      .accounts(methodArgs)
+      .instruction();
+
+    tx.add(initStakingPoolInstruction);
+
+    return { transaction: tx, stakingMemeVault, stakingWSolVault };
+  }
+
+  public async initStakingPool(input: InitStakingPoolArgs): Promise<InitStakingPoolResult> {
+    const { transaction, stakingMemeVault, stakingWSolVault } = await this.getInitStakingPoolTransaction(input);
+
+    const signAndConfirmInitStakingPoolTransaction = (async () => {
+      await sendAndConfirmTransaction(this.client.connection, transaction, [input.user], {
+        commitment: "confirmed",
+        preflightCommitment: "confirmed",
+        skipPreflight: true,
+      });
+    }).bind(this);
+
+    await retry({
+      fn: signAndConfirmInitStakingPoolTransaction,
+      retries: 3,
+      delay: 1000,
+      functionName: "initStakingPool",
+    });
 
     return { stakingMemeVault, stakingWSolVault };
   }
