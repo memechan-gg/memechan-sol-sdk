@@ -26,6 +26,5 @@ export async function signMessage(message: string, keypair: Keypair) {
     throw new Error("Signature verification failed");
   }
 
-  // Return the signed message in Base64 format
-  return encodeBase64(signature);
+  return Buffer.from(signature).toString('hex');
 }
