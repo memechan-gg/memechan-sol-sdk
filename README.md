@@ -7,3 +7,7 @@ Typescript SDK for memechan.gg
 - yarn install
 - create .env (simplest to copy .env.sample for dev env)
 - yarn test
+
+## Config
+
+Please set up config variables in `src/config/config.ts`.

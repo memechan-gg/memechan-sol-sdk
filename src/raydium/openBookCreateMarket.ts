@@ -1,6 +1,6 @@
 import { MarketV2, Token } from "@raydium-io/raydium-sdk";
 import { Connection, Keypair, PublicKey } from "@solana/web3.js";
-import { PROGRAMIDS, addLookupTableInfo, makeTxVersion } from "./config";
+import { PROGRAMIDS, makeTxVersion } from "./config";
 import { buildAndSendTx } from "../utils/util";
 
 type CreateMarketTxInput = {

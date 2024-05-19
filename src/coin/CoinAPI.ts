@@ -1,8 +1,9 @@
+import { BE_URL } from "../config/config";
 import { unsignedMultipartRequest } from "../utils/fetchs";
 import { QueryCoinsResponse, UploadFileResponse } from "./types";
 
 export class CoinAPI {
-  constructor(private url = process.env.BE_URL) {}
+  constructor(private url = BE_URL) {}
 
   queryCoins(): Promise<QueryCoinsResponse> {
     return new Promise((resolve) => {

@@ -1,6 +1,6 @@
 import { BN } from "@coral-xyz/anchor";
 import { MemeTicket } from "../memeticket/MemeTicket";
-import { Keypair, PublicKey } from "@solana/web3.js";
+import { Keypair, PublicKey, Transaction } from "@solana/web3.js";
 
 export interface UnstakeArgs {
   ticket: MemeTicket;
@@ -8,10 +8,18 @@ export interface UnstakeArgs {
   user: Keypair;
 }
 
+export type GetUnstakeTransactionArgs = UnstakeArgs & { transaction?: Transaction };
+
+export type AddFeesArgs = GetAddFeesTransactionArgs & { payer: Keypair };
+
+export type GetAddFeesTransactionArgs = { transaction?: Transaction };
+
 export interface WithdrawFeesArgs {
   ticket: MemeTicket;
   user: Keypair;
 }
+
+export type GetWithdrawFeesTransactionArgs = WithdrawFeesArgs & { transaction?: Transaction };
 
 export interface AccountMeta {
   isSigner: boolean;

@@ -1,36 +1,52 @@
+import { Token } from "@raydium-io/raydium-sdk";
 import {
   createAccount,
+  createAssociatedTokenAccountInstruction,
   createSyncNativeInstruction,
+  getAssociatedTokenAddressSync,
   getOrCreateAssociatedTokenAccount,
   mintTo,
+  NATIVE_MINT,
   TOKEN_PROGRAM_ID,
 } from "@solana/spl-token";
 import {
-  PublicKey,
+  ComputeBudgetProgram,
+  Connection,
   Keypair,
+  PublicKey,
+  sendAndConfirmTransaction,
   Signer,
   SystemProgram,
   SYSVAR_CLOCK_PUBKEY,
   SYSVAR_RENT_PUBKEY,
   Transaction,
-  sendAndConfirmTransaction,
-  Connection,
-  ComputeBudgetProgram,
 } from "@solana/web3.js";
-import { Token } from "@raydium-io/raydium-sdk";
 
-import { BoundPoolArgs, GoLiveArgs, InitStakingPoolArgs, InitStakingPoolResult, SwapXArgs, SwapYArgs } from "./types";
 import { AnchorError, BN, Program, Provider } from "@coral-xyz/anchor";
-import { MemeTicket } from "../memeticket/MemeTicket";
-import { StakingPool } from "../staking-pool/StakingPool";
 import { MemechanClient } from "../MemechanClient";
+import { MemeTicket } from "../memeticket/MemeTicket";
 import { ATA_PROGRAM_ID, PROGRAMIDS } from "../raydium/config";
 import { createMarket } from "../raydium/openBookCreateMarket";
+import { StakingPool } from "../staking-pool/StakingPool";
+import {
+  BoundPoolArgs,
+  GetBuyMemeTransactionArgs,
+  GetInitStakingPoolTransactionArgs,
+  GetSellMemeTransactionArgs,
+  GoLiveArgs,
+  InitStakingPoolArgs,
+  InitStakingPoolResult,
+  SwapXArgs,
+  SwapYArgs,
+} from "./types";
 
 import { findProgramAddress } from "../common/helpers";
-import { createMintWithPriority } from "../token/createMintWithPriority";
 import { MemechanSol } from "../schema/types/memechan_sol";
 import { createMetadata } from "../token/createMetadata";
+import { createMintWithPriority } from "../token/createMintWithPriority";
+import { getCreateAccountInstructions } from "../utils/getCreateAccountInstruction";
+import { getSendAndConfirmTransactionMethod } from "../utils/getSendAndConfirmTransactionMethod";
+import { retry } from "../utils/retry";
 
 export class BoundPool {
   private constructor(
@@ -88,7 +104,7 @@ export class BoundPool {
       commitment: "confirmed",
     });
     console.log("memeMint: " + memeMint.toBase58());
-    
+
     const adminSolVault = (
       await getOrCreateAssociatedTokenAccount(connection, payer, quoteToken.mint, admin, true, "confirmed", {
         skipPreflight: true,
@@ -134,17 +150,34 @@ export class BoundPool {
     return new BoundPool(id, signer, poolSolVault, launchVault, client, quoteToken);
   }
 
-  public async fetch(program = this.client.memechanProgram, accountId = this.id, retries = 3) {
-    for (let i = 0; i < retries; i++) {
-      try {
-        const accountInfo = await program.account.boundPool.fetch(accountId, "confirmed");
+  /**
+   * Fetches the account information.
+   *
+   * @param {Object} [program=this.client.memechanProgram] - The program to use for fetching the account.
+   * @param {string} [accountId=this.id] - The ID of the account to fetch.
+   * @returns {Promise<T>} - The account information.
+   */
+  async fetch(program = this.client.memechanProgram, accountId = this.id) {
+    const accountInfo = await program.account.boundPool.fetch(accountId, "confirmed");
+    return accountInfo;
+  }
 
-        return accountInfo;
-      } catch (error) {
-        if (i === retries - 1) throw error;
-        await new Promise((resolve) => setTimeout(resolve, 1000)); // wait 1 second before retrying
-      }
-    }
+  /**
+   * Fetches the account information with retry logic.
+   *
+   * @param {Object} [program=this.client.memechanProgram] - The program to use for fetching the account.
+   * @param {string} [accountId=this.id] - The ID of the account to fetch.
+   * @param {number} [retries=3] - The number of retry attempts.
+   * @param {number} [delay=1000] - The delay between retry attempts in milliseconds.
+   * @returns {Promise<T>} - The account information.
+   */
+  async fetchWithRetry(program = this.client.memechanProgram, accountId = this.id, retries = 3, delay = 1000) {
+    return retry({
+      fn: () => this.fetch(program, accountId),
+      retries,
+      delay,
+      functionName: "fetch",
+    });
   }
 
   public static async all(program: Program<MemechanSol>) {
@@ -166,7 +199,7 @@ export class BoundPool {
     return mintTo(provider.connection, payer, mint, wallet, authority, amount);
   }
 
-  public async swapY(input: Partial<SwapYArgs>): Promise<MemeTicket> {
+  public async swapY(input: SwapYArgs): Promise<MemeTicket> {
     const id = Keypair.generate();
     const user = input.user!;
     const payer = input.payer!;
@@ -207,7 +240,7 @@ export class BoundPool {
       SystemProgram.transfer({
         fromPubkey: payer.publicKey,
         toPubkey: userSolAcc,
-        lamports: sol_in,
+        lamports: BigInt(sol_in.toString()),
       }),
       createSyncNativeInstruction(userSolAcc),
     );
@@ -238,142 +271,233 @@ export class BoundPool {
     return new MemeTicket(id.publicKey, this.client);
   }
 
-  public async swapX(input: Partial<SwapXArgs>): Promise<void> {
+  /**
+   * Swaps a Y token (expecting SOL) for another asset by executing a buy meme transaction.
+   * @param {SwapYArgs} input - The input arguments required for the swap.
+   * @returns {Promise<string>} A promise that resolves to the transaction ID of the swap.
+   * @throws {Error} Throws an error if the transaction creation or confirmation fails.
+   * @untested This method is untested and may contain bugs.
+   */
+  public async swapY2(input: SwapYArgs): Promise<string> {
+    const buyMemeTransaction = await this.getBuyMemeTransaction(input);
+
+    const txId = await sendAndConfirmTransaction(this.client.connection, buyMemeTransaction, [input.user], {
+      skipPreflight: true,
+      commitment: "confirmed",
+    });
+
+    return txId;
+  }
+
+  /**
+   * Generates a transaction to buy a meme.
+   *
+   * @todo Implement the full functionality of this method (in regards of accepting different tokens).
+   * @todo Add comprehensive examples.
+   *
+   * @param {GetBuyMemeTransactionArgs} input - The input arguments required for the transaction.
+   * @returns {Promise<Transaction>} A promise that resolves to the transaction object.
+   *
+   * @work-in-progress This method is a work in progress and not yet ready for production use.
+   * @untested This method is untested and may contain bugs.
+   */
+  public async getBuyMemeTransaction(input: GetBuyMemeTransactionArgs): Promise<Transaction> {
+    const tx = input.transaction ?? new Transaction();
+
     const user = input.user;
 
-    const pool = input.pool ?? this.id;
-    const poolSigner = input.poolSignerPda ?? this.findSignerPda();
+    const pool = this.id;
+    const poolSignerPda = this.findSignerPda();
+
+    // TODO: Change that, we should allow to pass inputMint and outputMint
+    const tokenInMintPubkey = NATIVE_MINT;
+
+    const sol_in = input.solAmountIn;
+    const meme_out = input.memeTokensOut;
+
+    // TODO: ? We should handle SOL-based and non-SOL based swaps
+    let inputTokenUserAccountPubkey: undefined | PublicKey;
+
+    if (input.userSolAcc) {
+      inputTokenUserAccountPubkey = input.userSolAcc;
+    } else {
+      const associatedToken = getAssociatedTokenAddressSync(tokenInMintPubkey, user.publicKey, true);
+      inputTokenUserAccountPubkey = associatedToken;
+
+      const createAssociatedTokenAcouuntInstruction = createAssociatedTokenAccountInstruction(
+        user.publicKey,
+        associatedToken,
+        user.publicKey,
+        tokenInMintPubkey,
+      );
+
+      // Add creation of associated token account
+      tx.add(createAssociatedTokenAcouuntInstruction);
+
+      // TODO: We need to remove that once get rid of SOL-based pools
+      // Transfer SOL to wSOL
+      const transferSolToWSOLAccountInstruction = SystemProgram.transfer({
+        fromPubkey: user.publicKey,
+        toPubkey: inputTokenUserAccountPubkey,
+        lamports: BigInt(sol_in.toString()),
+      });
+      tx.add(transferSolToWSOLAccountInstruction);
+
+      // TODO: We need to remove that once get rid of SOL-based pools
+      // TODO: Double-check do we really need that or not
+      // createSyncNativeInstruction(inputTokenUserAccountPubkey);
+    }
+
+    // TODO: Why?
+    const memeTicketId = Keypair.generate();
+
+    const buyMemeInstruction = await this.client.memechanProgram.methods
+      .swapY(new BN(sol_in), new BN(meme_out))
+      .accounts({
+        memeTicket: memeTicketId.publicKey,
+        owner: user.publicKey,
+        pool: pool,
+        poolSignerPda: poolSignerPda,
+        quoteVault: this.solVault,
+        userSol: inputTokenUserAccountPubkey,
+        systemProgram: SystemProgram.programId,
+        tokenProgram: TOKEN_PROGRAM_ID,
+      })
+      .instruction();
+
+    tx.add(buyMemeInstruction);
+
+    return tx;
+  }
+
+  public async swapX(input: SwapXArgs): Promise<string> {
+    const sellMemeCoinTransaction = await this.getSellMemeTransaction(input);
+
+    const txId = await sendAndConfirmTransaction(this.client.connection, sellMemeCoinTransaction, [input.user], {
+      skipPreflight: true,
+      commitment: "confirmed",
+    });
+
+    return txId;
+  }
+
+  public async getSellMemeTransaction(input: GetSellMemeTransactionArgs): Promise<Transaction> {
+    const tx = input.transaction ?? new Transaction();
+    const user = input.user;
+
+    const pool = this.id;
+    const poolSignerPda = this.findSignerPda();
     const meme_in = input.memeAmountIn;
     const sol_out = input.solTokensOut;
 
     const memeTicket = input.userMemeTicket;
     const userSolAcc = input.userSolAcc;
 
-    await this.client.memechanProgram.methods
+    const sellMemeTransactionInstruction = await this.client.memechanProgram.methods
       .swapX(new BN(meme_in), new BN(sol_out))
       .accounts({
-        memeTicket: memeTicket?.id,
-        owner: user?.publicKey,
+        memeTicket: memeTicket.id,
+        owner: user.publicKey,
         pool: pool,
-        poolSigner,
+        poolSigner: poolSignerPda,
         quoteVault: this.solVault,
         userSol: userSolAcc,
         tokenProgram: TOKEN_PROGRAM_ID,
       })
-      .signers([user!])
-      .rpc({ skipPreflight: true, commitment: "confirmed" });
+      .instruction();
+
+    tx.add(sellMemeTransactionInstruction);
+
+    return tx;
   }
 
-  async retryInitStakingPool(client, methodArgs, maxRetries, initialTimeout): Promise<InitStakingPoolResult> {
-    let attempts = 0;
-    let timeout = initialTimeout;
-
-    while (attempts < maxRetries) {
-      try {
-        // Adjust the timeout for the RPC call
-        const options = {
-          skipPreflight: true,
-          commitment: "confirmed",
-          preflightCommitment: "confirmed",
-          timeout: timeout, // Timeout in milliseconds
-        };
-
-        const result = await client.memechanProgram.methods
-          .initStakingPool()
-          .accounts(methodArgs)
-          .signers([methodArgs.user])
-          .rpc(options);
-
-        console.log("Transaction successful:", result);
-        return result;
-      } catch (error) {
-        console.log(`Attempt ${attempts + 1} failed:`, error);
-        if (error.message.includes("Transaction was not confirmed in")) {
-          attempts++;
-          timeout += 30000; // Increase timeout by 30 seconds for each retry
-          if (attempts >= maxRetries) {
-            throw new Error("All attempts to send transaction failed");
-          }
-        } else {
-          // If the error is not related to timeout, rethrow it
-          throw error;
-        }
-      }
-    }
-  }
-
-  public async initStakingPool(input: Partial<InitStakingPoolArgs>): Promise<InitStakingPoolResult> {
-    const user = input.user!;
-    const pool = input.pool ?? this.id;
-
-    //console.log("initStakingPool fetch: " + this.id.toBase58());
-    //const boundPoolInfo = await this.fetch();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const boundPoolInfo = input.boundPoolInfo as any;
-
-    console.log("initStakingPool.boundPoolInfo: " + JSON.stringify(boundPoolInfo));
+  public async getInitStakingPoolTransaction(
+    input: GetInitStakingPoolTransactionArgs,
+  ): Promise<{ transaction: Transaction; stakingWSolVault: PublicKey; stakingMemeVault: PublicKey }> {
+    const { user, pool = this.id, boundPoolInfo } = input;
+    const tx = input.transaction ?? new Transaction();
 
     const stakingId = BoundPool.findStakingPda(boundPoolInfo.memeReserve.mint, this.client.memechanProgram.programId);
     const stakingSigner = StakingPool.findSignerPda(stakingId, this.client.memechanProgram.programId);
-
     const adminTicketId = BoundPool.findMemeTicketPda(stakingId, this.client.memechanProgram.programId);
 
-    const stakingPoolSolVaultid = Keypair.generate();
-    const stakingWSolVault = await createAccount(
+    const stakingPoolSolVaultId = Keypair.generate();
+    const stakingWSolVault = stakingPoolSolVaultId.publicKey;
+    const createWSolAccountInstructions = await getCreateAccountInstructions(
       this.client.connection,
       user,
       this.quoteToken.mint,
       stakingSigner,
-      stakingPoolSolVaultid,
-      { skipPreflight: true, commitment: "confirmed" },
+      stakingPoolSolVaultId,
+      "confirmed",
     );
 
-    const stakingMemeVaultid = Keypair.generate();
-    const stakingMemeVault = await createAccount(
+    tx.add(...createWSolAccountInstructions);
+
+    const stakingMemeVaultId = Keypair.generate();
+    const stakingMemeVault = stakingMemeVaultId.publicKey;
+    const createMemeAccountInstructions = await getCreateAccountInstructions(
       this.client.connection,
       user,
       boundPoolInfo.memeReserve.mint,
       stakingSigner,
-      stakingMemeVaultid,
-      { skipPreflight: true, commitment: "confirmed" },
+      stakingMemeVaultId,
+      "confirmed",
     );
 
-    try {
-      const methodArgs = {
-        pool: pool,
-        signer: user.publicKey,
-        boundPoolSignerPda: this.findSignerPda(),
-        memeTicket: adminTicketId,
-        poolMemeVault: boundPoolInfo.memeReserve.vault,
-        poolQuoteVault: boundPoolInfo.quoteReserve.vault,
-        stakingMemeVault: stakingMemeVault,
-        stakingQuoteVault: stakingWSolVault,
-        quoteMint: this.quoteToken.mint,
-        staking: stakingId,
-        stakingPoolSignerPda: stakingSigner,
-        adminVaultQuote: boundPoolInfo.adminVaultQuote,
-        marketProgramId: PROGRAMIDS.OPENBOOK_MARKET,
-        systemProgram: SystemProgram.programId,
-        tokenProgram: TOKEN_PROGRAM_ID,
-        clock: SYSVAR_CLOCK_PUBKEY,
-        rent: SYSVAR_RENT_PUBKEY,
-        memeMint: boundPoolInfo.memeReserve.mint,
-        ataProgram: ATA_PROGRAM_ID,
-        user: user,
-      };
+    tx.add(...createMemeAccountInstructions);
 
-      const result = await this.retryInitStakingPool(this.client, methodArgs, 3, 60000); // Retry up to 3 times with an initial timeout of 30 seconds
-      console.log("initStakingPool Final result:", result);
+    const methodArgs = {
+      pool,
+      signer: user.publicKey,
+      boundPoolSignerPda: this.findSignerPda(),
+      memeTicket: adminTicketId,
+      poolMemeVault: boundPoolInfo.memeReserve.vault,
+      poolQuoteVault: boundPoolInfo.quoteReserve.vault,
+      stakingMemeVault,
+      stakingQuoteVault: stakingWSolVault,
+      quoteMint: this.quoteToken.mint,
+      staking: stakingId,
+      stakingPoolSignerPda: stakingSigner,
+      adminVaultQuote: boundPoolInfo.adminVaultQuote,
+      marketProgramId: PROGRAMIDS.OPENBOOK_MARKET,
+      systemProgram: SystemProgram.programId,
+      tokenProgram: TOKEN_PROGRAM_ID,
+      clock: SYSVAR_CLOCK_PUBKEY,
+      rent: SYSVAR_RENT_PUBKEY,
+      memeMint: boundPoolInfo.memeReserve.mint,
+      ataProgram: ATA_PROGRAM_ID,
+      user,
+    };
 
-      return { stakingMemeVault, stakingWSolVault };
-    } catch (error) {
-      console.error("Failed to initialize staking pool:", error);
-    }
+    const initStakingPoolInstruction = await this.client.memechanProgram.methods
+      .initStakingPool()
+      .accounts(methodArgs)
+      .instruction();
+
+    tx.add(initStakingPoolInstruction);
+
+    return { transaction: tx, stakingMemeVault, stakingWSolVault };
+  }
+
+  public async initStakingPool(input: InitStakingPoolArgs): Promise<InitStakingPoolResult> {
+    const { transaction, stakingMemeVault, stakingWSolVault } = await this.getInitStakingPoolTransaction(input);
+
+    const signAndConfirmInitStakingPoolTransaction = getSendAndConfirmTransactionMethod({
+      connection: this.client.connection,
+      transaction,
+      signers: [input.user],
+    });
+
+    await retry({
+      fn: signAndConfirmInitStakingPoolTransaction,
+      functionName: "initStakingPool",
+    });
 
     return { stakingMemeVault, stakingWSolVault };
   }
 
-  public async goLive(input: Partial<GoLiveArgs>): Promise<[StakingPool]> {
+  public async goLive(input: GoLiveArgs): Promise<[StakingPool]> {
     const user = input.user!;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const boundPoolInfo = input.boundPoolInfo as any;
@@ -382,7 +506,7 @@ export class BoundPool {
 
     console.log("goLive.boundPoolInfo: " + JSON.stringify(boundPoolInfo));
 
-    const baseTokenInfo = { mint: boundPoolInfo.memeReserve.mint, decimals: 6 };
+    const baseTokenInfo = new Token(TOKEN_PROGRAM_ID, new PublicKey(boundPoolInfo.memeReserve.mint), 6);
     //const marketId = new PublicKey("AHZCwnUuiB3CUEyk2nybsU5c85WVDTHVP2UwuQwpVaR1");
     const quoteTokenInfo = Token.WSOL;
 
@@ -456,7 +580,7 @@ export class BoundPool {
       console.log("transferTxSyncResult: " + JSON.stringify(transferTxSyncResult));
     }
 
-    const feeDestination = new PublicKey(process.env.FEE_DESTINATION_ID as string);
+    const feeDestination = new PublicKey(input.feeDestinationWalletAddress);
     const ammId = BoundPool.getAssociatedId({ programId: PROGRAMIDS.AmmV4, marketId });
     const raydiumAmmAuthority = BoundPool.getAssociatedAuthority({ programId: PROGRAMIDS.AmmV4 });
     const openOrders = BoundPool.getAssociatedOpenOrders({ programId: PROGRAMIDS.AmmV4, marketId });

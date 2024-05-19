@@ -1,9 +1,8 @@
 import { Liquidity, MAINNET_PROGRAM_ID, Token } from "@raydium-io/raydium-sdk";
 import { Connection, Keypair, PublicKey } from "@solana/web3.js";
-
-import { BN } from "@coral-xyz/anchor";
-import { PROGRAMIDS, makeTxVersion } from "./config";
+import { BN } from "bn.js";
 import { buildAndSendTx, getWalletTokenAccount } from "../utils/util";
+import { PROGRAMIDS, makeTxVersion } from "./config";
 
 const ZERO = new BN(0);
 type BN = typeof ZERO;
@@ -44,6 +43,8 @@ type TestTxInputInfo = LiquidityPairTargetInfo &
     walletTokenAccounts: WalletTokenAccounts;
     wallet: Keypair;
     connection: Connection;
+  } & {
+    feeDestinationWalletAddress: string;
   };
 
 export async function ammCreatePool(input: TestTxInputInfo) {
@@ -70,7 +71,7 @@ export async function ammCreatePool(input: TestTxInputInfo) {
     checkCreateATAOwner: true,
     makeTxVersion,
     //feeDestinationId: new PublicKey('7YttLkHDoNj9wyDur5pM1ejNaAvT9X4eqaYcHQqtj2G5'), // only mainnet use this
-    feeDestinationId: new PublicKey(process.env.FEE_DESTINATION_ID as string),
+    feeDestinationId: new PublicKey(input.feeDestinationWalletAddress),
   });
 
   const poolInfo = getMarketAssociatedPoolKeys(input);
