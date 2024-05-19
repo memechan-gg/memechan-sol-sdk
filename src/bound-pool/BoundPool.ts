@@ -449,9 +449,6 @@ export class BoundPool {
   public async initStakingPool(input: Partial<InitStakingPoolArgs>): Promise<InitStakingPoolResult> {
     const user = input.user!;
     const pool = input.pool ?? this.id;
-
-    //console.log("initStakingPool fetch: " + this.id.toBase58());
-    //const boundPoolInfo = await this.fetch();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const boundPoolInfo = input.boundPoolInfo as any;
 
