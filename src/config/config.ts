@@ -14,4 +14,4 @@ export const BE_URL = "https://7mgmqkuj18.execute-api.us-east-1.amazonaws.com/pr
  *
  * @constant {string}
  */
-export const MEMECHAN_PROGRAM_ID = "HvGgKbPfar5eUAnE5gnq5NvFdJRMVo39PFjJ4Hhe5FGk";
+export const MEMECHAN_PROGRAM_ID = "BDRDLhqbfEQx2LZQ9Js7k1Dt1S9AArTw44q1rM96YrwC";

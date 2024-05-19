@@ -41,6 +41,11 @@
           "isSigner": false
         },
         {
+          "name": "targetConfig",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "poolSigner",
           "isMut": false,
           "isSigner": false
@@ -342,6 +347,58 @@
       "args": []
     },
     {
+      "name": "newTargetConfig",
+      "accounts": [
+        {
+          "name": "sender",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "targetConfig",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "targetAmount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "changeTargetConfig",
+      "accounts": [
+        {
+          "name": "sender",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "targetConfig",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "targetAmount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
       "name": "goLive",
       "accounts": [
         {
@@ -516,17 +573,7 @@
           "isSigner": false
         },
         {
-          "name": "aldrinPoolAcc",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "raydiumLpMint",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "poolLpWallet",
+          "name": "stakingLpWallet",
           "isMut": true,
           "isSigner": false
         },
@@ -552,6 +599,11 @@
         },
         {
           "name": "raydiumQuoteVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "raydiumLpMint",
           "isMut": true,
           "isSigner": false
         },
@@ -894,6 +946,14 @@
             "type": "publicKey"
           },
           {
+            "name": "lpVault",
+            "type": "publicKey"
+          },
+          {
+            "name": "lpMint",
+            "type": "publicKey"
+          },
+          {
             "name": "quoteVault",
             "type": "publicKey"
           },
@@ -902,6 +962,10 @@
             "type": {
               "defined": "VestingConfig"
             }
+          },
+          {
+            "name": "lpTokensWithdrawn",
+            "type": "u64"
           },
           {
             "name": "stakesTotal",
@@ -914,6 +978,22 @@
           {
             "name": "feesYTotal",
             "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "TargetConfig",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "tokenTargetAmount",
+            "type": "u64"
+          },
+          {
+            "name": "tokenMint",
+            "type": "publicKey"
           }
         ]
       }
@@ -1718,6 +1798,17 @@
           }
         ]
       }
+    },
+    {
+      "name": "DecimalError",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "MathOverflow"
+          }
+        ]
+      }
     }
   ],
   "errors": [
@@ -1810,6 +1901,6 @@
     }
   ],
   "metadata": {
-    "address": "DHkkfGmzePZfv2WjgwE5CZPNUdXuCeVGax4JgCA6Mwpr"
+    "address": "BDRDLhqbfEQx2LZQ9Js7k1Dt1S9AArTw44q1rM96YrwC"
   }
 }
