@@ -354,7 +354,7 @@ export class BoundPool {
         owner: user.publicKey,
         pool: pool,
         poolSignerPda: poolSignerPda,
-        solVault: this.solVault,
+        quoteVault: this.solVault,
         userSol: inputTokenUserAccountPubkey,
         systemProgram: SystemProgram.programId,
         tokenProgram: TOKEN_PROGRAM_ID,
