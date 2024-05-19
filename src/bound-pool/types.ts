@@ -71,6 +71,10 @@ export interface BoundPoolArgs {
   tokenMetadata: TokenMetadata;
 }
 
+export type GetCreateNewBondingPoolTransactionArgs = Omit<BoundPoolArgs, "tokenMetadata"> & {
+  transaction?: Transaction;
+};
+
 export interface InitStakingPoolResult {
   stakingMemeVault: PublicKey;
   stakingWSolVault: PublicKey;
