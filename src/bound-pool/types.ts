@@ -43,12 +43,10 @@ export type GetSellMemeTransactionArgs = Omit<SwapXArgs, "user" | "pool" | "pool
 };
 
 export interface GoLiveArgs {
-  pool: PublicKey;
   user: Keypair;
   payer: Signer;
   boundPoolInfo: object;
   memeVault: PublicKey;
-  wSolVault: PublicKey;
   feeDestinationWalletAddress: string;
   quoteVault: PublicKey;
 }
