@@ -63,6 +63,7 @@ describe("BoundPool", () => {
       user: payer,
       memeTokensOut: new BN(1),
       solAmountIn: new BN(1 * 1e9),
+      pool: pool.id,
     });
 
     console.log("swapY ticketId: " + ticketId.id.toBase58());
