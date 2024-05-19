@@ -44,8 +44,9 @@ import { findProgramAddress } from "../common/helpers";
 import { MemechanSol } from "../schema/types/memechan_sol";
 import { createMetadata } from "../token/createMetadata";
 import { createMintWithPriority } from "../token/createMintWithPriority";
-import { retry } from "../utils/retry";
 import { getCreateAccountInstructions } from "../utils/getCreateAccountInstruction";
+import { getSendAndConfirmTransactionMethod } from "../utils/getSendAndConfirmTransactionMethod";
+import { retry } from "../utils/retry";
 
 export class BoundPool {
   private constructor(
@@ -482,18 +483,14 @@ export class BoundPool {
   public async initStakingPool(input: InitStakingPoolArgs): Promise<InitStakingPoolResult> {
     const { transaction, stakingMemeVault, stakingWSolVault } = await this.getInitStakingPoolTransaction(input);
 
-    const signAndConfirmInitStakingPoolTransaction = (async () => {
-      await sendAndConfirmTransaction(this.client.connection, transaction, [input.user], {
-        commitment: "confirmed",
-        preflightCommitment: "confirmed",
-        skipPreflight: true,
-      });
-    }).bind(this);
+    const signAndConfirmInitStakingPoolTransaction = getSendAndConfirmTransactionMethod({
+      connection: this.client.connection,
+      transaction,
+      signers: [input.user],
+    });
 
     await retry({
       fn: signAndConfirmInitStakingPoolTransaction,
-      retries: 3,
-      delay: 1000,
       functionName: "initStakingPool",
     });
 
