@@ -69,6 +69,8 @@ describe("BoundPool", () => {
 
     const boundPoolInfo = await pool.fetch();
 
+    console.log("boundPoolInfo:", boundPoolInfo);
+
     const { stakingMemeVault, stakingWSolVault } = await pool.initStakingPool({
       payer: payer,
       user: payer,
