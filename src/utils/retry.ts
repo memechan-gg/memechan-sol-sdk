@@ -5,8 +5,8 @@ import { sleepTime } from "./util";
  */
 interface RetryParams<T> {
   fn: () => Promise<T>;
-  retries: number;
-  delay: number;
+  retries?: number;
+  delay?: number;
   functionName: string;
 }
 
@@ -17,7 +17,7 @@ interface RetryParams<T> {
  * @returns {Promise<T>} - The result of the asynchronous function if it succeeds.
  * @throws {Error} - Throws the error if all retry attempts fail.
  */
-export async function retry<T>({ fn, retries, delay, functionName }: RetryParams<T>): Promise<T> {
+export async function retry<T>({ fn, retries = 3, delay = 1000, functionName }: RetryParams<T>): Promise<T> {
   for (let i = 0; i < retries; i++) {
     try {
       return await fn();
