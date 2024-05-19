@@ -22,7 +22,7 @@ export class TargetConfig {
 
     const result = await input.client.memechanProgram.methods
     .newTargetConfig(
-      new BN(1000000)
+      new BN(1),
     )
     .accounts({
       mint: NATIVE_MINT,
@@ -31,7 +31,7 @@ export class TargetConfig {
       systemProgram: SystemProgram.programId,
     })
     .signers([input.payer])
-    .rpc();
+    .rpc({ skipPreflight: true });
 
     console.log("newTargetConfig result", result);
 

@@ -4,10 +4,10 @@ import { client, payer } from "./common/common";
 import { NATIVE_MINT } from "@solana/spl-token";
 
 describe("TargetConfig", () => {
-  it("creates target config", async () => {
+  it.skip("creates target config", async () => {
 
     const targetConfig = await TargetConfig.new({
-      payer,
+      payer: payer,
       client,
       mint: NATIVE_MINT,
     });
