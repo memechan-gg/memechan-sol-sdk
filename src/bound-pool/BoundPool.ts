@@ -51,6 +51,7 @@ import { getSendAndConfirmTransactionMethod } from "../utils/getSendAndConfirmTr
 import { retry } from "../utils/retry";
 import { createMintWithPriority } from "../token/createMintWithPriority";
 import { CoinAPI } from "../coin/CoinAPI";
+import { MEMECHAN_TARGET_CONFIG } from "../config/config";
 
 export class BoundPool {
   private constructor(
@@ -257,6 +258,7 @@ export class BoundPool {
         quoteMint: quoteToken.mint,
         tokenProgram: TOKEN_PROGRAM_ID,
         systemProgram: SystemProgram.programId,
+        targetConfig: new PublicKey(MEMECHAN_TARGET_CONFIG)
       })
       .signers([signer])
       .rpc({ skipPreflight: true });

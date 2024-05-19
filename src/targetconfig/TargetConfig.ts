@@ -22,10 +22,10 @@ export class TargetConfig {
 
     const result = await input.client.memechanProgram.methods
     .newTargetConfig(
-      new BN(1),
+      input.targetAmount
     )
     .accounts({
-      mint: NATIVE_MINT,
+      mint: input.mint,
       sender: input.payer.publicKey,
       targetConfig: pda,
       systemProgram: SystemProgram.programId,
