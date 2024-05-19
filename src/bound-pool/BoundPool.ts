@@ -41,6 +41,7 @@ import { createMarket } from "../raydium/openBookCreateMarket";
 
 import { findProgramAddress } from "../common/helpers";
 import { createMintWithPriority } from "../token/createMintWithPriority";
+import { sleepTime } from "../utils/util";
 
 export class BoundPool {
   private constructor(
@@ -148,7 +149,7 @@ export class BoundPool {
         return accountInfo;
       } catch (error) {
         if (i === retries - 1) throw error;
-        await new Promise((resolve) => setTimeout(resolve, 1000)); // wait 1 second before retrying
+        await sleepTime(1000); // wait 1 second before retrying
       }
     }
   }
