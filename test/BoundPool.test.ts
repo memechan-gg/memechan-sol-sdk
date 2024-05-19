@@ -22,9 +22,8 @@ const DUMMY_TOKEN_METADATA = {
       };
 
 describe("BoundPool", () => {
-  it("creates bound pool", async () => {
-    
-      const authService = new Auth(BE_URL);
+  beforeEach(async () => {
+    const authService = new Auth(BE_URL);
       const keypair = new Keypair();
       const messageToSign = await authService.requestMessageToSign(keypair.publicKey.toBase58());
       const signature = await signMessage(messageToSign, keypair);
@@ -36,7 +35,9 @@ describe("BoundPool", () => {
       });
 
       console.log(credentials);
+  });
 
+  it.skip("creates bound pool", async () => {
       const admin = new PublicKey(process.env.ADMIN_PUB_KEY as string);
       const payer =  Keypair.fromSecretKey(Buffer.from(JSON.parse(process.env.TEST_USER_SECRET_KEY as string)));
       const wallet = new NodeWallet(payer);
@@ -63,7 +64,7 @@ describe("BoundPool", () => {
     console.log(all);
   }, 30000)
 
-  it.skip("init staking pool then go live", async () => {
+  it("init staking pool then go live", async () => {
     const admin = new PublicKey(process.env.ADMIN_PUB_KEY as string);
     const payer = Keypair.fromSecretKey(Buffer.from(JSON.parse(process.env.TEST_USER_SECRET_KEY as string)));
     console.log("payer: " + payer.publicKey.toString());
