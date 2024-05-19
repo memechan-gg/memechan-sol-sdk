@@ -21,7 +21,8 @@
     "@solana/web3.js": "^1.91.8",
     "bn.js": "^5.2.1",
     "bs58": "^5.0.0",
-    "dotenv": "^16.4.5"
+    "dotenv": "^16.4.5",
+    "deploy": "yarn lint && yarn build && yarn publish --access restricted"
   },
   "devDependencies": {
     "@types/bn.js": "^5.1.5",
