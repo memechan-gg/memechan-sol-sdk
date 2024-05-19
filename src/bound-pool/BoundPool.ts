@@ -137,7 +137,7 @@ export class BoundPool {
 
     transaction.add(...createLaunchVaultInstructions);
 
-    const createMemeAndPoolInstruction = await memechanProgram.methods
+    const createPoolInstruction = await memechanProgram.methods
       .new()
       .accounts({
         adminQuoteVault: adminSolVault,
@@ -153,7 +153,7 @@ export class BoundPool {
       })
       .instruction();
 
-    transaction.add(createMemeAndPoolInstruction);
+    transaction.add(createPoolInstruction);
 
     return { transaction, memeMint, poolSolVault, launchVault };
   }
