@@ -73,6 +73,7 @@ export interface BoundPoolArgs {
 
 export type GetCreateNewBondingPoolTransactionArgs = Omit<BoundPoolArgs, "tokenMetadata"> & {
   transaction?: Transaction;
+  adminSolPublicKey?: PublicKey;
 };
 
 export interface InitStakingPoolResult {

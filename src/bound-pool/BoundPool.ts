@@ -1,5 +1,6 @@
 import { Token } from "@raydium-io/raydium-sdk";
 import {
+  ASSOCIATED_TOKEN_PROGRAM_ID,
   createAssociatedTokenAccountInstruction,
   createSyncNativeInstruction,
   getAssociatedTokenAddressSync,
@@ -92,7 +93,7 @@ export class BoundPool {
   public static async getCreateNewBondingPoolTransaction(
     args: GetCreateNewBondingPoolTransactionArgs,
   ): Promise<{ transaction: Transaction; memeMint: PublicKey; poolSolVault: PublicKey; launchVault: PublicKey }> {
-    const { admin, payer, signer, client, quoteToken, transaction = new Transaction() } = args;
+    const { admin, payer, signer, client, quoteToken, transaction = new Transaction(), adminSolPublicKey } = args;
     const { connection, memechanProgram } = client;
 
     const memeMintKeypair = Keypair.generate();
@@ -106,12 +107,30 @@ export class BoundPool {
 
     transaction.add(...createMemeMintWithPriorityInstructions);
 
-    // TODO: Find out how to create bonding pool and admin sol vault in one transaction
-    const adminSolVault = (
-      await getOrCreateAssociatedTokenAccount(connection, payer, quoteToken.mint, admin, true, "confirmed", {
-        skipPreflight: true,
-      })
-    ).address;
+    let adminQuoteVault;
+
+    if (!adminSolPublicKey) {
+      const associatedToken = getAssociatedTokenAddressSync(
+        quoteToken.mint,
+        admin,
+        true,
+        TOKEN_PROGRAM_ID,
+        ASSOCIATED_TOKEN_PROGRAM_ID,
+      );
+
+      const associatedTransactionInstruction = createAssociatedTokenAccountInstruction(
+        payer.publicKey,
+        associatedToken,
+        admin,
+        quoteToken.mint,
+        TOKEN_PROGRAM_ID,
+        ASSOCIATED_TOKEN_PROGRAM_ID,
+      );
+
+      transaction.add(associatedTransactionInstruction);
+
+      adminQuoteVault = associatedToken;
+    }
 
     const poolSolVaultId = Keypair.generate();
     const poolSolVault = poolSolVaultId.publicKey;
@@ -140,7 +159,7 @@ export class BoundPool {
     const createPoolInstruction = await memechanProgram.methods
       .new()
       .accounts({
-        adminQuoteVault: adminSolVault,
+        adminQuoteVault: adminQuoteVault,
         memeVault: launchVault,
         quoteVault: poolSolVault,
         memeMint: memeMint,
