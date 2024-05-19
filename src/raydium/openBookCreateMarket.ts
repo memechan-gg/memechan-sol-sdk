@@ -20,7 +20,7 @@ export async function createMarket(input: CreateMarketTxInput) {
     lotSize: 1,
     tickSize: 0.000001,
     dexProgramId: PROGRAMIDS.OPENBOOK_MARKET,
-    makeTxVersion
+    makeTxVersion,
   });
 
   return {

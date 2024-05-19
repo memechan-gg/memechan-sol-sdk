@@ -21,22 +21,22 @@
           "isSigner": false
         },
         {
-          "name": "solVault",
+          "name": "quoteVault",
           "isMut": false,
           "isSigner": false
         },
         {
-          "name": "solMint",
+          "name": "quoteMint",
           "isMut": false,
           "isSigner": false
         },
         {
-          "name": "adminSolVault",
+          "name": "adminQuoteVault",
           "isMut": false,
           "isSigner": false
         },
         {
-          "name": "launchVault",
+          "name": "memeVault",
           "isMut": true,
           "isSigner": false
         },
@@ -59,6 +59,76 @@
       "args": []
     },
     {
+      "name": "createMetadata",
+      "accounts": [
+        {
+          "name": "sender",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "pool",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "memeMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "memeMplMetadata",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "To store metaplex metadata. Created in the function scope"
+          ]
+        },
+        {
+          "name": "poolSigner",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "metadataProgram",
+          "isMut": false,
+          "isSigner": false,
+          "docs": [
+            "Program to create NFT metadata"
+          ]
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "name",
+          "type": "string"
+        },
+        {
+          "name": "symbol",
+          "type": "string"
+        },
+        {
+          "name": "uri",
+          "type": "string"
+        }
+      ]
+    },
+    {
       "name": "swapX",
       "accounts": [
         {
@@ -77,7 +147,7 @@
           "isSigner": false
         },
         {
-          "name": "solVault",
+          "name": "quoteVault",
           "isMut": true,
           "isSigner": false
         },
@@ -117,7 +187,7 @@
           "isSigner": false
         },
         {
-          "name": "solVault",
+          "name": "quoteVault",
           "isMut": true,
           "isSigner": false
         },
@@ -196,7 +266,7 @@
           ]
         },
         {
-          "name": "poolWsolVault",
+          "name": "poolQuoteVault",
           "isMut": true,
           "isSigner": false,
           "docs": [
@@ -204,7 +274,7 @@
           ]
         },
         {
-          "name": "adminVaultSol",
+          "name": "adminVaultQuote",
           "isMut": true,
           "isSigner": false,
           "docs": [
@@ -220,7 +290,7 @@
           ]
         },
         {
-          "name": "solMint",
+          "name": "quoteMint",
           "isMut": false,
           "isSigner": false,
           "docs": [
@@ -249,7 +319,7 @@
           "isSigner": false
         },
         {
-          "name": "stakingWsolVault",
+          "name": "stakingQuoteVault",
           "isMut": true,
           "isSigner": false,
           "docs": [
@@ -333,7 +403,7 @@
           ]
         },
         {
-          "name": "poolWsolVault",
+          "name": "poolQuoteVault",
           "isMut": true,
           "isSigner": false,
           "docs": [
@@ -349,7 +419,7 @@
           ]
         },
         {
-          "name": "solMint",
+          "name": "quoteMint",
           "isMut": false,
           "isSigner": false,
           "docs": [
@@ -414,7 +484,7 @@
           ]
         },
         {
-          "name": "raydiumWsolVault",
+          "name": "raydiumQuoteVault",
           "isMut": true,
           "isSigner": false,
           "docs": [
@@ -493,7 +563,7 @@
           "isSigner": false
         },
         {
-          "name": "wsolVault",
+          "name": "quoteVault",
           "isMut": true,
           "isSigner": false
         },
@@ -503,17 +573,7 @@
           "isSigner": false
         },
         {
-          "name": "aldrinPoolAcc",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "raydiumLpMint",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "poolLpWallet",
+          "name": "stakingLpWallet",
           "isMut": true,
           "isSigner": false
         },
@@ -538,7 +598,12 @@
           "isSigner": false
         },
         {
-          "name": "raydiumWsolVault",
+          "name": "raydiumQuoteVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "raydiumLpMint",
           "isMut": true,
           "isSigner": false
         },
@@ -619,7 +684,7 @@
           "isSigner": false
         },
         {
-          "name": "userWsol",
+          "name": "userQuote",
           "isMut": true,
           "isSigner": false
         },
@@ -629,7 +694,7 @@
           "isSigner": false
         },
         {
-          "name": "wsolVault",
+          "name": "quoteVault",
           "isMut": true,
           "isSigner": false
         },
@@ -675,7 +740,7 @@
           "isSigner": false
         },
         {
-          "name": "userWsol",
+          "name": "userQuote",
           "isMut": false,
           "isSigner": false
         },
@@ -685,7 +750,7 @@
           "isSigner": false
         },
         {
-          "name": "wsolVault",
+          "name": "quoteVault",
           "isMut": true,
           "isSigner": false
         },
@@ -789,7 +854,7 @@
             }
           },
           {
-            "name": "solReserve",
+            "name": "quoteReserve",
             "type": {
               "defined": "Reserve"
             }
@@ -799,11 +864,11 @@
             "type": "u64"
           },
           {
-            "name": "adminFeesSol",
+            "name": "adminFeesQuote",
             "type": "u64"
           },
           {
-            "name": "adminVaultSol",
+            "name": "adminVaultQuote",
             "type": "publicKey"
           },
           {
@@ -847,7 +912,7 @@
             "type": "u64"
           },
           {
-            "name": "withdrawsWsol",
+            "name": "withdrawsQuote",
             "type": "u64"
           },
           {
@@ -881,7 +946,15 @@
             "type": "publicKey"
           },
           {
-            "name": "wsolVault",
+            "name": "lpVault",
+            "type": "publicKey"
+          },
+          {
+            "name": "lpMint",
+            "type": "publicKey"
+          },
+          {
+            "name": "quoteVault",
             "type": "publicKey"
           },
           {
@@ -889,6 +962,10 @@
             "type": {
               "defined": "VestingConfig"
             }
+          },
+          {
+            "name": "lpTokensWithdrawn",
+            "type": "u64"
           },
           {
             "name": "stakesTotal",
@@ -1889,6 +1966,17 @@
           }
         ]
       }
+    },
+    {
+      "name": "DecimalError",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "MathOverflow"
+          }
+        ]
+      }
     }
   ],
   "errors": [
@@ -1979,5 +2067,8 @@
       "code": 6018,
       "name": "BondingCurveInterceptMustBePositive"
     }
-  ]
+  ],
+  "metadata": {
+    "address": "DHkkfGmzePZfv2WjgwE5CZPNUdXuCeVGax4JgCA6Mwpr"
+  }
 }

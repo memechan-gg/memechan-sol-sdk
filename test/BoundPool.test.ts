@@ -1,23 +1,58 @@
 import { BN } from "@coral-xyz/anchor";
+import { Token } from "@raydium-io/raydium-sdk";
 import { BoundPool } from "../src/bound-pool/BoundPool";
 import { sleep } from "../src/common/helpers";
 import { admin, client, payer } from "./common/common";
 
-describe("BoundPool", () => {
-  // it("creates bound pool", async () => {
+const DUMMY_TOKEN_METADATA = {
+  name: "Best Token Ever",
+  symbol: "BTE",
+  image: "https://cf-ipfs.com/ipfs/QmVevMfxFpfgBu5kHuYUPmDMaV6pWkAn3zw5XaCXxKdaBh",
+  description: "This is the best token ever",
+  twitter: "https://twitter.com/BestTokenEver",
+  telegram: "https://t.me/BestTokenEver",
+  website: "https://besttokenever.com",
+};
 
-  //     const admin = new PublicKey(ADMIN_PUB_KEY);
-  //     const payer =  Keypair.fromSecretKey(Buffer.from(JSON.parse(TEST_USER_SECRET_KEY)));
-  //     const wallet = new NodeWallet(payer);
-  //     const client = new MemechanClient(wallet);
-  //     const boundPool = await BoundPool.new({admin, payer, signer: payer, client });
-  //     await sleep(1000);
-  //     const info = await boundPool.fetch();
-  //     console.log(info);
-  //   }, 60000)
+describe("BoundPool", () => {
+  it("creates bound pool", async () => {
+    return;
+    const boundPool = await BoundPool.new({
+      admin,
+      payer,
+      signer: payer,
+      client,
+      quoteToken: Token.WSOL,
+      tokenMetadata: DUMMY_TOKEN_METADATA,
+    });
+    await sleep(1000);
+    const info = await boundPool.fetch();
+    console.log(info);
+  }, 90000);
+
+  it("all", async () => {
+    return;
+    const all = await BoundPool.all(client.memechanProgram);
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    for (const pool of all) {
+      //console.log(pool.account);
+      //console.log("==================================================");
+    }
+
+    console.log(all);
+  }, 30000);
 
   it("init staking pool then go live", async () => {
-    const pool = await BoundPool.new({ admin, payer, signer: payer, client });
+    console.log("payer: " + payer.publicKey.toString());
+    const pool = await BoundPool.new({
+      admin,
+      payer,
+      signer: payer,
+      client,
+      quoteToken: Token.WSOL,
+      tokenMetadata: DUMMY_TOKEN_METADATA,
+    });
 
     console.log("==== pool id: " + pool.id.toString());
     await sleep(2000);
@@ -49,18 +84,13 @@ describe("BoundPool", () => {
       user: payer,
       boundPoolInfo,
       memeVault: stakingMemeVault,
-      wSolVault: stakingWSolVault,
+      quoteVault: stakingWSolVault,
     });
 
     console.log("OINK");
   }, 520000);
 
   // it("swaps full sol->memecoin in one go", async () => {
-  //    const admin = new PublicKey(ADMIN_PUB_KEY);
-  //     const payer =  Keypair.fromSecretKey(Buffer.from(JSON.parse(TEST_USER_SECRET_KEY)));
-  //     const wallet = new NodeWallet(payer);
-  //     const client = new MemechanClient(wallet);
-
   //     const pool = await BoundPool.new({admin, payer, signer: payer, client });
 
   //     await sleep(1000);
@@ -96,10 +126,6 @@ describe("BoundPool", () => {
   // }, 120000);
 
   // it("user swaps more than have", async () => {
-  //   const admin = new PublicKey(ADMIN_PUB_KEY);
-  //   const payer =  Keypair.fromSecretKey(Buffer.from(JSON.parse(TEST_USER_SECRET_KEY)));
-  //   const wallet = new NodeWallet(payer);
-  //   const client = new MemechanClient(wallet);
   //   const boundPool = await BoundPool.new({admin, payer, signer: payer, client });
   //   await sleep(1000);
 
@@ -119,11 +145,6 @@ describe("BoundPool", () => {
   // }, 120000);
 
   // it("merge tickets presale", async () => {
-  //   const admin = new PublicKey(ADMIN_PUB_KEY);
-  //   const payer =  Keypair.fromSecretKey(Buffer.from(JSON.parse(TEST_USER_SECRET_KEY)));
-  //   const wallet = new NodeWallet(payer);
-  //   const client = new MemechanClient(wallet);
-
   //   const user = Keypair.generate()
   //   await airdrop(client.connection, user.publicKey)
   //   const pool = await BoundPool.new({admin, payer, signer: payer, client });
@@ -178,11 +199,6 @@ describe("BoundPool", () => {
   // }, 120000);
 
   // it("swaps user sol->memecoin->sol", async () => {
-  //   const admin = new PublicKey(ADMIN_PUB_KEY);
-  //   const payer =  Keypair.fromSecretKey(Buffer.from(JSON.parse(TEST_USER_SECRET_KEY)));
-  //   const wallet = new NodeWallet(payer);
-  //   const client = new MemechanClient(wallet);
-
   //   const user = Keypair.generate()
   //   await airdrop(client.connection, user.publicKey)
   //   const pool = await BoundPool.new({admin, payer, signer: payer, client });
@@ -213,11 +229,6 @@ describe("BoundPool", () => {
   // }, 120000);
 
   // it("swaps sol->memecoin->sol->full meme", async () => {
-  //   const admin = new PublicKey(ADMIN_PUB_KEY);
-  //   const payer =  Keypair.fromSecretKey(Buffer.from(JSON.parse(TEST_USER_SECRET_KEY)));
-  //   const wallet = new NodeWallet(payer);
-  //   const client = new MemechanClient(wallet);
-
   //   const user = Keypair.generate()
   //   await airdrop(client.connection, user.publicKey)
   //   const pool = await BoundPool.new({admin, payer, signer: payer, client });

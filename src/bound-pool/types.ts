@@ -2,6 +2,8 @@ import { BN } from "@coral-xyz/anchor";
 import { PublicKey, Keypair, Signer, Transaction } from "@solana/web3.js";
 import { MemeTicket } from "../memeticket/MemeTicket";
 import { MemechanClient } from "../MemechanClient";
+import { Token } from "@raydium-io/raydium-sdk";
+import { TokenMetadata } from "../token/types";
 
 export interface SwapYArgs {
   payer: Signer;
@@ -48,6 +50,7 @@ export interface GoLiveArgs {
   memeVault: PublicKey;
   wSolVault: PublicKey;
   feeDestinationWalletAddress: string;
+  quoteVault: PublicKey;
 }
 
 export interface InitStakingPoolArgs {
@@ -62,6 +65,8 @@ export interface BoundPoolArgs {
   payer: Signer;
   signer: Keypair;
   client: MemechanClient;
+  quoteToken: Token;
+  tokenMetadata: TokenMetadata;
 }
 
 export interface InitStakingPoolResult {

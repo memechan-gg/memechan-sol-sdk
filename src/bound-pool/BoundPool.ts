@@ -1,3 +1,4 @@
+import { Token } from "@raydium-io/raydium-sdk";
 import {
   createAccount,
   createAssociatedTokenAccountInstruction,
@@ -5,23 +6,27 @@ import {
   getAssociatedTokenAddressSync,
   getOrCreateAssociatedTokenAccount,
   mintTo,
-  NATIVE_MINT,
   TOKEN_PROGRAM_ID,
 } from "@solana/spl-token";
 import {
-  PublicKey,
+  ComputeBudgetProgram,
+  Connection,
   Keypair,
+  PublicKey,
+  sendAndConfirmTransaction,
   Signer,
   SystemProgram,
   SYSVAR_CLOCK_PUBKEY,
   SYSVAR_RENT_PUBKEY,
   Transaction,
-  sendAndConfirmTransaction,
-  Connection,
-  ComputeBudgetProgram,
 } from "@solana/web3.js";
-import { Token } from "@raydium-io/raydium-sdk";
 
+import { AnchorError, BN, Program, Provider } from "@coral-xyz/anchor";
+import { MemechanClient } from "../MemechanClient";
+import { MemeTicket } from "../memeticket/MemeTicket";
+import { ATA_PROGRAM_ID, PROGRAMIDS } from "../raydium/config";
+import { createMarket } from "../raydium/openBookCreateMarket";
+import { StakingPool } from "../staking-pool/StakingPool";
 import {
   BoundPoolArgs,
   GetBuyMemeTransactionArgs,
@@ -32,14 +37,10 @@ import {
   SwapXArgs,
   SwapYArgs,
 } from "./types";
-import { AnchorError, BN, Provider } from "@coral-xyz/anchor";
-import { MemeTicket } from "../memeticket/MemeTicket";
-import { StakingPool } from "../staking-pool/StakingPool";
-import { MemechanClient } from "../MemechanClient";
-import { ATA_PROGRAM_ID, PROGRAMIDS } from "../raydium/config";
-import { createMarket } from "../raydium/openBookCreateMarket";
 
 import { findProgramAddress } from "../common/helpers";
+import { MemechanSol } from "../schema/types/memechan_sol";
+import { createMetadata } from "../token/createMetadata";
 import { createMintWithPriority } from "../token/createMintWithPriority";
 import { sleepTime } from "../utils/util";
 
@@ -50,6 +51,7 @@ export class BoundPool {
     public solVault: PublicKey,
     public memeVault: PublicKey,
     public client: MemechanClient,
+    public quoteToken: Token = Token.WSOL,
   ) {
     //
   }
@@ -84,27 +86,28 @@ export class BoundPool {
   }
 
   public static async new(args: BoundPoolArgs): Promise<BoundPool> {
-    const { admin, payer, signer, client } = args;
+    const { admin, payer, signer, client, quoteToken } = args;
     const { connection, memechanProgram } = client;
 
     const memeMintKeypair = Keypair.generate();
-    const id = this.findBoundPoolPda(memeMintKeypair.publicKey, NATIVE_MINT, args.client.memechanProgram.programId);
+    console.log("quoteToken.mint: " + quoteToken.mint);
+    const id = this.findBoundPoolPda(memeMintKeypair.publicKey, quoteToken.mint, args.client.memechanProgram.programId);
     const poolSigner = BoundPool.findSignerPda(id, args.client.memechanProgram.programId);
+    console.log("poolSigner: " + poolSigner.toBase58());
 
     const memeMint = await createMintWithPriority(connection, payer, poolSigner, null, 6, memeMintKeypair, {
       skipPreflight: true,
       commitment: "confirmed",
     });
-
     console.log("memeMint: " + memeMint.toBase58());
 
     const adminSolVault = (
-      await getOrCreateAssociatedTokenAccount(connection, payer, NATIVE_MINT, admin, true, "confirmed", {
+      await getOrCreateAssociatedTokenAccount(connection, payer, quoteToken.mint, admin, true, "confirmed", {
         skipPreflight: true,
       })
     ).address;
     const poolSolVaultid = Keypair.generate();
-    const poolSolVault = await createAccount(connection, payer, NATIVE_MINT, poolSigner, poolSolVaultid, {
+    const poolSolVault = await createAccount(connection, payer, quoteToken.mint, poolSigner, poolSolVaultid, {
       skipPreflight: true,
       commitment: "confirmed",
     });
@@ -122,14 +125,14 @@ export class BoundPool {
     const result = await memechanProgram.methods
       .new()
       .accounts({
-        adminSolVault: adminSolVault,
-        launchVault: launchVault,
-        solVault: poolSolVault,
+        adminQuoteVault: adminSolVault,
+        memeVault: launchVault,
+        quoteVault: poolSolVault,
         memeMint: memeMint,
         pool: id,
         poolSigner: poolSigner,
         sender: signer.publicKey,
-        solMint: NATIVE_MINT,
+        quoteMint: quoteToken.mint,
         tokenProgram: TOKEN_PROGRAM_ID,
         systemProgram: SystemProgram.programId,
       })
@@ -138,7 +141,9 @@ export class BoundPool {
 
     console.log("new pool tx result: " + result);
 
-    return new BoundPool(id, signer, poolSolVault, launchVault, client);
+    await createMetadata(client, { payer, mint: memeMint, poolSigner, poolId: id, metadata: args.tokenMetadata });
+
+    return new BoundPool(id, signer, poolSolVault, launchVault, client, quoteToken);
   }
 
   public async fetch(program = this.client.memechanProgram, accountId = this.id, retries = 3) {
@@ -152,6 +157,10 @@ export class BoundPool {
         await sleepTime(1000); // wait 1 second before retrying
       }
     }
+  }
+
+  public static async all(program: Program<MemechanSol>) {
+    return program.account.boundPool.all();
   }
 
   public findSignerPda(): PublicKey {
@@ -185,7 +194,7 @@ export class BoundPool {
         await getOrCreateAssociatedTokenAccount(
           this.client.connection,
           payer,
-          NATIVE_MINT,
+          this.quoteToken.mint,
           user.publicKey,
           true,
           "confirmed",
@@ -229,7 +238,7 @@ export class BoundPool {
         owner: user.publicKey,
         pool: pool,
         poolSignerPda: poolSignerPda,
-        solVault: this.solVault,
+        quoteVault: this.solVault,
         userSol: userSolAcc,
         systemProgram: SystemProgram.programId,
         tokenProgram: TOKEN_PROGRAM_ID,
@@ -370,7 +379,7 @@ export class BoundPool {
         owner: user.publicKey,
         pool: pool,
         poolSigner: poolSignerPda,
-        solVault: this.solVault,
+        quoteVault: this.solVault,
         userSol: userSolAcc,
         tokenProgram: TOKEN_PROGRAM_ID,
       })
@@ -439,7 +448,7 @@ export class BoundPool {
     const stakingWSolVault = await createAccount(
       this.client.connection,
       user,
-      NATIVE_MINT,
+      this.quoteToken.mint,
       stakingSigner,
       stakingPoolSolVaultid,
       { skipPreflight: true, commitment: "confirmed" },
@@ -462,13 +471,13 @@ export class BoundPool {
         boundPoolSignerPda: this.findSignerPda(),
         memeTicket: adminTicketId,
         poolMemeVault: boundPoolInfo.memeReserve.vault,
-        poolWsolVault: boundPoolInfo.solReserve.vault,
+        poolQuoteVault: boundPoolInfo.quoteReserve.vault,
         stakingMemeVault: stakingMemeVault,
-        stakingWsolVault: stakingWSolVault,
-        solMint: NATIVE_MINT,
+        stakingQuoteVault: stakingWSolVault,
+        quoteMint: this.quoteToken.mint,
         staking: stakingId,
         stakingPoolSignerPda: stakingSigner,
-        adminVaultSol: boundPoolInfo.adminVaultSol,
+        adminVaultQuote: boundPoolInfo.adminVaultQuote,
         marketProgramId: PROGRAMIDS.OPENBOOK_MARKET,
         systemProgram: SystemProgram.programId,
         tokenProgram: TOKEN_PROGRAM_ID,
@@ -609,15 +618,15 @@ export class BoundPool {
         .accounts({
           signer: user.publicKey,
           poolMemeVault: input.memeVault,
-          poolWsolVault: input.wSolVault,
-          solMint: NATIVE_MINT,
+          poolQuoteVault: input.quoteVault,
+          quoteMint: this.quoteToken.mint,
           staking: stakingId,
           stakingPoolSignerPda: stakingSigner,
           raydiumLpMint: raydiumLpMint,
           raydiumAmm: ammId,
           raydiumAmmAuthority: raydiumAmmAuthority.publicKey,
           raydiumMemeVault: raydiumMemeVault,
-          raydiumWsolVault: raydiumWsolVault,
+          raydiumQuoteVault: raydiumWsolVault,
           marketProgramId: PROGRAMIDS.OPENBOOK_MARKET,
           systemProgram: SystemProgram.programId,
           tokenProgram: TOKEN_PROGRAM_ID,

@@ -1,8 +1,12 @@
-import { MINT_SIZE, TOKEN_PROGRAM_ID, createInitializeMint2Instruction, getMinimumBalanceForRentExemptMint } from '@solana/spl-token';
-import type { ConfirmOptions, Connection, PublicKey, Signer } from '@solana/web3.js';
-import { ComputeBudgetProgram, Keypair, sendAndConfirmTransaction, SystemProgram, Transaction } from '@solana/web3.js';
+import {
+  MINT_SIZE,
+  TOKEN_PROGRAM_ID,
+  createInitializeMintInstruction,
+} from "@solana/spl-token";
+import type { ConfirmOptions, Connection, PublicKey, Signer } from "@solana/web3.js";
+import { ComputeBudgetProgram, Keypair, sendAndConfirmTransaction, SystemProgram, Transaction } from "@solana/web3.js";
 
- /* Create and initialize a new mint
+/* Create and initialize a new mint
  *
  * @param connection      Connection to use
  * @param payer           Payer of the transaction and initialization fees
@@ -16,39 +20,48 @@ import { ComputeBudgetProgram, Keypair, sendAndConfirmTransaction, SystemProgram
  * @return Address of the new mint
  */
 export async function createMintWithPriority(
-    connection: Connection,
-    payer: Signer,
-    mintAuthority: PublicKey,
-    freezeAuthority: PublicKey | null,
-    decimals: number,
-    keypair = Keypair.generate(),
-    confirmOptions?: ConfirmOptions,
-    programId = TOKEN_PROGRAM_ID
+  connection: Connection,
+  payer: Signer,
+  mintAuthority: PublicKey,
+  freezeAuthority: PublicKey | null,
+  decimals: number,
+  keypair = Keypair.generate(),
+  confirmOptions?: ConfirmOptions,
 ): Promise<PublicKey> {
-    const lamports = await getMinimumBalanceForRentExemptMint(connection);
+  const modifyComputeUnits = ComputeBudgetProgram.setComputeUnitLimit({
+    units: 30000,
+  });
 
-    const modifyComputeUnits = ComputeBudgetProgram.setComputeUnitLimit({
-      units: 30000,
-    });
+  const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
+    microLamports: 6000000,
+  });
 
-    const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
-      microLamports: 6000000,
-    });
+  console.log("mintAuthority: " + mintAuthority.toBase58());
 
-    const transaction = new Transaction().add(
-       modifyComputeUnits,
-        addPriorityFee,
-        SystemProgram.createAccount({
-            fromPubkey: payer.publicKey,
-            newAccountPubkey: keypair.publicKey,
-            space: MINT_SIZE,
-            lamports,
-            programId,
-        }),
-        createInitializeMint2Instruction(keypair.publicKey, decimals, mintAuthority, freezeAuthority, programId)
-    );
+  const createMintAccountInstruction = SystemProgram.createAccount({
+		fromPubkey: payer.publicKey,
+		newAccountPubkey: keypair.publicKey,
+		lamports: await connection.getMinimumBalanceForRentExemption(MINT_SIZE),
+		space: MINT_SIZE,
+		programId: TOKEN_PROGRAM_ID,
+	});
 
-    await sendAndConfirmTransaction(connection, transaction, [payer, keypair], confirmOptions);
+  const initializeMintInstruction = createInitializeMintInstruction(
+		keypair.publicKey,
+		decimals,
+		mintAuthority,
+		null
+	);
+  
+  const transaction = new Transaction().add(
+    modifyComputeUnits,
+    addPriorityFee,
+    createMintAccountInstruction,
+    initializeMintInstruction
+  );
 
-    return keypair.publicKey;
+  const result = await sendAndConfirmTransaction(connection, transaction, [payer, keypair], confirmOptions);
+  console.log("create mint result: " + result);
+
+  return keypair.publicKey;
 }

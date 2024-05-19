@@ -1,6 +1,8 @@
 import { PublicKey } from "@solana/web3.js";
 import { BoundMerge, CloseArgs, StakingMerge } from "./types";
 import { MemechanClient } from "../MemechanClient";
+import { MemechanSol } from "../schema/types/memechan_sol";
+import { Program } from "@coral-xyz/anchor";
 
 export class MemeTicket {
   public constructor(
@@ -10,8 +12,12 @@ export class MemeTicket {
     //
   }
 
-  public async fetch() {
-    return this.client.memechanProgram.account.memeTicket.fetch(this.id);
+  public async fetch(program = this.client.memechanProgram) {
+    return program.account.memeTicket.fetch(this.id);
+  }
+
+  public static async all(program: Program<MemechanSol>) {
+    return program.account.memeTicket.all();
   }
 
   public async boundMerge(input: BoundMerge): Promise<MemeTicket> {
