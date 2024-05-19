@@ -1,6 +1,5 @@
 import { Token } from "@raydium-io/raydium-sdk";
 import {
-  createAccount,
   createAssociatedTokenAccountInstruction,
   createSyncNativeInstruction,
   getAssociatedTokenAddressSync,
@@ -31,6 +30,7 @@ import { StakingPool } from "../staking-pool/StakingPool";
 import {
   BoundPoolArgs,
   GetBuyMemeTransactionArgs,
+  GetCreateNewBondingPoolTransactionArgs,
   GetInitStakingPoolTransactionArgs,
   GetSellMemeTransactionArgs,
   GoLiveArgs,
@@ -43,7 +43,7 @@ import {
 import { findProgramAddress } from "../common/helpers";
 import { MemechanSol } from "../schema/types/memechan_sol";
 import { createMetadata } from "../token/createMetadata";
-import { createMintWithPriority } from "../token/createMintWithPriority";
+import { getCreateMintWithPriorityTransaction } from "../token/getCreateMintWithPriorityTransaction";
 import { getCreateAccountInstructions } from "../utils/getCreateAccountInstruction";
 import { getSendAndConfirmTransactionMethod } from "../utils/getSendAndConfirmTransactionMethod";
 import { retry } from "../utils/retry";
@@ -89,44 +89,55 @@ export class BoundPool {
     )[0];
   }
 
-  public static async new(args: BoundPoolArgs): Promise<BoundPool> {
-    const { admin, payer, signer, client, quoteToken } = args;
+  public static async getCreateNewBondingPoolTransaction(
+    args: GetCreateNewBondingPoolTransactionArgs,
+  ): Promise<{ transaction: Transaction; memeMint: PublicKey; poolSolVault: PublicKey; launchVault: PublicKey }> {
+    const { admin, payer, signer, client, quoteToken, transaction = new Transaction() } = args;
     const { connection, memechanProgram } = client;
 
     const memeMintKeypair = Keypair.generate();
-    console.log("quoteToken.mint: " + quoteToken.mint);
+    const memeMint = memeMintKeypair.publicKey;
     const id = this.findBoundPoolPda(memeMintKeypair.publicKey, quoteToken.mint, args.client.memechanProgram.programId);
     const poolSigner = BoundPool.findSignerPda(id, args.client.memechanProgram.programId);
-    console.log("poolSigner: " + poolSigner.toBase58());
 
-    const memeMint = await createMintWithPriority(connection, payer, poolSigner, null, 6, memeMintKeypair, {
-      skipPreflight: true,
-      commitment: "confirmed",
-    });
-    console.log("memeMint: " + memeMint.toBase58());
+    const createMemeMintWithPriorityInstructions = (
+      await getCreateMintWithPriorityTransaction(connection, payer, poolSigner, null, 6, memeMintKeypair)
+    ).instructions;
 
+    transaction.add(...createMemeMintWithPriorityInstructions);
+
+    // TODO: Find out how to create bonding pool and admin sol vault in one transaction
     const adminSolVault = (
       await getOrCreateAssociatedTokenAccount(connection, payer, quoteToken.mint, admin, true, "confirmed", {
         skipPreflight: true,
       })
     ).address;
-    const poolSolVaultid = Keypair.generate();
-    const poolSolVault = await createAccount(connection, payer, quoteToken.mint, poolSigner, poolSolVaultid, {
-      skipPreflight: true,
-      commitment: "confirmed",
-    });
 
-    const launchVaultid = Keypair.generate();
-    const launchVault = await createAccount(connection, payer, memeMint, poolSigner, launchVaultid, {
-      skipPreflight: true,
-      commitment: "confirmed",
-    });
-
-    console.log(
-      `pool id: ${id.toBase58()} memeMint: ${memeMint.toBase58()}, adminSolVault: ${adminSolVault.toBase58()}, poolSolVault: ${poolSolVault.toBase58()}, launchVault: ${launchVault.toBase58()}`,
+    const poolSolVaultId = Keypair.generate();
+    const poolSolVault = poolSolVaultId.publicKey;
+    const createPoolSolVaultInstructions = await getCreateAccountInstructions(
+      connection,
+      payer,
+      quoteToken.mint,
+      poolSigner,
+      poolSolVaultId,
     );
 
-    const result = await memechanProgram.methods
+    transaction.add(...createPoolSolVaultInstructions);
+
+    const launchVaultId = Keypair.generate();
+    const launchVault = launchVaultId.publicKey;
+    const createLaunchVaultInstructions = await getCreateAccountInstructions(
+      connection,
+      payer,
+      memeMint,
+      poolSigner,
+      launchVaultId,
+    );
+
+    transaction.add(...createLaunchVaultInstructions);
+
+    const createMemeAndPoolInstruction = await memechanProgram.methods
       .new()
       .accounts({
         adminQuoteVault: adminSolVault,
@@ -140,10 +151,34 @@ export class BoundPool {
         tokenProgram: TOKEN_PROGRAM_ID,
         systemProgram: SystemProgram.programId,
       })
-      .signers([signer])
-      .rpc({ skipPreflight: true });
+      .instruction();
 
-    console.log("new pool tx result: " + result);
+    transaction.add(createMemeAndPoolInstruction);
+
+    return { transaction, memeMint, poolSolVault, launchVault };
+  }
+
+  public static async new(args: BoundPoolArgs): Promise<BoundPool> {
+    const { payer, signer, client, quoteToken } = args;
+    const { connection, memechanProgram } = client;
+
+    const {
+      transaction: createPoolTransaction,
+      memeMint,
+      poolSolVault,
+      launchVault,
+    } = await this.getCreateNewBondingPoolTransaction(args);
+
+    const sendAndConfirmCreatePoolTransaction = getSendAndConfirmTransactionMethod({
+      connection,
+      signers: [signer],
+      transaction: createPoolTransaction,
+    });
+
+    await retry({ fn: sendAndConfirmCreatePoolTransaction, functionName: "new" });
+
+    const id = this.findBoundPoolPda(memeMint, quoteToken.mint, memechanProgram.programId);
+    const poolSigner = BoundPool.findSignerPda(id, memechanProgram.programId);
 
     await createMetadata(client, { payer, mint: memeMint, poolSigner, poolId: id, metadata: args.tokenMetadata });
 
