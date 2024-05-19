@@ -1,6 +1,11 @@
 export { BoundPool, BoundPoolFields, BoundPoolJSON } from "./BoundPool"
 export { MemeTicket, MemeTicketFields, MemeTicketJSON } from "./MemeTicket"
 export { StakingPool, StakingPoolFields, StakingPoolJSON } from "./StakingPool"
+export {
+  TargetConfig,
+  TargetConfigFields,
+  TargetConfigJSON,
+} from "./TargetConfig"
 export { AmmConfig, AmmConfigFields, AmmConfigJSON } from "./AmmConfig"
 export { AmmInfo, AmmInfoFields, AmmInfoJSON } from "./AmmInfo"
 export {
