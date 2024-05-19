@@ -1,6 +1,7 @@
 import { Token } from "@raydium-io/raydium-sdk";
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
+  createAccount,
   createAssociatedTokenAccountInstruction,
   createSyncNativeInstruction,
   getAssociatedTokenAddressSync,
@@ -48,6 +49,8 @@ import { getCreateMintWithPriorityTransaction } from "../token/getCreateMintWith
 import { getCreateAccountInstructions } from "../utils/getCreateAccountInstruction";
 import { getSendAndConfirmTransactionMethod } from "../utils/getSendAndConfirmTransactionMethod";
 import { retry } from "../utils/retry";
+import { createMintWithPriority } from "../token/createMintWithPriority";
+import { CoinAPI } from "../coin/CoinAPI";
 
 export class BoundPool {
   private constructor(
@@ -157,7 +160,7 @@ export class BoundPool {
     transaction.add(...createLaunchVaultInstructions);
 
     const createPoolInstruction = await memechanProgram.methods
-      .new()
+      .newPool()
       .accounts({
         adminQuoteVault: adminQuoteVault,
         memeVault: launchVault,
@@ -200,6 +203,74 @@ export class BoundPool {
     const poolSigner = BoundPool.findSignerPda(id, memechanProgram.programId);
 
     await createMetadata(client, { payer, mint: memeMint, poolSigner, poolId: id, metadata: args.tokenMetadata });
+
+    return new BoundPool(id, signer, poolSolVault, launchVault, client, quoteToken);
+  }
+
+  public static async slowNew(args: BoundPoolArgs): Promise<BoundPool> {
+    const { admin, payer, signer, client, quoteToken } = args;
+    const { connection, memechanProgram } = client;
+
+    const memeMintKeypair = Keypair.generate();
+    console.log("quoteToken.mint: " + quoteToken.mint);
+    const id = this.findBoundPoolPda(memeMintKeypair.publicKey, quoteToken.mint, args.client.memechanProgram.programId);
+    const poolSigner = BoundPool.findSignerPda(id, args.client.memechanProgram.programId);
+    console.log("poolSigner: " + poolSigner.toBase58());
+
+    const memeMint = await createMintWithPriority(connection, payer, poolSigner, null, 6, memeMintKeypair, {
+      skipPreflight: true,
+      commitment: "confirmed",
+    });
+    console.log("memeMint: " + memeMint.toBase58());
+    
+    const adminSolVault = (
+      await getOrCreateAssociatedTokenAccount(connection, payer, quoteToken.mint, admin, true, "confirmed", {
+        skipPreflight: true,
+      })
+    ).address;
+    const poolSolVaultid = Keypair.generate();
+    const poolSolVault = await createAccount(connection, payer, quoteToken.mint, poolSigner, poolSolVaultid, {
+      skipPreflight: true,
+      commitment: "confirmed",
+    });
+
+    const launchVaultid = Keypair.generate();
+    const launchVault = await createAccount(connection, payer, memeMint, poolSigner, launchVaultid, {
+      skipPreflight: true,
+      commitment: "confirmed",
+    });
+
+    console.log(
+      `pool id: ${id.toBase58()} memeMint: ${memeMint.toBase58()}, adminSolVault: ${adminSolVault.toBase58()}, poolSolVault: ${poolSolVault.toBase58()}, launchVault: ${launchVault.toBase58()}`,
+    );
+
+    const newPoolTxDigest = await memechanProgram.methods
+      .newPool()
+      .accounts({
+        adminQuoteVault: adminSolVault,
+        memeVault: launchVault,
+        quoteVault: poolSolVault,
+        memeMint: memeMint,
+        pool: id,
+        poolSigner: poolSigner,
+        sender: signer.publicKey,
+        quoteMint: quoteToken.mint,
+        tokenProgram: TOKEN_PROGRAM_ID,
+        systemProgram: SystemProgram.programId,
+      })
+      .signers([signer])
+      .rpc({ skipPreflight: true });
+
+    console.log("new pool tx result: " + newPoolTxDigest);
+
+    await createMetadata(client, { payer, mint: memeMint, poolSigner, poolId: id, metadata: args.tokenMetadata });
+
+    // const coinApi = new CoinAPI();
+    // const createCoinResponse = coinApi.({
+    //   txDigest: newPoolTxDigest,
+    // });
+
+    // console.log("createCoinResponse: " + JSON.stringify(createCoinResponse));
 
     return new BoundPool(id, signer, poolSolVault, launchVault, client, quoteToken);
   }
