@@ -12,6 +12,7 @@ export interface New2Accounts {
   quoteMint: PublicKey
   adminQuoteVault: PublicKey
   memeVault: PublicKey
+  targetConfig: PublicKey
   poolSigner: PublicKey
   systemProgram: PublicKey
   tokenProgram: PublicKey
@@ -26,6 +27,7 @@ export function new2(accounts: New2Accounts) {
     { pubkey: accounts.quoteMint, isSigner: false, isWritable: false },
     { pubkey: accounts.adminQuoteVault, isSigner: false, isWritable: false },
     { pubkey: accounts.memeVault, isSigner: false, isWritable: true },
+    { pubkey: accounts.targetConfig, isSigner: false, isWritable: false },
     { pubkey: accounts.poolSigner, isSigner: false, isWritable: false },
     { pubkey: accounts.systemProgram, isSigner: false, isWritable: false },
     { pubkey: accounts.tokenProgram, isSigner: false, isWritable: false },

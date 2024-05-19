@@ -9,14 +9,13 @@ export interface AddFeesAccounts {
   memeVault: PublicKey
   quoteVault: PublicKey
   stakingSignerPda: PublicKey
-  aldrinPoolAcc: PublicKey
-  raydiumLpMint: PublicKey
-  poolLpWallet: PublicKey
+  stakingLpWallet: PublicKey
   signer: PublicKey
   raydiumAmm: PublicKey
   raydiumAmmAuthority: PublicKey
   raydiumMemeVault: PublicKey
   raydiumQuoteVault: PublicKey
+  raydiumLpMint: PublicKey
   openOrders: PublicKey
   targetOrders: PublicKey
   marketAccount: PublicKey
@@ -36,9 +35,7 @@ export function addFees(accounts: AddFeesAccounts) {
     { pubkey: accounts.memeVault, isSigner: false, isWritable: true },
     { pubkey: accounts.quoteVault, isSigner: false, isWritable: true },
     { pubkey: accounts.stakingSignerPda, isSigner: false, isWritable: false },
-    { pubkey: accounts.aldrinPoolAcc, isSigner: false, isWritable: true },
-    { pubkey: accounts.raydiumLpMint, isSigner: false, isWritable: true },
-    { pubkey: accounts.poolLpWallet, isSigner: false, isWritable: true },
+    { pubkey: accounts.stakingLpWallet, isSigner: false, isWritable: true },
     { pubkey: accounts.signer, isSigner: true, isWritable: true },
     { pubkey: accounts.raydiumAmm, isSigner: false, isWritable: true },
     {
@@ -48,6 +45,7 @@ export function addFees(accounts: AddFeesAccounts) {
     },
     { pubkey: accounts.raydiumMemeVault, isSigner: false, isWritable: true },
     { pubkey: accounts.raydiumQuoteVault, isSigner: false, isWritable: true },
+    { pubkey: accounts.raydiumLpMint, isSigner: false, isWritable: true },
     { pubkey: accounts.openOrders, isSigner: false, isWritable: true },
     { pubkey: accounts.targetOrders, isSigner: false, isWritable: true },
     { pubkey: accounts.marketAccount, isSigner: false, isWritable: true },

@@ -1,3 +1,5 @@
+import * as DecimalError from "./DecimalError"
+
 export { Config, ConfigFields, ConfigJSON } from "./Config"
 export { Fees, FeesFields, FeesJSON } from "./Fees"
 export { TokenLimit, TokenLimitFields, TokenLimitJSON } from "./TokenLimit"
@@ -12,3 +14,7 @@ export {
   VestingConfigJSON,
 } from "./VestingConfig"
 export { VestingData, VestingDataFields, VestingDataJSON } from "./VestingData"
+export { DecimalError }
+
+export type DecimalErrorKind = DecimalError.MathOverflow
+export type DecimalErrorJSON = DecimalError.MathOverflowJSON
