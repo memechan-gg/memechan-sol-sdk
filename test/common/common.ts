@@ -5,6 +5,7 @@ import { MemechanClient } from "../../src/MemechanClient";
 import { MEMECHAN_PROGRAM_ID } from "../../src/config/config";
 
 export const admin = new PublicKey(ADMIN_PUB_KEY);
+export const adminKeypair = Keypair.fromSecretKey(Buffer.from(JSON.parse(ADMIN_SECRET_KEY)));
 export const payer = Keypair.fromSecretKey(Buffer.from(JSON.parse(TEST_USER_SECRET_KEY)));
 export const wallet = new NodeWallet(payer);
 export const client = new MemechanClient(
