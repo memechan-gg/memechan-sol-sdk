@@ -42,7 +42,7 @@ import { findProgramAddress } from "../common/helpers";
 import { MemechanSol } from "../schema/types/memechan_sol";
 import { createMetadata } from "../token/createMetadata";
 import { createMintWithPriority } from "../token/createMintWithPriority";
-import { sleepTime } from "../utils/util";
+import { retry } from "../utils/retry";
 
 export class BoundPool {
   private constructor(
@@ -146,17 +146,34 @@ export class BoundPool {
     return new BoundPool(id, signer, poolSolVault, launchVault, client, quoteToken);
   }
 
-  public async fetch(program = this.client.memechanProgram, accountId = this.id, retries = 3) {
-    for (let i = 0; i < retries; i++) {
-      try {
-        const accountInfo = await program.account.boundPool.fetch(accountId, "confirmed");
+  /**
+   * Fetches the account information.
+   *
+   * @param {Object} [program=this.client.memechanProgram] - The program to use for fetching the account.
+   * @param {string} [accountId=this.id] - The ID of the account to fetch.
+   * @returns {Promise<T>} - The account information.
+   */
+  async fetch(program = this.client.memechanProgram, accountId = this.id) {
+    const accountInfo = await program.account.boundPool.fetch(accountId, "confirmed");
+    return accountInfo;
+  }
 
-        return accountInfo;
-      } catch (error) {
-        if (i === retries - 1) throw error;
-        await sleepTime(1000); // wait 1 second before retrying
-      }
-    }
+  /**
+   * Fetches the account information with retry logic.
+   *
+   * @param {Object} [program=this.client.memechanProgram] - The program to use for fetching the account.
+   * @param {string} [accountId=this.id] - The ID of the account to fetch.
+   * @param {number} [retries=3] - The number of retry attempts.
+   * @param {number} [delay=1000] - The delay between retry attempts in milliseconds.
+   * @returns {Promise<T>} - The account information.
+   */
+  async fetchWithRetry(program = this.client.memechanProgram, accountId = this.id, retries = 3, delay = 1000) {
+    return retry({
+      fn: () => this.fetch(program, accountId),
+      retries,
+      delay,
+      functionName: "fetch",
+    });
   }
 
   public static async all(program: Program<MemechanSol>) {
