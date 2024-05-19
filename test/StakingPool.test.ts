@@ -10,7 +10,7 @@ import { StakingPool } from "../src/staking-pool/StakingPool";
 
 describe("StakingPool", () => {
 
-  it.skip("all", async() => {
+  it("all", async() => {
     const payer = Keypair.fromSecretKey(Buffer.from(JSON.parse(process.env.TEST_USER_SECRET_KEY as string)));
     console.log("payer: " + payer.publicKey.toString());
 

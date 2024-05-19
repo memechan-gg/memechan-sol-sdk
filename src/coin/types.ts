@@ -25,11 +25,3 @@ export type UploadFileResponse = {
   Timestamp: string;
   isDuplicate: boolean;
 };
-
-export type CreateCoinResponse = {
-  coin: object;
-};
-
-export type CreateCoinRequestBody = {
-  txDigest: string;
-}

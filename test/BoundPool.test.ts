@@ -7,9 +7,7 @@ import NodeWallet from "@coral-xyz/anchor/dist/cjs/nodewallet";
 import { NATIVE_MINT, createWrappedNativeAccount, getAccount } from "@solana/spl-token";
 import { MemeTicket } from "../src/memeticket/MemeTicket";
 import { Token } from "@raydium-io/raydium-sdk";
-import {BE_URL, SLERF_MINT} from "../src/common/constants";
-import { Auth } from "../src/auth/Auth";
-import { signMessage } from "../src/utils/signMessage";
+import {SLERF_MINT} from "../src/common/consts";
 
 const DUMMY_TOKEN_METADATA = {
         name: "Best Token Ever",
@@ -22,22 +20,8 @@ const DUMMY_TOKEN_METADATA = {
       };
 
 describe("BoundPool", () => {
-  beforeEach(async () => {
-    const authService = new Auth(BE_URL);
-      const keypair = new Keypair();
-      const messageToSign = await authService.requestMessageToSign(keypair.publicKey.toBase58());
-      const signature = await signMessage(messageToSign, keypair);
-
-      // This signature const should be cached.
-      const credentials = await authService.refreshSession({
-          walletAddress: keypair.publicKey.toBase58(),
-          signedMessage: signature,
-      });
-
-      console.log(credentials);
-  });
-
-  it.skip("creates bound pool", async () => {
+  it("creates bound pool", async () => {
+      return;
       const admin = new PublicKey(process.env.ADMIN_PUB_KEY as string);
       const payer =  Keypair.fromSecretKey(Buffer.from(JSON.parse(process.env.TEST_USER_SECRET_KEY as string)));
       const wallet = new NodeWallet(payer);
@@ -46,9 +30,10 @@ describe("BoundPool", () => {
       await sleep(1000);
       const info = await boundPool.fetch();
       console.log(info);
-    }, 150000)
+    }, 90000)
 
-  it.skip("all", async() => {
+  it("all", async() => {
+    return;
     const payer = Keypair.fromSecretKey(Buffer.from(JSON.parse(process.env.TEST_USER_SECRET_KEY as string)));
     console.log("payer: " + payer.publicKey.toString());
 

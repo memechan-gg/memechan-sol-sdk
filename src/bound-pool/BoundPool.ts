@@ -31,7 +31,6 @@ import { findProgramAddress } from "../common/helpers";
 import { createMintWithPriority } from "../token/createMintWithPriority";
 import { MemechanSol } from "../schema/types/memechan_sol";
 import { createMetadata } from "../token/createMetadata";
-import { CoinAPI } from "../coin/CoinAPI";
 
 export class BoundPool {
   private constructor(
@@ -111,7 +110,7 @@ export class BoundPool {
       `pool id: ${id.toBase58()} memeMint: ${memeMint.toBase58()}, adminSolVault: ${adminSolVault.toBase58()}, poolSolVault: ${poolSolVault.toBase58()}, launchVault: ${launchVault.toBase58()}`,
     );
 
-    const newPoolTxDigest = await memechanProgram.methods
+    const result = await memechanProgram.methods
       .new()
       .accounts({
         adminQuoteVault: adminSolVault,
@@ -128,16 +127,9 @@ export class BoundPool {
       .signers([signer])
       .rpc({ skipPreflight: true });
 
-    console.log("new pool tx result: " + newPoolTxDigest);
+    console.log("new pool tx result: " + result);
 
     await createMetadata(client, { payer, mint: memeMint, poolSigner, poolId: id, metadata: args.tokenMetadata });
-
-    const coinApi = new CoinAPI();
-    const createCoinResponse = coinApi.createCoin({
-      txDigest: newPoolTxDigest,
-    });
-
-    console.log("createCoinResponse: " + JSON.stringify(createCoinResponse));
 
     return new BoundPool(id, signer, poolSolVault, launchVault, client, quoteToken);
   }
