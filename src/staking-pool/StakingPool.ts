@@ -1,9 +1,19 @@
-import { NATIVE_MINT, TOKEN_PROGRAM_ID, createAccount } from "@solana/spl-token";
-import { PublicKey, Keypair, AccountMeta } from "@solana/web3.js";
-import { UnstakeArgs, WithdrawFeesArgs } from "./types";
+import { Program } from "@coral-xyz/anchor";
+import { NATIVE_MINT, TOKEN_PROGRAM_ID } from "@solana/spl-token";
+import { AccountMeta, Keypair, PublicKey, Transaction } from "@solana/web3.js";
 import { MemechanClient } from "../MemechanClient";
 import { MemechanSol } from "../schema/types/memechan_sol";
-import { Program } from "@coral-xyz/anchor";
+import { getCreateAccountInstructions } from "../utils/getCreateAccountInstruction";
+import { getSendAndConfirmTransactionMethod } from "../utils/getSendAndConfirmTransactionMethod";
+import { retry } from "../utils/retry";
+import {
+  AddFeesArgs,
+  GetAddFeesTransactionArgs,
+  GetUnstakeTransactionArgs,
+  GetWithdrawFeesTransactionArgs,
+  UnstakeArgs,
+  WithdrawFeesArgs,
+} from "./types";
 
 export class StakingPool {
   constructor(
@@ -15,11 +25,11 @@ export class StakingPool {
     return PublicKey.findProgramAddressSync([Buffer.from("staking"), publicKey.toBytes()], memechanProgramId)[0];
   }
 
-  public async addFees(ammPool: undefined, payer: Keypair) {
+  public async getAddFeesTransaction({ transaction }: GetAddFeesTransactionArgs): Promise<Transaction> {
+    const tx = transaction ?? new Transaction();
     const stakingInfo = await this.fetch();
-    //const ammInfo = await ammPool.fetch();
 
-    await this.client.memechanProgram.methods
+    const addFeesInstruction = await this.client.memechanProgram.methods
       .addFees()
       .accounts({
         memeVault: stakingInfo.memeVault,
@@ -28,30 +38,59 @@ export class StakingPool {
         stakingSignerPda: this.findSignerPda(),
         tokenProgram: TOKEN_PROGRAM_ID,
       })
-      .signers([payer])
-      .rpc();
+      .instruction();
+
+    tx.add(addFeesInstruction);
+
+    return tx;
   }
 
-  public async unstake(args: UnstakeArgs): Promise<[PublicKey, PublicKey]> {
+  public async addFees({ payer, transaction }: AddFeesArgs): Promise<void> {
+    const addFeesTransaction = await this.getAddFeesTransaction({ transaction });
+
+    const sendAndConfirmAddFeesTransaction = getSendAndConfirmTransactionMethod({
+      connection: this.client.connection,
+      signers: [payer],
+      transaction: addFeesTransaction,
+    });
+
+    await retry({
+      fn: sendAndConfirmAddFeesTransaction,
+      functionName: "addFees",
+    });
+  }
+
+  public async getUnstakeTransaction(
+    args: GetUnstakeTransactionArgs,
+  ): Promise<{ transaction: Transaction; memeAccountPublicKey: PublicKey; wSolAccountPublicKey: PublicKey }> {
+    const tx = args.transaction ?? new Transaction();
     const stakingInfo = await this.fetch();
 
-    const memeAcc = await createAccount(
+    const memeAccountKeypair = Keypair.generate();
+    const memeAccountPublicKey = memeAccountKeypair.publicKey;
+    const createMemeAccountInstructions = await getCreateAccountInstructions(
       this.client.connection,
       args.user,
       stakingInfo.memeMint,
       args.user.publicKey,
-      Keypair.generate(),
+      memeAccountKeypair,
     );
 
-    const wsolAcc = await createAccount(
+    tx.add(...createMemeAccountInstructions);
+
+    const wSolAccountKeypair = Keypair.generate();
+    const wSolAccountPublicKey = wSolAccountKeypair.publicKey;
+    const createWSolAccountInstructions = await getCreateAccountInstructions(
       this.client.connection,
       args.user,
       NATIVE_MINT,
       args.user.publicKey,
-      Keypair.generate(),
+      wSolAccountKeypair,
     );
 
-    await this.client.memechanProgram.methods
+    tx.add(...createWSolAccountInstructions);
+
+    const unstakeInstruction = await this.client.memechanProgram.methods
       .unstake(args.amount)
       .accounts({
         memeTicket: args.ticket.id,
@@ -60,36 +99,69 @@ export class StakingPool {
         memeVault: stakingInfo.memeVault,
         quoteVault: stakingInfo.quoteVault,
         staking: this.id,
-        userMeme: memeAcc,
-        userQuote: wsolAcc,
+        userMeme: memeAccountPublicKey,
+        userQuote: wSolAccountPublicKey,
         tokenProgram: TOKEN_PROGRAM_ID,
       })
-      .signers([args.user])
-      .rpc();
+      .instruction();
 
-    return [memeAcc, wsolAcc];
+    tx.add(unstakeInstruction);
+
+    return { transaction: tx, memeAccountPublicKey, wSolAccountPublicKey };
   }
 
-  public async withdrawFees(args: WithdrawFeesArgs): Promise<[PublicKey, PublicKey]> {
+  public async unstake(
+    args: UnstakeArgs,
+  ): Promise<{ memeAccountPublicKey: PublicKey; wSolAccountPublicKey: PublicKey }> {
+    const { memeAccountPublicKey, transaction, wSolAccountPublicKey } = await this.getUnstakeTransaction(args);
+
+    const sendAndConfirmUnstakeTransaction = getSendAndConfirmTransactionMethod({
+      connection: this.client.connection,
+      signers: [args.user],
+      transaction,
+    });
+
+    await retry({
+      fn: sendAndConfirmUnstakeTransaction,
+      functionName: "unstake",
+    });
+
+    return { memeAccountPublicKey, wSolAccountPublicKey };
+  }
+
+  public async getWithdrawFeesTransaction(args: GetWithdrawFeesTransactionArgs): Promise<{
+    transaction: Transaction;
+    memeAccountPublicKey: PublicKey;
+    wSolAccountPublicKey: PublicKey;
+  }> {
+    const tx = args.transaction ?? new Transaction();
     const stakingInfo = await this.fetch();
 
-    const memeAcc = await createAccount(
+    const memeAccountKeypair = Keypair.generate();
+    const memeAccountPublicKey = memeAccountKeypair.publicKey;
+    const createMemeAccountInstructions = await getCreateAccountInstructions(
       this.client.connection,
       args.user,
       stakingInfo.memeMint,
       args.user.publicKey,
-      Keypair.generate(),
+      memeAccountKeypair,
     );
 
-    const wsolAcc = await createAccount(
+    tx.add(...createMemeAccountInstructions);
+
+    const wSolAccountKeypair = Keypair.generate();
+    const wSolAccountPublicKey = wSolAccountKeypair.publicKey;
+    const createWSolAccountInstructions = await getCreateAccountInstructions(
       this.client.connection,
       args.user,
       NATIVE_MINT,
       args.user.publicKey,
-      Keypair.generate(),
+      wSolAccountKeypair,
     );
 
-    await this.client.memechanProgram.methods
+    tx.add(...createWSolAccountInstructions);
+
+    const withdrawFeesInstruction = await this.client.memechanProgram.methods
       .withdrawFees()
       .accounts({
         memeTicket: args.ticket.id,
@@ -97,15 +169,35 @@ export class StakingPool {
         memeVault: stakingInfo.memeVault,
         quoteVault: stakingInfo.quoteVault,
         staking: this.id,
-        userMeme: memeAcc,
-        userQuote: wsolAcc,
+        userMeme: memeAccountPublicKey,
+        userQuote: wSolAccountPublicKey,
         signer: args.user.publicKey,
         tokenProgram: TOKEN_PROGRAM_ID,
       })
-      .signers([args.user])
-      .rpc();
+      .instruction();
 
-    return [memeAcc, wsolAcc];
+    tx.add(withdrawFeesInstruction);
+
+    return { transaction: tx, memeAccountPublicKey, wSolAccountPublicKey };
+  }
+
+  public async withdrawFees(
+    args: WithdrawFeesArgs,
+  ): Promise<{ memeAccountPublicKey: PublicKey; wSolAccountPublicKey: PublicKey }> {
+    const { memeAccountPublicKey, transaction, wSolAccountPublicKey } = await this.getWithdrawFeesTransaction(args);
+
+    const sendAndConfirmWithdrawFeesTransaction = getSendAndConfirmTransactionMethod({
+      connection: this.client.connection,
+      signers: [args.user],
+      transaction,
+    });
+
+    await retry({
+      fn: sendAndConfirmWithdrawFeesTransaction,
+      functionName: "withdrawFees",
+    });
+
+    return { memeAccountPublicKey, wSolAccountPublicKey };
   }
 
   private async fetch(program = this.client.memechanProgram) {
