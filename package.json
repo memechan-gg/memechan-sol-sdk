@@ -14,6 +14,17 @@
   "engines": {
     "node": "20"
   },
+  "scripts": {
+    "test": "jest",
+    "audit": "yarn audit --groups dependencies",
+    "format": "prettier --write src/**/*.ts",
+    "lint": "tsc --noEmit && eslint --ext .ts",
+    "build": "yarn lint && tsup",
+    "build:watch": "tsc --watch",
+    "prettier-format": "prettier --config .prettierrc 'src/**/*.ts' --write",
+    "codegen": "yarn run anchor-client-gen src/schema/idl/memechan_sol.json src/schema/codegen/",
+    "deploy": "yarn lint && yarn build && yarn publish --access restricted"
+  },
   "dependencies": {
     "@coral-xyz/anchor": "0.29.0",
     "@raydium-io/raydium-sdk": "^1.3.1-beta.52",
@@ -21,8 +32,7 @@
     "@solana/web3.js": "^1.91.8",
     "bn.js": "^5.2.1",
     "bs58": "^5.0.0",
-    "dotenv": "^16.4.5",
-    "deploy": "yarn lint && yarn build && yarn publish --access restricted"
+    "dotenv": "^16.4.5"
   },
   "devDependencies": {
     "@types/bn.js": "^5.1.5",
@@ -36,16 +46,6 @@
     "ts-jest": "^29.1.2",
     "tsup": "^8.0.2",
     "typescript": "^5.4.5"
-  },
-  "scripts": {
-    "test": "jest",
-    "audit": "yarn audit --groups dependencies",
-    "format": "prettier --write src/**/*.ts",
-    "lint": "tsc --noEmit && eslint --ext .ts",
-    "build": "yarn lint && tsup",
-    "build:watch": "tsc --watch",
-    "prettier-format": "prettier --config .prettierrc 'src/**/*.ts' --write",
-    "codegen": "yarn run anchor-client-gen src/schema/idl/memechan_sol.json src/schema/codegen/"
   },
   "keywords": [],
   "author": "0xunreal",
