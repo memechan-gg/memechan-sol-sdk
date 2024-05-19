@@ -54,11 +54,15 @@ export interface GoLiveArgs {
 }
 
 export interface InitStakingPoolArgs {
-  pool: PublicKey;
+  pool?: PublicKey;
   user: Keypair;
   payer: Signer;
-  boundPoolInfo: object;
+  // TODO: Add type for `boundPoolInfo`
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  boundPoolInfo: any;
 }
+
+export type GetInitStakingPoolTransactionArgs = InitStakingPoolArgs & { transaction?: Transaction };
 
 export interface BoundPoolArgs {
   admin: PublicKey;
