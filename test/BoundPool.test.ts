@@ -3,6 +3,7 @@ import { Token } from "@raydium-io/raydium-sdk";
 import { BoundPool } from "../src/bound-pool/BoundPool";
 import { sleep } from "../src/common/helpers";
 import { admin, client, payer } from "./common/common";
+import { FEE_DESTINATION_ID } from "./common/env";
 
 const DUMMY_TOKEN_METADATA = {
   name: "Best Token Ever",
@@ -83,6 +84,7 @@ describe("BoundPool", () => {
       payer: payer,
       user: payer,
       boundPoolInfo,
+      feeDestinationWalletAddress: FEE_DESTINATION_ID,
       memeVault: stakingMemeVault,
       quoteVault: stakingWSolVault,
     });
