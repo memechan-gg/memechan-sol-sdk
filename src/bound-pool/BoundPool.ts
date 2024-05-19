@@ -525,7 +525,7 @@ export class BoundPool {
 
     console.log("goLive.boundPoolInfo: " + JSON.stringify(boundPoolInfo));
 
-    const baseTokenInfo = { mint: boundPoolInfo.memeReserve.mint, decimals: 6 };
+    const baseTokenInfo = new Token(TOKEN_PROGRAM_ID, new PublicKey(boundPoolInfo.memeReserve.mint), 6);
     //const marketId = new PublicKey("AHZCwnUuiB3CUEyk2nybsU5c85WVDTHVP2UwuQwpVaR1");
     const quoteTokenInfo = Token.WSOL;
 
