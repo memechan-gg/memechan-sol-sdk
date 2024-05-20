@@ -10,7 +10,8 @@ export interface SwapYArgs {
   user: Keypair;
   pool: PublicKey;
   userSolAcc?: PublicKey;
-  solAmountIn: BN;
+  quoteAmountIn: BN;
+  quoteMint: PublicKey;
   memeTokensOut: BN;
 }
 
