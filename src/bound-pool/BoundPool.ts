@@ -32,7 +32,7 @@ import { StakingPool } from "../staking-pool/StakingPool";
 import {
   BoundPoolArgs,
   GetBuyMemeTransactionArgs,
-  GetCreateNewBondingPoolTransactionArgs,
+  GetCreateNewBondingPoolAndTokenTransactionArgs,
   GetInitStakingPoolTransactionArgs,
   GetSellMemeTransactionArgs,
   GoLiveArgs,
@@ -45,7 +45,7 @@ import {
 import { findProgramAddress } from "../common/helpers";
 import { MEMECHAN_QUOTE_TOKEN, MEMECHAN_TARGET_CONFIG } from "../config/config";
 import { MemechanSol } from "../schema/types/memechan_sol";
-import { createMetadata } from "../token/createMetadata";
+import { createMetadata, getCreateMetadataTransaction } from "../token/createMetadata";
 import { createMintWithPriority } from "../token/createMintWithPriority";
 import { getCreateMintWithPriorityTransaction } from "../token/getCreateMintWithPriorityTransaction";
 import { getCreateAccountInstructions } from "../utils/getCreateAccountInstruction";
@@ -93,10 +93,19 @@ export class BoundPool {
     )[0];
   }
 
-  public static async getCreateNewBondingPoolTransaction(
-    args: GetCreateNewBondingPoolTransactionArgs,
+  public static async getCreateNewBondingPoolAndTokenTransaction(
+    args: GetCreateNewBondingPoolAndTokenTransactionArgs,
   ): Promise<{ transaction: Transaction; memeMint: PublicKey; poolSolVault: PublicKey; launchVault: PublicKey }> {
-    const { admin, payer, signer, client, quoteToken, transaction = new Transaction(), adminSolPublicKey } = args;
+    const {
+      admin,
+      payer,
+      signer,
+      client,
+      quoteToken,
+      transaction = new Transaction(),
+      adminSolPublicKey,
+      tokenMetadata,
+    } = args;
     const { connection, memechanProgram } = client;
 
     const memeMintKeypair = Keypair.generate();
@@ -177,6 +186,18 @@ export class BoundPool {
 
     transaction.add(createPoolInstruction);
 
+    const createTokenInstructions = (
+      await getCreateMetadataTransaction(client, {
+        payer,
+        mint: memeMint,
+        poolSigner,
+        poolId: id,
+        metadata: tokenMetadata,
+      })
+    ).instructions;
+
+    transaction.add(...createTokenInstructions);
+
     return { transaction, memeMint, poolSolVault, launchVault };
   }
 
@@ -185,24 +206,19 @@ export class BoundPool {
     const { connection, memechanProgram } = client;
 
     const {
-      transaction: createPoolTransaction,
+      transaction: createPoolAndTokenTransaction,
       memeMint,
       poolSolVault,
       launchVault,
-    } = await this.getCreateNewBondingPoolTransaction(args);
+    } = await this.getCreateNewBondingPoolAndTokenTransaction(args);
 
-    const sendAndConfirmCreatePoolTransaction = getSendAndConfirmTransactionMethod({
-      connection,
-      signers: [signer],
-      transaction: createPoolTransaction,
+    const signature = await sendAndConfirmTransaction(connection, createPoolAndTokenTransaction, [signer, payer], {
+      commitment: "confirmed",
+      skipPreflight: true,
     });
-
-    await retry({ fn: sendAndConfirmCreatePoolTransaction, functionName: "new" });
+    console.log("Create new pool and token transaction signature:", signature);
 
     const id = this.findBoundPoolPda(memeMint, quoteToken.mint, memechanProgram.programId);
-    const poolSigner = BoundPool.findSignerPda(id, memechanProgram.programId);
-
-    await createMetadata(client, { payer, mint: memeMint, poolSigner, poolId: id, metadata: args.tokenMetadata });
 
     return new BoundPool(id, signer, poolSolVault, launchVault, client, quoteToken);
   }
