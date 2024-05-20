@@ -50,8 +50,7 @@ import { getCreateAccountInstructions } from "../utils/getCreateAccountInstructi
 import { getSendAndConfirmTransactionMethod } from "../utils/getSendAndConfirmTransactionMethod";
 import { retry } from "../utils/retry";
 import { createMintWithPriority } from "../token/createMintWithPriority";
-import { CoinAPI } from "../coin/CoinAPI";
-import { MEMECHAN_TARGET_CONFIG } from "../config/config";
+import { MEMECHAN_QUOTE_TOKEN, MEMECHAN_TARGET_CONFIG } from "../config/config";
 
 export class BoundPool {
   private constructor(
@@ -60,7 +59,7 @@ export class BoundPool {
     public solVault: PublicKey,
     public memeVault: PublicKey,
     public client: MemechanClient,
-    public quoteToken: Token = Token.WSOL,
+    public quoteToken: Token = MEMECHAN_QUOTE_TOKEN,
   ) {
     //
   }
@@ -635,7 +634,7 @@ export class BoundPool {
 
     const baseTokenInfo = new Token(TOKEN_PROGRAM_ID, new PublicKey(boundPoolInfo.memeReserve.mint), 6);
     //const marketId = new PublicKey("AHZCwnUuiB3CUEyk2nybsU5c85WVDTHVP2UwuQwpVaR1");
-    const quoteTokenInfo = Token.WSOL;
+    const quoteTokenInfo = MEMECHAN_QUOTE_TOKEN;
 
     const { txids: createMarketTxIds, marketId } = await createMarket({
       baseToken: baseTokenInfo,

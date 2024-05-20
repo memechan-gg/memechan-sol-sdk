@@ -4,6 +4,7 @@ import { BoundPool } from "../src/bound-pool/BoundPool";
 import { sleep } from "../src/common/helpers";
 import { admin, client, payer } from "./common/common";
 import { FEE_DESTINATION_ID } from "./common/env";
+import { MEMECHAN_QUOTE_TOKEN } from "../src/config/config";
 
 const DUMMY_TOKEN_METADATA = {
   name: "Best Token Ever",
@@ -16,19 +17,19 @@ const DUMMY_TOKEN_METADATA = {
 };
 
 describe("BoundPool", () => {
-  it.skip("creates bound pool", async () => {
+  it("creates bound pool", async () => {
     const boundPool = await BoundPool.slowNew({
       admin,
       payer,
       signer: payer,
       client,
-      quoteToken: Token.WSOL,
+      quoteToken: MEMECHAN_QUOTE_TOKEN,
       tokenMetadata: DUMMY_TOKEN_METADATA,
     });
     await sleep(1000);
     const info = await boundPool.fetch();
     console.log(info);
-  }, 90000);
+  }, 150000);
 
   it.skip("all", async () => {
     const all = await BoundPool.all(client.memechanProgram);
@@ -49,7 +50,7 @@ describe("BoundPool", () => {
       payer,
       signer: payer,
       client,
-      quoteToken: Token.WSOL,
+      quoteToken: MEMECHAN_QUOTE_TOKEN,
       tokenMetadata: DUMMY_TOKEN_METADATA,
     });
 

@@ -1,3 +1,5 @@
+import { SplTokenInfo, TOKEN_PROGRAM_ID, Token } from "@raydium-io/raydium-sdk";
+
 /**
  * The base URL for the backend API for fetching off-chain data.
  * This endpoint ideally should point to the environment-specific endpoint, but currently it's only prod one
@@ -18,3 +20,4 @@ export const MEMECHAN_PROGRAM_ID = "8e1Asi2foEGzoZWsGN7zuDFGHseDJgyu2gYr2qKAmFj"
 
 export const MEMECHAN_QUOTE_MINT = "Do6NqMhU5sHA9p11FVePcPN4rxEjNGu6ZH2B2bCpQfpJ";
 export const MEMECHAN_TARGET_CONFIG = "6aW9gpGABLKDyt6kCiW88tuwSkLGwkZe8RRrfcPmrE1m";
+export const MEMECHAN_QUOTE_TOKEN: Token = new Token(TOKEN_PROGRAM_ID, MEMECHAN_QUOTE_MINT, 9, 'SLERF', 'SLERF');
