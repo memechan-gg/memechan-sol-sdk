@@ -31,12 +31,13 @@ export type GetBuyMemeTransactionArgs = Omit<SwapYArgs, "user" | "payer" | "pool
 
 export interface SwapXArgs {
   user: Keypair;
-  pool: PublicKey;
-  poolSignerPda: PublicKey;
+  //pool: PublicKey;
+  //poolSignerPda: PublicKey;
   memeAmountIn: BN;
-  solTokensOut: BN;
+  minQuoteAmountOut: BN;
   userMemeTicket: MemeTicket;
-  userSolAcc: PublicKey;
+  userQuoteAcc: PublicKey;
+  quoteMint: PublicKey;
 }
 
 export type GetSellMemeTransactionArgs = Omit<SwapXArgs, "user" | "pool" | "poolSignerPda"> & {

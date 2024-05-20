@@ -610,13 +610,13 @@ export class BoundPoolClient {
     const pool = this.id;
     const poolSignerPda = this.findSignerPda();
     const meme_in = input.memeAmountIn;
-    const sol_out = input.solTokensOut;
+    const minQuoteAmountOut = input.minQuoteAmountOut;
 
     const memeTicket = input.userMemeTicket;
-    const userSolAcc = input.userSolAcc;
+    const userSolAcc = input.userQuoteAcc;
 
     const sellMemeTransactionInstruction = await this.client.memechanProgram.methods
-      .swapX(new BN(meme_in), new BN(sol_out))
+      .swapX(new BN(meme_in), new BN(minQuoteAmountOut))
       .accounts({
         memeTicket: memeTicket.id,
         owner: user.publicKey,

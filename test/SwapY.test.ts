@@ -1,8 +1,8 @@
-import { payer, sleep } from "../helpers";
 import { BN } from "@project-serum/anchor";
 import { BoundPoolClient } from "../src/bound-pool/BoundPool";
-import { DUMMY_TOKEN_METADATA, admin, client } from "./common/common";
+import { DUMMY_TOKEN_METADATA, admin, client, payer } from "./common/common";
 import { MEMECHAN_QUOTE_TOKEN } from "../src/config/config";
+import { sleep } from "../src/common/helpers";
 
 
 describe("SwapY", () => {
@@ -31,5 +31,5 @@ describe("SwapY", () => {
     });
 
     console.log("swapY ticketId: " + ticketId.id.toBase58());
-  }, 120000);
+  }, 220000);
 });

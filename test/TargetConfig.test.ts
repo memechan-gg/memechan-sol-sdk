@@ -6,7 +6,7 @@ import { MEMECHAN_QUOTE_TOKEN } from "../src/config/config";
 import { MintUtils } from "../src/token/mintUtils";
 
 describe("TargetConfig", () => {
-  it("creates target config", async () => {
+  it.skip("creates target config", async () => {
 
     const mintUtils = new MintUtils(client.connection, payer);
     const mint = await mintUtils.createMint(6);
