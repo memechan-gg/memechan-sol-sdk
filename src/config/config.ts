@@ -16,4 +16,5 @@ export const BE_URL = "https://7mgmqkuj18.execute-api.us-east-1.amazonaws.com/pr
  */
 export const MEMECHAN_PROGRAM_ID = "8e1Asi2foEGzoZWsGN7zuDFGHseDJgyu2gYr2qKAmFj";
 
-export const MEMECHAN_TARGET_CONFIG = "B6xXRig7FsVGxnPVZLcHibECbPWWHaLSBBPea6Fi8MkR";
+export const MEMECHAN_QUOTE_MINT = "Do6NqMhU5sHA9p11FVePcPN4rxEjNGu6ZH2B2bCpQfpJ";
+export const MEMECHAN_TARGET_CONFIG = "6aW9gpGABLKDyt6kCiW88tuwSkLGwkZe8RRrfcPmrE1m";

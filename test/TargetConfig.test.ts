@@ -10,6 +10,8 @@ describe("TargetConfig", () => {
     const mintUtils = new MintUtils(client.connection, payer);
     const mint = await mintUtils.createMint(6);
 
+    console.log("targetconfig mint: " + mint.toString());
+
     const targetConfig = await TargetConfig.new({
       payer: payer,
       client,
@@ -17,6 +19,7 @@ describe("TargetConfig", () => {
       targetAmount: new BN(1000000000),
     });
     await sleep(1000);
+    console.log("targetconfig id: " + targetConfig.id);
     const info = await targetConfig.fetch();
     console.log(info);
   }, 90000);
