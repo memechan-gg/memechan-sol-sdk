@@ -1,7 +1,5 @@
 import { PublicKey, SystemProgram } from "@solana/web3.js";
 import { MemechanClient } from "../MemechanClient";
-import { BN } from "bn.js";
-import { NATIVE_MINT } from "@solana/spl-token";
 import { CreateTargetConfigArgs } from "./types";
 
 export class TargetConfig {
