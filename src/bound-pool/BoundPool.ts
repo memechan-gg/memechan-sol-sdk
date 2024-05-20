@@ -277,7 +277,7 @@ export class BoundPool {
   }
 
   /**
-   * Fetches the account information.
+   * Fetches the bound pool account information.
    *
    * @deprecated Please use `fetch2` method
    * @param {Object} [program=this.client.memechanProgram] - The program to use for fetching the account.
@@ -290,7 +290,7 @@ export class BoundPool {
   }
 
   /**
-   * Fetches the account information.
+   * Fetches the bound pool account information.
    *
    * @param {Connection} connection - The Solana RPC connection.
    * @param {PublicKey} accountId - The ID of the account to fetch.
@@ -418,13 +418,13 @@ export class BoundPool {
   }
 
   /**
-   * Swaps a Y token (expecting SOL) for another asset by executing a buy meme transaction.
+   * Swaps a Y token (expecting `SLERF` token) for another asset by executing a buy meme transaction.
    * @param {SwapYArgs} input - The input arguments required for the swap.
    * @returns {Promise<string>} A promise that resolves to the transaction ID of the swap.
    * @throws {Error} Throws an error if the transaction creation or confirmation fails.
    * @untested This method is untested and may contain bugs.
    */
-  public async swapY2(input: SwapYArgs): Promise<string> {
+  public async buyMeme(input: SwapYArgs): Promise<string> {
     const buyMemeTransaction = await this.getBuyMemeTransaction(input);
 
     const txId = await sendAndConfirmTransaction(this.client.connection, buyMemeTransaction, [input.user], {
