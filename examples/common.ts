@@ -8,11 +8,9 @@ export const connection = new Connection(RPC_API_CLUSTER);
 export const admin = new PublicKey(ADMIN_PUB_KEY);
 export const payer = Keypair.fromSecretKey(Buffer.from(JSON.parse(TEST_USER_SECRET_KEY)));
 export const wallet = new NodeWallet(payer);
-export const client = new MemechanClient(
+export const client = new MemechanClient({
   wallet,
-  {},
-  RPC_API_CLUSTER,
-  WSS_API_CLUSTER,
-  MEMECHAN_PROGRAM_ID,
-  IS_TEST_ENV,
-);
+  rpcApiUrl: RPC_API_CLUSTER,
+  wssApiUrl: WSS_API_CLUSTER,
+  isTest: IS_TEST_ENV,
+});

@@ -1,22 +1,25 @@
 import { AnchorProvider, Program, Wallet, setProvider } from "@coral-xyz/anchor";
 import { Connection, ConnectionConfig, PublicKey } from "@solana/web3.js";
 import { IDL, MemechanSol } from "./schema/types/memechan_sol";
+import { MEMECHAN_PROGRAM_ID } from "./config/config";
+
+export interface MemechanClientConfigArgs {
+  wallet: Wallet;
+  rpcConnectionConfig?: ConnectionConfig;
+  rpcApiUrl: string;
+  wssApiUrl: string;
+  isTest: boolean;
+}
 
 export class MemechanClient {
+  public wallet: Wallet;
   public connection: Connection;
   public memechanProgram: Program<MemechanSol>;
   public anchorProvider: AnchorProvider;
 
-  constructor(
-    private wallet: Wallet,
+  constructor(private config: MemechanClientConfigArgs) {
+    const { wallet, isTest, rpcApiUrl, rpcConnectionConfig, wssApiUrl } = config;
 
-    private rpcConnectionConfig: ConnectionConfig,
-    private rpcApiUrl: string,
-    private wssApiUrl: string,
-
-    private memechanProgramId: string,
-    private isTest: boolean,
-  ) {
     this.wallet = wallet;
     this.connection = new Connection(rpcApiUrl, {
       httpAgent: isTest ? false : undefined,
@@ -31,9 +34,9 @@ export class MemechanClient {
     setProvider(provider);
     this.anchorProvider = provider;
 
-    console.log("program id: " + memechanProgramId);
+    console.log("program id: " + MEMECHAN_PROGRAM_ID);
     console.log("connection rpc: " + this.connection.rpcEndpoint);
 
-    this.memechanProgram = new Program<MemechanSol>(IDL, new PublicKey(memechanProgramId), provider);
+    this.memechanProgram = new Program<MemechanSol>(IDL, new PublicKey(MEMECHAN_PROGRAM_ID), provider);
   }
 }
