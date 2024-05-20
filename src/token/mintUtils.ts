@@ -23,7 +23,8 @@ export class MintUtils {
       this.conn,
       this.authority,
       this.authority.publicKey,
-      this.authority.publicKey,
+      null,
+      //this.authority.publicKey,
       nb_decimals,
       kp
     );
