@@ -961,11 +961,27 @@ export class BoundPoolClient {
     }
   }
 
+  public async fetchRelatedTickets() {
+    return BoundPoolClient.fetchRelatedTickets(this.id, this.client)
+  }
+
+  public async getHoldersCount() {
+    return BoundPoolClient.getHoldersCount(this.id, this.client)
+  }
+
+  public async getHoldersMap() {
+    return BoundPoolClient.getHoldersMap(this.id, this.client)
+  }
+
+  public async getHoldersList() {
+    return BoundPoolClient.getHoldersList(this.id, this.client)
+  }
+
   /**
    * Fetches all tickets for provided pool id
    */
-  public async fetchRelatedTickets(pool = this.id): Promise<MemeTicketFields[]> {
-    const program = this.client.memechanProgram;
+  public static async fetchRelatedTickets(pool: PublicKey, client: MemechanClient): Promise<MemeTicketFields[]> {
+    const program = client.memechanProgram;
     const filters: GetProgramAccountsFilter[] = [
       {
         memcmp: {
@@ -983,22 +999,32 @@ export class BoundPoolClient {
   /**
    * Fetches all unique token holders for pool and returns their number
    */
-  public async getHoldersCount(pool = this.id) {
-    return (await this.getHoldersList(pool)).length
+  public static async getHoldersCount(pool: PublicKey, client: MemechanClient) {
+    return (await BoundPoolClient.getHoldersList(pool, client)).length
+  }
+
+  public static async getHoldersMap(pool: PublicKey, client: MemechanClient) {
+    const tickets = await BoundPoolClient.fetchRelatedTickets(pool, client);
+    const uniqueHolders: Map<string, MemeTicketFields[]> = new Map();
+
+    tickets.forEach(ticket => {
+      const addr = ticket.owner.toBase58();
+      if (!uniqueHolders.has(addr)) {
+        uniqueHolders.set(addr, []);
+      }
+      uniqueHolders.get(addr)?.push(ticket);
+    });
+
+    return uniqueHolders
   }
 
   /**
    * Fetches all unique token holders for pool and returns thier addresses
    */
-  public async getHoldersList(pool = this.id) {
-    const tickets = await this.fetchRelatedTickets(pool);
-    const uniqueHolders: Set<PublicKey> = new Set();
+  public static async getHoldersList(pool: PublicKey, client: MemechanClient) {
+    const holdersMap = await BoundPoolClient.getHoldersMap(pool, client);
 
-    tickets.forEach(ticket => {
-      uniqueHolders.add(ticket.owner);
-    });
-
-    return Array.from(uniqueHolders)
+    return Array.from(holdersMap.keys())
   }
 
   static getATAAddress(owner: PublicKey, mint: PublicKey, programId: PublicKey) {

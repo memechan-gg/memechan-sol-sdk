@@ -4,6 +4,8 @@ import { admin, client, payer } from "./common/common";
 import { MEMECHAN_QUOTE_TOKEN } from "../src/config/config";
 import BN from "bn.js";
 import { sleep } from "../src/common/helpers";
+import { StakingPool } from "../src/staking-pool/StakingPool";
+import { FEE_DESTINATION_ID } from "./common/env";
 
 const DUMMY_TOKEN_METADATA = {
   name: "Best Token Ever",
@@ -15,8 +17,8 @@ const DUMMY_TOKEN_METADATA = {
   website: "https://besttokenever.com",
 };
 
-describe("Getting meme token holders", () => {
-  it("all", async () => {
+describe("Holders endpoints", () => {
+  it("bonding curve", async () => {
     const boundPool = await BoundPoolClient.fromBoundPoolId({
       client,
       poolAccountAddressId: new PublicKey("3oh7S8dMwTwG3fmXD7MAJ75VCyKWQ4ZTmqc6ewZ6fwUu")
@@ -24,5 +26,19 @@ describe("Getting meme token holders", () => {
 
     console.log(await boundPool.getHoldersList());
     console.log(await boundPool.getHoldersCount());
-  }, 150000);
+  }, 20000);
+
+  it("live", async () => {
+    const poolAddr = new PublicKey("DitzVtU8GKzXaJP5wmiYxEceT4G6PG3SNpbTNUwtParZ");
+    const staking = new StakingPool(
+      poolAddr,
+      client,
+    );
+    const fetchedStaking = await client.memechanProgram.account.stakingPool.fetch(poolAddr);
+    staking.pool = fetchedStaking.pool;
+    staking.mint = fetchedStaking.memeMint;
+
+    console.log(await staking.getHoldersList());
+    console.log(await staking.getHoldersCount());
+  }, 20000);
 });

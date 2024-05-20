@@ -1,6 +1,6 @@
 import { Program } from "@coral-xyz/anchor";
 import { NATIVE_MINT, TOKEN_PROGRAM_ID } from "@solana/spl-token";
-import { AccountMeta, Keypair, PublicKey, Transaction } from "@solana/web3.js";
+import { AccountMeta, GetProgramAccountsFilter, Keypair, PublicKey, Transaction } from "@solana/web3.js";
 import { MemechanClient } from "../MemechanClient";
 import { MemechanSol } from "../schema/types/memechan_sol";
 import { getCreateAccountInstructions } from "../utils/getCreateAccountInstruction";
@@ -14,12 +14,17 @@ import {
   UnstakeArgs,
   WithdrawFeesArgs,
 } from "./types";
+import { MemeTicketFields } from "../schema/codegen/accounts";
+import { BoundPoolClient } from "../bound-pool/BoundPool";
 
 export class StakingPool {
+  public pool!: PublicKey;
+  public mint!: PublicKey;
+
   constructor(
     public id: PublicKey,
     private client: MemechanClient,
-  ) {}
+  ) { }
 
   public static findSignerPda(publicKey: PublicKey, memechanProgramId: PublicKey): PublicKey {
     return PublicKey.findProgramAddressSync([Buffer.from("staking"), publicKey.toBytes()], memechanProgramId)[0];
@@ -198,6 +203,81 @@ export class StakingPool {
     });
 
     return { memeAccountPublicKey, wSolAccountPublicKey };
+  }
+
+  public async getHoldersCount() {
+    return StakingPool.getHoldersCount(this.pool, this.mint, this.client)
+  }
+
+  public async getHoldersList() {
+    return StakingPool.getHoldersList(this.pool, this.mint, this.client)
+  }
+
+  /**
+   * Fetches all tickets for corresponding pool id
+   */
+  public async fetchRelatedTickets(pool = this.pool, client = this.client): Promise<MemeTicketFields[]> {
+    return BoundPoolClient.fetchRelatedTickets(pool, client)
+  }
+
+  /**
+   * Fetches all unique token holders and memetickets owners for pool; then returns their number
+   */
+  public static async getHoldersCount(pool: PublicKey, mint: PublicKey, client: MemechanClient) {
+    return (await StakingPool.getHoldersList(pool, mint, client)).length
+  }
+
+  /**
+   * Fetches all unique token holders and memetickets owners for pool; then returns thier addresses
+   */
+  public static async getHoldersList(pool: PublicKey, mint: PublicKey, client: MemechanClient) {
+    const ticketHolderList = await BoundPoolClient.getHoldersList(pool, client);
+    const tokenHolderList = await StakingPool.getTokenHolderListHel(mint);
+
+    ticketHolderList.forEach(holder => {
+      tokenHolderList.add(holder)
+    });
+
+    return Array.from(tokenHolderList)
+  }
+
+  public static async getTokenHolderListHel(mint: PublicKey) {
+    let page = 1;
+    let allOwners: Set<string> = new Set();
+
+    const url = `https://devnet.helius-rpc.com/?api-key=${process.env.HELIUS_DEV_KEY}`;
+
+    while (true) {
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          jsonrpc: "2.0",
+          method: "getTokenAccounts",
+          id: "helius-test",
+          params: {
+            page: page,
+            limit: 1000,
+            displayOptions: {},
+            mint: mint.toBase58(),
+          },
+        }),
+      });
+      const data = await response.json();
+
+      if (!data.result || data.result.token_accounts.length === 0) {
+        break;
+      }
+
+      data.result.token_accounts.forEach((account: { owner: string; }) =>
+        allOwners.add(account.owner)
+      );
+      page++;
+    }
+
+    return allOwners
   }
 
   private async fetch(program = this.client.memechanProgram) {
