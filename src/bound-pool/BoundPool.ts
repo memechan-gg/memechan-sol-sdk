@@ -255,6 +255,7 @@ export class BoundPoolClient {
     const poolQuoteVault = poolQuoteVaultId.publicKey;
     const launchVault = launchVaultId.publicKey;
 
+    // TODO: We can remove 2 calls here and combine it into one, once we'll have lookup table implementation on smart-contract side
     const createPoolSignature = await sendAndConfirmTransaction(connection, createPoolTransaction, [signer, payer], {
       commitment: "confirmed",
       skipPreflight: true,
