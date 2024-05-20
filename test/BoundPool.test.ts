@@ -1,5 +1,4 @@
 import { BN } from "@coral-xyz/anchor";
-import { Token } from "@raydium-io/raydium-sdk";
 import { BoundPool } from "../src/bound-pool/BoundPool";
 import { sleep } from "../src/common/helpers";
 import { admin, client, payer } from "./common/common";
@@ -68,18 +67,18 @@ describe("BoundPool", () => {
 
     console.log("swapY ticketId: " + ticketId.id.toBase58());
 
-    const boundPoolInfo = await pool.fetch();
+    const boundPoolInfo = await BoundPool.fetch2(client.connection, pool.id);
 
     console.log("boundPoolInfo:", boundPoolInfo);
 
-    const { stakingMemeVault, stakingWSolVault } = await pool.slowInitStakingPool({
+    const { stakingMemeVault, stakingQuoteVault } = await pool.slowInitStakingPool({
       payer: payer,
       user: payer,
       boundPoolInfo,
     });
 
     console.log("stakingMemeVault: " + stakingMemeVault.toString());
-    console.log("stakingWSolVault: " + stakingWSolVault.toString());
+    console.log("stakingQuoteVault: " + stakingQuoteVault.toString());
 
     await sleep(2000);
 
@@ -89,14 +88,14 @@ describe("BoundPool", () => {
       boundPoolInfo,
       feeDestinationWalletAddress: FEE_DESTINATION_ID,
       memeVault: stakingMemeVault,
-      quoteVault: stakingWSolVault,
+      quoteVault: stakingQuoteVault,
     });
 
     console.log("OINK");
   }, 520000);
 
   it.skip("swaps full quote token->memecoin in one go", async () => {
-       const pool = await BoundPool.slowNew({
+    const pool = await BoundPool.slowNew({
       admin,
       payer,
       signer: payer,
@@ -120,7 +119,6 @@ describe("BoundPool", () => {
     });
 
     console.log("swapY ticketId: " + ticketId.id.toBase58());
-
   }, 120000);
 
   //   sleep(1000);

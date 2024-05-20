@@ -1,4 +1,4 @@
-export { new2, New2Accounts } from "./new2"
+export { newPool, NewPoolAccounts } from "./newPool"
 export {
   createMetadata,
   CreateMetadataArgs,

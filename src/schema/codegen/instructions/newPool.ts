@@ -4,7 +4,7 @@ import * as borsh from "@project-serum/borsh" // eslint-disable-line @typescript
 import * as types from "../types" // eslint-disable-line @typescript-eslint/no-unused-vars
 import { PROGRAM_ID } from "../programId"
 
-export interface New2Accounts {
+export interface NewPoolAccounts {
   sender: PublicKey
   pool: PublicKey
   memeMint: PublicKey
@@ -18,7 +18,7 @@ export interface New2Accounts {
   tokenProgram: PublicKey
 }
 
-export function new2(accounts: New2Accounts) {
+export function newPool(accounts: NewPoolAccounts) {
   const keys = [
     { pubkey: accounts.sender, isSigner: true, isWritable: true },
     { pubkey: accounts.pool, isSigner: false, isWritable: true },
@@ -32,7 +32,7 @@ export function new2(accounts: New2Accounts) {
     { pubkey: accounts.systemProgram, isSigner: false, isWritable: false },
     { pubkey: accounts.tokenProgram, isSigner: false, isWritable: false },
   ]
-  const identifier = Buffer.from([67, 186, 227, 31, 219, 8, 26, 80])
+  const identifier = Buffer.from([38, 63, 210, 32, 246, 20, 239, 112])
   const data = identifier
   const ix = new TransactionInstruction({ keys, programId: PROGRAM_ID, data })
   return ix

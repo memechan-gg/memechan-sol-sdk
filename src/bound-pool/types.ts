@@ -4,6 +4,7 @@ import { MemeTicket } from "../memeticket/MemeTicket";
 import { MemechanClient } from "../MemechanClient";
 import { Token } from "@raydium-io/raydium-sdk";
 import { TokenMetadata } from "../token/types";
+import { BoundPool as CodegenBoundPool } from "../schema/codegen/accounts";
 
 export interface SwapYArgs {
   payer: Signer;
@@ -46,7 +47,7 @@ export type GetSellMemeTransactionArgs = Omit<SwapXArgs, "user" | "pool" | "pool
 export interface GoLiveArgs {
   user: Keypair;
   payer: Signer;
-  boundPoolInfo: object;
+  boundPoolInfo: CodegenBoundPool;
   memeVault: PublicKey;
   feeDestinationWalletAddress: string;
   quoteVault: PublicKey;
@@ -72,12 +73,12 @@ export interface BoundPoolArgs {
   tokenMetadata: TokenMetadata;
 }
 
-export type GetCreateNewBondingPoolTransactionArgs = Omit<BoundPoolArgs, "tokenMetadata"> & {
+export type GetCreateNewBondingPoolAndTokenTransactionArgs = BoundPoolArgs & {
   transaction?: Transaction;
   adminSolPublicKey?: PublicKey;
 };
 
 export interface InitStakingPoolResult {
   stakingMemeVault: PublicKey;
-  stakingWSolVault: PublicKey;
+  stakingQuoteVault: PublicKey;
 }
