@@ -12,6 +12,7 @@ import {
 import {
   ComputeBudgetProgram,
   Connection,
+  GetProgramAccountsFilter,
   Keypair,
   PublicKey,
   sendAndConfirmTransaction,
@@ -21,7 +22,7 @@ import {
   SYSVAR_RENT_PUBKEY,
   Transaction,
 } from "@solana/web3.js";
-import { BoundPool as CodegenBoundPool } from "../schema/codegen/accounts";
+import { BoundPool as CodegenBoundPool, MemeTicketFields, MemeTicketJSON } from "../schema/codegen/accounts";
 
 import { AnchorError, BN, Program, Provider } from "@coral-xyz/anchor";
 import { MemechanClient } from "../MemechanClient";
@@ -958,6 +959,46 @@ export class BoundPoolClient {
 
       throw error;
     }
+  }
+
+  /**
+   * Fetches all tickets for provided pool id
+   */
+  public async fetchRelatedTickets(pool = this.id): Promise<MemeTicketFields[]> {
+    const program = this.client.memechanProgram;
+    const filters: GetProgramAccountsFilter[] = [
+      {
+        memcmp: {
+          bytes: pool.toBase58(),
+          offset: 40,
+        }
+      }
+    ];
+
+    const fetchedTickets = await program.account.memeTicket.all(filters);
+    const tickets = fetchedTickets.map(ticket => ticket.account);
+    return tickets
+  }
+
+  /**
+   * Fetches all unique token holders for pool and returns their number
+   */
+  public async getHoldersCount(pool = this.id) {
+    return (await this.getHoldersList(pool)).length
+  }
+
+  /**
+   * Fetches all unique token holders for pool and returns thier addresses
+   */
+  public async getHoldersList(pool = this.id) {
+    const tickets = await this.fetchRelatedTickets(pool);
+    const uniqueHolders: Set<PublicKey> = new Set();
+
+    tickets.forEach(ticket => {
+      uniqueHolders.add(ticket.owner);
+    });
+
+    return Array.from(uniqueHolders)
   }
 
   static getATAAddress(owner: PublicKey, mint: PublicKey, programId: PublicKey) {
