@@ -32,7 +32,7 @@ function getMarketAssociatedPoolKeys(input: LiquidityPairTargetInfo) {
     quoteDecimals: input.quoteToken.decimals,
     marketId: input.targetMarketId,
     programId: PROGRAMIDS.AmmV4,
-    marketProgramId: MAINNET_PROGRAM_ID.OPENBOOK_MARKET,
+    marketProgramId: PROGRAMIDS.OPENBOOK_MARKET,
   });
 }
 

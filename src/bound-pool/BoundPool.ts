@@ -6,7 +6,6 @@ import {
   getAssociatedTokenAddressSync,
   getOrCreateAssociatedTokenAccount,
   mintTo,
-  NATIVE_MINT,
   TOKEN_PROGRAM_ID,
 } from "@solana/spl-token";
 import {
@@ -366,16 +365,16 @@ export class BoundPool {
 
     const pool = input.pool ?? this.id;
     const poolSignerPda = BoundPool.findSignerPda(pool, this.client.memechanProgram.programId);
-    const sol_in = input.solAmountIn;
+    const sol_in = input.quoteAmountIn;
     const meme_out = input.memeTokensOut;
 
-    const userSolAcc =
+    const userQuoteAcc =
       input.userSolAcc ??
       (
         await getOrCreateAssociatedTokenAccount(
           this.client.connection,
           payer,
-          NATIVE_MINT, // this is a sol acc
+          input.quoteMint,
           user.publicKey,
           true,
           "confirmed",
@@ -422,7 +421,7 @@ export class BoundPool {
         pool: pool,
         poolSignerPda: poolSignerPda,
         quoteVault: this.quoteVault,
-        userSol: userSolAcc,
+        userSol: userQuoteAcc,
         systemProgram: SystemProgram.programId,
         tokenProgram: TOKEN_PROGRAM_ID,
       })
@@ -471,10 +470,9 @@ export class BoundPool {
     const pool = this.id;
     const poolSignerPda = this.findSignerPda();
 
-    // TODO: Change that, we should allow to pass inputMint and outputMint
-    const tokenInMintPubkey = NATIVE_MINT;
+    const tokenInMintPubkey = input.quoteMint;
 
-    const sol_in = input.solAmountIn;
+    const sol_in = input.quoteAmountIn;
     const meme_out = input.memeTokensOut;
 
     // TODO: ? We should handle SOL-based and non-SOL based swaps

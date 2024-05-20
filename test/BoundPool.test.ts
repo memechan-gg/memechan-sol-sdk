@@ -60,7 +60,8 @@ describe("BoundPool", () => {
       payer: payer,
       user: payer,
       memeTokensOut: new BN(1),
-      solAmountIn: new BN(1 * 1e9),
+      quoteAmountIn: new BN(1000),
+      quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
       pool: pool.id,
     });
 
@@ -93,18 +94,33 @@ describe("BoundPool", () => {
     console.log("OINK");
   }, 520000);
 
-  // it("swaps full sol->memecoin in one go", async () => {
-  //     const pool = await BoundPool.new({admin, payer, signer: payer, client });
+  it.skip("swaps full quote token->memecoin in one go", async () => {
+       const pool = await BoundPool.slowNew({
+      admin,
+      payer,
+      signer: payer,
+      client,
+      quoteToken: MEMECHAN_QUOTE_TOKEN,
+      tokenMetadata: DUMMY_TOKEN_METADATA,
+    });
 
-  //     await sleep(1000);
+    console.log("==== swapy pool id: " + pool.id.toString());
 
-  //   // call to the swap endpoint
-  //   const ticketId = await pool.swapY({
-  //     payer: payer,
-  //     user: payer,
-  //     memeTokensOut: new BN(1),
-  //     solAmountIn: new BN(2 * 1e9),
-  //   });
+    await sleep(1000);
+
+    // call to the swap endpoint
+    const ticketId = await pool.swapY({
+      payer: payer,
+      user: payer,
+      memeTokensOut: new BN(1),
+      quoteAmountIn: new BN(1000),
+      quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
+      pool: pool.id,
+    });
+
+    console.log("swapY ticketId: " + ticketId.id.toBase58());
+
+  }, 120000);
 
   //   sleep(1000);
 
