@@ -14,8 +14,8 @@ import { formatAmmKeysById } from './formatAmmKeysById';
 import { buildAndSendTx, getWalletTokenAccount } from '../utils/util';
 import { makeTxVersion } from './config';
 
-type WalletTokenAccounts = Awaited<ReturnType<typeof getWalletTokenAccount>>
-type TestTxInputInfo = {
+export type WalletTokenAccounts = Awaited<ReturnType<typeof getWalletTokenAccount>>
+export type SawpOnlyAmmInputInfo = {
   outputToken: Token
   targetPool: string
   inputTokenAmount: TokenAmount
@@ -25,7 +25,7 @@ type TestTxInputInfo = {
   connection: Connection
 }
 
-export async function swapOnlyAmm(input: TestTxInputInfo) {
+export async function swapOnlyAmm(input: SawpOnlyAmmInputInfo) {
   const { connection, wallet } = input;
   // -------- pre-action: get pool info --------
   const targetPoolInfo = await formatAmmKeysById(input.targetPool, connection)
