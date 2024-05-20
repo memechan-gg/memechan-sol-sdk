@@ -45,6 +45,7 @@ export const createNewTokenAndPool = async () => {
     console.log("createTokenSignature:", createTokenSignature);
 
     const id = BoundPoolClient.findBoundPoolPda(memeMint, MEMECHAN_QUOTE_TOKEN.mint, client.memechanProgram.programId);
+    console.debug("id: ", id);
     const boundPool = await BoundPoolClient.fetch2(client.connection, id);
     console.log("boundPool:", boundPool);
   } catch (e) {
