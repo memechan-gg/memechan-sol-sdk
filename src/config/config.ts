@@ -1,4 +1,5 @@
 import { TOKEN_PROGRAM_ID, Token } from "@raydium-io/raydium-sdk";
+import { PublicKey } from "@solana/web3.js";
 
 /**
  * The base URL for the backend API for fetching off-chain data.
@@ -18,6 +19,6 @@ export const BE_URL = "https://7mgmqkuj18.execute-api.us-east-1.amazonaws.com/pr
  */
 export const MEMECHAN_PROGRAM_ID = "2WRqhjrZUkMvvKPNg6KLCJwuqNdNjF4cjhGN2VWw1YeK";
 
-export const MEMECHAN_QUOTE_MINT = "Do6NqMhU5sHA9p11FVePcPN4rxEjNGu6ZH2B2bCpQfpJ";
+export const MEMECHAN_QUOTE_MINT = new PublicKey("Do6NqMhU5sHA9p11FVePcPN4rxEjNGu6ZH2B2bCpQfpJ");
 export const MEMECHAN_TARGET_CONFIG = "5cdqbrwSMEeubReme7g72VZ7zLVvab4LMnKwydsqQMCR";
-export const MEMECHAN_QUOTE_TOKEN: Token = new Token(TOKEN_PROGRAM_ID, MEMECHAN_QUOTE_MINT, 9, 'SLERF', 'SLERF');
+export const MEMECHAN_QUOTE_TOKEN: Token = new Token(TOKEN_PROGRAM_ID, MEMECHAN_QUOTE_MINT, 9, "SLERF", "SLERF");
