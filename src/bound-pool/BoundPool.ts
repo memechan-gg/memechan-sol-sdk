@@ -609,6 +609,82 @@ export class BoundPool {
     return { transaction: tx, stakingMemeVault, stakingWSolVault };
   }
 
+  public async slowInitStakingPool(input: Partial<InitStakingPoolArgs>): Promise<InitStakingPoolResult> {
+    const user = input.user!;
+    const pool = input.pool ?? this.id;
+
+    //console.log("initStakingPool fetch: " + this.id.toBase58());
+    //const boundPoolInfo = await this.fetch();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const boundPoolInfo = input.boundPoolInfo as any;
+
+    console.log("initStakingPool.boundPoolInfo: " + JSON.stringify(boundPoolInfo));
+
+    const stakingId = BoundPool.findStakingPda(boundPoolInfo.memeReserve.mint, this.client.memechanProgram.programId);
+    const stakingSigner = StakingPool.findSignerPda(stakingId, this.client.memechanProgram.programId);
+
+    const adminTicketId = BoundPool.findMemeTicketPda(stakingId, this.client.memechanProgram.programId);
+
+    const stakingPoolSolVaultid = Keypair.generate();
+    const stakingWSolVault = await createAccount(
+      this.client.connection,
+      user,
+      this.quoteToken.mint,
+      stakingSigner,
+      stakingPoolSolVaultid,
+      { skipPreflight: true, commitment: "confirmed" },
+    );
+
+    const stakingMemeVaultid = Keypair.generate();
+    const stakingMemeVault = await createAccount(
+      this.client.connection,
+      user,
+      boundPoolInfo.memeReserve.mint,
+      stakingSigner,
+      stakingMemeVaultid,
+      { skipPreflight: true, commitment: "confirmed" },
+    );
+
+    try {
+      const methodArgs = {
+        pool: pool,
+        signer: user.publicKey,
+        boundPoolSignerPda: this.findSignerPda(),
+        memeTicket: adminTicketId,
+        poolMemeVault: boundPoolInfo.memeReserve.vault,
+        poolQuoteVault: boundPoolInfo.quoteReserve.vault,
+        stakingMemeVault: stakingMemeVault,
+        stakingQuoteVault: stakingWSolVault,
+        quoteMint: this.quoteToken.mint,
+        staking: stakingId,
+        stakingPoolSignerPda: stakingSigner,
+        adminVaultQuote: boundPoolInfo.adminVaultQuote,
+        marketProgramId: PROGRAMIDS.OPENBOOK_MARKET,
+        systemProgram: SystemProgram.programId,
+        tokenProgram: TOKEN_PROGRAM_ID,
+        clock: SYSVAR_CLOCK_PUBKEY,
+        rent: SYSVAR_RENT_PUBKEY,
+        memeMint: boundPoolInfo.memeReserve.mint,
+        ataProgram: ATA_PROGRAM_ID,
+        user: user,
+      };
+
+      const result = await this.client.memechanProgram.methods
+        .initStakingPool()
+        .accounts(methodArgs)
+        .signers([methodArgs.user])
+        .rpc({ skipPreflight: true, commitment: "confirmed" });
+
+      console.log("initStakingPool Final result:", result);
+
+      return { stakingMemeVault, stakingWSolVault };
+    } catch (error) {
+      console.error("Failed to initialize staking pool:", error);
+    }
+
+    return { stakingMemeVault, stakingWSolVault };
+  }
+
   public async initStakingPool(input: InitStakingPoolArgs): Promise<InitStakingPoolResult> {
     const { transaction, stakingMemeVault, stakingWSolVault } = await this.getInitStakingPoolTransaction(input);
 

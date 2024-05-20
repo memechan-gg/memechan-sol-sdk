@@ -71,7 +71,7 @@ describe("BoundPool", () => {
 
     console.log("boundPoolInfo:", boundPoolInfo);
 
-    const { stakingMemeVault, stakingWSolVault } = await pool.initStakingPool({
+    const { stakingMemeVault, stakingWSolVault } = await pool.slowInitStakingPool({
       payer: payer,
       user: payer,
       boundPoolInfo,
