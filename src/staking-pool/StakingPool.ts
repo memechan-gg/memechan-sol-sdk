@@ -18,13 +18,40 @@ import { MemeTicketFields } from "../schema/codegen/accounts";
 import { BoundPoolClient } from "../bound-pool/BoundPool";
 
 export class StakingPool {
-  public pool!: PublicKey;
-  public mint!: PublicKey;
-
   constructor(
     public id: PublicKey,
     private client: MemechanClient,
+    public pool: PublicKey,
+    public memeVault: PublicKey,
+    public memeMint: PublicKey,
+    public lpVault: PublicKey,
+    public lpMint: PublicKey,
+    public quote_vault: PublicKey,
   ) { }
+
+
+  public static async fromStakingPoolId({
+    client,
+    poolAccountAddressId,
+  }: {
+    client: MemechanClient;
+    poolAccountAddressId: PublicKey;
+  }) {
+    const stakingPoolObjectData = await client.memechanProgram.account.stakingPool.fetch(poolAccountAddressId);
+
+    const boundClientInstance = new StakingPool(
+      poolAccountAddressId,
+      client,
+      stakingPoolObjectData.pool,
+      stakingPoolObjectData.memeVault,
+      stakingPoolObjectData.memeMint,
+      stakingPoolObjectData.lpVault,
+      stakingPoolObjectData.lpMint,
+      stakingPoolObjectData.quoteVault,
+    );
+
+    return boundClientInstance;
+  }
 
   public static findSignerPda(publicKey: PublicKey, memechanProgramId: PublicKey): PublicKey {
     return PublicKey.findProgramAddressSync([Buffer.from("staking"), publicKey.toBytes()], memechanProgramId)[0];
@@ -206,11 +233,11 @@ export class StakingPool {
   }
 
   public async getHoldersCount() {
-    return StakingPool.getHoldersCount(this.pool, this.mint, this.client)
+    return StakingPool.getHoldersCount(this.pool, this.memeMint, this.client)
   }
 
   public async getHoldersList() {
-    return StakingPool.getHoldersList(this.pool, this.mint, this.client)
+    return StakingPool.getHoldersList(this.pool, this.memeMint, this.client)
   }
 
   /**

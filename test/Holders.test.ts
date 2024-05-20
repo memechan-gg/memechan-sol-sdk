@@ -30,13 +30,13 @@ describe("Holders endpoints", () => {
 
   it("live", async () => {
     const poolAddr = new PublicKey("DitzVtU8GKzXaJP5wmiYxEceT4G6PG3SNpbTNUwtParZ");
-    const staking = new StakingPool(
-      poolAddr,
+    const staking = await StakingPool.fromStakingPoolId({
+      poolAccountAddressId: poolAddr,
       client,
+    }
     );
     const fetchedStaking = await client.memechanProgram.account.stakingPool.fetch(poolAddr);
-    staking.pool = fetchedStaking.pool;
-    staking.mint = fetchedStaking.memeMint;
+
 
     console.log(await staking.getHoldersList());
     console.log(await staking.getHoldersCount());

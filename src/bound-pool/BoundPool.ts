@@ -946,7 +946,10 @@ export class BoundPoolClient {
         .rpc({ skipPreflight: true, commitment: "confirmed" });
       console.log("goLive Transaction successful:", result);
 
-      return [new StakingPool(stakingId, this.client)];
+      return [await StakingPool.fromStakingPoolId({
+        client: this.client,
+        poolAccountAddressId: stakingId
+      })]
     } catch (error) {
       if (error instanceof AnchorError) {
         console.error("Error details:", error);
