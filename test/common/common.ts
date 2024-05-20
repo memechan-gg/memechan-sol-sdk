@@ -22,3 +22,8 @@ export const DUMMY_TOKEN_METADATA = {
   telegram: "https://t.me/BestTokenEver",
   website: "https://besttokenever.com",
 };
+
+export const LIVE_BOUND_POOL_ID = new PublicKey("9pEBW3vNF7uxaPyJbATK1AdCLSxAzJyXs5bPCbuyRHhB");
+
+
+export const STAKING_POOL_ID = new PublicKey("G8Zd2am13ABpytWo3WQ6uEkHRsnYVKrVk6rD3qG642nx");
