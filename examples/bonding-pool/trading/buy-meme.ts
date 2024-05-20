@@ -1,6 +1,6 @@
-// import { BoundPool } from "../../../src/bound-pool/BoundPool";
+import { BoundPool } from "../../../src/bound-pool/BoundPool";
 
-// yarn tsx examples/bonding-pool/trading/buy-meme-legacy.ts
+// yarn tsx examples/bonding-pool/trading/buy-meme.ts
 (async () => {
-  // new BoundPool({});
+  // new BoundPool({ });
 })();

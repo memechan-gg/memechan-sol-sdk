@@ -1,5 +1,5 @@
 import { sendAndConfirmTransaction } from "@solana/web3.js";
-import { BoundPool } from "../../src/bound-pool/BoundPool";
+import { BoundPoolClient } from "../../src/bound-pool/BoundPool";
 import { MEMECHAN_QUOTE_TOKEN } from "../../src/config/config";
 import { admin, payer, client } from "../common";
 
@@ -16,7 +16,7 @@ const DUMMY_TOKEN_METADATA = {
 // yarn tsx examples/bonding-pool/create-new-token-and-pool.ts > log.txt 2>&1
 export const createNewTokenAndPool = async () => {
   const { createPoolTransaction, createTokenTransaction, memeMintKeypair, poolQuoteVaultId, launchVaultId } =
-    await BoundPool.getCreateNewBondingPoolAndTokenTransaction({
+    await BoundPoolClient.getCreateNewBondingPoolAndTokenTransaction({
       admin,
       payer,
       signer: payer,
@@ -44,8 +44,8 @@ export const createNewTokenAndPool = async () => {
     });
     console.log("createTokenSignature:", createTokenSignature);
 
-    const id = BoundPool.findBoundPoolPda(memeMint, MEMECHAN_QUOTE_TOKEN.mint, client.memechanProgram.programId);
-    const boundPool = await BoundPool.fetch2(client.connection, id);
+    const id = BoundPoolClient.findBoundPoolPda(memeMint, MEMECHAN_QUOTE_TOKEN.mint, client.memechanProgram.programId);
+    const boundPool = await BoundPoolClient.fetch2(client.connection, id);
     console.log("boundPool:", boundPool);
   } catch (e) {
     console.error(e);

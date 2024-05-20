@@ -1,4 +1,4 @@
-import { BoundPool } from "../../src/bound-pool/BoundPool";
+import { BoundPoolClient } from "../../src/bound-pool/BoundPool";
 import { MEMECHAN_QUOTE_TOKEN } from "../../src/config/config";
 import { admin, payer, client } from "../common";
 
@@ -14,7 +14,7 @@ const DUMMY_TOKEN_METADATA = {
 
 // yarn tsx examples/bonding-pool/create-new-token-and-pool-slow.ts > log.txt 2>&1
 export const createNewTokenAndPoolSlow = async () => {
-  const boundPool = await BoundPool.slowNew({
+  const boundPool = await BoundPoolClient.slowNew({
     admin,
     payer,
     signer: payer,
