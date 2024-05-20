@@ -67,7 +67,7 @@ describe("BoundPool", () => {
 
     console.log("swapY ticketId: " + ticketId.id.toBase58());
 
-    const boundPoolInfo = await pool.fetch();
+    const boundPoolInfo = await BoundPool.fetch2(client.connection, pool.id);
 
     console.log("boundPoolInfo:", boundPoolInfo);
 
@@ -95,7 +95,7 @@ describe("BoundPool", () => {
   }, 520000);
 
   it.skip("swaps full quote token->memecoin in one go", async () => {
-       const pool = await BoundPool.slowNew({
+    const pool = await BoundPool.slowNew({
       admin,
       payer,
       signer: payer,
@@ -119,7 +119,6 @@ describe("BoundPool", () => {
     });
 
     console.log("swapY ticketId: " + ticketId.id.toBase58());
-
   }, 120000);
 
   //   sleep(1000);
