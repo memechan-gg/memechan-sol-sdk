@@ -1,19 +1,13 @@
 {
-    "compilerOptions": {
-        "sourceMap": false,
-        "removeComments": true,
-        "declaration": true,
-        "declarationDir": "dist",
-        "rootDir": "./src"
-    },
-    "compileOnSave": true,
-    "include": [
-        "src",
-        "eslint.config.js"
-    ],
-    "exclude": [
-        "src/examples",
-        "demo"
-    ],
-    "extends": "./tsconfig"
+  "compilerOptions": {
+    "sourceMap": false,
+    "removeComments": true,
+    "declaration": true,
+    "declarationDir": "dist",
+    "rootDir": "./src"
+  },
+  "compileOnSave": true,
+  "include": ["src", "eslint.config.js"],
+  "exclude": ["examples", "test"],
+  "extends": "./tsconfig"
 }

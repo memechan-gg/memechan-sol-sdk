@@ -1,5 +1,5 @@
 import { client, payer } from "./common/common";
-import { MEMECHAN_QUOTE_MINT, MEMECHAN_QUOTE_TOKEN } from "../src/config/config";
+import { MEMECHAN_QUOTE_TOKEN } from "../src/config/config";
 import { MintUtils } from "../src/token/mintUtils";
 
 describe("QUOTE TOKEN MINT", () => {
