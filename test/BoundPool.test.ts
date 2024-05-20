@@ -1,5 +1,5 @@
 import { BN } from "@coral-xyz/anchor";
-import { BoundPool } from "../src/bound-pool/BoundPool";
+import { BoundPoolClient } from "../src/bound-pool/BoundPool";
 import { sleep } from "../src/common/helpers";
 import { admin, client, payer } from "./common/common";
 import { FEE_DESTINATION_ID } from "./common/env";
@@ -17,7 +17,7 @@ const DUMMY_TOKEN_METADATA = {
 
 describe("BoundPool", () => {
   it.skip("creates bound pool", async () => {
-    const boundPool = await BoundPool.slowNew({
+    const boundPool = await BoundPoolClient.slowNew({
       admin,
       payer,
       signer: payer,
@@ -31,7 +31,7 @@ describe("BoundPool", () => {
   }, 150000);
 
   it.skip("all", async () => {
-    const all = await BoundPool.all(client.memechanProgram);
+    const all = await BoundPoolClient.all(client.memechanProgram);
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     for (const pool of all) {
@@ -44,7 +44,7 @@ describe("BoundPool", () => {
 
   it("init staking pool then go live", async () => {
     console.log("payer: " + payer.publicKey.toString());
-    const pool = await BoundPool.slowNew({
+    const pool = await BoundPoolClient.slowNew({
       admin,
       payer,
       signer: payer,
@@ -67,7 +67,7 @@ describe("BoundPool", () => {
 
     console.log("swapY ticketId: " + ticketId.id.toBase58());
 
-    const boundPoolInfo = await BoundPool.fetch2(client.connection, pool.id);
+    const boundPoolInfo = await BoundPoolClient.fetch2(client.connection, pool.id);
 
     console.log("boundPoolInfo:", boundPoolInfo);
 
@@ -95,7 +95,7 @@ describe("BoundPool", () => {
   }, 520000);
 
   it.skip("swaps full quote token->memecoin in one go", async () => {
-    const pool = await BoundPool.slowNew({
+    const pool = await BoundPoolClient.slowNew({
       admin,
       payer,
       signer: payer,
@@ -144,7 +144,7 @@ describe("BoundPool", () => {
   // }, 120000);
 
   // it("user swaps more than have", async () => {
-  //   const boundPool = await BoundPool.new({admin, payer, signer: payer, client });
+  //   const boundPool = await BoundPoolClient.new({admin, payer, signer: payer, client });
   //   await sleep(1000);
 
   //   const user = new Keypair();
@@ -165,7 +165,7 @@ describe("BoundPool", () => {
   // it("merge tickets presale", async () => {
   //   const user = Keypair.generate()
   //   await airdrop(client.connection, user.publicKey)
-  //   const pool = await BoundPool.new({admin, payer, signer: payer, client });
+  //   const pool = await BoundPoolClient.new({admin, payer, signer: payer, client });
 
   //   await sleep(1000);
 
@@ -219,7 +219,7 @@ describe("BoundPool", () => {
   // it("swaps user sol->memecoin->sol", async () => {
   //   const user = Keypair.generate()
   //   await airdrop(client.connection, user.publicKey)
-  //   const pool = await BoundPool.new({admin, payer, signer: payer, client });
+  //   const pool = await BoundPoolClient.new({admin, payer, signer: payer, client });
 
   //   const userSolAcc = await createWrappedNativeAccount(
   //     client.connection,
@@ -249,7 +249,7 @@ describe("BoundPool", () => {
   // it("swaps sol->memecoin->sol->full meme", async () => {
   //   const user = Keypair.generate()
   //   await airdrop(client.connection, user.publicKey)
-  //   const pool = await BoundPool.new({admin, payer, signer: payer, client });
+  //   const pool = await BoundPoolClient.new({admin, payer, signer: payer, client });
 
   //   const userSolAcc = await createWrappedNativeAccount(
   //     client.connection,
