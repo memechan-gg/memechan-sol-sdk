@@ -1,12 +1,12 @@
-import { TOKEN_PROGRAM_ID, createInitializeAccountInstruction, getAccountLenForMint, getMint } from "@solana/spl-token";
+import { TOKEN_PROGRAM_ID, createInitializeAccountInstruction } from "@solana/spl-token";
 import {
-  Connection,
-  Signer,
-  PublicKey,
-  Keypair,
   Commitment,
-  Transaction,
+  Connection,
+  Keypair,
+  PublicKey,
+  Signer,
   SystemProgram,
+  Transaction,
   TransactionInstruction,
 } from "@solana/web3.js";
 
@@ -19,8 +19,9 @@ export async function getCreateAccountInstructions(
   commitment?: Commitment,
   programId = TOKEN_PROGRAM_ID,
 ): Promise<TransactionInstruction[]> {
-  const mintState = await getMint(connection, mint, commitment, programId);
-  const space = getAccountLenForMint(mintState);
+  // Warning: That's an average space for the new account creation. It's used instead of `getMint()` method, because
+  // it's not possible to call `getMint()` for not created token (e.g. for not created meme in `new()` method).
+  const space = 165;
   const lamports = await connection.getMinimumBalanceForRentExemption(space);
 
   const transaction = new Transaction().add(
