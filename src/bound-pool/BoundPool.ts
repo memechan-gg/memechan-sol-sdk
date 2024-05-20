@@ -9,6 +9,7 @@ import {
   mintTo,
   NATIVE_MINT,
   TOKEN_PROGRAM_ID,
+  transfer,
 } from "@solana/spl-token";
 import {
   ComputeBudgetProgram,
@@ -341,7 +342,7 @@ export class BoundPool {
         await getOrCreateAssociatedTokenAccount(
           this.client.connection,
           payer,
-          this.quoteToken.mint,
+          NATIVE_MINT, // this is a sol acc
           user.publicKey,
           true,
           "confirmed",
@@ -360,23 +361,25 @@ export class BoundPool {
     //   microLamports: 20000,
     // });
 
-    const transferTx = new Transaction().add(
-      //  modifyComputeUnits,
-      // addPriorityFee,
-      SystemProgram.transfer({
-        fromPubkey: payer.publicKey,
-        toPubkey: userSolAcc,
-        lamports: BigInt(sol_in.toString()),
-      }),
-      createSyncNativeInstruction(userSolAcc),
-    );
+    //   transfer(this.client.connection, payer, 
 
-    const transferResult = await sendAndConfirmTransaction(this.client.connection, transferTx, [payer], {
-      skipPreflight: true,
-      commitment: "confirmed",
-    });
+    // const transferTx = new Transaction().add(
+    //   //  modifyComputeUnits,
+    //   // addPriorityFee,
+    //   SystemProgram.transfer({
+    //     fromPubkey: payer.publicKey,
+    //     toPubkey: userSolAcc,
+    //     lamports: BigInt(sol_in.toString()),
+    //   }),
+    //   createSyncNativeInstruction(userSolAcc),
+    // );
 
-    console.log("3 transferResult: " + transferResult);
+    // const transferResult = await sendAndConfirmTransaction(this.client.connection, transferTx, [payer], {
+    //   skipPreflight: true,
+    //   commitment: "confirmed",
+    // });
+
+    //console.log("3 transferResult: " + transferResult);
 
     await this.client.memechanProgram.methods
       .swapY(new BN(sol_in), new BN(meme_out))

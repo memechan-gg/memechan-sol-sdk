@@ -17,7 +17,7 @@ const DUMMY_TOKEN_METADATA = {
 };
 
 describe("BoundPool", () => {
-  it("creates bound pool", async () => {
+  it.skip("creates bound pool", async () => {
     const boundPool = await BoundPool.slowNew({
       admin,
       payer,
@@ -43,9 +43,9 @@ describe("BoundPool", () => {
     console.log(all);
   }, 30000);
 
-  it.skip("init staking pool then go live", async () => {
+  it("init staking pool then go live", async () => {
     console.log("payer: " + payer.publicKey.toString());
-    const pool = await BoundPool.new({
+    const pool = await BoundPool.slowNew({
       admin,
       payer,
       signer: payer,
