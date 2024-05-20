@@ -1,4 +1,4 @@
-import { PublicKey, SYSVAR_RENT_PUBKEY, SystemProgram } from "@solana/web3.js";
+import { PublicKey, SYSVAR_RENT_PUBKEY, SystemProgram, Transaction, sendAndConfirmTransaction } from "@solana/web3.js";
 import { MemechanClient } from "../MemechanClient";
 import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import { CreateMetadataInfo } from "./types";
@@ -7,16 +7,28 @@ import { uploadMetadataToIpfs } from "./uploadMetadataToIpfs";
 //  https://github.com/metaplex-foundation/metaplex-program-library/blob/caeab0f7/token-metadata/js/src/generated/index.ts#L13
 const TOKEN_METADATA_PROGRAM_ID = new PublicKey("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s");
 
-export async function createMetadata(
+export async function createMetadata(client: MemechanClient, input: CreateMetadataInfo): Promise<string> {
+  const createMetadataTransaction = await getCreateMetadataTransaction(client, input);
+
+  const signature = await sendAndConfirmTransaction(client.connection, createMetadataTransaction, [input.payer], {
+    skipPreflight: true,
+    commitment: "confirmed",
+  });
+
+  console.log("Transaction signature", signature);
+  return signature;
+}
+
+export async function getCreateMetadataTransaction(
   client: MemechanClient,
-  input: CreateMetadataInfo
-): Promise<string> {
+  input: CreateMetadataInfo,
+): Promise<Transaction> {
   const metadata = input.metadata;
   const metadataUri = await uploadMetadataToIpfs(metadata);
   const pda = findMetadataPDA(input.mint);
 
   // Prepare the transaction to initialize the counter
-  const tx = await client.memechanProgram.methods
+  const tx = client.memechanProgram.methods
     .createMetadata(metadata.name, metadata.symbol, metadataUri)
     .accounts({
       pool: input.poolId,
@@ -29,10 +41,8 @@ export async function createMetadata(
       systemProgram: SystemProgram.programId,
       tokenProgram: TOKEN_PROGRAM_ID,
     })
-    .signers([input.payer])
-    .rpc({ skipPreflight: true, commitment: "confirmed"});
+    .transaction();
 
-  console.log("Transaction signature", tx);
   return tx;
 }
 
