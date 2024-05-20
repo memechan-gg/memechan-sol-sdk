@@ -79,5 +79,5 @@ export type GetCreateNewBondingPoolAndTokenTransactionArgs = BoundPoolArgs & {
 
 export interface InitStakingPoolResult {
   stakingMemeVault: PublicKey;
-  stakingWSolVault: PublicKey;
+  stakingQuoteVault: PublicKey;
 }
