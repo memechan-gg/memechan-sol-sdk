@@ -1,5 +1,4 @@
 import { BN } from "@coral-xyz/anchor";
-import { Token } from "@raydium-io/raydium-sdk";
 import { BoundPool } from "../src/bound-pool/BoundPool";
 import { sleep } from "../src/common/helpers";
 import { admin, client, payer } from "./common/common";
@@ -71,14 +70,14 @@ describe("BoundPool", () => {
 
     console.log("boundPoolInfo:", boundPoolInfo);
 
-    const { stakingMemeVault, stakingWSolVault } = await pool.slowInitStakingPool({
+    const { stakingMemeVault, stakingQuoteVault } = await pool.slowInitStakingPool({
       payer: payer,
       user: payer,
       boundPoolInfo,
     });
 
     console.log("stakingMemeVault: " + stakingMemeVault.toString());
-    console.log("stakingWSolVault: " + stakingWSolVault.toString());
+    console.log("stakingQuoteVault: " + stakingQuoteVault.toString());
 
     await sleep(2000);
 
@@ -88,7 +87,7 @@ describe("BoundPool", () => {
       boundPoolInfo,
       feeDestinationWalletAddress: FEE_DESTINATION_ID,
       memeVault: stakingMemeVault,
-      quoteVault: stakingWSolVault,
+      quoteVault: stakingQuoteVault,
     });
 
     console.log("OINK");

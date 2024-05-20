@@ -78,5 +78,5 @@ export type GetCreateNewBondingPoolTransactionArgs = Omit<BoundPoolArgs, "tokenM
 
 export interface InitStakingPoolResult {
   stakingMemeVault: PublicKey;
-  stakingWSolVault: PublicKey;
+  stakingQuoteVault: PublicKey;
 }
