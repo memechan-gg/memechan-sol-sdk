@@ -3,13 +3,11 @@ import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
   createAccount,
   createAssociatedTokenAccountInstruction,
-  createSyncNativeInstruction,
   getAssociatedTokenAddressSync,
   getOrCreateAssociatedTokenAccount,
   mintTo,
   NATIVE_MINT,
   TOKEN_PROGRAM_ID,
-  transfer,
 } from "@solana/spl-token";
 import {
   ComputeBudgetProgram,
@@ -23,6 +21,7 @@ import {
   SYSVAR_RENT_PUBKEY,
   Transaction,
 } from "@solana/web3.js";
+import { BoundPool as CodegenBoundPool } from "../schema/codegen/accounts";
 
 import { AnchorError, BN, Program, Provider } from "@coral-xyz/anchor";
 import { MemechanClient } from "../MemechanClient";
@@ -44,14 +43,14 @@ import {
 } from "./types";
 
 import { findProgramAddress } from "../common/helpers";
+import { MEMECHAN_QUOTE_TOKEN, MEMECHAN_TARGET_CONFIG } from "../config/config";
 import { MemechanSol } from "../schema/types/memechan_sol";
 import { createMetadata } from "../token/createMetadata";
+import { createMintWithPriority } from "../token/createMintWithPriority";
 import { getCreateMintWithPriorityTransaction } from "../token/getCreateMintWithPriorityTransaction";
 import { getCreateAccountInstructions } from "../utils/getCreateAccountInstruction";
 import { getSendAndConfirmTransactionMethod } from "../utils/getSendAndConfirmTransactionMethod";
 import { retry } from "../utils/retry";
-import { createMintWithPriority } from "../token/createMintWithPriority";
-import { MEMECHAN_QUOTE_TOKEN, MEMECHAN_TARGET_CONFIG } from "../config/config";
 
 export class BoundPool {
   private constructor(
@@ -223,7 +222,7 @@ export class BoundPool {
       commitment: "confirmed",
     });
     console.log("memeMint: " + memeMint.toBase58());
-    
+
     const adminSolVault = (
       await getOrCreateAssociatedTokenAccount(connection, payer, quoteToken.mint, admin, true, "confirmed", {
         skipPreflight: true,
@@ -258,7 +257,7 @@ export class BoundPool {
         quoteMint: quoteToken.mint,
         tokenProgram: TOKEN_PROGRAM_ID,
         systemProgram: SystemProgram.programId,
-        targetConfig: new PublicKey(MEMECHAN_TARGET_CONFIG)
+        targetConfig: new PublicKey(MEMECHAN_TARGET_CONFIG),
       })
       .signers([signer])
       .rpc({ skipPreflight: true });
@@ -280,12 +279,30 @@ export class BoundPool {
   /**
    * Fetches the account information.
    *
+   * @deprecated Please use `fetch2` method
    * @param {Object} [program=this.client.memechanProgram] - The program to use for fetching the account.
    * @param {string} [accountId=this.id] - The ID of the account to fetch.
    * @returns {Promise<T>} - The account information.
    */
   async fetch(program = this.client.memechanProgram, accountId = this.id) {
     const accountInfo = await program.account.boundPool.fetch(accountId, "confirmed");
+    return accountInfo;
+  }
+
+  /**
+   * Fetches the account information.
+   *
+   * @param {Connection} connection - The Solana RPC connection.
+   * @param {PublicKey} accountId - The ID of the account to fetch.
+   * @returns {Promise<T>} - The account information.
+   */
+  static async fetch2(connection: Connection, accountId: PublicKey) {
+    const accountInfo = await CodegenBoundPool.fetch(connection, accountId);
+
+    if (!accountInfo) {
+      throw new Error(`[BoundPool.fetch] No account info found for the pool ${accountId}`);
+    }
+
     return accountInfo;
   }
 
@@ -361,7 +378,7 @@ export class BoundPool {
     //   microLamports: 20000,
     // });
 
-    //   transfer(this.client.connection, payer, 
+    //   transfer(this.client.connection, payer,
 
     // const transferTx = new Transaction().add(
     //   //  modifyComputeUnits,
