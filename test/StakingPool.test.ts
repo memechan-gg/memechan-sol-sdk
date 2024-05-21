@@ -1,9 +1,9 @@
 import BN from "bn.js";
 import { BoundPoolClient } from "../src/bound-pool/BoundPool";
 import { sleep } from "../src/common/helpers";
-import { MEMECHAN_QUOTE_TOKEN } from "../src/config/config";
+import { MEMECHAN_MEME_TOKEN_DECIMALS, MEMECHAN_QUOTE_TOKEN } from "../src/config/config";
 import { StakingPool } from "../src/staking-pool/StakingPool";
-import { DUMMY_TOKEN_METADATA, STAKING_POOL_ID, admin, client, payer} from "./common/common";
+import { DUMMY_TOKEN_METADATA, MARKET_ID, MEME_MINT, STAKING_POOL_ID, admin, client, payer} from "./common/common";
 import { FEE_DESTINATION_ID } from "./common/env";
 import { MemeTicket } from "../src/memeticket/MemeTicket";
 import { swapOnlyAmm } from "../src/raydium/swapOnlyAmm";
@@ -87,8 +87,9 @@ describe("StakingPool", () => {
     
     const stakingPool = await StakingPool.fromStakingPoolId({client, poolAccountAddressId: STAKING_POOL_ID});
 
+
     const inputToken = MEMECHAN_QUOTE_TOKEN;
-    const outputToken = new Token(TOKEN_PROGRAM_ID, new PublicKey("HJ4wgN3N98adPGcSQfwCFZHcUDJoAb7aYi7fksh1ewqB"), 6)
+    const outputToken = new Token(TOKEN_PROGRAM_ID, MEME_MINT, MEMECHAN_MEME_TOKEN_DECIMALS)
     const targetPool = STAKING_POOL_ID.toBase58();
     const inputTokenAmount = new TokenAmount(inputToken, 1)
     const slippage = new Percent(10, 100)
@@ -102,6 +103,13 @@ describe("StakingPool", () => {
       slippage,
       walletTokenAccounts,
       wallet: payer,
+      lpMint: stakingPool.lpMint,
+      baseVault: stakingPool.memeVault,
+      quoteVault: stakingPool.quote_vault,
+      //openOrders: stakingPool.openOrders,
+      marketId: MARKET_ID,
+     // marketEventQueue: stakingPool.marketEventQueue,
+
     }).then(({ txids }) => {
       /** continue with txids */
       console.log('amm swapresult txids', txids)

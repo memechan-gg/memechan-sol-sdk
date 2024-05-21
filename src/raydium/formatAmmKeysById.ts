@@ -7,26 +7,24 @@ import {
   SPL_MINT_LAYOUT,
 } from "@raydium-io/raydium-sdk";
 import { Connection, PublicKey } from "@solana/web3.js";
-import { safeBNToNumber } from "../utils/safeBNToNumber";
 import { MEMECHAN_MEME_TOKEN_DECIMALS, MEMECHAN_QUOTE_TOKEN_DECIMALS } from "../config/config";
 
 export async function formatAmmKeysById(id: string, connection: Connection): Promise<ApiPoolInfoV4> {
   console.log("formatAmmKeysById id: " + id);
   const account = await connection.getAccountInfo(new PublicKey(id), { commitment: "confirmed" });
-  console.log("formatAmmKeysById account: " + account);
 
   if (account === null) throw Error(" get id info error ");
   const info = LIQUIDITY_STATE_LAYOUT_V4.decode(account.data);
 
   const marketId = info.marketId;
-  const marketAccount = await connection.getAccountInfo(marketId, "processed");
+  const marketAccount = await connection.getAccountInfo(marketId, "confirmed");
   if (marketAccount === null) throw Error(" get market info error");
   const marketInfo = MARKET_STATE_LAYOUT_V3.decode(marketAccount.data);
 
   const lpMint = info.lpMint;
-  const lpMintAccount = await connection.getAccountInfo(lpMint, "processed");
+  const lpMintAccount = await connection.getAccountInfo(lpMint, "confirmed");
   if (lpMintAccount === null) throw Error(" get lp mint info error");
-  // const lpMintInfo = SPL_MINT_LAYOUT.decode(lpMintAccount.data); // throws RangeError: The value of "offset" is out of range. It must be >= 0 and <= 13. Received 44
+  //const lpMintInfo = SPL_MINT_LAYOUT.decode(lpMintAccount.data); // throws RangeError: The value of "offset" is out of range. It must be >= 0 and <= 13. Received 44
 
   return {
     id,
