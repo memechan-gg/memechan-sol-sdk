@@ -20,17 +20,16 @@ export const BE_URL = "https://7mgmqkuj18.execute-api.us-east-1.amazonaws.com/pr
 export const MEMECHAN_PROGRAM_ID = "2WRqhjrZUkMvvKPNg6KLCJwuqNdNjF4cjhGN2VWw1YeK";
 
 export const MEMECHAN_QUOTE_MINT = new PublicKey("Do6NqMhU5sHA9p11FVePcPN4rxEjNGu6ZH2B2bCpQfpJ");
-export const MEMECHAN_TARGET_CONFIG = "5cdqbrwSMEeubReme7g72VZ7zLVvab4LMnKwydsqQMCR";
-// https://explorer.solana.com/address/7BgBvyjrZX1YKz4oh9mjb8ZScatkkwb8DzFx7LoiVkM3
-export const SLERF_DECIMALS = 9;
-export const MEMECHAN_MEMECOIN_DECIMALS = 6;
+export const MEMECHAN_TARGET_CONFIG = new PublicKey("5cdqbrwSMEeubReme7g72VZ7zLVvab4LMnKwydsqQMCR");
+export const MEMECHAN_QUOTE_TOKEN_DECIMALS = 9;
 export const MEMECHAN_QUOTE_TOKEN: Token = new Token(
   TOKEN_PROGRAM_ID,
   MEMECHAN_QUOTE_MINT,
-  SLERF_DECIMALS,
+  MEMECHAN_QUOTE_TOKEN_DECIMALS,
   "SLERF",
   "SLERF",
 );
+export const MEMECHAN_MEME_TOKEN_DECIMALS = 6;
 
 // Contract constants
 export const MAX_TICKET_TOKENS = 900_000_000;

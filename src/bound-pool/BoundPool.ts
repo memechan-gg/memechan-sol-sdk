@@ -52,11 +52,11 @@ import { findProgramAddress } from "../common/helpers";
 import {
   DEFAULT_MAX_M,
   DEFAULT_MAX_M_LP,
-  MEMECHAN_MEMECOIN_DECIMALS,
   MEMECHAN_QUOTE_MINT,
   MEMECHAN_QUOTE_TOKEN,
   MEMECHAN_TARGET_CONFIG,
-  SLERF_DECIMALS,
+  MEMECHAN_MEME_TOKEN_DECIMALS,
+  MEMECHAN_QUOTE_TOKEN_DECIMALS,
 } from "../config/config";
 import { MemechanSol } from "../schema/types/memechan_sol";
 import { createMetadata, getCreateMetadataTransaction } from "../token/createMetadata";
@@ -98,7 +98,7 @@ export class BoundPoolClient {
       poolObjectData.quoteReserve.vault,
       poolObjectData.memeReserve.mint,
       poolObjectData.quoteReserve.mint,
-      new Token(TOKEN_PROGRAM_ID, poolObjectData.memeReserve.mint, 6), // TODO fix 6 decimals
+      new Token(TOKEN_PROGRAM_ID, poolObjectData.memeReserve.mint, MEMECHAN_MEME_TOKEN_DECIMALS),
     );
 
     return boundClientInstance;
@@ -160,7 +160,14 @@ export class BoundPoolClient {
     const poolSigner = BoundPoolClient.findSignerPda(id, args.client.memechanProgram.programId);
 
     const createMemeMintWithPriorityInstructions = (
-      await getCreateMintWithPriorityTransaction(connection, payer, poolSigner, null, 6, memeMintKeypair)
+      await getCreateMintWithPriorityTransaction(
+        connection,
+        payer,
+        poolSigner,
+        null,
+        MEMECHAN_MEME_TOKEN_DECIMALS,
+        memeMintKeypair,
+      )
     ).instructions;
 
     transaction.add(...createMemeMintWithPriorityInstructions);
@@ -234,7 +241,7 @@ export class BoundPoolClient {
         quoteMint: quoteToken.mint,
         tokenProgram: TOKEN_PROGRAM_ID,
         systemProgram: SystemProgram.programId,
-        targetConfig: new PublicKey(MEMECHAN_TARGET_CONFIG),
+        targetConfig: MEMECHAN_TARGET_CONFIG,
       })
       .instruction();
 
@@ -301,7 +308,7 @@ export class BoundPoolClient {
       poolQuoteVault,
       memeMint,
       quoteToken.mint,
-      new Token(TOKEN_PROGRAM_ID, memeMint, 6),
+      new Token(TOKEN_PROGRAM_ID, memeMint, MEMECHAN_MEME_TOKEN_DECIMALS),
     );
   }
 
@@ -315,10 +322,18 @@ export class BoundPoolClient {
     const poolSigner = BoundPoolClient.findSignerPda(id, args.client.memechanProgram.programId);
     console.log("poolSigner: " + poolSigner.toBase58());
 
-    const memeMint = await createMintWithPriority(connection, payer, poolSigner, null, 6, memeMintKeypair, {
-      skipPreflight: true,
-      commitment: "confirmed",
-    });
+    const memeMint = await createMintWithPriority(
+      connection,
+      payer,
+      poolSigner,
+      null,
+      MEMECHAN_MEME_TOKEN_DECIMALS,
+      memeMintKeypair,
+      {
+        skipPreflight: true,
+        commitment: "confirmed",
+      },
+    );
     console.log("memeMint: " + memeMint.toBase58());
 
     const adminSolVault = (
@@ -355,7 +370,7 @@ export class BoundPoolClient {
         quoteMint: quoteToken.mint,
         tokenProgram: TOKEN_PROGRAM_ID,
         systemProgram: SystemProgram.programId,
-        targetConfig: new PublicKey(MEMECHAN_TARGET_CONFIG),
+        targetConfig: MEMECHAN_TARGET_CONFIG,
       })
       .signers([signer])
       .rpc({ skipPreflight: true });
@@ -378,7 +393,7 @@ export class BoundPoolClient {
       poolQuoteVault,
       memeMint,
       quoteToken.mint,
-      new Token(TOKEN_PROGRAM_ID, memeMint, 6),
+      new Token(TOKEN_PROGRAM_ID, memeMint, MEMECHAN_MEME_TOKEN_DECIMALS),
     );
   }
 
@@ -561,14 +576,17 @@ export class BoundPoolClient {
     const connection = this.client.connection;
 
     // input
-    const inputAmountWithDecimals = normalizeInputCoinAmount(inputAmount, SLERF_DECIMALS);
+    const inputAmountWithDecimals = normalizeInputCoinAmount(inputAmount, MEMECHAN_QUOTE_TOKEN_DECIMALS);
     const inputAmountBN = new BN(inputAmountWithDecimals.toString());
 
     // output
     // Note: Be aware, we relay on the fact that `MEMECOIN_DECIMALS` would be always set same for all memecoins
     // As well as the fact that memecoins and tickets decimals are always the same
     const minOutputWithSlippage = deductSlippage(new BigNumber(minOutputAmount), slippagePercentage);
-    const minOutputNormalized = normalizeInputCoinAmount(minOutputWithSlippage.toString(), MEMECHAN_MEMECOIN_DECIMALS);
+    const minOutputNormalized = normalizeInputCoinAmount(
+      minOutputWithSlippage.toString(),
+      MEMECHAN_MEME_TOKEN_DECIMALS,
+    );
     const minOutputBN = new BN(minOutputNormalized.toString());
 
     // If `inputTokenAccount` is not passed in args, we need to find out, whether a quote account for an admin
@@ -850,7 +868,11 @@ export class BoundPoolClient {
       this.client.memechanProgram.programId,
     );
     const stakingSigner = StakingPool.findSignerPda(stakingId, this.client.memechanProgram.programId);
-    const baseTokenInfo = new Token(TOKEN_PROGRAM_ID, new PublicKey(boundPoolInfo.memeReserve.mint), 6);
+    const baseTokenInfo = new Token(
+      TOKEN_PROGRAM_ID,
+      new PublicKey(boundPoolInfo.memeReserve.mint),
+      MEMECHAN_MEME_TOKEN_DECIMALS,
+    );
     const quoteTokenInfo = MEMECHAN_QUOTE_TOKEN;
 
     // TODO: Put all the transactions into one (now they exceed trx size limit)
@@ -1006,7 +1028,11 @@ export class BoundPoolClient {
 
     console.log("goLive.boundPoolInfo: " + JSON.stringify(boundPoolInfo));
 
-    const baseTokenInfo = new Token(TOKEN_PROGRAM_ID, new PublicKey(boundPoolInfo.memeReserve.mint), 6);
+    const baseTokenInfo = new Token(
+      TOKEN_PROGRAM_ID,
+      new PublicKey(boundPoolInfo.memeReserve.mint),
+      MEMECHAN_MEME_TOKEN_DECIMALS,
+    );
     //const marketId = new PublicKey("AHZCwnUuiB3CUEyk2nybsU5c85WVDTHVP2UwuQwpVaR1");
     const quoteTokenInfo = MEMECHAN_QUOTE_TOKEN;
 
@@ -1246,8 +1272,8 @@ export class BoundPoolClient {
     const memeBalance = new BigNumber(boundPoolInfo.memeReserve.tokens.toString());
     const quoteBalance = new BigNumber(boundPoolInfo.quoteReserve.tokens.toString());
 
-    const quoteBalanceConverted = quoteBalance.div(10 ** SLERF_DECIMALS);
-    const soldMemeConverted = new BigNumber(DEFAULT_MAX_M).minus(memeBalance).div(10 ** MEMECHAN_MEMECOIN_DECIMALS);
+    const quoteBalanceConverted = quoteBalance.div(10 ** MEMECHAN_QUOTE_TOKEN_DECIMALS);
+    const soldMemeConverted = new BigNumber(DEFAULT_MAX_M).minus(memeBalance).div(10 ** MEMECHAN_MEME_TOKEN_DECIMALS);
 
     // In case no meme coins were sold, return 0-prices
     if (soldMemeConverted.eq(0)) {
@@ -1263,7 +1289,7 @@ export class BoundPoolClient {
   public static getMemeMarketCap({ memePriceInUsd }: { memePriceInUsd: string }): string {
     const fullMemeAmountConverted = new BigNumber(DEFAULT_MAX_M_LP)
       .plus(DEFAULT_MAX_M)
-      .div(10 ** MEMECHAN_MEMECOIN_DECIMALS);
+      .div(10 ** MEMECHAN_MEME_TOKEN_DECIMALS);
 
     const marketCap = fullMemeAmountConverted.multipliedBy(memePriceInUsd).toString();
 
@@ -1271,10 +1297,7 @@ export class BoundPoolClient {
   }
 
   static getATAAddress(owner: PublicKey, mint: PublicKey, programId: PublicKey) {
-    return findProgramAddress(
-      [owner.toBuffer(), programId.toBuffer(), mint.toBuffer()],
-      new PublicKey("ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"),
-    );
+    return findProgramAddress([owner.toBuffer(), programId.toBuffer(), mint.toBuffer()], new PublicKey(ATA_PROGRAM_ID));
   }
 
   static getAssociatedId({ programId, marketId }: { programId: PublicKey; marketId: PublicKey }) {

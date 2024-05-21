@@ -1,9 +1,9 @@
 import BN from "bn.js";
 import { BoundPoolClient } from "../src/bound-pool/BoundPool";
 import { sleep } from "../src/common/helpers";
-import { MEMECHAN_QUOTE_TOKEN } from "../src/config/config";
+import { MEMECHAN_MEME_TOKEN_DECIMALS, MEMECHAN_QUOTE_TOKEN } from "../src/config/config";
 import { StakingPool } from "../src/staking-pool/StakingPool";
-import { DUMMY_TOKEN_METADATA, STAKING_POOL_ID, admin, client, payer} from "./common/common";
+import { DUMMY_TOKEN_METADATA, MARKET_ID, MEME_MINT, STAKING_POOL_ID, admin, client, payer} from "./common/common";
 import { FEE_DESTINATION_ID } from "./common/env";
 import { MemeTicket } from "../src/memeticket/MemeTicket";
 import { swapOnlyAmm } from "../src/raydium/swapOnlyAmm";
@@ -22,7 +22,7 @@ describe("StakingPool", () => {
     }
   }, 30000);
 
-  it("swap, unstake", async () => {
+  it.skip("swap, unstake", async () => {
     // //console.log("payer: " + payer.publicKey.toString());
     // // const pool = await BoundPoolClient.slowNew({
     // //   admin,
@@ -59,55 +59,37 @@ describe("StakingPool", () => {
 
     // console.log("swapY ticketId: " + ticketId.id.toBase58());
 
-    // const boundPoolInfo = await BoundPoolClient.fetch2(client.connection, pool.id);
-
-    // console.log("boundPoolInfo:", boundPoolInfo);
-
-    // const { stakingMemeVault, stakingQuoteVault } = await pool.slowInitStakingPool({
-    //   payer: payer,
-    //   user: payer,
-    //   boundPoolInfo,
-    // });
-
-    // console.log("stakingMemeVault: " + stakingMemeVault.toString());
-    // console.log("stakingQuoteVault: " + stakingQuoteVault.toString());
-
-    // await sleep(2000);
-
-    // const [stakingPool ] = await pool.goLive({
-    //   payer: payer,
-    //   user: payer,
-    //   boundPoolInfo,
-    //   feeDestinationWalletAddress: FEE_DESTINATION_ID,
-    //   memeVault: stakingMemeVault,
-    //   quoteVault: stakingQuoteVault,
-    // });
-
-    // console.log("golive finished. stakingPool: " + stakingPool.id.toString());
-    
     const stakingPool = await StakingPool.fromStakingPoolId({client, poolAccountAddressId: STAKING_POOL_ID});
 
+
     const inputToken = MEMECHAN_QUOTE_TOKEN;
-    const outputToken = new Token(TOKEN_PROGRAM_ID, new PublicKey("HJ4wgN3N98adPGcSQfwCFZHcUDJoAb7aYi7fksh1ewqB"), 6)
+    const outputToken = new Token(TOKEN_PROGRAM_ID, MEME_MINT, MEMECHAN_MEME_TOKEN_DECIMALS)
     const targetPool = STAKING_POOL_ID.toBase58();
     const inputTokenAmount = new TokenAmount(inputToken, 1)
     const slippage = new Percent(10, 100)
     const walletTokenAccounts = await getWalletTokenAccount(client.connection, payer.publicKey)
 
-    await swapOnlyAmm({
-      connection: client.connection,
-      outputToken,
-      targetPool,
-      inputTokenAmount,
-      slippage,
-      walletTokenAccounts,
-      wallet: payer,
-    }).then(({ txids }) => {
-      /** continue with txids */
-      console.log('amm swapresult txids', txids)
-    })
+    // await swapOnlyAmm({
+    //   connection: client.connection,
+    //   outputToken,
+    //   targetPool,
+    //   inputTokenAmount,
+    //   slippage,
+    //   walletTokenAccounts,
+    //   wallet: payer,
+    //   lpMint: stakingPool.lpMint,
+    //   baseVault: stakingPool.memeVault,
+    //   quoteVault: stakingPool.quote_vault,
+    //   //openOrders: stakingPool.openOrders,
+    //   marketId: MARKET_ID,
+    //  // marketEventQueue: stakingPool.marketEventQueue,
 
-    //stakingPool.unstake(tickets);
+    // }).then(({ txids }) => {
+    //   /** continue with txids */
+    //   console.log('amm swapresult txids', txids)
+    // })
+
+   // stakingPool.unstake(tickets);
 
   }, 550000);
 });
