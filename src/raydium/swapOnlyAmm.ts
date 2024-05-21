@@ -57,7 +57,7 @@ export async function swapOnlyAmm(input: SawpOnlyAmmInputInfo) {
 
   console.log('amountOut:', amountOut.toFixed(), '  minAmountOut: ', minAmountOut.toFixed())
 
-  return { txids: await buildAndSendTx(connection, wallet, innerTransactions) }
+  return { txids: await buildAndSendTx(connection, wallet, innerTransactions, { skipPreflight: true }) }
 }
 
 // async function howToUse() {

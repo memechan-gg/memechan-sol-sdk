@@ -7,6 +7,7 @@ import {
   SPL_MINT_LAYOUT,
 } from "@raydium-io/raydium-sdk";
 import { Connection, PublicKey } from "@solana/web3.js";
+import { safeBNToNumber } from "../utils/safeBNToNumber";
 
 export async function formatAmmKeysById(id: string, connection: Connection): Promise<ApiPoolInfoV4> {
   console.log("formatAmmKeysById id: " + id);
@@ -31,8 +32,8 @@ export async function formatAmmKeysById(id: string, connection: Connection): Pro
     baseMint: info.baseMint.toString(),
     quoteMint: info.quoteMint.toString(),
     lpMint: info.lpMint.toString(),
-    baseDecimals: info.baseDecimal.toNumber(),
-    quoteDecimals: info.quoteDecimal.toNumber(),
+    baseDecimals: safeBNToNumber(info.baseDecimal),
+    quoteDecimals: safeBNToNumber(info.quoteDecimal),
     lpDecimals: 6,//lpMintInfo.decimals,
     version: 4,
     programId: account.owner.toString(),
@@ -58,3 +59,4 @@ export async function formatAmmKeysById(id: string, connection: Connection): Pro
     lookupTableAccount: PublicKey.default.toString(),
   };
 }
+

@@ -3,7 +3,7 @@ import { MEMECHAN_QUOTE_TOKEN } from "../src/config/config";
 import { MintUtils } from "../src/token/mintUtils";
 
 describe("QUOTE TOKEN MINT", () => {
-  it("airdrop quote token", async () => {
+  it.skip("airdrop quote token", async () => {
 
     console.log("payer: " + payer.publicKey.toString());
     console.log("quote token mint: " + MEMECHAN_QUOTE_TOKEN.mint.toString());

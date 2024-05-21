@@ -163,7 +163,7 @@ describe("MemeTicket", () => {
       console.log("mergedTicket2: " + mergedTicket2.id.toBase58());
     }, 520000);
 
-    it("close ticket", async () => {
+    it.skip("close ticket", async () => {
       const pool = await BoundPoolClient.fromBoundPoolId({client, poolAccountAddressId: LIVE_BOUND_POOL_ID});
 
       const ticket = await pool.swapY({

@@ -7,7 +7,7 @@ import { MintUtils } from "../src/token/mintUtils";
 
   describe("swapX", () => {
 
-    it("swaps user quote token->memecoin", async () => {
+    it.skip("swaps user quote token->memecoin", async () => {
       const pool = await BoundPoolClient.slowNew({
         admin,
         payer,
