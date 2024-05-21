@@ -1,6 +1,6 @@
 import { Keypair } from "@solana/web3.js";
 import { Auth } from "../src/auth/Auth";
-import { BE_URL, isSorted } from "./helpers";
+import { BE_URL, isSorted } from "./utils";
 import nacl from "tweetnacl";
 import { TokenAPI } from "../src/token/TokenAPI";
 import { SolanaToken, solanaTokenSchema } from "../src/token/schemas/token-schemas";
