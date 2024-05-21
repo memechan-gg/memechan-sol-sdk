@@ -5,6 +5,7 @@ import { MemechanClient } from "../MemechanClient";
 import { MemeTicketFields } from "../schema/codegen/accounts";
 import { MemechanSol } from "../schema/types/memechan_sol";
 import { BoundMerge, CloseArgs, StakingMerge, StringifiedMemeTicketFields } from "./types";
+import { MEMECHAN_MEME_TOKEN_DECIMALS } from "../config/config";
 
 export class MemeTicket {
   public constructor(
@@ -120,8 +121,13 @@ export class MemeTicket {
     const stringifiedTickets = tickets.map((ticket) => {
       return {
         ...ticket,
-        amount: ticket.amount.toString(),
         untilTimestamp: ticket.untilTimestamp.toString(),
+        amount: ticket.amount.toString(),
+        // Note: we relay that memecoin decimals and ticket coin decimals are always equal,
+        // otherwise we'll need to fetch meta to get decimals for each ticket
+        balanceWithDecimals: new BigNumber(ticket.amount.toString())
+          .dividedBy(10 ** MEMECHAN_MEME_TOKEN_DECIMALS)
+          .toString(),
       };
     });
 
@@ -138,13 +144,17 @@ export class MemeTicket {
       return currentTimestamp >= unlockTicketTimestamp;
     });
 
-    const availableAmount = availableTickets
-      .reduce((amount: BigNumber, ticket) => {
-        amount = amount.plus(ticket.amount);
-        return amount;
-      }, new BigNumber(0))
-      .toString();
+    const availableAmount = availableTickets.reduce((amount: BigNumber, ticket) => {
+      amount = amount.plus(ticket.amount);
+      return amount;
+    }, new BigNumber(0));
 
-    return { tickets: availableTickets, availableAmount };
+    const availableAmountWithDecimals = availableAmount.div(10 ** MEMECHAN_MEME_TOKEN_DECIMALS);
+
+    return {
+      tickets: availableTickets,
+      amount: availableAmount.toString(),
+      amountWithDecimals: availableAmountWithDecimals,
+    };
   }
 }
