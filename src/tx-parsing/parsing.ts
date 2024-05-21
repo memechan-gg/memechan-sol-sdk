@@ -15,13 +15,13 @@ export async function ParseTx(
   client: MemechanClient,
 ): Promise<
   | (
-    | NewBPInstructionParsed
-    | SwapYInstructionParsed
-    | SwapXInstructionParsed
-    | InitStakingPoolInstructionParsed
-    | GoLiveInstructionParsed
-    | CreateMetadataInstructionParsed
-  )[]
+      | NewBPInstructionParsed
+      | SwapYInstructionParsed
+      | SwapXInstructionParsed
+      | InitStakingPoolInstructionParsed
+      | GoLiveInstructionParsed
+      | CreateMetadataInstructionParsed
+    )[]
   | undefined
 > {
   const pt = await client.connection.getParsedTransaction(txSig);
@@ -96,7 +96,7 @@ async function ptx(
   }
   if (ixBytesSliced.equals(Buffer.from([0x1e, 0x23]))) {
     console.log("parsing ix: CreateMetadata");
-    return await ParseCreateMetadataInstruction(tx, index);
+    return await ParseCreateMetadataInstruction(tx, index, memechanProgram);
   }
 
   return undefined;
