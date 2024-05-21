@@ -129,9 +129,9 @@ export class MemeTicket {
 
   public static async fetchAvailableTicketsByUser(pool: PublicKey, client: MemechanClient, user: PublicKey) {
     const tickets = await MemeTicket.fetchTicketsByUser(pool, client, user);
+    const currentTimestamp = Date.now();
 
     return tickets.filter((ticket) => {
-      const currentTimestamp = Date.now();
       const unlockTicketTimestamp = +ticket.untilTimestamp;
 
       return currentTimestamp >= unlockTicketTimestamp;
