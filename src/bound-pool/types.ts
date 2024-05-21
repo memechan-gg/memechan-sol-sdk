@@ -1,44 +1,69 @@
 import { BN } from "@coral-xyz/anchor";
-import { PublicKey, Keypair, Signer } from "@solana/web3.js";
-import { MemeTicket } from "../memeticket/MemeTicket";
-import { MemechanClient } from "../MemechanClient";
 import { Token } from "@raydium-io/raydium-sdk";
+import { Keypair, PublicKey, Signer, Transaction } from "@solana/web3.js";
+import { MemechanClient } from "../MemechanClient";
+import { MemeTicket } from "../memeticket/MemeTicket";
+import { BoundPool } from "../schema/codegen/accounts";
 import { TokenMetadata } from "../token/types";
 
 export interface SwapYArgs {
   payer: Signer;
   user: Keypair;
   pool: PublicKey;
-  userSolAcc: PublicKey;
-  solAmountIn: BN;
+  userSolAcc?: PublicKey;
+  quoteAmountIn: BN;
+  quoteMint: PublicKey;
   memeTokensOut: BN;
 }
 
+export type GetBuyMemeTransactionArgs = Omit<SwapYArgs, "user" | "payer" | "pool"> & {
+  user: { publicKey: PublicKey };
+  // inputToken: {
+  //   mint: PublicKey;
+  //   amount: string;
+  // };
+  // outputToken: {
+  //   mint: PublicKey;
+  //   minAmount: string;
+  // };
+  transaction?: Transaction;
+};
+
 export interface SwapXArgs {
   user: Keypair;
-  pool: PublicKey;
-  poolSignerPda: PublicKey;
+  //pool: PublicKey;
+  //poolSignerPda: PublicKey;
   memeAmountIn: BN;
-  solTokensOut: BN;
+  minQuoteAmountOut: BN;
   userMemeTicket: MemeTicket;
-  userSolAcc: PublicKey;
+  userQuoteAcc: PublicKey;
+  quoteMint: PublicKey;
 }
 
+export type GetSellMemeTransactionArgs = Omit<SwapXArgs, "user" | "pool" | "poolSignerPda"> & {
+  user: { publicKey: PublicKey };
+  transaction?: Transaction;
+};
+
 export interface GoLiveArgs {
-  pool: PublicKey;
   user: Keypair;
   payer: Signer;
-  boundPoolInfo: object;
+  boundPoolInfo: BoundPool;
   memeVault: PublicKey;
+  feeDestinationWalletAddress: string;
   quoteVault: PublicKey;
 }
 
+export type GetGoLiveTransactionArgs = GoLiveArgs & { transaction?: Transaction };
+
 export interface InitStakingPoolArgs {
-  pool: PublicKey;
+  pool?: PublicKey;
   user: Keypair;
   payer: Signer;
-  boundPoolInfo: object;
+  boundPoolInfo: BoundPool;
 }
+
+export type GetInitStakingPoolTransactionArgs = InitStakingPoolArgs & { transaction?: Transaction };
 
 export interface BoundPoolArgs {
   admin: PublicKey;
@@ -49,7 +74,12 @@ export interface BoundPoolArgs {
   tokenMetadata: TokenMetadata;
 }
 
+export type GetCreateNewBondingPoolAndTokenTransactionArgs = BoundPoolArgs & {
+  transaction?: Transaction;
+  adminSolPublicKey?: PublicKey;
+};
+
 export interface InitStakingPoolResult {
   stakingMemeVault: PublicKey;
-  stakingWSolVault: PublicKey;
+  stakingQuoteVault: PublicKey;
 }

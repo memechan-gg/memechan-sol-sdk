@@ -23,7 +23,8 @@ export class MintUtils {
       this.conn,
       this.authority,
       this.authority.publicKey,
-      this.authority.publicKey,
+      null,
+      //this.authority.publicKey,
       nb_decimals,
       kp
     );
@@ -71,14 +72,14 @@ export class MintUtils {
     );
   }
 
-  public async mintTo(mint: PublicKey, tokenAccount: PublicKey) {
+  public async mintTo(mint: PublicKey, tokenAccount: PublicKey, amount: number = 1000000000000) {
     await splToken.mintTo(
       this.conn,
       this.authority,
       mint,
       tokenAccount,
       this.authority,
-      1000000000000
+      amount
     );
   }
 }

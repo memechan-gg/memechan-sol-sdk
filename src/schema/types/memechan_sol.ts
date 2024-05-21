@@ -3,7 +3,7 @@ export type MemechanSol = {
   "name": "memechan_sol",
   "instructions": [
     {
-      "name": "new",
+      "name": "newPool",
       "accounts": [
         {
           "name": "sender",
@@ -38,6 +38,11 @@ export type MemechanSol = {
         {
           "name": "memeVault",
           "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "targetConfig",
+          "isMut": false,
           "isSigner": false
         },
         {
@@ -366,6 +371,58 @@ export type MemechanSol = {
         }
       ],
       "args": []
+    },
+    {
+      "name": "newTargetConfig",
+      "accounts": [
+        {
+          "name": "sender",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "targetConfig",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "targetAmount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "changeTargetConfig",
+      "accounts": [
+        {
+          "name": "sender",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "targetConfig",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "targetAmount",
+          "type": "u64"
+        }
+      ]
     },
     {
       "name": "goLive",
@@ -978,6 +1035,22 @@ export type MemechanSol = {
           {
             "name": "feesYTotal",
             "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "targetConfig",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "tokenTargetAmount",
+            "type": "u64"
+          },
+          {
+            "name": "tokenMint",
+            "type": "publicKey"
           }
         ]
       }
@@ -2075,7 +2148,7 @@ export const IDL: MemechanSol = {
   "name": "memechan_sol",
   "instructions": [
     {
-      "name": "new",
+      "name": "newPool",
       "accounts": [
         {
           "name": "sender",
@@ -2110,6 +2183,11 @@ export const IDL: MemechanSol = {
         {
           "name": "memeVault",
           "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "targetConfig",
+          "isMut": false,
           "isSigner": false
         },
         {
@@ -2438,6 +2516,58 @@ export const IDL: MemechanSol = {
         }
       ],
       "args": []
+    },
+    {
+      "name": "newTargetConfig",
+      "accounts": [
+        {
+          "name": "sender",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "targetConfig",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "targetAmount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "changeTargetConfig",
+      "accounts": [
+        {
+          "name": "sender",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "targetConfig",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "targetAmount",
+          "type": "u64"
+        }
+      ]
     },
     {
       "name": "goLive",
@@ -3050,6 +3180,22 @@ export const IDL: MemechanSol = {
           {
             "name": "feesYTotal",
             "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "targetConfig",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "tokenTargetAmount",
+            "type": "u64"
+          },
+          {
+            "name": "tokenMint",
+            "type": "publicKey"
           }
         ]
       }

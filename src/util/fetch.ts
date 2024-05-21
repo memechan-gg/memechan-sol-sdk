@@ -1,5 +1,5 @@
 import { IAMCredentials } from "../auth/Auth";
-import { BE_REGION } from "../common/constants";
+import { BE_REGION } from "../config/config";
 import { createSignedFetcher } from "./sigv4";
 
 

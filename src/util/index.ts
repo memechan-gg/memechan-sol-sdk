@@ -1,8 +1,8 @@
 import {
   buildSimpleTransaction,
+  InnerSimpleV0Transaction,
   SPL_ACCOUNT_LAYOUT,
   TOKEN_PROGRAM_ID,
-  InnerSimpleV0Transaction,
   TokenAccount,
 } from "@raydium-io/raydium-sdk";
 
@@ -23,15 +23,40 @@ export async function buildAndSendTx(
   innerSimpleV0Transaction: InnerSimpleV0Transaction[],
   options?: SendOptions,
 ) {
-  const willSendTx = await buildSimpleTransaction({
+
+  const willSendTx = await buildTxs(connection, payer, innerSimpleV0Transaction);
+
+  return await sendTx(connection, payer, willSendTx, options);
+}
+
+export async function buildTxs(
+  connection: Connection,
+  payer: Signer,
+  innerSimpleV0Transaction: InnerSimpleV0Transaction[],
+): Promise<(Transaction | VersionedTransaction)[]> {
+
+  let responseBlock;
+
+  try {
+      responseBlock = await connection.getLatestBlockhash("confirmed")
+  } catch (error) {
+      console.log(error)
+      console.log("Refetching latest Blockhash")
+      responseBlock = await connection.getLatestBlockhash("confirmed")
+  }
+
+  const recentBlockhash = (responseBlock).blockhash;
+
+  const transactions = await buildSimpleTransaction({
     connection,
     makeTxVersion,
     payer: payer.publicKey,
     innerTransactions: innerSimpleV0Transaction,
+    recentBlockhash,
     addLookupTableInfo: addLookupTableInfo,
   });
 
-  return await sendTx(connection, payer, willSendTx, options);
+  return transactions;
 }
 
 export async function sendTx(

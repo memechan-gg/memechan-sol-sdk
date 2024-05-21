@@ -7,6 +7,7 @@ import {
   SPL_MINT_LAYOUT,
 } from "@raydium-io/raydium-sdk";
 import { Connection, PublicKey } from "@solana/web3.js";
+import { safeBNToNumber } from "../utils/safeBNToNumber";
 
 export async function formatAmmKeysById(id: string, connection: Connection): Promise<ApiPoolInfoV4> {
   console.log("formatAmmKeysById id: " + id);
@@ -24,16 +25,16 @@ export async function formatAmmKeysById(id: string, connection: Connection): Pro
   const lpMint = info.lpMint;
   const lpMintAccount = await connection.getAccountInfo(lpMint, "processed");
   if (lpMintAccount === null) throw Error(" get lp mint info error");
-  const lpMintInfo = SPL_MINT_LAYOUT.decode(lpMintAccount.data);
+  // const lpMintInfo = SPL_MINT_LAYOUT.decode(lpMintAccount.data); // throws RangeError: The value of "offset" is out of range. It must be >= 0 and <= 13. Received 44
 
   return {
     id,
     baseMint: info.baseMint.toString(),
     quoteMint: info.quoteMint.toString(),
     lpMint: info.lpMint.toString(),
-    baseDecimals: info.baseDecimal.toNumber(),
-    quoteDecimals: info.quoteDecimal.toNumber(),
-    lpDecimals: lpMintInfo.decimals,
+    baseDecimals: safeBNToNumber(info.baseDecimal),
+    quoteDecimals: safeBNToNumber(info.quoteDecimal),
+    lpDecimals: 6,//lpMintInfo.decimals,
     version: 4,
     programId: account.owner.toString(),
     authority: Liquidity.getAssociatedAuthority({ programId: account.owner }).publicKey.toString(),
@@ -58,3 +59,4 @@ export async function formatAmmKeysById(id: string, connection: Connection): Pro
     lookupTableAccount: PublicKey.default.toString(),
   };
 }
+

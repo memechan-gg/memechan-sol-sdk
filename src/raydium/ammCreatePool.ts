@@ -33,7 +33,7 @@ function getMarketAssociatedPoolKeys(input: LiquidityPairTargetInfo) {
     quoteDecimals: input.quoteToken.decimals,
     marketId: input.targetMarketId,
     programId: PROGRAMIDS.AmmV4,
-    marketProgramId: MAINNET_PROGRAM_ID.OPENBOOK_MARKET,
+    marketProgramId: PROGRAMIDS.OPENBOOK_MARKET,
   });
 }
 
@@ -44,6 +44,8 @@ type TestTxInputInfo = LiquidityPairTargetInfo &
     walletTokenAccounts: WalletTokenAccounts;
     wallet: Keypair;
     connection: Connection;
+  } & {
+    feeDestinationWalletAddress: string;
   };
 
 export async function ammCreatePool(input: TestTxInputInfo) {
@@ -70,7 +72,7 @@ export async function ammCreatePool(input: TestTxInputInfo) {
     checkCreateATAOwner: true,
     makeTxVersion,
     //feeDestinationId: new PublicKey('7YttLkHDoNj9wyDur5pM1ejNaAvT9X4eqaYcHQqtj2G5'), // only mainnet use this
-    feeDestinationId: new PublicKey(process.env.FEE_DESTINATION_ID as string),
+    feeDestinationId: new PublicKey(input.feeDestinationWalletAddress),
   });
 
   const poolInfo = getMarketAssociatedPoolKeys(input);

@@ -1,31 +1,49 @@
 import { AnchorProvider, Program, Wallet, setProvider } from "@coral-xyz/anchor";
+<<<<<<< HEAD
 import { Connection, PublicKey } from "@solana/web3.js";
+=======
+import { Connection, ConnectionConfig, PublicKey } from "@solana/web3.js";
+>>>>>>> f24f9fff00698c2c30e0eafc12366222a7129f0c
 import { IDL, MemechanSol } from "./schema/types/memechan_sol";
+import { MEMECHAN_PROGRAM_ID } from "./config/config";
+
+export interface MemechanClientConfigArgs {
+  wallet: Wallet;
+  rpcConnectionConfig?: ConnectionConfig;
+  rpcApiUrl: string;
+  wssApiUrl: string;
+  heliusApiUrl: string;
+  isTest: boolean;
+}
 
 export class MemechanClient {
+  public wallet: Wallet;
   public connection: Connection;
   public memechanProgram: Program<MemechanSol>;
+  public anchorProvider: AnchorProvider;
+  public heliusApiUrl: string;
 
-  constructor(
-    private wallet: Wallet,
-    //network: Cluster = process.env.NETWORK as Cluster,
-  ) {
+  constructor(private config: MemechanClientConfigArgs) {
+    const { wallet, isTest, rpcApiUrl, rpcConnectionConfig, wssApiUrl, heliusApiUrl } = config;
+
     this.wallet = wallet;
-    const isTest = process.env.NODE_ENV === "test";
-
-    //this.connection = new Connection(clusterApiUrl('devnet'), {
-    this.connection = new Connection(process.env.RPC_API_CLUSTER, {
+    this.connection = new Connection(rpcApiUrl, {
       httpAgent: isTest ? false : undefined,
       commitment: "confirmed",
-      wsEndpoint: process.env.WSS_API_CLUSTER,
-      confirmTransactionInitialTimeout: 120000
+      wsEndpoint: wssApiUrl,
+      confirmTransactionInitialTimeout: 120000,
+
+      ...(rpcConnectionConfig ? rpcConnectionConfig : {}),
     });
 
+    this.heliusApiUrl = heliusApiUrl;
     const provider = new AnchorProvider(this.connection, wallet, { commitment: "confirmed" });
     setProvider(provider);
+    this.anchorProvider = provider;
 
-    console.log("program id: " + process.env.MEMECHAN_PROGRAM_ID);
+    console.log("program id: " + MEMECHAN_PROGRAM_ID);
     console.log("connection rpc: " + this.connection.rpcEndpoint);
-    this.memechanProgram = new Program<MemechanSol>(IDL, new PublicKey(process.env.MEMECHAN_PROGRAM_ID!), provider);
+
+    this.memechanProgram = new Program<MemechanSol>(IDL, new PublicKey(MEMECHAN_PROGRAM_ID), provider);
   }
 }
