@@ -6,14 +6,15 @@ import { client, payer } from "../common";
 export const getAvailableStakedLpByOwner = async () => {
   const poolAddress = new PublicKey("9Qy1JawWD9Ue7rWfCJUwcTDWqSSbS48e8MhqgGsprrcV");
 
-  const { availableAmount, tickets } = await MemeTicket.fetchAvailableTicketsByUser(
+  const { amount, amountWithDecimals, tickets } = await MemeTicket.fetchAvailableTicketsByUser(
     poolAddress,
     client,
     payer.publicKey,
   );
 
   console.log("\ntickets:", tickets);
-  console.log("\navailableAmount:", availableAmount);
+  console.log("\navailableAmount (raw):", amount);
+  console.log("amountWithDecimals:", amountWithDecimals);
 };
 
 getAvailableStakedLpByOwner();
