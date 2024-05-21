@@ -1,7 +1,8 @@
-import { Logger, StableModelLayout, ModelDataPubkey, formatLayout, ApiPoolInfoItem, BigNumberish, TokenAccount, CurrencyAmount, GetMultipleAccountsInfoConfig, Currency, Token, Percent, Base, LIQUIDITY_VERSION_TO_STATE_LAYOUT, findProgramAddress, Market, struct, u64, u8, parseBigNumberish, AccountMetaReadonly, TOKEN_PROGRAM_ID, AccountMeta, InstructionType, TxVersion, CacheLTA, ComputeBudgetConfig, TokenAmount, splitTxAndSigners, LiquidityStateV4, MakeInstructionOutType, ASSOCIATED_TOKEN_PROGRAM_ID, SYSTEM_PROGRAM_ID, RENT_PROGRAM_ID, ClmmPoolInfo, FarmPoolKeys, Clmm, InnerTransaction, Farm, MarketState, getMultipleAccountsInfo, MARKET_STATE_LAYOUT_V3, LiquidityStateV5, simulateMultipleInstruction, parseSimulateLogToJson, parseSimulateValue, ZERO, divCeil, ONE, Price, getStablePrice, BNDivCeil, getDyByDxBaseIn, getDxByDyBaseIn } from '@raydium-io/raydium-sdk'
+import { Logger, StableModelLayout, ModelDataPubkey, formatLayout, ApiPoolInfoItem, BigNumberish, TokenAccount, CurrencyAmount, GetMultipleAccountsInfoConfig, Currency, Token, Percent, Base, LIQUIDITY_VERSION_TO_STATE_LAYOUT, findProgramAddress, Market, struct, u64, u8, parseBigNumberish, AccountMetaReadonly, TOKEN_PROGRAM_ID, AccountMeta, InstructionType, TxVersion, CacheLTA, ComputeBudgetConfig, TokenAmount, splitTxAndSigners, LiquidityStateV4, MakeInstructionOutType, ASSOCIATED_TOKEN_PROGRAM_ID, SYSTEM_PROGRAM_ID, RENT_PROGRAM_ID, ClmmPoolInfo, FarmPoolKeys, Clmm, InnerTransaction, Farm, MarketState, getMultipleAccountsInfo, MARKET_STATE_LAYOUT_V3, LiquidityStateV5, parseSimulateLogToJson, parseSimulateValue, ZERO, divCeil, ONE, Price, getStablePrice, BNDivCeil, getDyByDxBaseIn, getDxByDyBaseIn } from '@raydium-io/raydium-sdk'
 import { Connection, PublicKey, Signer, TransactionInstruction } from '@solana/web3.js'
 import BN from 'bn.js'
 import { getATAAddress } from '../utils/util'
+import { simulateMultipleInstruction } from './memeWeb3'
 
 
 const logger = Logger.from('MemeLiquidity')
