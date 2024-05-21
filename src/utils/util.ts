@@ -16,6 +16,7 @@ import {
   VersionedTransaction,
 } from "@solana/web3.js";
 import { addLookupTableInfo, makeTxVersion } from "../raydium/config";
+import { findProgramAddress } from "../common/helpers";
 
 export async function buildAndSendTx(
   connection: Connection,
@@ -88,13 +89,13 @@ export async function getWalletTokenAccount(connection: Connection, wallet: Publ
   }));
 }
 
-// export function getATAAddress(programId: PublicKey, owner: PublicKey, mint: PublicKey) {
-//   const { publicKey, nonce } = findProgramAddress(
-//     [owner.toBuffer(), programId.toBuffer(), mint.toBuffer()],
-//     new PublicKey("ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"),
-//   );
-//   return { publicKey, nonce };
-// }
+export function getATAAddress(programId: PublicKey, owner: PublicKey, mint: PublicKey) {
+  const { publicKey, nonce } = findProgramAddress(
+    [owner.toBuffer(), programId.toBuffer(), mint.toBuffer()],
+    new PublicKey("ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"),
+  );
+  return { publicKey, nonce };
+}
 
 export async function sleepTime(ms: number) {
   console.log(new Date().toLocaleString(), "sleepTime", ms);
