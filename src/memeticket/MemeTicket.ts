@@ -20,6 +20,9 @@ export class MemeTicket {
     return program.account.memeTicket.all();
   }
 
+  // TODO:
+  // Add method for fetching tickets by user
+
   public async boundMerge(input: BoundMerge): Promise<MemeTicket> {
     const user = input.user;
 
