@@ -1,10 +1,10 @@
 import { BN } from "@coral-xyz/anchor";
-import { PublicKey, Keypair, Signer, Transaction } from "@solana/web3.js";
-import { MemeTicket } from "../memeticket/MemeTicket";
-import { MemechanClient } from "../MemechanClient";
 import { Token } from "@raydium-io/raydium-sdk";
+import { Keypair, PublicKey, Signer, Transaction } from "@solana/web3.js";
+import { MemechanClient } from "../MemechanClient";
+import { MemeTicket } from "../memeticket/MemeTicket";
+import { BoundPool } from "../schema/codegen/accounts";
 import { TokenMetadata } from "../token/types";
-import { BoundPool as CodegenBoundPool } from "../schema/codegen/accounts";
 
 export interface SwapYArgs {
   payer: Signer;
@@ -48,7 +48,7 @@ export type GetSellMemeTransactionArgs = Omit<SwapXArgs, "user" | "pool" | "pool
 export interface GoLiveArgs {
   user: Keypair;
   payer: Signer;
-  boundPoolInfo: CodegenBoundPool;
+  boundPoolInfo: BoundPool;
   memeVault: PublicKey;
   feeDestinationWalletAddress: string;
   quoteVault: PublicKey;
@@ -60,9 +60,7 @@ export interface InitStakingPoolArgs {
   pool?: PublicKey;
   user: Keypair;
   payer: Signer;
-  // TODO: Add type for `boundPoolInfo`
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  boundPoolInfo: any;
+  boundPoolInfo: BoundPool;
 }
 
 export type GetInitStakingPoolTransactionArgs = InitStakingPoolArgs & { transaction?: Transaction };
