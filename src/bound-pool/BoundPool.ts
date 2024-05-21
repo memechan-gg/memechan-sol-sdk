@@ -1295,6 +1295,17 @@ export class BoundPoolClient {
     return tickets;
   }
 
+  public static async fetchAvailableTicketsByUser(pool: PublicKey, client: MemechanClient, user: PublicKey) {
+    const tickets = await BoundPoolClient.fetchTicketsByUser(pool, client, user);
+
+    return tickets.filter((ticket) => {
+      const currentTimestamp = Date.now();
+      const unlockTicketTimestamp = ticket.untilTimestamp.toNumber();
+
+      return currentTimestamp >= unlockTicketTimestamp;
+    });
+  }
+
   /**
    * Fetches all unique token holders for pool and returns their number
    */
