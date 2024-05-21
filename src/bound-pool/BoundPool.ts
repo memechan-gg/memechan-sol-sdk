@@ -233,7 +233,7 @@ export class BoundPoolClient {
         quoteMint: quoteToken.mint,
         tokenProgram: TOKEN_PROGRAM_ID,
         systemProgram: SystemProgram.programId,
-        targetConfig: new PublicKey(MEMECHAN_TARGET_CONFIG),
+        targetConfig: MEMECHAN_TARGET_CONFIG,
       })
       .instruction();
 
@@ -362,7 +362,7 @@ export class BoundPoolClient {
         quoteMint: quoteToken.mint,
         tokenProgram: TOKEN_PROGRAM_ID,
         systemProgram: SystemProgram.programId,
-        targetConfig: new PublicKey(MEMECHAN_TARGET_CONFIG),
+        targetConfig: MEMECHAN_TARGET_CONFIG,
       })
       .signers([signer])
       .rpc({ skipPreflight: true });

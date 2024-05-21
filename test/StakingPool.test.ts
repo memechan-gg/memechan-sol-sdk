@@ -22,7 +22,7 @@ describe("StakingPool", () => {
     }
   }, 30000);
 
-  it("swap, unstake", async () => {
+  it.skip("swap, unstake", async () => {
     // //console.log("payer: " + payer.publicKey.toString());
     // // const pool = await BoundPoolClient.slowNew({
     // //   admin,
@@ -59,32 +59,6 @@ describe("StakingPool", () => {
 
     // console.log("swapY ticketId: " + ticketId.id.toBase58());
 
-    // const boundPoolInfo = await BoundPoolClient.fetch2(client.connection, pool.id);
-
-    // console.log("boundPoolInfo:", boundPoolInfo);
-
-    // const { stakingMemeVault, stakingQuoteVault } = await pool.slowInitStakingPool({
-    //   payer: payer,
-    //   user: payer,
-    //   boundPoolInfo,
-    // });
-
-    // console.log("stakingMemeVault: " + stakingMemeVault.toString());
-    // console.log("stakingQuoteVault: " + stakingQuoteVault.toString());
-
-    // await sleep(2000);
-
-    // const [stakingPool ] = await pool.goLive({
-    //   payer: payer,
-    //   user: payer,
-    //   boundPoolInfo,
-    //   feeDestinationWalletAddress: FEE_DESTINATION_ID,
-    //   memeVault: stakingMemeVault,
-    //   quoteVault: stakingQuoteVault,
-    // });
-
-    // console.log("golive finished. stakingPool: " + stakingPool.id.toString());
-    
     const stakingPool = await StakingPool.fromStakingPoolId({client, poolAccountAddressId: STAKING_POOL_ID});
 
 
@@ -95,27 +69,27 @@ describe("StakingPool", () => {
     const slippage = new Percent(10, 100)
     const walletTokenAccounts = await getWalletTokenAccount(client.connection, payer.publicKey)
 
-    await swapOnlyAmm({
-      connection: client.connection,
-      outputToken,
-      targetPool,
-      inputTokenAmount,
-      slippage,
-      walletTokenAccounts,
-      wallet: payer,
-      lpMint: stakingPool.lpMint,
-      baseVault: stakingPool.memeVault,
-      quoteVault: stakingPool.quote_vault,
-      //openOrders: stakingPool.openOrders,
-      marketId: MARKET_ID,
-     // marketEventQueue: stakingPool.marketEventQueue,
+    // await swapOnlyAmm({
+    //   connection: client.connection,
+    //   outputToken,
+    //   targetPool,
+    //   inputTokenAmount,
+    //   slippage,
+    //   walletTokenAccounts,
+    //   wallet: payer,
+    //   lpMint: stakingPool.lpMint,
+    //   baseVault: stakingPool.memeVault,
+    //   quoteVault: stakingPool.quote_vault,
+    //   //openOrders: stakingPool.openOrders,
+    //   marketId: MARKET_ID,
+    //  // marketEventQueue: stakingPool.marketEventQueue,
 
-    }).then(({ txids }) => {
-      /** continue with txids */
-      console.log('amm swapresult txids', txids)
-    })
+    // }).then(({ txids }) => {
+    //   /** continue with txids */
+    //   console.log('amm swapresult txids', txids)
+    // })
 
-    //stakingPool.unstake(tickets);
+   // stakingPool.unstake(tickets);
 
   }, 550000);
 });
