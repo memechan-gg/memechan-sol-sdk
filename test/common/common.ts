@@ -27,3 +27,4 @@ export const LIVE_BOUND_POOL_ID = new PublicKey("9pEBW3vNF7uxaPyJbATK1AdCLSxAzJy
 
 
 export const STAKING_POOL_ID = new PublicKey("AAJypjQCKkjkoTjSrM1rd2EEQNhbF27ZSseGJaiiVsRY");
+export const MEME_MINT = new PublicKey("HJ4wgN3N98adPGcSQfwCFZHcUDJoAb7aYi7fksh1ewqB");

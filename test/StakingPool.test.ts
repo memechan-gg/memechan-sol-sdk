@@ -85,8 +85,10 @@ describe("StakingPool", () => {
 
     // console.log("golive finished. stakingPool: " + stakingPool.id.toString());
     
+    const stakingPool = await StakingPool.fromStakingPoolId({client, poolAccountAddressId: STAKING_POOL_ID});
+
     const inputToken = MEMECHAN_QUOTE_TOKEN;
-    const outputToken = new Token(TOKEN_PROGRAM_ID, new PublicKey("37XrBAWxaBfzb3K2wG8GjAnoz1bCkbLXUDEkg1w9tQun"), 6)
+    const outputToken = new Token(TOKEN_PROGRAM_ID, new PublicKey("HJ4wgN3N98adPGcSQfwCFZHcUDJoAb7aYi7fksh1ewqB"), 6)
     const targetPool = STAKING_POOL_ID.toBase58();
     const inputTokenAmount = new TokenAmount(inputToken, 1)
     const slippage = new Percent(10, 100)
