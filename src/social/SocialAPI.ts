@@ -1,6 +1,6 @@
 /* eslint-disable require-jsdoc */
 import { Auth } from "../auth/Auth";
-import { BE_URL } from "../common/constants";
+import { BE_URL } from "../config/config";
 import { jsonFetch, signedJsonFetch } from "../util/fetch";
 import {
   CreateThreadReplyBody,

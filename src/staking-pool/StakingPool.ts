@@ -1,6 +1,6 @@
 import { Program } from "@coral-xyz/anchor";
 import { NATIVE_MINT, TOKEN_PROGRAM_ID } from "@solana/spl-token";
-import { AccountMeta, GetProgramAccountsFilter, Keypair, PublicKey, Transaction } from "@solana/web3.js";
+import { AccountMeta, Keypair, PublicKey, Transaction } from "@solana/web3.js";
 import { MemechanClient } from "../MemechanClient";
 import { MemechanSol } from "../schema/types/memechan_sol";
 import {
