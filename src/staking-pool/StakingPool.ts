@@ -1,7 +1,10 @@
 import { Program } from "@coral-xyz/anchor";
 import { NATIVE_MINT, TOKEN_PROGRAM_ID } from "@solana/spl-token";
-import { AccountMeta, GetProgramAccountsFilter, Keypair, PublicKey, Transaction } from "@solana/web3.js";
+import { AccountMeta, Keypair, PublicKey, Transaction } from "@solana/web3.js";
 import { MemechanClient } from "../MemechanClient";
+import { BoundPoolClient } from "../bound-pool/BoundPool";
+import { MemeTicket } from "../memeticket/MemeTicket";
+import { MemeTicketFields } from "../schema/codegen/accounts";
 import { MemechanSol } from "../schema/types/memechan_sol";
 import { getCreateAccountInstructions } from "../utils/getCreateAccountInstruction";
 import { getSendAndConfirmTransactionMethod } from "../utils/getSendAndConfirmTransactionMethod";
@@ -14,8 +17,6 @@ import {
   UnstakeArgs,
   WithdrawFeesArgs,
 } from "./types";
-import { MemeTicketFields } from "../schema/codegen/accounts";
-import { BoundPoolClient } from "../bound-pool/BoundPool";
 
 export class StakingPool {
   constructor(
@@ -243,7 +244,7 @@ export class StakingPool {
    * Fetches all tickets for corresponding pool id
    */
   public async fetchRelatedTickets(pool = this.pool, client = this.client): Promise<MemeTicketFields[]> {
-    return BoundPoolClient.fetchRelatedTickets(pool, client);
+    return MemeTicket.fetchRelatedTickets(pool, client);
   }
 
   /**
