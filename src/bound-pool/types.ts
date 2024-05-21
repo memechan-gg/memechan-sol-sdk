@@ -25,14 +25,26 @@ export type GetBuyMemeTransactionArgs = {
   transaction?: Transaction;
 };
 
+export type GetSellMemeTransactionArgs = Omit<GetBuyMemeTransactionArgs, "inputTokenAccount"> & {
+  outputTokenAccount?: PublicKey;
+};
+
 export type BuyMemeArgs = GetBuyMemeTransactionArgs & { signer: Keypair };
 
-export type GetOutputAmountForBuyMeme = Omit<BuyMemeArgs, "minOutputAmount">;
+export type SellMemeArgs = GetSellMemeTransactionArgs & { signer: Keypair };
+
+export type GetOutputAmountForBuyMemeArgs = Omit<BuyMemeArgs, "minOutputAmount">;
+
+export type GetOutputAmountForSellMemeArgs = Omit<SellMemeArgs, "minOutputAmount">;
 
 export type GetBuyMemeTransactionOutput = {
   tx: Transaction;
   memeTicketKeypair: Keypair;
   inputTokenAccount: PublicKey;
+};
+
+export type GetSellMemeTransactionOutput = {
+  tx: Transaction;
 };
 
 export interface SwapXArgs {
@@ -45,11 +57,6 @@ export interface SwapXArgs {
   userQuoteAcc: PublicKey;
   quoteMint: PublicKey;
 }
-
-export type GetSellMemeTransactionArgs = Omit<SwapXArgs, "user" | "pool" | "poolSignerPda"> & {
-  user: { publicKey: PublicKey };
-  transaction?: Transaction;
-};
 
 export interface GoLiveArgs {
   user: Keypair;

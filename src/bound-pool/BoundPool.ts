@@ -39,11 +39,14 @@ import {
   GetCreateNewBondingPoolAndTokenTransactionArgs,
   GetGoLiveTransactionArgs,
   GetInitStakingPoolTransactionArgs,
-  GetOutputAmountForBuyMeme,
+  GetOutputAmountForBuyMemeArgs,
+  GetOutputAmountForSellMemeArgs,
   GetSellMemeTransactionArgs,
+  GetSellMemeTransactionOutput,
   GoLiveArgs,
   InitStakingPoolArgs,
   InitStakingPoolResult,
+  SellMemeArgs,
   SwapXArgs,
   SwapYArgs,
 } from "./types";
@@ -580,13 +583,23 @@ export class BoundPoolClient {
    * @param {SwapYArgs} input - The input arguments required for the swap.
    * @returns {Promise<string>} A promise that resolves to the transaction ID of the swap.
    * @throws {Error} Throws an error if the transaction creation or confirmation fails.
-   * @untested This method is untested and may contain bugs.
    */
   public async buyMeme(input: BuyMemeArgs): Promise<string> {
     // TODO: Check whether user has enough amount of quoute token
     const { tx, memeTicketKeypair } = await this.getBuyMemeTransaction(input);
 
     const txId = await sendAndConfirmTransaction(this.client.connection, tx, [input.signer, memeTicketKeypair], {
+      skipPreflight: true,
+      commitment: "confirmed",
+    });
+
+    return txId;
+  }
+
+  public async sellMeme(input: SellMemeArgs): Promise<string> {
+    const { tx } = await this.getSellMemeTransaction(input);
+
+    const txId = await sendAndConfirmTransaction(this.client.connection, tx, [input.signer], {
       skipPreflight: true,
       commitment: "confirmed",
     });
@@ -604,6 +617,8 @@ export class BoundPoolClient {
    * @untested This method is untested and may contain bugs.
    */
   public async getBuyMemeTransaction(input: GetBuyMemeTransactionArgs): Promise<GetBuyMemeTransactionOutput> {
+    // TODO: Add check that inputBalance is not exceeded the associated account limit
+    // TODO: ? Think more should we create account for quote or base token?
     const { inputAmount, minOutputAmount, slippagePercentage, user, transaction = new Transaction() } = input;
     let { inputTokenAccount } = input;
 
@@ -626,8 +641,7 @@ export class BoundPoolClient {
     );
     const minOutputBN = new BN(minOutputNormalized.toString());
 
-    // If `inputTokenAccount` is not passed in args, we need to find out, whether a quote account for an admin
-    // already exists
+    // If `inputTokenAccount` is not passed in args, we need to find out, whether a inputTokenAccount exists for user
     if (!inputTokenAccount) {
       const associatedToken = getAssociatedTokenAddressSync(
         this.quoteTokenMint,
@@ -640,7 +654,7 @@ export class BoundPoolClient {
       const account = await getAccount(connection, associatedToken);
       inputTokenAccount = account.address;
 
-      // If the quote account for the admin doesn't exist, add an instruction to create it
+      // If doesn't exist, add an instruction to create it
       if (!inputTokenAccount) {
         const associatedTransactionInstruction = createAssociatedTokenAccountInstruction(
           user,
@@ -679,7 +693,7 @@ export class BoundPoolClient {
     return { tx: transaction, memeTicketKeypair, inputTokenAccount };
   }
 
-  public async getOutputAmountForBuyMeme(input: GetOutputAmountForBuyMeme) {
+  public async getOutputAmountForBuyMeme(input: GetOutputAmountForBuyMemeArgs) {
     const { tx, memeTicketKeypair } = await this.getBuyMemeTransaction({ ...input, minOutputAmount: "0" });
 
     const result = await this.client.connection.simulateTransaction(tx, [input.signer, memeTicketKeypair], true);
@@ -701,8 +715,7 @@ export class BoundPoolClient {
     return isPoolLocked;
   }
 
-  // TODO: Add method for checking is pool locked or not
-
+  // TODO: Add method for checking is pool locked or not for swapX and swapY
   public async swapX(input: SwapXArgs): Promise<string> {
     const sellMemeCoinTransaction = await this.getSellMemeTransaction(input);
 
@@ -714,34 +727,91 @@ export class BoundPoolClient {
     return txId;
   }
 
-  public async getSellMemeTransaction(input: GetSellMemeTransactionArgs): Promise<Transaction> {
-    const tx = input.transaction ?? new Transaction();
-    const user = input.user;
+  // TODO: Add check that pool is locked
+  // TODO: Add check that there is no available tickets (or input amount is bigger than available)
+  public async getSellMemeTransaction(input: GetSellMemeTransactionArgs): Promise<GetSellMemeTransactionOutput> {
+    const { inputAmount, minOutputAmount, slippagePercentage, user, transaction = new Transaction() } = input;
+    let { outputTokenAccount } = input;
 
     const pool = this.id;
     const poolSignerPda = this.findSignerPda();
-    const meme_in = input.memeAmountIn;
-    const minQuoteAmountOut = input.minQuoteAmountOut;
+    const connection = this.client.connection;
 
-    const memeTicket = input.userMemeTicket;
-    const userSolAcc = input.userQuoteAcc;
+    // input
+    const inputAmountWithDecimals = normalizeInputCoinAmount(inputAmount, MEMECHAN_MEME_TOKEN_DECIMALS);
+    const inputAmountBN = new BN(inputAmountWithDecimals.toString());
+
+    // output
+    // Note: Be aware, we relay on the fact that `MEMECHAN_QUOTE_TOKEN_DECIMALS` would be always set same for all memecoins
+    // As well as the fact that memecoins and tickets decimals are always the same
+    const minOutputWithSlippage = deductSlippage(new BigNumber(minOutputAmount), slippagePercentage);
+    const minOutputNormalized = normalizeInputCoinAmount(
+      minOutputWithSlippage.toString(),
+      MEMECHAN_QUOTE_TOKEN_DECIMALS,
+    );
+    const minOutputBN = new BN(minOutputNormalized.toString());
+
+    // If `outputTokenAccount` is not passed in args, we need to find out, whether a outputTokenAccount exists for user
+    if (!outputTokenAccount) {
+      const associatedToken = getAssociatedTokenAddressSync(
+        this.quoteTokenMint,
+        user,
+        true,
+        TOKEN_PROGRAM_ID,
+        ASSOCIATED_TOKEN_PROGRAM_ID,
+      );
+
+      const account = await getAccount(connection, associatedToken);
+      outputTokenAccount = account.address;
+
+      // If doesn't exist, add an instruction to create it
+      if (!outputTokenAccount) {
+        const associatedTransactionInstruction = createAssociatedTokenAccountInstruction(
+          user,
+          associatedToken,
+          user,
+          this.quoteTokenMint,
+          TOKEN_PROGRAM_ID,
+          ASSOCIATED_TOKEN_PROGRAM_ID,
+        );
+
+        transaction.add(associatedTransactionInstruction);
+
+        outputTokenAccount = associatedToken;
+      }
+    }
 
     const sellMemeTransactionInstruction = await this.client.memechanProgram.methods
-      .swapX(new BN(meme_in), new BN(minQuoteAmountOut))
+      .swapX(new BN(inputAmountBN), new BN(minOutputBN))
       .accounts({
         memeTicket: memeTicket.id,
-        owner: user.publicKey,
+        owner: user,
         pool: pool,
         poolSigner: poolSignerPda,
         quoteVault: this.quoteVault,
-        userSol: userSolAcc,
+        userSol: outputTokenAccount,
         tokenProgram: TOKEN_PROGRAM_ID,
       })
       .instruction();
 
-    tx.add(sellMemeTransactionInstruction);
+    transaction.add(sellMemeTransactionInstruction);
 
-    return tx;
+    return { tx: transaction };
+  }
+
+  public async getOutputAmountForSellMeme(input: GetOutputAmountForSellMemeArgs) {
+    const { tx } = await this.getSellMemeTransaction({ ...input, minOutputAmount: "0" });
+
+    const result = await this.client.connection.simulateTransaction(tx, [input.signer], true);
+
+    // If error happened (e.g. pool is locked)
+    if (result.value.err) {
+      return { outputAmount: 0, error: result.value.err, logs: result.value.logs };
+    }
+
+    // TODO: Decode the result of swap simulation
+
+    return result;
   }
 
   public async getInitStakingPoolTransaction(
