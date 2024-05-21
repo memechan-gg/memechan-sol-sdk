@@ -973,7 +973,12 @@ export class BoundPoolClient {
       throw new Error("goLiveTxResult failed");
     }
 
-    return await StakingPool.fromStakingPoolId({ poolAccountAddressId: stakingId, client: this.client });
+    const stakingPoolInstance = await StakingPool.fromStakingPoolId({
+      client: this.client,
+      poolAccountAddressId: stakingId,
+    });
+
+    return stakingPoolInstance;
   }
 
   public async goLive(input: GoLiveArgs): Promise<[StakingPool]> {

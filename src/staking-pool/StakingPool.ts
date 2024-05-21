@@ -27,8 +27,7 @@ export class StakingPool {
     public lpVault: PublicKey,
     public lpMint: PublicKey,
     public quote_vault: PublicKey,
-  ) { }
-
+  ) {}
 
   public static async fromStakingPoolId({
     client,
@@ -233,25 +232,25 @@ export class StakingPool {
   }
 
   public async getHoldersCount() {
-    return StakingPool.getHoldersCount(this.pool, this.memeMint, this.client)
+    return StakingPool.getHoldersCount(this.pool, this.memeMint, this.client);
   }
 
   public async getHoldersList() {
-    return StakingPool.getHoldersList(this.pool, this.memeMint, this.client)
+    return StakingPool.getHoldersList(this.pool, this.memeMint, this.client);
   }
 
   /**
    * Fetches all tickets for corresponding pool id
    */
   public async fetchRelatedTickets(pool = this.pool, client = this.client): Promise<MemeTicketFields[]> {
-    return BoundPoolClient.fetchRelatedTickets(pool, client)
+    return BoundPoolClient.fetchRelatedTickets(pool, client);
   }
 
   /**
    * Fetches all unique token holders and memetickets owners for pool; then returns their number
    */
   public static async getHoldersCount(pool: PublicKey, mint: PublicKey, client: MemechanClient) {
-    return (await StakingPool.getHoldersList(pool, mint, client)).length
+    return (await StakingPool.getHoldersList(pool, mint, client)).length;
   }
 
   /**
@@ -259,21 +258,20 @@ export class StakingPool {
    */
   public static async getHoldersList(pool: PublicKey, mint: PublicKey, client: MemechanClient) {
     const ticketHolderList = await BoundPoolClient.getHoldersList(pool, client);
-    const tokenHolderList = await StakingPool.getTokenHolderListHel(mint);
+    const tokenHolderList = await StakingPool.getTokenHolderListHelius(mint, client.heliusApiUrl);
 
-    ticketHolderList.forEach(holder => {
-      tokenHolderList.add(holder)
+    ticketHolderList.forEach((holder) => {
+      tokenHolderList.add(holder);
     });
 
-    return Array.from(tokenHolderList)
+    return Array.from(tokenHolderList);
   }
 
-  public static async getTokenHolderListHel(mint: PublicKey) {
+  public static async getTokenHolderListHelius(mint: PublicKey, url: string) {
     let page = 1;
-    let allOwners: Set<string> = new Set();
+    const allOwners: Set<string> = new Set();
 
-    const url = `https://devnet.helius-rpc.com/?api-key=${process.env.HELIUS_DEV_KEY}`;
-
+    // eslint-disable-next-line no-constant-condition
     while (true) {
       const response = await fetch(url, {
         method: "POST",
@@ -298,13 +296,11 @@ export class StakingPool {
         break;
       }
 
-      data.result.token_accounts.forEach((account: { owner: string; }) =>
-        allOwners.add(account.owner)
-      );
+      data.result.token_accounts.forEach((account: { owner: string }) => allOwners.add(account.owner));
       page++;
     }
 
-    return allOwners
+    return allOwners;
   }
 
   private async fetch(program = this.client.memechanProgram) {

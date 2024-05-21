@@ -45,6 +45,7 @@ jobs:
           WSS_API_CLUSTER: wss://api.devnet.solana.com/
           FEE_DESTINATION_ID: 3XMrhbv989VxAMi3DErLV9eJht1pHppW5LbKxe9fkEFR
           USER_ID: 8SvkUtJZCyJwSQGkiszwcRcPv7c8pPSr8GVEppGNN7DV
+          HELIUS_API_URL: https://mainnet.helius-rpc.com/?api-key=89bb46d5-c874-4de8-873c-4a7cebdd7376
 
       - name: Run Security Audit
         run: |

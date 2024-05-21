@@ -1,5 +1,12 @@
 import { Keypair, PublicKey } from "@solana/web3.js";
-import { ADMIN_PUB_KEY, IS_TEST_ENV, RPC_API_CLUSTER, TEST_USER_SECRET_KEY, WSS_API_CLUSTER } from "./env";
+import {
+  ADMIN_PUB_KEY,
+  HELIUS_API_URL,
+  IS_TEST_ENV,
+  RPC_API_CLUSTER,
+  TEST_USER_SECRET_KEY,
+  WSS_API_CLUSTER,
+} from "./env";
 import NodeWallet from "@coral-xyz/anchor/dist/cjs/nodewallet";
 import { MemechanClient } from "../../src/MemechanClient";
 
@@ -8,6 +15,7 @@ export const payer = Keypair.fromSecretKey(Buffer.from(JSON.parse(TEST_USER_SECR
 export const wallet = new NodeWallet(payer);
 export const client = new MemechanClient({
   wallet,
+  heliusApiUrl: HELIUS_API_URL,
   rpcApiUrl: RPC_API_CLUSTER,
   wssApiUrl: WSS_API_CLUSTER,
   isTest: IS_TEST_ENV,
@@ -24,7 +32,6 @@ export const DUMMY_TOKEN_METADATA = {
 };
 
 export const LIVE_BOUND_POOL_ID = new PublicKey("9pEBW3vNF7uxaPyJbATK1AdCLSxAzJyXs5bPCbuyRHhB");
-
 
 export const STAKING_POOL_ID = new PublicKey("AAJypjQCKkjkoTjSrM1rd2EEQNhbF27ZSseGJaiiVsRY");
 export const MEME_MINT = new PublicKey("HJ4wgN3N98adPGcSQfwCFZHcUDJoAb7aYi7fksh1ewqB");
