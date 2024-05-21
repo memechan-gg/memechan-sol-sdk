@@ -20,7 +20,7 @@ export const BE_URL = "https://7mgmqkuj18.execute-api.us-east-1.amazonaws.com/pr
 export const MEMECHAN_PROGRAM_ID = "FJuQ8pqDRKTmzrLASriYJBYUKRiRo9WWBJJwLe7C6ZLu";
 
 export const MEMECHAN_QUOTE_MINT = new PublicKey("Do6NqMhU5sHA9p11FVePcPN4rxEjNGu6ZH2B2bCpQfpJ");
-export const MEMECHAN_TARGET_CONFIG = new PublicKey("5cdqbrwSMEeubReme7g72VZ7zLVvab4LMnKwydsqQMCR");
+export const MEMECHAN_TARGET_CONFIG = new PublicKey("F3fnjGGcvsaK5CCrSYryBqcgcrpaTcBCPGNpjd5HSqL1");
 export const MEMECHAN_QUOTE_TOKEN_DECIMALS = 9;
 export const MEMECHAN_QUOTE_TOKEN: Token = new Token(
   TOKEN_PROGRAM_ID,
