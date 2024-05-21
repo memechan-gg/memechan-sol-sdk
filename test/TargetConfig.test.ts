@@ -2,7 +2,7 @@ import { TargetConfig } from "../src/targetconfig/TargetConfig";
 import { sleep } from "../src/common/helpers";
 import { client, payer } from "./common/common";
 import BN from "bn.js";
-import { MEMECHAN_MEME_TOKEN_DECIMALS, MEMECHAN_QUOTE_TOKEN } from "../src/config/config";
+import { MEMECHAN_MEME_TOKEN_DECIMALS, MEMECHAN_QUOTE_TOKEN, MEMECHAN_TARGET_CONFIG } from "../src/config/config";
 import { MintUtils } from "../src/token/mintUtils";
 
 describe("TargetConfig", () => {
@@ -26,4 +26,12 @@ describe("TargetConfig", () => {
     const info = await targetConfig.fetch();
     console.log(info);
   }, 90000);
+  it("change_target_config", async () => {
+    
+    const targetConfig = await TargetConfig.fromTargetConfigId({client, accountAddressId: MEMECHAN_TARGET_CONFIG});
+    await targetConfig.changeTargetConfig(new BN(2000000000));
+
+    const targetConfig2 = await TargetConfig.fromTargetConfigId({client, accountAddressId: MEMECHAN_TARGET_CONFIG});
+    console.log("targetConfig2: ", targetConfig2);
+  })
 });

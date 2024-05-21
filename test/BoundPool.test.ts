@@ -4,6 +4,7 @@ import { sleep } from "../src/common/helpers";
 import { DUMMY_TOKEN_METADATA, admin, client, payer } from "./common/common";
 import { FEE_DESTINATION_ID } from "./common/env";
 import { MEMECHAN_QUOTE_TOKEN } from "../src/config/config";
+import { formatAmmKeysById } from "../src/raydium/formatAmmKeysById";
 
 describe("BoundPool", () => {
   it.skip("creates bound pool", async () => {
@@ -80,6 +81,9 @@ describe("BoundPool", () => {
       memeVault: stakingMemeVault,
       quoteVault: stakingQuoteVault,
     });
+
+    const poolInfo2 = await formatAmmKeysById(stakingPool.id.toBase58(), client.connection);
+    console.log("poolInfo2: " + JSON.stringify(poolInfo2));
 
     console.log("golive finished. stakingPool: " + stakingPool.id.toString());
   }, 520000);
