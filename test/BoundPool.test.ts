@@ -1,19 +1,9 @@
 import { BN } from "@coral-xyz/anchor";
 import { BoundPoolClient } from "../src/bound-pool/BoundPool";
 import { sleep } from "../src/common/helpers";
-import { admin, client, payer } from "./common/common";
+import { DUMMY_TOKEN_METADATA, admin, client, payer } from "./common/common";
 import { FEE_DESTINATION_ID } from "./common/env";
 import { MEMECHAN_QUOTE_TOKEN } from "../src/config/config";
-
-const DUMMY_TOKEN_METADATA = {
-  name: "Best Token Ever",
-  symbol: "BTE",
-  image: "https://cf-ipfs.com/ipfs/QmVevMfxFpfgBu5kHuYUPmDMaV6pWkAn3zw5XaCXxKdaBh",
-  description: "This is the best token ever",
-  twitter: "https://twitter.com/BestTokenEver",
-  telegram: "https://t.me/BestTokenEver",
-  website: "https://besttokenever.com",
-};
 
 describe("BoundPool", () => {
   it.skip("creates bound pool", async () => {
@@ -26,7 +16,7 @@ describe("BoundPool", () => {
       tokenMetadata: DUMMY_TOKEN_METADATA,
     });
     await sleep(1000);
-    const info = await boundPool.fetch();
+    const info = await BoundPoolClient.fetch2(client.connection, boundPool.id);
     console.log(info);
   }, 150000);
 
@@ -59,8 +49,8 @@ describe("BoundPool", () => {
     const ticketId = await pool.swapY({
       payer: payer,
       user: payer,
-      memeTokensOut: new BN(1),
-      quoteAmountIn: new BN(1000),
+      memeTokensOut: new BN(10000),
+      quoteAmountIn: new BN(10000000),
       quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
       pool: pool.id,
     });
@@ -82,7 +72,7 @@ describe("BoundPool", () => {
 
     await sleep(2000);
 
-    await pool.goLive({
+    const [stakingPool ] = await pool.goLive({
       payer: payer,
       user: payer,
       boundPoolInfo,
@@ -91,35 +81,8 @@ describe("BoundPool", () => {
       quoteVault: stakingQuoteVault,
     });
 
-    console.log("OINK");
+    console.log("golive finished. stakingPool: " + stakingPool.id.toString());
   }, 520000);
-
-  it.skip("swaps full quote token->memecoin in one go", async () => {
-    const pool = await BoundPoolClient.slowNew({
-      admin,
-      payer,
-      signer: payer,
-      client,
-      quoteToken: MEMECHAN_QUOTE_TOKEN,
-      tokenMetadata: DUMMY_TOKEN_METADATA,
-    });
-
-    console.log("==== swapy pool id: " + pool.id.toString());
-
-    await sleep(1000);
-
-    // call to the swap endpoint
-    const ticketId = await pool.swapY({
-      payer: payer,
-      user: payer,
-      memeTokensOut: new BN(1),
-      quoteAmountIn: new BN(1000),
-      quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
-      pool: pool.id,
-    });
-
-    console.log("swapY ticketId: " + ticketId.id.toBase58());
-  }, 120000);
 
   //   sleep(1000);
 

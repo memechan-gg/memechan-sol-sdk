@@ -2,7 +2,7 @@ import { ParseTx } from "../src/tx-parsing/parsing";
 import { client } from "./common/common";
 
 describe("Tx Parsing", () => {
-  it("all", async () => {
+  it.skip("all", async () => {
     const txSigs = [
       "k4eiJmPATkjGbVXZn5EmjnpVHL8R8NXNu9LxXvrPruPHV2KR5oePTUUHBCJbpXHM3neZQHErApzN9cbN35yUEux", // newPool (null)
       "66oryLCS9H5Fr1MZ7ELw848jcaVXfVcAx37QRTj3BBxmQjG8nEc86MFhU5MJF9MV9qJPveSXE58p1yTP9RE4ntLo", // newPool

@@ -66,6 +66,7 @@ export class BoundPoolClient {
     public quoteVault: PublicKey,
     public memeTokenMint: PublicKey,
     public quoteTokenMint: PublicKey = MEMECHAN_QUOTE_MINT,
+    public memeToken: Token
   ) {
     //
   }
@@ -86,6 +87,7 @@ export class BoundPoolClient {
       poolObjectData.quoteReserve.vault,
       poolObjectData.memeReserve.mint,
       poolObjectData.quoteReserve.mint,
+      new Token(TOKEN_PROGRAM_ID, poolObjectData.memeReserve.mint, 6) // TODO fix 6 decimals
     );
 
     return boundClientInstance;
@@ -281,7 +283,7 @@ export class BoundPoolClient {
 
     const id = this.findBoundPoolPda(memeMint, quoteToken.mint, memechanProgram.programId);
 
-    return new BoundPoolClient(id, client, launchVault, poolQuoteVault, memeMint, quoteToken.mint);
+    return new BoundPoolClient(id, client, launchVault, poolQuoteVault, memeMint, quoteToken.mint, new Token(TOKEN_PROGRAM_ID, memeMint, 6));
   }
 
   public static async slowNew(args: BoundPoolArgs): Promise<BoundPoolClient> {
@@ -350,7 +352,7 @@ export class BoundPoolClient {
 
     // console.log("createCoinResponse: " + JSON.stringify(createCoinResponse));
 
-    return new BoundPoolClient(id, client, launchVault, poolQuoteVault, memeMint, quoteToken.mint);
+    return new BoundPoolClient(id, client, launchVault, poolQuoteVault, memeMint, quoteToken.mint, new Token(TOKEN_PROGRAM_ID, memeMint, 6));
   }
 
   /**
@@ -610,13 +612,13 @@ export class BoundPoolClient {
     const pool = this.id;
     const poolSignerPda = this.findSignerPda();
     const meme_in = input.memeAmountIn;
-    const sol_out = input.solTokensOut;
+    const minQuoteAmountOut = input.minQuoteAmountOut;
 
     const memeTicket = input.userMemeTicket;
-    const userSolAcc = input.userSolAcc;
+    const userSolAcc = input.userQuoteAcc;
 
     const sellMemeTransactionInstruction = await this.client.memechanProgram.methods
-      .swapX(new BN(meme_in), new BN(sol_out))
+      .swapX(new BN(meme_in), new BN(minQuoteAmountOut))
       .accounts({
         memeTicket: memeTicket.id,
         owner: user.publicKey,
