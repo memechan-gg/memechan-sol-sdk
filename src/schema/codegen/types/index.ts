@@ -1,5 +1,6 @@
 import * as DecimalError from "./DecimalError"
 
+export { Decimals, DecimalsFields, DecimalsJSON } from "./Decimals"
 export { Config, ConfigFields, ConfigJSON } from "./Config"
 export { Fees, FeesFields, FeesJSON } from "./Fees"
 export { TokenLimit, TokenLimitFields, TokenLimitJSON } from "./TokenLimit"
