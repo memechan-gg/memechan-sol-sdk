@@ -12,7 +12,6 @@ import {
 import {
   ComputeBudgetProgram,
   Connection,
-  GetProgramAccountsFilter,
   Keypair,
   PublicKey,
   sendAndConfirmTransaction,
@@ -63,13 +62,13 @@ import { MemechanSol } from "../schema/types/memechan_sol";
 import { createMetadata, getCreateMetadataTransaction } from "../token/createMetadata";
 import { createMintWithPriority } from "../token/createMintWithPriority";
 import { getCreateMintWithPriorityTransaction } from "../token/getCreateMintWithPriorityTransaction";
+import { NewBPInstructionParsed } from "../tx-parsing/parsers/bonding-pool-creation-parser";
+import { ParseTx } from "../tx-parsing/parsing";
 import { getCreateAccountInstructions } from "../utils/getCreateAccountInstruction";
 import { getSendAndConfirmTransactionMethod } from "../utils/getSendAndConfirmTransactionMethod";
 import { retry } from "../utils/retry";
 import { deductSlippage } from "../utils/trading/deductSlippage";
 import { normalizeInputCoinAmount } from "../utils/trading/normalizeInputCoinAmount";
-import { ParseTx } from "../tx-parsing/parsing";
-import { NewBPInstructionParsed } from "../tx-parsing/parsers/bonding-pool-creation-parser";
 import { sendTx } from "../utils/util";
 
 export class BoundPoolClient {
@@ -1261,7 +1260,7 @@ export class BoundPoolClient {
   }
 
   public async fetchRelatedTickets() {
-    return BoundPoolClient.fetchRelatedTickets(this.id, this.client);
+    return MemeTicket.fetchRelatedTickets(this.id, this.client);
   }
 
   public async getHoldersCount() {
@@ -1277,51 +1276,6 @@ export class BoundPoolClient {
   }
 
   /**
-   * Fetches all tickets for provided pool id
-   */
-  public static async fetchRelatedTickets(pool: PublicKey, client: MemechanClient): Promise<MemeTicketFields[]> {
-    const program = client.memechanProgram;
-    const filters: GetProgramAccountsFilter[] = [
-      {
-        memcmp: {
-          bytes: pool.toBase58(),
-          offset: 40,
-        },
-      },
-    ];
-
-    const fetchedTickets = await program.account.memeTicket.all(filters);
-    const tickets = fetchedTickets.map((ticket) => ticket.account);
-    return tickets;
-  }
-
-  public static async fetchTicketsByUser(
-    pool: PublicKey,
-    client: MemechanClient,
-    user: PublicKey,
-  ): Promise<MemeTicketFields[]> {
-    const program = client.memechanProgram;
-    const filters: GetProgramAccountsFilter[] = [
-      {
-        memcmp: {
-          bytes: pool.toBase58(),
-          offset: 40,
-        },
-      },
-      {
-        memcmp: {
-          bytes: user.toBase58(),
-          offset: 8,
-        },
-      },
-    ];
-
-    const fetchedTickets = await program.account.memeTicket.all(filters);
-    const tickets = fetchedTickets.map((ticket) => ticket.account);
-    return tickets;
-  }
-
-  /**
    * Fetches all unique token holders for pool and returns their number
    */
   public static async getHoldersCount(pool: PublicKey, client: MemechanClient) {
@@ -1329,7 +1283,7 @@ export class BoundPoolClient {
   }
 
   public static async getHoldersMap(pool: PublicKey, client: MemechanClient) {
-    const tickets = await BoundPoolClient.fetchRelatedTickets(pool, client);
+    const tickets = await MemeTicket.fetchRelatedTickets(pool, client);
     const uniqueHolders: Map<string, MemeTicketFields[]> = new Map();
 
     tickets.forEach((ticket) => {

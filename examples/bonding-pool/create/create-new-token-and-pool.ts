@@ -1,6 +1,6 @@
-import { BoundPoolClient } from "../../src/bound-pool/BoundPool";
-import { MEMECHAN_QUOTE_TOKEN } from "../../src/config/config";
-import { admin, client, payer } from "../common";
+import { BoundPoolClient } from "../../../src/bound-pool/BoundPool";
+import { MEMECHAN_QUOTE_TOKEN } from "../../../src/config/config";
+import { admin, client, payer } from "../../common";
 
 const DUMMY_TOKEN_METADATA = {
   name: "Best Token Ever",
