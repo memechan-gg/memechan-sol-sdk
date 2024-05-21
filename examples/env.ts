@@ -1,3 +1,5 @@
+import "dotenv/config";
+
 if (!process.env.TEST_PAYER_SECRET_KEY?.length) {
   throw new Error("Empty TEST_PAYER_SECRET_KEY");
 }

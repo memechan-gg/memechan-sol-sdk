@@ -1,9 +1,9 @@
 import { BN } from "@coral-xyz/anchor";
-import { Token } from "@raydium-io/raydium-sdk";
-import { BoundPool } from "../src/bound-pool/BoundPool";
+import { BoundPoolClient } from "../src/bound-pool/BoundPool";
 import { sleep } from "../src/common/helpers";
 import { admin, client, payer } from "./common/common";
 import { FEE_DESTINATION_ID } from "./common/env";
+import { MEMECHAN_QUOTE_TOKEN } from "../src/config/config";
 
 const DUMMY_TOKEN_METADATA = {
   name: "Best Token Ever",
@@ -16,24 +16,22 @@ const DUMMY_TOKEN_METADATA = {
 };
 
 describe("BoundPool", () => {
-  it("creates bound pool", async () => {
-    return;
-    const boundPool = await BoundPool.new({
+  it.skip("creates bound pool", async () => {
+    const boundPool = await BoundPoolClient.slowNew({
       admin,
       payer,
       signer: payer,
       client,
-      quoteToken: Token.WSOL,
+      quoteToken: MEMECHAN_QUOTE_TOKEN,
       tokenMetadata: DUMMY_TOKEN_METADATA,
     });
     await sleep(1000);
     const info = await boundPool.fetch();
     console.log(info);
-  }, 90000);
+  }, 150000);
 
-  it("all", async () => {
-    return;
-    const all = await BoundPool.all(client.memechanProgram);
+  it.skip("all", async () => {
+    const all = await BoundPoolClient.all(client.memechanProgram);
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     for (const pool of all) {
@@ -46,12 +44,12 @@ describe("BoundPool", () => {
 
   it("init staking pool then go live", async () => {
     console.log("payer: " + payer.publicKey.toString());
-    const pool = await BoundPool.new({
+    const pool = await BoundPoolClient.slowNew({
       admin,
       payer,
       signer: payer,
       client,
-      quoteToken: Token.WSOL,
+      quoteToken: MEMECHAN_QUOTE_TOKEN,
       tokenMetadata: DUMMY_TOKEN_METADATA,
     });
 
@@ -62,24 +60,25 @@ describe("BoundPool", () => {
       payer: payer,
       user: payer,
       memeTokensOut: new BN(1),
-      solAmountIn: new BN(1 * 1e9),
+      quoteAmountIn: new BN(1000),
+      quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
       pool: pool.id,
     });
 
     console.log("swapY ticketId: " + ticketId.id.toBase58());
 
-    const boundPoolInfo = await pool.fetch();
+    const boundPoolInfo = await BoundPoolClient.fetch2(client.connection, pool.id);
 
     console.log("boundPoolInfo:", boundPoolInfo);
 
-    const { stakingMemeVault, stakingWSolVault } = await pool.initStakingPool({
+    const { stakingMemeVault, stakingQuoteVault } = await pool.slowInitStakingPool({
       payer: payer,
       user: payer,
       boundPoolInfo,
     });
 
     console.log("stakingMemeVault: " + stakingMemeVault.toString());
-    console.log("stakingWSolVault: " + stakingWSolVault.toString());
+    console.log("stakingQuoteVault: " + stakingQuoteVault.toString());
 
     await sleep(2000);
 
@@ -89,24 +88,38 @@ describe("BoundPool", () => {
       boundPoolInfo,
       feeDestinationWalletAddress: FEE_DESTINATION_ID,
       memeVault: stakingMemeVault,
-      quoteVault: stakingWSolVault,
+      quoteVault: stakingQuoteVault,
     });
 
     console.log("OINK");
   }, 520000);
 
-  // it("swaps full sol->memecoin in one go", async () => {
-  //     const pool = await BoundPool.new({admin, payer, signer: payer, client });
+  it.skip("swaps full quote token->memecoin in one go", async () => {
+    const pool = await BoundPoolClient.slowNew({
+      admin,
+      payer,
+      signer: payer,
+      client,
+      quoteToken: MEMECHAN_QUOTE_TOKEN,
+      tokenMetadata: DUMMY_TOKEN_METADATA,
+    });
 
-  //     await sleep(1000);
+    console.log("==== swapy pool id: " + pool.id.toString());
 
-  //   // call to the swap endpoint
-  //   const ticketId = await pool.swapY({
-  //     payer: payer,
-  //     user: payer,
-  //     memeTokensOut: new BN(1),
-  //     solAmountIn: new BN(2 * 1e9),
-  //   });
+    await sleep(1000);
+
+    // call to the swap endpoint
+    const ticketId = await pool.swapY({
+      payer: payer,
+      user: payer,
+      memeTokensOut: new BN(1),
+      quoteAmountIn: new BN(1000),
+      quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
+      pool: pool.id,
+    });
+
+    console.log("swapY ticketId: " + ticketId.id.toBase58());
+  }, 120000);
 
   //   sleep(1000);
 
@@ -131,7 +144,7 @@ describe("BoundPool", () => {
   // }, 120000);
 
   // it("user swaps more than have", async () => {
-  //   const boundPool = await BoundPool.new({admin, payer, signer: payer, client });
+  //   const boundPool = await BoundPoolClient.new({admin, payer, signer: payer, client });
   //   await sleep(1000);
 
   //   const user = new Keypair();
@@ -152,7 +165,7 @@ describe("BoundPool", () => {
   // it("merge tickets presale", async () => {
   //   const user = Keypair.generate()
   //   await airdrop(client.connection, user.publicKey)
-  //   const pool = await BoundPool.new({admin, payer, signer: payer, client });
+  //   const pool = await BoundPoolClient.new({admin, payer, signer: payer, client });
 
   //   await sleep(1000);
 
@@ -206,7 +219,7 @@ describe("BoundPool", () => {
   // it("swaps user sol->memecoin->sol", async () => {
   //   const user = Keypair.generate()
   //   await airdrop(client.connection, user.publicKey)
-  //   const pool = await BoundPool.new({admin, payer, signer: payer, client });
+  //   const pool = await BoundPoolClient.new({admin, payer, signer: payer, client });
 
   //   const userSolAcc = await createWrappedNativeAccount(
   //     client.connection,
@@ -236,7 +249,7 @@ describe("BoundPool", () => {
   // it("swaps sol->memecoin->sol->full meme", async () => {
   //   const user = Keypair.generate()
   //   await airdrop(client.connection, user.publicKey)
-  //   const pool = await BoundPool.new({admin, payer, signer: payer, client });
+  //   const pool = await BoundPoolClient.new({admin, payer, signer: payer, client });
 
   //   const userSolAcc = await createWrappedNativeAccount(
   //     client.connection,

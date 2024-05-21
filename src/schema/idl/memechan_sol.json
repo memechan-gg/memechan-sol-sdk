@@ -3,7 +3,7 @@
   "name": "memechan_sol",
   "instructions": [
     {
-      "name": "new2",
+      "name": "newPool",
       "accounts": [
         {
           "name": "sender",
@@ -1825,7 +1825,7 @@
     {
       "code": 6002,
       "name": "SlippageExceeded",
-      "msg": "Given amount of tokens to swap would result in \\\n        less than minimum requested tokens to receive"
+      "msg": "Given amount of tokens to swap would result in \\\r\n        less than minimum requested tokens to receive"
     },
     {
       "code": 6003,
@@ -1901,6 +1901,6 @@
     }
   ],
   "metadata": {
-    "address": "BDRDLhqbfEQx2LZQ9Js7k1Dt1S9AArTw44q1rM96YrwC"
+    "address": "2WRqhjrZUkMvvKPNg6KLCJwuqNdNjF4cjhGN2VWw1YeK"
   }
 }
