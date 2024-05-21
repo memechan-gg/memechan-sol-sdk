@@ -1,4 +1,3 @@
-import BigNumber from "bignumber.js";
 import { Token } from "@raydium-io/raydium-sdk";
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
@@ -24,7 +23,8 @@ import {
   Transaction,
   VersionedTransaction,
 } from "@solana/web3.js";
-import { BoundPool as CodegenBoundPool, MemeTicketFields } from "../schema/codegen/accounts";
+import BigNumber from "bignumber.js";
+import { BoundPool, BoundPool as CodegenBoundPool, MemeTicketFields } from "../schema/codegen/accounts";
 
 import { AnchorError, BN, Program, Provider } from "@coral-xyz/anchor";
 import { MemechanClient } from "../MemechanClient";
@@ -50,6 +50,8 @@ import {
 
 import { findProgramAddress } from "../common/helpers";
 import {
+  DEFAULT_MAX_M,
+  DEFAULT_MAX_M_LP,
   MEMECHAN_MEMECOIN_DECIMALS,
   MEMECHAN_QUOTE_MINT,
   MEMECHAN_QUOTE_TOKEN,
@@ -63,9 +65,9 @@ import { getCreateMintWithPriorityTransaction } from "../token/getCreateMintWith
 import { getCreateAccountInstructions } from "../utils/getCreateAccountInstruction";
 import { getSendAndConfirmTransactionMethod } from "../utils/getSendAndConfirmTransactionMethod";
 import { retry } from "../utils/retry";
-import { sendTx } from "../utils/util";
 import { deductSlippage } from "../utils/trading/deductSlippage";
 import { normalizeInputCoinAmount } from "../utils/trading/normalizeInputCoinAmount";
+import { sendTx } from "../utils/util";
 
 export class BoundPoolClient {
   private constructor(
@@ -1232,6 +1234,39 @@ export class BoundPoolClient {
     const holdersMap = await BoundPoolClient.getHoldersMap(pool, client);
 
     return Array.from(holdersMap.keys());
+  }
+
+  public static async getMemePrice({
+    boundPoolInfo,
+    quotePriceInUsd,
+  }: {
+    boundPoolInfo: BoundPool;
+    quotePriceInUsd: number;
+  }): Promise<{ priceInQuote: string; priceInUsd: string }> {
+    const memeBalance = new BigNumber(boundPoolInfo.memeReserve.tokens.toString());
+    const quoteBalance = new BigNumber(boundPoolInfo.quoteReserve.tokens.toString());
+
+    const quoteBalanceConverted = quoteBalance.div(10 ** SLERF_DECIMALS);
+    const soldMemeConverted = new BigNumber(DEFAULT_MAX_M).minus(memeBalance).div(10 ** MEMECHAN_MEMECOIN_DECIMALS);
+
+    if (soldMemeConverted.eq(0)) {
+      return { priceInQuote: "0", priceInUsd: "0" };
+    }
+
+    const memePriceInQuote = quoteBalanceConverted.div(soldMemeConverted);
+    const memePriceInUsd = memePriceInQuote.multipliedBy(quotePriceInUsd).toString();
+
+    return { priceInQuote: memePriceInQuote.toString(), priceInUsd: memePriceInUsd };
+  }
+
+  public static getMemeMarketCap({ memePriceInUsd }: { memePriceInUsd: string }): string {
+    const fullMemeAmountConverted = new BigNumber(DEFAULT_MAX_M_LP)
+      .plus(DEFAULT_MAX_M)
+      .div(10 ** MEMECHAN_MEMECOIN_DECIMALS);
+
+    const marketCap = fullMemeAmountConverted.multipliedBy(memePriceInUsd).toString();
+
+    return marketCap;
   }
 
   static getATAAddress(owner: PublicKey, mint: PublicKey, programId: PublicKey) {
