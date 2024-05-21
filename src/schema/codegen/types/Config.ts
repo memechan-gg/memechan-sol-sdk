@@ -10,6 +10,7 @@ export interface ConfigFields {
   gammaS: BN
   gammaM: BN
   omegaM: BN
+  decimals: types.DecimalsFields
 }
 
 export interface ConfigJSON {
@@ -19,6 +20,7 @@ export interface ConfigJSON {
   gammaS: string
   gammaM: string
   omegaM: string
+  decimals: types.DecimalsJSON
 }
 
 export class Config {
@@ -28,6 +30,7 @@ export class Config {
   readonly gammaS: BN
   readonly gammaM: BN
   readonly omegaM: BN
+  readonly decimals: types.Decimals
 
   constructor(fields: ConfigFields) {
     this.alphaAbs = fields.alphaAbs
@@ -36,6 +39,7 @@ export class Config {
     this.gammaS = fields.gammaS
     this.gammaM = fields.gammaM
     this.omegaM = fields.omegaM
+    this.decimals = new types.Decimals({ ...fields.decimals })
   }
 
   static layout(property?: string) {
@@ -47,6 +51,7 @@ export class Config {
         borsh.u64("gammaS"),
         borsh.u64("gammaM"),
         borsh.u64("omegaM"),
+        types.Decimals.layout("decimals"),
       ],
       property
     )
@@ -61,6 +66,7 @@ export class Config {
       gammaS: obj.gammaS,
       gammaM: obj.gammaM,
       omegaM: obj.omegaM,
+      decimals: types.Decimals.fromDecoded(obj.decimals),
     })
   }
 
@@ -72,6 +78,7 @@ export class Config {
       gammaS: fields.gammaS,
       gammaM: fields.gammaM,
       omegaM: fields.omegaM,
+      decimals: types.Decimals.toEncodable(fields.decimals),
     }
   }
 
@@ -83,6 +90,7 @@ export class Config {
       gammaS: this.gammaS.toString(),
       gammaM: this.gammaM.toString(),
       omegaM: this.omegaM.toString(),
+      decimals: this.decimals.toJSON(),
     }
   }
 
@@ -94,6 +102,7 @@ export class Config {
       gammaS: new BN(obj.gammaS),
       gammaM: new BN(obj.gammaM),
       omegaM: new BN(obj.omegaM),
+      decimals: types.Decimals.fromJSON(obj.decimals),
     })
   }
 
