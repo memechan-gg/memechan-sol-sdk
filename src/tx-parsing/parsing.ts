@@ -8,6 +8,7 @@ import { GoLiveInstructionParsed, ParseGoLiveInstruction } from "./parsers/go-li
 import { InitStakingPoolInstructionParsed, ParseInitStakingInstruction } from "./parsers/init-staking-parser";
 import { ParseSwapXInstruction, SwapXInstructionParsed } from "./parsers/swap-x-parser";
 import { ParseSwapYInstruction, SwapYInstructionParsed } from "./parsers/swap-y-parser";
+import { CreateMetadataInstructionParsed, ParseCreateMetadataInstruction } from "./parsers/create-metadata-parser";
 
 export async function ParseTx(
   txSig: TransactionSignature,
@@ -19,6 +20,7 @@ export async function ParseTx(
     | SwapXInstructionParsed
     | InitStakingPoolInstructionParsed
     | GoLiveInstructionParsed
+    | CreateMetadataInstructionParsed
   )[]
   | undefined
 > {
@@ -36,6 +38,7 @@ export async function ParseTx(
     | SwapXInstructionParsed
     | InitStakingPoolInstructionParsed
     | GoLiveInstructionParsed
+    | CreateMetadataInstructionParsed
   )[] = [];
 
   for (let i = 0; i < ixs.length; i++) {
@@ -66,9 +69,11 @@ async function ptx(
   | SwapXInstructionParsed
   | InitStakingPoolInstructionParsed
   | GoLiveInstructionParsed
+  | CreateMetadataInstructionParsed
   | undefined
 > {
   const ixBytesSliced = ixBytes.subarray(0, 2);
+
   if (ixBytesSliced.equals(Buffer.from([0x26, 0x3f]))) {
     console.log("parsing ix: NewPool");
     return await ParseNewBPInstruction(tx, index, memechanProgram);
@@ -88,6 +93,10 @@ async function ptx(
   if (ixBytesSliced.equals(Buffer.from([0x7e, 0x62]))) {
     console.log("parsing ix: GoLive");
     return await ParseGoLiveInstruction(tx, index);
+  }
+  if (ixBytesSliced.equals(Buffer.from([0x1e, 0x23]))) {
+    console.log("parsing ix: CreateMetadata");
+    return await ParseCreateMetadataInstruction(tx, index);
   }
 
   return undefined;
