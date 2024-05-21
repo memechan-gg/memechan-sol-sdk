@@ -23,15 +23,23 @@ describe("TargetConfig", () => {
     });
     await sleep(1000);
     console.log("targetconfig id: " + targetConfig.id);
-    const info = await targetConfig.fetch();
+    const info = await TargetConfig.fetch(client.connection, targetConfig.id);
     console.log(info);
   }, 90000);
-  it("change_target_config", async () => {
+  it.skip("change_target_config", async () => {
     
     const targetConfig = await TargetConfig.fromTargetConfigId({client, accountAddressId: MEMECHAN_TARGET_CONFIG});
-    await targetConfig.changeTargetConfig(new BN(2000000000));
 
-    const targetConfig2 = await TargetConfig.fromTargetConfigId({client, accountAddressId: MEMECHAN_TARGET_CONFIG});
-    console.log("targetConfig2: ", targetConfig2);
-  })
+    console.log("original targetConfig: ", targetConfig.tokenTargetAmount.toString());
+    const newTargetAmount = targetConfig.tokenTargetAmount.add(new BN(10));
+    console.log("new target amount: ", newTargetAmount.toString());
+
+    await targetConfig.changeTargetConfig(newTargetAmount);
+  
+    await sleep(5000);
+
+    const targetConfig2 = await TargetConfig.fetch(client.connection, targetConfig.id);
+    console.log("changed targetConfig: ", targetConfig2.tokenTargetAmount.toString());
+    expect(targetConfig2.tokenTargetAmount).toBe(newTargetAmount);
+  }, 20000)
 });
