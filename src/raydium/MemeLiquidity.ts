@@ -1827,6 +1827,7 @@ export class Liquidity extends Base {
               })
             }
           }
+          return [];
         }),
       )
     ).flat()
