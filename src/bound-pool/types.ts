@@ -27,9 +27,11 @@ export type GetBuyMemeTransactionArgs = {
 
 export type BuyMemeArgs = GetBuyMemeTransactionArgs & { signer: Keypair };
 
+export type GetOutputAmountForBuyMeme = Omit<BuyMemeArgs, "minOutputAmount">;
+
 export type GetBuyMemeTransactionOutput = {
   tx: Transaction;
-  memeTicketPublicKey: PublicKey;
+  memeTicketKeypair: Keypair;
   inputTokenAccount: PublicKey;
 };
 
