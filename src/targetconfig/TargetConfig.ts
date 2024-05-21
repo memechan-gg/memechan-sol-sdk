@@ -1,8 +1,9 @@
-import { PublicKey, SystemProgram } from "@solana/web3.js";
+import { Connection, PublicKey, SystemProgram } from "@solana/web3.js";
 import { MemechanClient } from "../MemechanClient";
 import { CreateTargetConfigArgs } from "./types";
 import BN from "bn.js";
 import { payer } from "../../examples/common";
+import { TargetConfig as CodegenTargetConfig } from "../schema/codegen/accounts";
 
 export class TargetConfig {
   public constructor(
@@ -21,7 +22,7 @@ export class TargetConfig {
     client: MemechanClient;
     accountAddressId: PublicKey;
   }) {
-    const objectData = await client.memechanProgram.account.targetConfig.fetch(accountAddressId);
+    const objectData = await TargetConfig.fetch(client.connection, accountAddressId);
 
     console.log("objectData:", objectData);
 
@@ -35,8 +36,25 @@ export class TargetConfig {
     return instance;
   }
 
-  public async fetch(program = this.client.memechanProgram) {
-    return program.account.targetConfig.fetch(this.id);
+  // public async fetch(program = this.client.memechanProgram) {
+  //   return program.account.targetConfig.fetch(this.id, "confirmed");
+  // }
+
+  /**
+   * Fetches the bound pool account information.
+   *
+   * @param {Connection} connection - The Solana RPC connection.
+   * @param {PublicKey} accountId - The ID of the account to fetch.
+   * @returns {Promise<T>} - The account information.
+   */
+  static async fetch(connection: Connection, accountId: PublicKey) {
+    const accountInfo = await CodegenTargetConfig.fetch(connection, accountId);
+
+    if (!accountInfo) {
+      throw new Error(`[TargetConfig.fetch] No account info found for ${accountId}`);
+    }
+
+    return accountInfo;
   }
 
   public static async new(input: CreateTargetConfigArgs) {
@@ -71,7 +89,7 @@ export class TargetConfig {
     )[0];
   }
 
-  public async changeTargetConfig(targetAmount: BN) {
+  public async changeTargetConfig(targetAmount: BN): Promise<string> {
     const result = await this.client.memechanProgram.methods
     .changeTargetConfig(
       targetAmount
@@ -81,8 +99,9 @@ export class TargetConfig {
       targetConfig: this.id,
     })
     .signers([payer])
-    .rpc({ skipPreflight: true });
+    .rpc({ commitment: "confirmed"});
 
     console.log("changeTargetConfig result", result);
+    return result;
   }
 }
