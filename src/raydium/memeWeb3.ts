@@ -15,7 +15,9 @@ import {
   Transaction,
   TransactionInstruction,
   TransactionMessage,
+
 } from '@solana/web3.js'
+import { addComputeBudget } from './instrument'
 
 
 
