@@ -23,7 +23,8 @@ import {
   Transaction,
   VersionedTransaction,
 } from "@solana/web3.js";
-import { BoundPool as CodegenBoundPool, MemeTicketFields } from "../schema/codegen/accounts";
+import BigNumber from "bignumber.js";
+import { BoundPool, BoundPool as CodegenBoundPool, MemeTicketFields } from "../schema/codegen/accounts";
 
 import { AnchorError, BN, Program, Provider } from "@coral-xyz/anchor";
 import { MemechanClient } from "../MemechanClient";
@@ -33,10 +34,13 @@ import { createMarket, getCreateMarketTransactions } from "../raydium/openBookCr
 import { StakingPool } from "../staking-pool/StakingPool";
 import {
   BoundPoolArgs,
+  BuyMemeArgs,
   GetBuyMemeTransactionArgs,
+  GetBuyMemeTransactionOutput,
   GetCreateNewBondingPoolAndTokenTransactionArgs,
   GetGoLiveTransactionArgs,
   GetInitStakingPoolTransactionArgs,
+  GetOutputAmountForBuyMeme,
   GetSellMemeTransactionArgs,
   GoLiveArgs,
   InitStakingPoolArgs,
@@ -47,10 +51,13 @@ import {
 
 import { findProgramAddress } from "../common/helpers";
 import {
-  MEMECHAN_MEME_TOKEN_DECIMALS,
+  DEFAULT_MAX_M,
+  DEFAULT_MAX_M_LP,
   MEMECHAN_QUOTE_MINT,
   MEMECHAN_QUOTE_TOKEN,
   MEMECHAN_TARGET_CONFIG,
+  MEMECHAN_MEME_TOKEN_DECIMALS,
+  MEMECHAN_QUOTE_TOKEN_DECIMALS,
 } from "../config/config";
 import { MemechanSol } from "../schema/types/memechan_sol";
 import { createMetadata, getCreateMetadataTransaction } from "../token/createMetadata";
@@ -59,6 +66,10 @@ import { getCreateMintWithPriorityTransaction } from "../token/getCreateMintWith
 import { getCreateAccountInstructions } from "../utils/getCreateAccountInstruction";
 import { getSendAndConfirmTransactionMethod } from "../utils/getSendAndConfirmTransactionMethod";
 import { retry } from "../utils/retry";
+import { deductSlippage } from "../utils/trading/deductSlippage";
+import { normalizeInputCoinAmount } from "../utils/trading/normalizeInputCoinAmount";
+import { ParseTx } from "../tx-parsing/parsing";
+import { NewBPInstructionParsed } from "../tx-parsing/parsers/bonding-pool-creation-parser";
 import { sendTx } from "../utils/util";
 
 export class BoundPoolClient {
@@ -91,6 +102,41 @@ export class BoundPoolClient {
       poolObjectData.memeReserve.mint,
       poolObjectData.quoteReserve.mint,
       new Token(TOKEN_PROGRAM_ID, poolObjectData.memeReserve.mint, MEMECHAN_MEME_TOKEN_DECIMALS),
+    );
+
+    return boundClientInstance;
+  }
+
+  public static async fromPoolCreationTransaction({
+    client,
+    poolCreationSignature,
+  }: {
+    client: MemechanClient;
+    poolCreationSignature: string;
+  }) {
+    const parsedData = await ParseTx(poolCreationSignature, client);
+    console.debug("parsedData: ", parsedData);
+
+    if (!parsedData) {
+      throw new Error(`No such pool found for such signature ${poolCreationSignature}`);
+    }
+
+    const newPoolInstructionData = parsedData.find((el): el is NewBPInstructionParsed => el.type === "new_pool");
+
+    if (!newPoolInstructionData) {
+      throw new Error(`No such pool found in instruction data for signature ${poolCreationSignature}`);
+    }
+
+    const poolObjectData = await BoundPoolClient.fetch2(client.connection, newPoolInstructionData.poolAddr);
+
+    const boundClientInstance = new BoundPoolClient(
+      newPoolInstructionData.poolAddr,
+      client,
+      poolObjectData.memeReserve.vault,
+      poolObjectData.quoteReserve.vault,
+      poolObjectData.memeReserve.mint,
+      poolObjectData.quoteReserve.mint,
+      new Token(TOKEN_PROGRAM_ID, poolObjectData.memeReserve.mint, 6), // TODO fix 6 decimals
     );
 
     return boundClientInstance;
@@ -537,10 +583,10 @@ export class BoundPoolClient {
    * @throws {Error} Throws an error if the transaction creation or confirmation fails.
    * @untested This method is untested and may contain bugs.
    */
-  public async buyMeme(input: SwapYArgs): Promise<string> {
-    const buyMemeTransaction = await this.getBuyMemeTransaction(input);
+  public async buyMeme(input: BuyMemeArgs): Promise<string> {
+    const { tx, memeTicketKeypair } = await this.getBuyMemeTransaction(input);
 
-    const txId = await sendAndConfirmTransaction(this.client.connection, buyMemeTransaction, [input.user], {
+    const txId = await sendAndConfirmTransaction(this.client.connection, tx, [input.signer, memeTicketKeypair], {
       skipPreflight: true,
       commitment: "confirmed",
     });
@@ -551,82 +597,111 @@ export class BoundPoolClient {
   /**
    * Generates a transaction to buy a meme.
    *
-   * @todo Implement the full functionality of this method (in regards of accepting different tokens).
-   * @todo Add comprehensive examples.
-   *
    * @param {GetBuyMemeTransactionArgs} input - The input arguments required for the transaction.
-   * @returns {Promise<Transaction>} A promise that resolves to the transaction object.
+   * @returns {Promise<GetBuyMemeTransactionOutput>} A promise that resolves to the transaction object.
    *
    * @work-in-progress This method is a work in progress and not yet ready for production use.
    * @untested This method is untested and may contain bugs.
    */
-  public async getBuyMemeTransaction(input: GetBuyMemeTransactionArgs): Promise<Transaction> {
-    const tx = input.transaction ?? new Transaction();
-
-    const user = input.user;
+  public async getBuyMemeTransaction(input: GetBuyMemeTransactionArgs): Promise<GetBuyMemeTransactionOutput> {
+    const { inputAmount, minOutputAmount, slippagePercentage, user, transaction = new Transaction() } = input;
+    let { inputTokenAccount } = input;
 
     const pool = this.id;
     const poolSignerPda = this.findSignerPda();
+    const memeTicketKeypair = Keypair.generate();
+    const connection = this.client.connection;
 
-    const tokenInMintPubkey = input.quoteMint;
+    // input
+    const inputAmountWithDecimals = normalizeInputCoinAmount(inputAmount, MEMECHAN_QUOTE_TOKEN_DECIMALS);
+    const inputAmountBN = new BN(inputAmountWithDecimals.toString());
 
-    const sol_in = input.quoteAmountIn;
-    const meme_out = input.memeTokensOut;
+    // output
+    // Note: Be aware, we relay on the fact that `MEMECOIN_DECIMALS` would be always set same for all memecoins
+    // As well as the fact that memecoins and tickets decimals are always the same
+    const minOutputWithSlippage = deductSlippage(new BigNumber(minOutputAmount), slippagePercentage);
+    const minOutputNormalized = normalizeInputCoinAmount(
+      minOutputWithSlippage.toString(),
+      MEMECHAN_MEME_TOKEN_DECIMALS,
+    );
+    const minOutputBN = new BN(minOutputNormalized.toString());
 
-    // TODO: ? We should handle SOL-based and non-SOL based swaps
-    let inputTokenUserAccountPubkey: undefined | PublicKey;
-
-    if (input.userSolAcc) {
-      inputTokenUserAccountPubkey = input.userSolAcc;
-    } else {
-      const associatedToken = getAssociatedTokenAddressSync(tokenInMintPubkey, user.publicKey, true);
-      inputTokenUserAccountPubkey = associatedToken;
-
-      const createAssociatedTokenAcouuntInstruction = createAssociatedTokenAccountInstruction(
-        user.publicKey,
-        associatedToken,
-        user.publicKey,
-        tokenInMintPubkey,
+    // If `inputTokenAccount` is not passed in args, we need to find out, whether a quote account for an admin
+    // already exists
+    if (!inputTokenAccount) {
+      const associatedToken = getAssociatedTokenAddressSync(
+        this.quoteTokenMint,
+        user,
+        true,
+        TOKEN_PROGRAM_ID,
+        ASSOCIATED_TOKEN_PROGRAM_ID,
       );
 
-      // Add creation of associated token account
-      tx.add(createAssociatedTokenAcouuntInstruction);
+      const account = await getAccount(connection, associatedToken);
+      inputTokenAccount = account.address;
 
-      // TODO: We need to remove that once get rid of SOL-based pools
-      // Transfer SOL to wSOL
-      const transferSolToWSOLAccountInstruction = SystemProgram.transfer({
-        fromPubkey: user.publicKey,
-        toPubkey: inputTokenUserAccountPubkey,
-        lamports: BigInt(sol_in.toString()),
-      });
-      tx.add(transferSolToWSOLAccountInstruction);
+      // If the quote account for the admin doesn't exist, add an instruction to create it
+      if (!inputTokenAccount) {
+        const associatedTransactionInstruction = createAssociatedTokenAccountInstruction(
+          user,
+          associatedToken,
+          user,
+          this.quoteTokenMint,
+          TOKEN_PROGRAM_ID,
+          ASSOCIATED_TOKEN_PROGRAM_ID,
+        );
 
-      // TODO: We need to remove that once get rid of SOL-based pools
-      // TODO: Double-check do we really need that or not
-      // createSyncNativeInstruction(inputTokenUserAccountPubkey);
+        transaction.add(associatedTransactionInstruction);
+
+        inputTokenAccount = associatedToken;
+      }
     }
 
-    // TODO: Why?
-    const memeTicketId = Keypair.generate();
-
     const buyMemeInstruction = await this.client.memechanProgram.methods
-      .swapY(new BN(sol_in), new BN(meme_out))
+      .swapY(inputAmountBN, minOutputBN)
       .accounts({
-        memeTicket: memeTicketId.publicKey,
-        owner: user.publicKey,
+        memeTicket: memeTicketKeypair.publicKey,
+        owner: user,
         pool: pool,
         poolSignerPda: poolSignerPda,
         quoteVault: this.quoteVault,
-        userSol: inputTokenUserAccountPubkey,
+        userSol: inputTokenAccount,
         systemProgram: SystemProgram.programId,
         tokenProgram: TOKEN_PROGRAM_ID,
       })
       .instruction();
 
-    tx.add(buyMemeInstruction);
+    transaction.add(buyMemeInstruction);
 
-    return tx;
+    console.debug("memeTicketPublicKey: ", memeTicketKeypair.publicKey.toString());
+    console.debug("inputTokenAccount: ", inputTokenAccount.toString());
+
+    return { tx: transaction, memeTicketKeypair, inputTokenAccount };
   }
+
+  public async getOutputAmountForBuyMeme(input: GetOutputAmountForBuyMeme) {
+    const { tx, memeTicketKeypair } = await this.getBuyMemeTransaction({ ...input, minOutputAmount: "0" });
+
+    const result = await this.client.connection.simulateTransaction(tx, [input.signer, memeTicketKeypair], true);
+
+    // If error happened (e.g. pool is locked)
+    if (result.value.err) {
+      return { outputAmount: 0, error: result.value.err, logs: result.value.logs };
+    }
+
+    // TODO: Decode the result of swap simulation
+
+    return result;
+  }
+
+  public async isMemeCoinReadyToLivePhase() {
+    const poolData = await BoundPoolClient.fetch2(this.client.connection, this.id);
+    const isPoolLocked = poolData.locked;
+
+    return isPoolLocked;
+  }
+
+  // TODO: Add method for checking is pool locked or not
 
   public async swapX(input: SwapXArgs): Promise<string> {
     const sellMemeCoinTransaction = await this.getSellMemeTransaction(input);
@@ -1220,6 +1295,32 @@ export class BoundPoolClient {
     return tickets;
   }
 
+  public static async fetchTicketsByUser(
+    pool: PublicKey,
+    client: MemechanClient,
+    user: PublicKey,
+  ): Promise<MemeTicketFields[]> {
+    const program = client.memechanProgram;
+    const filters: GetProgramAccountsFilter[] = [
+      {
+        memcmp: {
+          bytes: pool.toBase58(),
+          offset: 40,
+        },
+      },
+      {
+        memcmp: {
+          bytes: user.toBase58(),
+          offset: 8,
+        },
+      },
+    ];
+
+    const fetchedTickets = await program.account.memeTicket.all(filters);
+    const tickets = fetchedTickets.map((ticket) => ticket.account);
+    return tickets;
+  }
+
   /**
    * Fetches all unique token holders for pool and returns their number
    */
@@ -1249,6 +1350,40 @@ export class BoundPoolClient {
     const holdersMap = await BoundPoolClient.getHoldersMap(pool, client);
 
     return Array.from(holdersMap.keys());
+  }
+
+  public static async getMemePrice({
+    boundPoolInfo,
+    quotePriceInUsd,
+  }: {
+    boundPoolInfo: BoundPool;
+    quotePriceInUsd: number;
+  }): Promise<{ priceInQuote: string; priceInUsd: string }> {
+    const memeBalance = new BigNumber(boundPoolInfo.memeReserve.tokens.toString());
+    const quoteBalance = new BigNumber(boundPoolInfo.quoteReserve.tokens.toString());
+
+    const quoteBalanceConverted = quoteBalance.div(10 ** MEMECHAN_QUOTE_TOKEN_DECIMALS);
+    const soldMemeConverted = new BigNumber(DEFAULT_MAX_M).minus(memeBalance).div(10 ** MEMECHAN_MEME_TOKEN_DECIMALS);
+
+    // In case no meme coins were sold, return 0-prices
+    if (soldMemeConverted.eq(0)) {
+      return { priceInQuote: "0", priceInUsd: "0" };
+    }
+
+    const memePriceInQuote = quoteBalanceConverted.div(soldMemeConverted);
+    const memePriceInUsd = memePriceInQuote.multipliedBy(quotePriceInUsd).toString();
+
+    return { priceInQuote: memePriceInQuote.toString(), priceInUsd: memePriceInUsd };
+  }
+
+  public static getMemeMarketCap({ memePriceInUsd }: { memePriceInUsd: string }): string {
+    const fullMemeAmountConverted = new BigNumber(DEFAULT_MAX_M_LP)
+      .plus(DEFAULT_MAX_M)
+      .div(10 ** MEMECHAN_MEME_TOKEN_DECIMALS);
+
+    const marketCap = fullMemeAmountConverted.multipliedBy(memePriceInUsd).toString();
+
+    return marketCap;
   }
 
   static getATAAddress(owner: PublicKey, mint: PublicKey, programId: PublicKey) {
