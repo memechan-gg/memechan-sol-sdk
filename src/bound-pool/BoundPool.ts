@@ -40,6 +40,7 @@ import {
   GetCreateNewBondingPoolAndTokenTransactionArgs,
   GetGoLiveTransactionArgs,
   GetInitStakingPoolTransactionArgs,
+  GetOutputAmountForBuyMeme,
   GetSellMemeTransactionArgs,
   GoLiveArgs,
   InitStakingPoolArgs,
@@ -67,6 +68,8 @@ import { getSendAndConfirmTransactionMethod } from "../utils/getSendAndConfirmTr
 import { retry } from "../utils/retry";
 import { deductSlippage } from "../utils/trading/deductSlippage";
 import { normalizeInputCoinAmount } from "../utils/trading/normalizeInputCoinAmount";
+import { ParseTx } from "../tx-parsing/parsing";
+import { NewBPInstructionParsed } from "../tx-parsing/parsers/bonding-pool-creation-parser";
 import { sendTx } from "../utils/util";
 
 export class BoundPoolClient {
@@ -99,6 +102,41 @@ export class BoundPoolClient {
       poolObjectData.memeReserve.mint,
       poolObjectData.quoteReserve.mint,
       new Token(TOKEN_PROGRAM_ID, poolObjectData.memeReserve.mint, MEMECHAN_MEME_TOKEN_DECIMALS),
+    );
+
+    return boundClientInstance;
+  }
+
+  public static async fromPoolCreationTransaction({
+    client,
+    poolCreationSignature,
+  }: {
+    client: MemechanClient;
+    poolCreationSignature: string;
+  }) {
+    const parsedData = await ParseTx(poolCreationSignature, client);
+    console.debug("parsedData: ", parsedData);
+
+    if (!parsedData) {
+      throw new Error(`No such pool found for such signature ${poolCreationSignature}`);
+    }
+
+    const newPoolInstructionData = parsedData.find((el): el is NewBPInstructionParsed => el.type === "new_pool");
+
+    if (!newPoolInstructionData) {
+      throw new Error(`No such pool found in instruction data for signature ${poolCreationSignature}`);
+    }
+
+    const poolObjectData = await BoundPoolClient.fetch2(client.connection, newPoolInstructionData.poolAddr);
+
+    const boundClientInstance = new BoundPoolClient(
+      newPoolInstructionData.poolAddr,
+      client,
+      poolObjectData.memeReserve.vault,
+      poolObjectData.quoteReserve.vault,
+      poolObjectData.memeReserve.mint,
+      poolObjectData.quoteReserve.mint,
+      new Token(TOKEN_PROGRAM_ID, poolObjectData.memeReserve.mint, 6), // TODO fix 6 decimals
     );
 
     return boundClientInstance;
@@ -546,9 +584,9 @@ export class BoundPoolClient {
    * @untested This method is untested and may contain bugs.
    */
   public async buyMeme(input: BuyMemeArgs): Promise<string> {
-    const { tx } = await this.getBuyMemeTransaction(input);
+    const { tx, memeTicketKeypair } = await this.getBuyMemeTransaction(input);
 
-    const txId = await sendAndConfirmTransaction(this.client.connection, tx, [input.signer], {
+    const txId = await sendAndConfirmTransaction(this.client.connection, tx, [input.signer, memeTicketKeypair], {
       skipPreflight: true,
       commitment: "confirmed",
     });
@@ -571,8 +609,7 @@ export class BoundPoolClient {
 
     const pool = this.id;
     const poolSignerPda = this.findSignerPda();
-    const memeTicketId = Keypair.generate();
-    const memeTicketPublicKey = memeTicketId.publicKey;
+    const memeTicketKeypair = Keypair.generate();
     const connection = this.client.connection;
 
     // input
@@ -623,7 +660,7 @@ export class BoundPoolClient {
     const buyMemeInstruction = await this.client.memechanProgram.methods
       .swapY(inputAmountBN, minOutputBN)
       .accounts({
-        memeTicket: memeTicketId.publicKey,
+        memeTicket: memeTicketKeypair.publicKey,
         owner: user,
         pool: pool,
         poolSignerPda: poolSignerPda,
@@ -636,8 +673,35 @@ export class BoundPoolClient {
 
     transaction.add(buyMemeInstruction);
 
-    return { tx: transaction, memeTicketPublicKey, inputTokenAccount };
+    console.debug("memeTicketPublicKey: ", memeTicketKeypair.publicKey.toString());
+    console.debug("inputTokenAccount: ", inputTokenAccount.toString());
+
+    return { tx: transaction, memeTicketKeypair, inputTokenAccount };
   }
+
+  public async getOutputAmountForBuyMeme(input: GetOutputAmountForBuyMeme) {
+    const { tx, memeTicketKeypair } = await this.getBuyMemeTransaction({ ...input, minOutputAmount: "0" });
+
+    const result = await this.client.connection.simulateTransaction(tx, [input.signer, memeTicketKeypair], true);
+
+    // If error happened (e.g. pool is locked)
+    if (result.value.err) {
+      return { outputAmount: 0, error: result.value.err, logs: result.value.logs };
+    }
+
+    // TODO: Decode the result of swap simulation
+
+    return result;
+  }
+
+  public async isMemeCoinReadyToLivePhase() {
+    const poolData = await BoundPoolClient.fetch2(this.client.connection, this.id);
+    const isPoolLocked = poolData.locked;
+
+    return isPoolLocked;
+  }
+
+  // TODO: Add method for checking is pool locked or not
 
   public async swapX(input: SwapXArgs): Promise<string> {
     const sellMemeCoinTransaction = await this.getSellMemeTransaction(input);
@@ -1222,6 +1286,32 @@ export class BoundPoolClient {
         memcmp: {
           bytes: pool.toBase58(),
           offset: 40,
+        },
+      },
+    ];
+
+    const fetchedTickets = await program.account.memeTicket.all(filters);
+    const tickets = fetchedTickets.map((ticket) => ticket.account);
+    return tickets;
+  }
+
+  public static async fetchTicketsByUser(
+    pool: PublicKey,
+    client: MemechanClient,
+    user: PublicKey,
+  ): Promise<MemeTicketFields[]> {
+    const program = client.memechanProgram;
+    const filters: GetProgramAccountsFilter[] = [
+      {
+        memcmp: {
+          bytes: pool.toBase58(),
+          offset: 40,
+        },
+      },
+      {
+        memcmp: {
+          bytes: user.toBase58(),
+          offset: 8,
         },
       },
     ];
