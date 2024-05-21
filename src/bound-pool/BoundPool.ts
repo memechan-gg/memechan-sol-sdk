@@ -27,12 +27,17 @@ import { AnchorError, BN, Program, Provider } from "@coral-xyz/anchor";
 import { MemechanClient } from "../MemechanClient";
 import { MemeTicket } from "../memeticket/MemeTicket";
 import { ATA_PROGRAM_ID, PROGRAMIDS } from "../raydium/config";
-import { createMarket } from "../raydium/openBookCreateMarket";
+import {
+  createMarket,
+  getCreateMarketInstructions,
+  getCreateMarketTransactions,
+} from "../raydium/openBookCreateMarket";
 import { StakingPool } from "../staking-pool/StakingPool";
 import {
   BoundPoolArgs,
   GetBuyMemeTransactionArgs,
   GetCreateNewBondingPoolAndTokenTransactionArgs,
+  GetGoLiveTransactionArgs,
   GetInitStakingPoolTransactionArgs,
   GetSellMemeTransactionArgs,
   GoLiveArgs,
@@ -245,7 +250,7 @@ export class BoundPoolClient {
   }
 
   public static async new(args: BoundPoolArgs): Promise<BoundPoolClient> {
-    const { payer, signer, client, quoteToken } = args;
+    const { payer, client, quoteToken } = args;
     const { connection, memechanProgram } = client;
 
     const { createPoolTransaction, createTokenTransaction, memeMintKeypair, poolQuoteVaultId, launchVaultId } =
@@ -255,13 +260,19 @@ export class BoundPoolClient {
     const poolQuoteVault = poolQuoteVaultId.publicKey;
     const launchVault = launchVaultId.publicKey;
 
-    const createPoolSignature = await sendAndConfirmTransaction(connection, createPoolTransaction, [signer, payer], {
-      commitment: "confirmed",
-      skipPreflight: true,
-    });
+    // TODO: We can remove 2 calls here and combine it into one, once we'll have lookup table implementation on smart-contract side
+    const createPoolSignature = await sendAndConfirmTransaction(
+      connection,
+      createPoolTransaction,
+      [payer, memeMintKeypair, poolQuoteVaultId, launchVaultId],
+      {
+        commitment: "confirmed",
+        skipPreflight: true,
+      },
+    );
     console.log("Create new pool signature:", createPoolSignature);
 
-    const createTokenSignature = await sendAndConfirmTransaction(connection, createTokenTransaction, [signer, payer], {
+    const createTokenSignature = await sendAndConfirmTransaction(connection, createTokenTransaction, [payer], {
       commitment: "confirmed",
       skipPreflight: true,
     });
@@ -787,6 +798,121 @@ export class BoundPoolClient {
     });
 
     return { stakingMemeVault, stakingQuoteVault };
+  }
+
+  public async getGoLiveTransaction(
+    args: GetGoLiveTransactionArgs,
+  ): Promise<{ transaction: Transaction; stakingId: PublicKey }> {
+    const {
+      boundPoolInfo,
+      user,
+      feeDestinationWalletAddress,
+      memeVault,
+      quoteVault,
+      transaction = new Transaction(),
+    } = args;
+    const stakingId = BoundPoolClient.findStakingPda(
+      boundPoolInfo.memeReserve.mint,
+      this.client.memechanProgram.programId,
+    );
+    const stakingSigner = StakingPool.findSignerPda(stakingId, this.client.memechanProgram.programId);
+    const baseTokenInfo = new Token(TOKEN_PROGRAM_ID, new PublicKey(boundPoolInfo.memeReserve.mint), 6);
+    const quoteTokenInfo = MEMECHAN_QUOTE_TOKEN;
+
+    const { marketId, transactions } = await getCreateMarketTransactions({
+      baseToken: baseTokenInfo,
+      quoteToken: quoteTokenInfo,
+      wallet: user.publicKey,
+      signer: user,
+      connection: this.client.connection,
+    });
+    const createMarketInstructions = getCreateMarketInstructions(transactions);
+
+    transaction.add(...createMarketInstructions);
+
+    transaction.add(
+      SystemProgram.transfer({
+        fromPubkey: user.publicKey,
+        toPubkey: stakingSigner,
+        lamports: 2_000_000_000,
+      }),
+    );
+
+    const modifyComputeUnits = ComputeBudgetProgram.setComputeUnitLimit({
+      units: 250000,
+    });
+
+    transaction.add(modifyComputeUnits);
+
+    const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
+      microLamports: 5000000,
+    });
+
+    transaction.add(addPriorityFee);
+
+    const feeDestination = new PublicKey(feeDestinationWalletAddress);
+    const ammId = BoundPoolClient.getAssociatedId({ programId: PROGRAMIDS.AmmV4, marketId });
+    const raydiumAmmAuthority = BoundPoolClient.getAssociatedAuthority({ programId: PROGRAMIDS.AmmV4 });
+    const openOrders = BoundPoolClient.getAssociatedOpenOrders({ programId: PROGRAMIDS.AmmV4, marketId });
+    const targetOrders = BoundPoolClient.getAssociatedTargetOrders({ programId: PROGRAMIDS.AmmV4, marketId });
+    const ammConfig = BoundPoolClient.getAssociatedConfigId({ programId: PROGRAMIDS.AmmV4 });
+    const raydiumLpMint = BoundPoolClient.getAssociatedLpMint({ programId: PROGRAMIDS.AmmV4, marketId });
+
+    const raydiumMemeVault = BoundPoolClient.getAssociatedBaseVault({ programId: PROGRAMIDS.AmmV4, marketId });
+    const raydiumWsolVault = BoundPoolClient.getAssociatedQuoteVault({ programId: PROGRAMIDS.AmmV4, marketId });
+
+    const userDestinationLpTokenAta = BoundPoolClient.getATAAddress(
+      stakingSigner,
+      raydiumLpMint,
+      TOKEN_PROGRAM_ID,
+    ).publicKey;
+
+    const goLiveInstruction = await this.client.memechanProgram.methods
+      .goLive(raydiumAmmAuthority.nonce)
+      .accounts({
+        signer: user.publicKey,
+        poolMemeVault: memeVault,
+        poolQuoteVault: quoteVault,
+        quoteMint: this.quoteTokenMint,
+        staking: stakingId,
+        stakingPoolSignerPda: stakingSigner,
+        raydiumLpMint: raydiumLpMint,
+        raydiumAmm: ammId,
+        raydiumAmmAuthority: raydiumAmmAuthority.publicKey,
+        raydiumMemeVault: raydiumMemeVault,
+        raydiumQuoteVault: raydiumWsolVault,
+        marketProgramId: PROGRAMIDS.OPENBOOK_MARKET,
+        systemProgram: SystemProgram.programId,
+        tokenProgram: TOKEN_PROGRAM_ID,
+        marketAccount: marketId,
+        clock: SYSVAR_CLOCK_PUBKEY,
+        rent: SYSVAR_RENT_PUBKEY,
+        openOrders: openOrders,
+        targetOrders: targetOrders,
+        memeMint: boundPoolInfo.memeReserve.mint,
+        ammConfig: ammConfig,
+        ataProgram: ATA_PROGRAM_ID,
+        feeDestinationInfo: feeDestination,
+        userDestinationLpTokenAta: userDestinationLpTokenAta,
+        raydiumProgram: PROGRAMIDS.AmmV4,
+      })
+      .instruction();
+
+    transaction.add(goLiveInstruction);
+
+    return { transaction, stakingId };
+  }
+
+  public async goLive2(args: GoLiveArgs): Promise<StakingPool> {
+    const { transaction, stakingId } = await this.getGoLiveTransaction(args);
+
+    const signature = await sendAndConfirmTransaction(this.client.connection, transaction, [args.user], {
+      skipPreflight: true,
+      commitment: "confirmed",
+    });
+    console.log("Go live signature:", signature);
+
+    return new StakingPool(stakingId, this.client);
   }
 
   public async goLive(input: GoLiveArgs): Promise<[StakingPool]> {

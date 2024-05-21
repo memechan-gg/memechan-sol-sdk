@@ -53,6 +53,8 @@ export interface GoLiveArgs {
   quoteVault: PublicKey;
 }
 
+export type GetGoLiveTransactionArgs = GoLiveArgs & { transaction?: Transaction };
+
 export interface InitStakingPoolArgs {
   pool?: PublicKey;
   user: Keypair;
