@@ -1,6 +1,6 @@
 import { Auth } from "../auth/Auth";
 import { BE_URL } from "../common/consts";
-import { jsonFetch, signedJsonFetch, unsignedMultipartRequest } from "../utils/fetch";
+import { jsonFetch, signedJsonFetch, unsignedMultipartRequest } from "../util/fetch";
 import {
   TokenStatus,
   createCoinRequestBodySchema,

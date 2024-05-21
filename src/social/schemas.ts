@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { paginatedResultSchema } from "../coin/schemas/coin-schemas";
+import { paginatedResultSchema } from "../token/schemas/token-schemas";
 
 export const createThreadRequestBody = z.object({
   message: z.string(),

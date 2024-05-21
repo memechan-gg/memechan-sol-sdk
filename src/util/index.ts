@@ -1,6 +1,5 @@
 import {
   buildSimpleTransaction,
-  findProgramAddress,
   SPL_ACCOUNT_LAYOUT,
   TOKEN_PROGRAM_ID,
   InnerSimpleV0Transaction,

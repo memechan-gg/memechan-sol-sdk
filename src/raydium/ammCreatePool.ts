@@ -3,7 +3,7 @@ import { Connection, Keypair, PublicKey } from "@solana/web3.js";
 
 import { BN } from "@coral-xyz/anchor";
 import { PROGRAMIDS, makeTxVersion } from "./config";
-import { buildAndSendTx, getWalletTokenAccount } from "../utils/util";
+import { buildAndSendTx, getWalletTokenAccount } from "../util";
 
 const ZERO = new BN(0);
 type BN = typeof ZERO;

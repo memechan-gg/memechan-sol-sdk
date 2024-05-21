@@ -1,5 +1,5 @@
 import { BE_URL } from "../common/consts";
-import { jsonFetch } from "../utils/fetch";
+import { jsonFetch } from "../util/fetch";
 import { SolanaLivePool, SolanaSeedPool } from "./schemas/pools-schema";
 import { QueryAllLivePoolsResponse, QueryAllSeedPoolsResponse, QueryAllStakingPoolsResponse } from "./types";
 

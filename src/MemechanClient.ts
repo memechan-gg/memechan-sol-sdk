@@ -1,5 +1,5 @@
 import { AnchorProvider, Program, Wallet, setProvider } from "@coral-xyz/anchor";
-import { Cluster, Connection, PublicKey, clusterApiUrl } from "@solana/web3.js";
+import { Connection, PublicKey } from "@solana/web3.js";
 import { IDL, MemechanSol } from "./schema/types/memechan_sol";
 
 export class MemechanClient {

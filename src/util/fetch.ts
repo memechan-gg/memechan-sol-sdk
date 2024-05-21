@@ -1,4 +1,4 @@
-import { IAMCredentials } from "../auth/types";
+import { IAMCredentials } from "../auth/Auth";
 import { BE_REGION } from "../common/consts";
 import { createSignedFetcher } from "./sigv4";
 
@@ -73,22 +73,3 @@ export const signedJsonFetch = async (
   return r.json();
 };
 
-export const jsonFetch = async (
-  input: string | URL | globalThis.Request,
-  init?: Omit<RequestInit, "body"> & { body?: unknown },
-) => {
-  let body;
-  if (init?.body) {
-    body = JSON.stringify(init.body);
-  }
-  const r = await fetch(input, { ...init, body });
-  if (!r.ok) {
-    const body = await r.text();
-    try {
-      throw new Error(JSON.stringify({ body, status: r.statusText }));
-    } catch (e) {
-      throw new Error(body);
-    }
-  }
-  return r.json();
-};
