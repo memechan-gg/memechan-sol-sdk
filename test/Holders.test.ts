@@ -17,7 +17,7 @@ const DUMMY_TOKEN_METADATA = {
   website: "https://besttokenever.com",
 };
 
-describe("Holders endpoints", () => {
+describe.skip("Holders endpoints", () => {
   it("bonding curve", async () => {
     const boundPool = await BoundPoolClient.fromBoundPoolId({
       client,

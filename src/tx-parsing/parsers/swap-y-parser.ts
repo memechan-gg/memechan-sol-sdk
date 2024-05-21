@@ -12,6 +12,7 @@ export type SwapYInstructionParsed = {
   quoteAmtSwapped: number;
   baseAmtReceived: number;
   poolQuoteVault: number;
+  type: "swap_y";
 };
 
 export async function ParseSwapYInstruction(
@@ -53,6 +54,7 @@ export async function ParseSwapYInstruction(
     poolQuoteVault,
     quoteAmtSwapped,
     sender: tx.transaction.message.accountKeys[0].pubkey, // In the `Message` structure, the first account is always the fee-payer
+    type: "swap_y",
   };
 
   return swyParsed;

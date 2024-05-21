@@ -1,5 +1,6 @@
 import * as splToken from "@solana/spl-token";
 import { PublicKey, Connection, Keypair } from "@solana/web3.js";
+import { MEMECHAN_MEME_TOKEN_DECIMALS } from "../config/config";
 
 export interface TokenData {
   mint: PublicKey;
@@ -17,7 +18,7 @@ export class MintUtils {
     this.authority = authority;
   }
 
-  async createMint(nb_decimals = 6): Promise<PublicKey> {
+  async createMint(nb_decimals = MEMECHAN_MEME_TOKEN_DECIMALS): Promise<PublicKey> {
     const kp = Keypair.generate();
     return await splToken.createMint(
       this.conn,
@@ -38,7 +39,7 @@ export class MintUtils {
     );
   }
 
-  public async createNewToken(nbDecimals = 6, startingPrice = 1_000_000) {
+  public async createNewToken(nbDecimals = MEMECHAN_MEME_TOKEN_DECIMALS, startingPrice = 1_000_000) {
     const mint = await this.createMint(nbDecimals);
     const tokenData: TokenData = {
       mint: mint,
