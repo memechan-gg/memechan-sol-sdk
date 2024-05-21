@@ -1,8 +1,14 @@
 import NodeWallet from "@coral-xyz/anchor/dist/cjs/nodewallet";
 import { Connection, Keypair, PublicKey } from "@solana/web3.js";
 import { MemechanClient } from "../src";
-import { MEMECHAN_PROGRAM_ID } from "../src/config/config";
-import { ADMIN_PUB_KEY, IS_TEST_ENV, RPC_API_CLUSTER, TEST_USER_SECRET_KEY, WSS_API_CLUSTER } from "./env";
+import {
+  ADMIN_PUB_KEY,
+  HELIUS_API_URL,
+  IS_TEST_ENV,
+  RPC_API_CLUSTER,
+  TEST_USER_SECRET_KEY,
+  WSS_API_CLUSTER,
+} from "./env";
 
 export const connection = new Connection(RPC_API_CLUSTER);
 export const admin = new PublicKey(ADMIN_PUB_KEY);
@@ -10,6 +16,7 @@ export const payer = Keypair.fromSecretKey(Buffer.from(JSON.parse(TEST_USER_SECR
 export const wallet = new NodeWallet(payer);
 export const client = new MemechanClient({
   wallet,
+  heliusApiUrl: HELIUS_API_URL,
   rpcApiUrl: RPC_API_CLUSTER,
   wssApiUrl: WSS_API_CLUSTER,
   isTest: IS_TEST_ENV,

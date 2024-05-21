@@ -21,7 +21,7 @@ describe("Holders endpoints", () => {
   it("bonding curve", async () => {
     const boundPool = await BoundPoolClient.fromBoundPoolId({
       client,
-      poolAccountAddressId: new PublicKey("3oh7S8dMwTwG3fmXD7MAJ75VCyKWQ4ZTmqc6ewZ6fwUu")
+      poolAccountAddressId: new PublicKey("3oh7S8dMwTwG3fmXD7MAJ75VCyKWQ4ZTmqc6ewZ6fwUu"),
     });
 
     console.log(await boundPool.getHoldersList());
@@ -33,10 +33,8 @@ describe("Holders endpoints", () => {
     const staking = await StakingPool.fromStakingPoolId({
       poolAccountAddressId: poolAddr,
       client,
-    }
-    );
+    });
     const fetchedStaking = await client.memechanProgram.account.stakingPool.fetch(poolAddr);
-
 
     console.log(await staking.getHoldersList());
     console.log(await staking.getHoldersCount());

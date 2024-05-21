@@ -66,7 +66,7 @@ export class BoundPoolClient {
     public quoteVault: PublicKey,
     public memeTokenMint: PublicKey,
     public quoteTokenMint: PublicKey = MEMECHAN_QUOTE_MINT,
-    public memeToken: Token
+    public memeToken: Token,
   ) {
     //
   }
@@ -87,7 +87,7 @@ export class BoundPoolClient {
       poolObjectData.quoteReserve.vault,
       poolObjectData.memeReserve.mint,
       poolObjectData.quoteReserve.mint,
-      new Token(TOKEN_PROGRAM_ID, poolObjectData.memeReserve.mint, 6) // TODO fix 6 decimals
+      new Token(TOKEN_PROGRAM_ID, poolObjectData.memeReserve.mint, 6), // TODO fix 6 decimals
     );
 
     return boundClientInstance;
@@ -283,7 +283,15 @@ export class BoundPoolClient {
 
     const id = this.findBoundPoolPda(memeMint, quoteToken.mint, memechanProgram.programId);
 
-    return new BoundPoolClient(id, client, launchVault, poolQuoteVault, memeMint, quoteToken.mint, new Token(TOKEN_PROGRAM_ID, memeMint, 6));
+    return new BoundPoolClient(
+      id,
+      client,
+      launchVault,
+      poolQuoteVault,
+      memeMint,
+      quoteToken.mint,
+      new Token(TOKEN_PROGRAM_ID, memeMint, 6),
+    );
   }
 
   public static async slowNew(args: BoundPoolArgs): Promise<BoundPoolClient> {
@@ -352,7 +360,15 @@ export class BoundPoolClient {
 
     // console.log("createCoinResponse: " + JSON.stringify(createCoinResponse));
 
-    return new BoundPoolClient(id, client, launchVault, poolQuoteVault, memeMint, quoteToken.mint, new Token(TOKEN_PROGRAM_ID, memeMint, 6));
+    return new BoundPoolClient(
+      id,
+      client,
+      launchVault,
+      poolQuoteVault,
+      memeMint,
+      quoteToken.mint,
+      new Token(TOKEN_PROGRAM_ID, memeMint, 6),
+    );
   }
 
   /**
@@ -915,7 +931,12 @@ export class BoundPoolClient {
     });
     console.log("Go live signature:", signature);
 
-    return new StakingPool(stakingId, this.client);
+    const stakingPoolInstance = await StakingPool.fromStakingPoolId({
+      client: this.client,
+      poolAccountAddressId: stakingId,
+    });
+
+    return stakingPoolInstance;
   }
 
   public async goLive(input: GoLiveArgs): Promise<[StakingPool]> {
@@ -1074,10 +1095,12 @@ export class BoundPoolClient {
         .rpc({ skipPreflight: true, commitment: "confirmed" });
       console.log("goLive Transaction successful:", result);
 
-      return [await StakingPool.fromStakingPoolId({
-        client: this.client,
-        poolAccountAddressId: stakingId
-      })]
+      return [
+        await StakingPool.fromStakingPoolId({
+          client: this.client,
+          poolAccountAddressId: stakingId,
+        }),
+      ];
     } catch (error) {
       if (error instanceof AnchorError) {
         console.error("Error details:", error);
@@ -1093,19 +1116,19 @@ export class BoundPoolClient {
   }
 
   public async fetchRelatedTickets() {
-    return BoundPoolClient.fetchRelatedTickets(this.id, this.client)
+    return BoundPoolClient.fetchRelatedTickets(this.id, this.client);
   }
 
   public async getHoldersCount() {
-    return BoundPoolClient.getHoldersCount(this.id, this.client)
+    return BoundPoolClient.getHoldersCount(this.id, this.client);
   }
 
   public async getHoldersMap() {
-    return BoundPoolClient.getHoldersMap(this.id, this.client)
+    return BoundPoolClient.getHoldersMap(this.id, this.client);
   }
 
   public async getHoldersList() {
-    return BoundPoolClient.getHoldersList(this.id, this.client)
+    return BoundPoolClient.getHoldersList(this.id, this.client);
   }
 
   /**
@@ -1118,27 +1141,27 @@ export class BoundPoolClient {
         memcmp: {
           bytes: pool.toBase58(),
           offset: 40,
-        }
-      }
+        },
+      },
     ];
 
     const fetchedTickets = await program.account.memeTicket.all(filters);
-    const tickets = fetchedTickets.map(ticket => ticket.account);
-    return tickets
+    const tickets = fetchedTickets.map((ticket) => ticket.account);
+    return tickets;
   }
 
   /**
    * Fetches all unique token holders for pool and returns their number
    */
   public static async getHoldersCount(pool: PublicKey, client: MemechanClient) {
-    return (await BoundPoolClient.getHoldersList(pool, client)).length
+    return (await BoundPoolClient.getHoldersList(pool, client)).length;
   }
 
   public static async getHoldersMap(pool: PublicKey, client: MemechanClient) {
     const tickets = await BoundPoolClient.fetchRelatedTickets(pool, client);
     const uniqueHolders: Map<string, MemeTicketFields[]> = new Map();
 
-    tickets.forEach(ticket => {
+    tickets.forEach((ticket) => {
       const addr = ticket.owner.toBase58();
       if (!uniqueHolders.has(addr)) {
         uniqueHolders.set(addr, []);
@@ -1146,7 +1169,7 @@ export class BoundPoolClient {
       uniqueHolders.get(addr)?.push(ticket);
     });
 
-    return uniqueHolders
+    return uniqueHolders;
   }
 
   /**
@@ -1155,7 +1178,7 @@ export class BoundPoolClient {
   public static async getHoldersList(pool: PublicKey, client: MemechanClient) {
     const holdersMap = await BoundPoolClient.getHoldersMap(pool, client);
 
-    return Array.from(holdersMap.keys())
+    return Array.from(holdersMap.keys());
   }
 
   static getATAAddress(owner: PublicKey, mint: PublicKey, programId: PublicKey) {
