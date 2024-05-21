@@ -1,8 +1,9 @@
-import { PublicKey } from "@solana/web3.js";
-import { BoundMerge, CloseArgs, StakingMerge } from "./types";
-import { MemechanClient } from "../MemechanClient";
-import { MemechanSol } from "../schema/types/memechan_sol";
 import { Program } from "@coral-xyz/anchor";
+import { GetProgramAccountsFilter, PublicKey } from "@solana/web3.js";
+import { MemechanClient } from "../MemechanClient";
+import { MemeTicketFields } from "../schema/codegen/accounts";
+import { MemechanSol } from "../schema/types/memechan_sol";
+import { BoundMerge, CloseArgs, StakingMerge, StringifiedMemeTicketFields } from "./types";
 
 export class MemeTicket {
   public constructor(
@@ -70,5 +71,70 @@ export class MemeTicket {
       .rpc();
 
     return this;
+  }
+
+  /**
+   * Fetches all tickets for provided pool id
+   */
+  public static async fetchRelatedTickets(pool: PublicKey, client: MemechanClient): Promise<MemeTicketFields[]> {
+    const program = client.memechanProgram;
+    const filters: GetProgramAccountsFilter[] = [
+      {
+        memcmp: {
+          bytes: pool.toBase58(),
+          offset: 40,
+        },
+      },
+    ];
+
+    const fetchedTickets = await program.account.memeTicket.all(filters);
+    const tickets = fetchedTickets.map((ticket) => ticket.account);
+    return tickets;
+  }
+
+  public static async fetchTicketsByUser(
+    pool: PublicKey,
+    client: MemechanClient,
+    user: PublicKey,
+  ): Promise<StringifiedMemeTicketFields[]> {
+    const program = client.memechanProgram;
+    const filters: GetProgramAccountsFilter[] = [
+      {
+        memcmp: {
+          bytes: pool.toBase58(),
+          offset: 40,
+        },
+      },
+      {
+        memcmp: {
+          bytes: user.toBase58(),
+          offset: 8,
+        },
+      },
+    ];
+
+    const fetchedTickets = await program.account.memeTicket.all(filters);
+    const tickets = fetchedTickets.map((ticket) => ticket.account);
+
+    const stringifiedTickets = tickets.map((ticket) => {
+      return {
+        ...ticket,
+        amount: ticket.amount.toString(),
+        untilTimestamp: ticket.untilTimestamp.toString(),
+      };
+    });
+
+    return stringifiedTickets;
+  }
+
+  public static async fetchAvailableTicketsByUser(pool: PublicKey, client: MemechanClient, user: PublicKey) {
+    const tickets = await MemeTicket.fetchTicketsByUser(pool, client, user);
+
+    return tickets.filter((ticket) => {
+      const currentTimestamp = Date.now();
+      const unlockTicketTimestamp = +ticket.untilTimestamp;
+
+      return currentTimestamp >= unlockTicketTimestamp;
+    });
   }
 }
