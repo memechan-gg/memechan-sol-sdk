@@ -21,3 +21,13 @@ export const client = new MemechanClient({
   wssApiUrl: WSS_API_CLUSTER,
   isTest: IS_TEST_ENV,
 });
+
+export const DUMMY_TOKEN_METADATA = {
+  name: "Best Token Ever",
+  symbol: "BTE",
+  image: "https://cf-ipfs.com/ipfs/QmVevMfxFpfgBu5kHuYUPmDMaV6pWkAn3zw5XaCXxKdaBh",
+  description: "This is the best token ever",
+  twitter: "https://twitter.com/BestTokenEver",
+  telegram: "https://t.me/BestTokenEver",
+  website: "https://besttokenever.com",
+};

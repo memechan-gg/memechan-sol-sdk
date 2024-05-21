@@ -31,3 +31,15 @@ export const MEMECHAN_QUOTE_TOKEN: Token = new Token(
   "SLERF",
   "SLERF",
 );
+
+// Contract constants
+export const MAX_TICKET_TOKENS = 900_000_000;
+export const MAX_MEME_TOKENS = 1_125_000_000;
+
+export const DEFAULT_PRICE_FACTOR = 2;
+export const DEFAULT_MAX_M_LP = 200_000_000_000_000;
+export const DEFAULT_MAX_M = 900_000_000_000_000;
+export const DEFAULT_MAX_S = 300;
+
+export const DECIMALS_ALPHA = 1_000_000; // consider increase
+export const DECIMALS_BETA = 1_000_000; // consider increase
