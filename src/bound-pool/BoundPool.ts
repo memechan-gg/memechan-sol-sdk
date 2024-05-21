@@ -12,6 +12,7 @@ import {
 import {
   ComputeBudgetProgram,
   Connection,
+  GetProgramAccountsFilter,
   Keypair,
   PublicKey,
   sendAndConfirmTransaction,
@@ -21,7 +22,7 @@ import {
   SYSVAR_RENT_PUBKEY,
   Transaction,
 } from "@solana/web3.js";
-import { BoundPool as CodegenBoundPool } from "../schema/codegen/accounts";
+import { BoundPool as CodegenBoundPool, MemeTicketFields, MemeTicketJSON } from "../schema/codegen/accounts";
 
 import { AnchorError, BN, Program, Provider } from "@coral-xyz/anchor";
 import { MemechanClient } from "../MemechanClient";
@@ -1071,7 +1072,10 @@ export class BoundPoolClient {
         .rpc({ skipPreflight: true, commitment: "confirmed" });
       console.log("goLive Transaction successful:", result);
 
-      return [new StakingPool(stakingId, this.client)];
+      return [await StakingPool.fromStakingPoolId({
+        client: this.client,
+        poolAccountAddressId: stakingId
+      })]
     } catch (error) {
       if (error instanceof AnchorError) {
         console.error("Error details:", error);
@@ -1084,6 +1088,72 @@ export class BoundPoolClient {
 
       throw error;
     }
+  }
+
+  public async fetchRelatedTickets() {
+    return BoundPoolClient.fetchRelatedTickets(this.id, this.client)
+  }
+
+  public async getHoldersCount() {
+    return BoundPoolClient.getHoldersCount(this.id, this.client)
+  }
+
+  public async getHoldersMap() {
+    return BoundPoolClient.getHoldersMap(this.id, this.client)
+  }
+
+  public async getHoldersList() {
+    return BoundPoolClient.getHoldersList(this.id, this.client)
+  }
+
+  /**
+   * Fetches all tickets for provided pool id
+   */
+  public static async fetchRelatedTickets(pool: PublicKey, client: MemechanClient): Promise<MemeTicketFields[]> {
+    const program = client.memechanProgram;
+    const filters: GetProgramAccountsFilter[] = [
+      {
+        memcmp: {
+          bytes: pool.toBase58(),
+          offset: 40,
+        }
+      }
+    ];
+
+    const fetchedTickets = await program.account.memeTicket.all(filters);
+    const tickets = fetchedTickets.map(ticket => ticket.account);
+    return tickets
+  }
+
+  /**
+   * Fetches all unique token holders for pool and returns their number
+   */
+  public static async getHoldersCount(pool: PublicKey, client: MemechanClient) {
+    return (await BoundPoolClient.getHoldersList(pool, client)).length
+  }
+
+  public static async getHoldersMap(pool: PublicKey, client: MemechanClient) {
+    const tickets = await BoundPoolClient.fetchRelatedTickets(pool, client);
+    const uniqueHolders: Map<string, MemeTicketFields[]> = new Map();
+
+    tickets.forEach(ticket => {
+      const addr = ticket.owner.toBase58();
+      if (!uniqueHolders.has(addr)) {
+        uniqueHolders.set(addr, []);
+      }
+      uniqueHolders.get(addr)?.push(ticket);
+    });
+
+    return uniqueHolders
+  }
+
+  /**
+   * Fetches all unique token holders for pool and returns thier addresses
+   */
+  public static async getHoldersList(pool: PublicKey, client: MemechanClient) {
+    const holdersMap = await BoundPoolClient.getHoldersMap(pool, client);
+
+    return Array.from(holdersMap.keys())
   }
 
   static getATAAddress(owner: PublicKey, mint: PublicKey, programId: PublicKey) {
