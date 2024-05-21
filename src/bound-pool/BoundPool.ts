@@ -1249,6 +1249,7 @@ export class BoundPoolClient {
     const quoteBalanceConverted = quoteBalance.div(10 ** SLERF_DECIMALS);
     const soldMemeConverted = new BigNumber(DEFAULT_MAX_M).minus(memeBalance).div(10 ** MEMECHAN_MEMECOIN_DECIMALS);
 
+    // In case no meme coins were sold, return 0-prices
     if (soldMemeConverted.eq(0)) {
       return { priceInQuote: "0", priceInUsd: "0" };
     }
