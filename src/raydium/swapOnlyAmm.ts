@@ -2,7 +2,6 @@ import assert from 'assert';
 
 import {
   jsonInfo2PoolKeys,
-  Liquidity,
   LiquidityPoolKeys,
   Percent,
   Token,
@@ -13,6 +12,7 @@ import { Connection, Keypair } from '@solana/web3.js';
 import { formatAmmKeysById } from './formatAmmKeysById';
 import { buildAndSendTx, getWalletTokenAccount } from '../utils/util';
 import { makeTxVersion } from './config';
+import { Liquidity } from './MemeLiquidity';
 
 export type WalletTokenAccounts = Awaited<ReturnType<typeof getWalletTokenAccount>>
 export type SawpOnlyAmmInputInfo = {
@@ -30,16 +30,26 @@ export async function swapOnlyAmm(input: SawpOnlyAmmInputInfo) {
   // -------- pre-action: get pool info --------
   const targetPoolInfo = await formatAmmKeysById(input.targetPool, connection)
   assert(targetPoolInfo, 'cannot find the target pool')
+
+  console.log('targetPoolInfo:', targetPoolInfo);
+
   const poolKeys = jsonInfo2PoolKeys(targetPoolInfo) as LiquidityPoolKeys
 
   // -------- step 1: coumpute amount out --------
+
+  const poolInfo = await Liquidity.fetchInfo({ connection, poolKeys });
+
+  console.log('poolInfo:', poolInfo)
+
   const { amountOut, minAmountOut } = Liquidity.computeAmountOut({
     poolKeys: poolKeys,
-    poolInfo: await Liquidity.fetchInfo({ connection, poolKeys }),
+    poolInfo: poolInfo,
     amountIn: input.inputTokenAmount,
     currencyOut: input.outputToken,
     slippage: input.slippage,
   })
+
+  console.log('amountOut:', amountOut.toFixed(), '  minAmountOut: ', minAmountOut.toFixed())
 
   // -------- step 2: create instructions by SDK function --------
   const { innerTransactions } = await Liquidity.makeSwapInstructionSimple({

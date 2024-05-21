@@ -52,6 +52,6 @@ export async function sleep(ms: number) {
 // }
 
 export function findProgramAddress(seeds: Array<Buffer | Uint8Array>, programId: PublicKey) {
-  const [publicKey, nonce] = PublicKey.findProgramAddressSync(seeds, programId)
-  return { publicKey, nonce }
+  const [publicKey, nonce] = PublicKey.findProgramAddressSync(seeds, programId);
+  return { publicKey, nonce };
 }

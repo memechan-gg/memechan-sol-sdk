@@ -8,6 +8,7 @@ import {
 } from "@raydium-io/raydium-sdk";
 import { Connection, PublicKey } from "@solana/web3.js";
 import { safeBNToNumber } from "../utils/safeBNToNumber";
+import { MEMECHAN_MEME_TOKEN_DECIMALS, MEMECHAN_QUOTE_TOKEN_DECIMALS } from "../config/config";
 
 export async function formatAmmKeysById(id: string, connection: Connection): Promise<ApiPoolInfoV4> {
   console.log("formatAmmKeysById id: " + id);
@@ -32,9 +33,9 @@ export async function formatAmmKeysById(id: string, connection: Connection): Pro
     baseMint: info.baseMint.toString(),
     quoteMint: info.quoteMint.toString(),
     lpMint: info.lpMint.toString(),
-    baseDecimals: safeBNToNumber(info.baseDecimal),
-    quoteDecimals: safeBNToNumber(info.quoteDecimal),
-    lpDecimals: 6,//lpMintInfo.decimals,
+    baseDecimals: MEMECHAN_MEME_TOKEN_DECIMALS, //safeBNToNumber(info.baseDecimal),
+    quoteDecimals: MEMECHAN_QUOTE_TOKEN_DECIMALS, //safeBNToNumber(info.quoteDecimal),
+    lpDecimals: MEMECHAN_MEME_TOKEN_DECIMALS,//lpMintInfo.decimals,
     version: 4,
     programId: account.owner.toString(),
     authority: Liquidity.getAssociatedAuthority({ programId: account.owner }).publicKey.toString(),

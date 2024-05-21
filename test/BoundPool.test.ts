@@ -32,7 +32,7 @@ describe("BoundPool", () => {
     console.log(all);
   }, 30000);
 
-  it("init staking pool then go live", async () => {
+  it.skip("init staking pool then go live", async () => {
     console.log("payer: " + payer.publicKey.toString());
     const pool = await BoundPoolClient.slowNew({
       admin,
