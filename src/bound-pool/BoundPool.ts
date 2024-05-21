@@ -1,3 +1,4 @@
+import BigNumber from "bignumber.js";
 import { Token } from "@raydium-io/raydium-sdk";
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
@@ -33,7 +34,9 @@ import { createMarket, getCreateMarketTransactions } from "../raydium/openBookCr
 import { StakingPool } from "../staking-pool/StakingPool";
 import {
   BoundPoolArgs,
+  BuyMemeArgs,
   GetBuyMemeTransactionArgs,
+  GetBuyMemeTransactionOutput,
   GetCreateNewBondingPoolAndTokenTransactionArgs,
   GetGoLiveTransactionArgs,
   GetInitStakingPoolTransactionArgs,
@@ -46,7 +49,13 @@ import {
 } from "./types";
 
 import { findProgramAddress } from "../common/helpers";
-import { MEMECHAN_QUOTE_MINT, MEMECHAN_QUOTE_TOKEN, MEMECHAN_TARGET_CONFIG } from "../config/config";
+import {
+  MEMECHAN_MEMECOIN_DECIMALS,
+  MEMECHAN_QUOTE_MINT,
+  MEMECHAN_QUOTE_TOKEN,
+  MEMECHAN_TARGET_CONFIG,
+  SLERF_DECIMALS,
+} from "../config/config";
 import { MemechanSol } from "../schema/types/memechan_sol";
 import { createMetadata, getCreateMetadataTransaction } from "../token/createMetadata";
 import { createMintWithPriority } from "../token/createMintWithPriority";
@@ -55,6 +64,8 @@ import { getCreateAccountInstructions } from "../utils/getCreateAccountInstructi
 import { getSendAndConfirmTransactionMethod } from "../utils/getSendAndConfirmTransactionMethod";
 import { retry } from "../utils/retry";
 import { sendTx } from "../utils/util";
+import { deductSlippage } from "../utils/trading/deductSlippage";
+import { normalizeInputCoinAmount } from "../utils/trading/normalizeInputCoinAmount";
 
 export class BoundPoolClient {
   private constructor(
@@ -517,10 +528,10 @@ export class BoundPoolClient {
    * @throws {Error} Throws an error if the transaction creation or confirmation fails.
    * @untested This method is untested and may contain bugs.
    */
-  public async buyMeme(input: SwapYArgs): Promise<string> {
-    const buyMemeTransaction = await this.getBuyMemeTransaction(input);
+  public async buyMeme(input: BuyMemeArgs): Promise<string> {
+    const { tx } = await this.getBuyMemeTransaction(input);
 
-    const txId = await sendAndConfirmTransaction(this.client.connection, buyMemeTransaction, [input.user], {
+    const txId = await sendAndConfirmTransaction(this.client.connection, tx, [input.signer], {
       skipPreflight: true,
       commitment: "confirmed",
     });
@@ -531,81 +542,81 @@ export class BoundPoolClient {
   /**
    * Generates a transaction to buy a meme.
    *
-   * @todo Implement the full functionality of this method (in regards of accepting different tokens).
-   * @todo Add comprehensive examples.
-   *
    * @param {GetBuyMemeTransactionArgs} input - The input arguments required for the transaction.
-   * @returns {Promise<Transaction>} A promise that resolves to the transaction object.
+   * @returns {Promise<GetBuyMemeTransactionOutput>} A promise that resolves to the transaction object.
    *
    * @work-in-progress This method is a work in progress and not yet ready for production use.
    * @untested This method is untested and may contain bugs.
    */
-  public async getBuyMemeTransaction(input: GetBuyMemeTransactionArgs): Promise<Transaction> {
-    const tx = input.transaction ?? new Transaction();
-
-    const user = input.user;
+  public async getBuyMemeTransaction(input: GetBuyMemeTransactionArgs): Promise<GetBuyMemeTransactionOutput> {
+    const { inputAmount, minOutputAmount, slippagePercentage, user, transaction = new Transaction() } = input;
+    let { inputTokenAccount } = input;
 
     const pool = this.id;
     const poolSignerPda = this.findSignerPda();
+    const memeTicketId = Keypair.generate();
+    const memeTicketPublicKey = memeTicketId.publicKey;
+    const connection = this.client.connection;
 
-    const tokenInMintPubkey = input.quoteMint;
+    // input
+    const inputAmountWithDecimals = normalizeInputCoinAmount(inputAmount, SLERF_DECIMALS);
+    const inputAmountBN = new BN(inputAmountWithDecimals.toString());
 
-    const sol_in = input.quoteAmountIn;
-    const meme_out = input.memeTokensOut;
+    // output
+    // Note: Be aware, we relay on the fact that `MEMECOIN_DECIMALS` would be always set same for all memecoins
+    // As well as the fact that memecoins and tickets decimals are always the same
+    const minOutputWithSlippage = deductSlippage(new BigNumber(minOutputAmount), slippagePercentage);
+    const minOutputNormalized = normalizeInputCoinAmount(minOutputWithSlippage.toString(), MEMECHAN_MEMECOIN_DECIMALS);
+    const minOutputBN = new BN(minOutputNormalized.toString());
 
-    // TODO: ? We should handle SOL-based and non-SOL based swaps
-    let inputTokenUserAccountPubkey: undefined | PublicKey;
-
-    if (input.userSolAcc) {
-      inputTokenUserAccountPubkey = input.userSolAcc;
-    } else {
-      const associatedToken = getAssociatedTokenAddressSync(tokenInMintPubkey, user.publicKey, true);
-      inputTokenUserAccountPubkey = associatedToken;
-
-      const createAssociatedTokenAcouuntInstruction = createAssociatedTokenAccountInstruction(
-        user.publicKey,
-        associatedToken,
-        user.publicKey,
-        tokenInMintPubkey,
+    // If `inputTokenAccount` is not passed in args, we need to find out, whether a quote account for an admin
+    // already exists
+    if (!inputTokenAccount) {
+      const associatedToken = getAssociatedTokenAddressSync(
+        this.quoteTokenMint,
+        user,
+        true,
+        TOKEN_PROGRAM_ID,
+        ASSOCIATED_TOKEN_PROGRAM_ID,
       );
 
-      // Add creation of associated token account
-      tx.add(createAssociatedTokenAcouuntInstruction);
+      const account = await getAccount(connection, associatedToken);
+      inputTokenAccount = account.address;
 
-      // TODO: We need to remove that once get rid of SOL-based pools
-      // Transfer SOL to wSOL
-      const transferSolToWSOLAccountInstruction = SystemProgram.transfer({
-        fromPubkey: user.publicKey,
-        toPubkey: inputTokenUserAccountPubkey,
-        lamports: BigInt(sol_in.toString()),
-      });
-      tx.add(transferSolToWSOLAccountInstruction);
+      // If the quote account for the admin doesn't exist, add an instruction to create it
+      if (!inputTokenAccount) {
+        const associatedTransactionInstruction = createAssociatedTokenAccountInstruction(
+          user,
+          associatedToken,
+          user,
+          this.quoteTokenMint,
+          TOKEN_PROGRAM_ID,
+          ASSOCIATED_TOKEN_PROGRAM_ID,
+        );
 
-      // TODO: We need to remove that once get rid of SOL-based pools
-      // TODO: Double-check do we really need that or not
-      // createSyncNativeInstruction(inputTokenUserAccountPubkey);
+        transaction.add(associatedTransactionInstruction);
+
+        inputTokenAccount = associatedToken;
+      }
     }
 
-    // TODO: Why?
-    const memeTicketId = Keypair.generate();
-
     const buyMemeInstruction = await this.client.memechanProgram.methods
-      .swapY(new BN(sol_in), new BN(meme_out))
+      .swapY(inputAmountBN, minOutputBN)
       .accounts({
         memeTicket: memeTicketId.publicKey,
-        owner: user.publicKey,
+        owner: user,
         pool: pool,
         poolSignerPda: poolSignerPda,
         quoteVault: this.quoteVault,
-        userSol: inputTokenUserAccountPubkey,
+        userSol: inputTokenAccount,
         systemProgram: SystemProgram.programId,
         tokenProgram: TOKEN_PROGRAM_ID,
       })
       .instruction();
 
-    tx.add(buyMemeInstruction);
+    transaction.add(buyMemeInstruction);
 
-    return tx;
+    return { tx: transaction, memeTicketPublicKey, inputTokenAccount };
   }
 
   public async swapX(input: SwapXArgs): Promise<string> {

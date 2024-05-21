@@ -16,17 +16,21 @@ export interface SwapYArgs {
   memeTokensOut: BN;
 }
 
-export type GetBuyMemeTransactionArgs = Omit<SwapYArgs, "user" | "payer" | "pool"> & {
-  user: { publicKey: PublicKey };
-  // inputToken: {
-  //   mint: PublicKey;
-  //   amount: string;
-  // };
-  // outputToken: {
-  //   mint: PublicKey;
-  //   minAmount: string;
-  // };
+export type GetBuyMemeTransactionArgs = {
+  user: PublicKey;
+  inputTokenAccount?: PublicKey;
+  inputAmount: string;
+  minOutputAmount: string;
+  slippagePercentage: number;
   transaction?: Transaction;
+};
+
+export type BuyMemeArgs = GetBuyMemeTransactionArgs & { signer: Keypair };
+
+export type GetBuyMemeTransactionOutput = {
+  tx: Transaction;
+  memeTicketPublicKey: PublicKey;
+  inputTokenAccount: PublicKey;
 };
 
 export interface SwapXArgs {
