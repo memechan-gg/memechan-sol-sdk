@@ -1,10 +1,18 @@
 import { Program } from "@coral-xyz/anchor";
-import { GetProgramAccountsFilter, PublicKey } from "@solana/web3.js";
+import { GetProgramAccountsFilter, PublicKey, Transaction, sendAndConfirmTransaction } from "@solana/web3.js";
 import BigNumber from "bignumber.js";
 import { MemechanClient } from "../MemechanClient";
 import { MemeTicketFields } from "../schema/codegen/accounts";
 import { MemechanSol } from "../schema/types/memechan_sol";
-import { BoundMerge, CloseArgs, StakingMerge, StringifiedMemeTicketFields } from "./types";
+import {
+  BoundMerge,
+  CloseArgs,
+  GetBoundMergeTransactionArgs,
+  GetCloseTransactionArgs,
+  GetStakingMergeTransactionArgs,
+  StakingMerge,
+  StringifiedMemeTicketFields,
+} from "./types";
 
 export class MemeTicket {
   public constructor(
@@ -22,54 +30,104 @@ export class MemeTicket {
     return program.account.memeTicket.all();
   }
 
-  // TODO:
-  // Add method for fetching tickets by user
+  public async getBoundMergeTransaction({
+    transaction,
+    pool,
+    ticketsToMerge,
+    user,
+  }: GetBoundMergeTransactionArgs): Promise<Transaction> {
+    const tx = transaction ?? new Transaction();
+
+    for (const ticket of ticketsToMerge) {
+      const mergeInstruction = await this.client.memechanProgram.methods
+        .boundMergeTickets()
+        .accounts({
+          owner: user.publicKey,
+          pool: pool,
+          ticketFrom: ticket.id,
+          ticketInto: this.id,
+        })
+        .instruction();
+
+      tx.add(mergeInstruction);
+    }
+
+    return tx;
+  }
 
   public async boundMerge(input: BoundMerge): Promise<MemeTicket> {
-    const user = input.user;
+    const mergeTransaction = await this.getBoundMergeTransaction(input);
 
-    await this.client.memechanProgram.methods
-      .boundMergeTickets()
-      .accounts({
-        owner: user.publicKey,
-        pool: input.pool,
-        ticketFrom: input.ticketToMerge.id,
-        ticketInto: this.id,
-      })
-      .signers([user])
-      .rpc();
+    const signature = await sendAndConfirmTransaction(this.client.connection, mergeTransaction, [input.user], {
+      commitment: "confirmed",
+      skipPreflight: true,
+    });
+    console.log("bound merge signature:", signature);
 
     return this;
+  }
+
+  public async getStakingMergeTransaction({
+    staking,
+    ticketsToMerge,
+    user,
+    transaction,
+  }: GetStakingMergeTransactionArgs): Promise<Transaction> {
+    const tx = transaction ?? new Transaction();
+
+    for (const ticket of ticketsToMerge) {
+      const mergeInstruction = await this.client.memechanProgram.methods
+        .stakingMergeTickets()
+        .accounts({
+          owner: user.publicKey,
+          staking: staking,
+          ticketFrom: ticket.id,
+          ticketInto: this.id,
+        })
+        .instruction();
+
+      tx.add(mergeInstruction);
+    }
+
+    return tx;
   }
 
   public async stakingMerge(input: StakingMerge): Promise<MemeTicket> {
-    const user = input.user;
+    const mergeTransaction = await this.getStakingMergeTransaction(input);
 
-    await this.client.memechanProgram.methods
-      .stakingMergeTickets()
-      .accounts({
-        owner: user.publicKey,
-        staking: input.staking,
-        ticketFrom: input.ticketToMerge.id,
-        ticketInto: this.id,
-      })
-      .signers([user])
-      .rpc();
+    const signature = await sendAndConfirmTransaction(this.client.connection, mergeTransaction, [input.user], {
+      commitment: "confirmed",
+      skipPreflight: true,
+    });
+    console.log("staking merge signature:", signature);
 
     return this;
   }
 
-  public async close(input: CloseArgs): Promise<MemeTicket> {
-    const user = input.user;
+  public async getCloseTransaction({ user, transaction }: GetCloseTransactionArgs): Promise<Transaction> {
+    const tx = transaction ?? new Transaction();
 
-    await this.client.memechanProgram.methods
+    const closeInstruction = await this.client.memechanProgram.methods
       .closeTicket()
       .accounts({
         owner: user.publicKey,
         ticket: this.id,
       })
-      .signers([user])
-      .rpc();
+      .instruction();
+
+    tx.add(closeInstruction);
+
+    return tx;
+  }
+
+  public async close(input: CloseArgs): Promise<MemeTicket> {
+    const closeTransaction = await this.getCloseTransaction(input);
+
+    const signature = await sendAndConfirmTransaction(this.client.connection, closeTransaction, [input.user], {
+      commitment: "confirmed",
+      skipPreflight: true,
+    });
+    console.log("close meme ticket signature:", signature);
 
     return this;
   }
