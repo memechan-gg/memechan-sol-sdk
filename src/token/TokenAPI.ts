@@ -1,5 +1,5 @@
 import { Auth } from "../auth/Auth";
-import { BE_URL } from "../common/consts";
+import { BE_URL } from "../common/constants";
 import { jsonFetch, signedJsonFetch, unsignedMultipartRequest } from "../util/fetch";
 import {
   TokenStatus,

@@ -1,4 +1,4 @@
-import { BE_URL } from "../common/consts";
+import { BE_URL } from "../common/constants";
 import { jsonFetch } from "../util/fetch";
 import { SolanaLivePool, SolanaSeedPool } from "./schemas/pools-schema";
 import { QueryAllLivePoolsResponse, QueryAllSeedPoolsResponse, QueryAllStakingPoolsResponse } from "./types";

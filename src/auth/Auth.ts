@@ -1,4 +1,4 @@
-import { BE_URL } from "../common/consts";
+import { BE_URL } from "../common/constants";
 import { jsonFetch } from "../util/fetch";
 
 export interface AuthParams {
