@@ -12,7 +12,7 @@ export type NewBPInstructionParsed = {
 }
 
 export async function ParseNewBPInstruction(tx: ParsedTransactionWithMeta, index: number, client: MemechanClient): Promise<NewBPInstructionParsed | undefined> {
-    var poolAddr = PublicKey.default;
+    let poolAddr = PublicKey.default;
     const ix = tx.transaction.message.instructions[index];
 
     if ("accounts" in ix && ix.accounts.length > 1) {
