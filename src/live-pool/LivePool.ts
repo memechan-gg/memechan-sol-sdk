@@ -2,7 +2,7 @@ import { Liquidity, Percent, Token, TokenAmount, jsonInfo2PoolKeys } from "@rayd
 import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import { Connection } from "@solana/web3.js";
 import BigNumber from "bignumber.js";
-import { MEMECHAN_MEMECOIN_DECIMALS, MEMECHAN_QUOTE_TOKEN } from "../config/config";
+import { MEMECHAN_QUOTE_TOKEN, MEMECHAN_MEME_TOKEN_DECIMALS } from "../config/config";
 import { formatAmmKeysById } from "../raydium/formatAmmKeysById";
 
 export class LivePool {
@@ -19,7 +19,7 @@ export class LivePool {
     const poolKeys = jsonInfo2PoolKeys(targetPoolInfo);
 
     const quoteAmountIn = new TokenAmount(MEMECHAN_QUOTE_TOKEN, 10);
-    const tokenOut = new Token(TOKEN_PROGRAM_ID, poolKeys.baseMint, MEMECHAN_MEMECOIN_DECIMALS);
+    const tokenOut = new Token(TOKEN_PROGRAM_ID, poolKeys.baseMint, MEMECHAN_MEME_TOKEN_DECIMALS);
     const slippage = new Percent(1, 10000);
 
     const { amountOut } = Liquidity.computeAmountOut({
