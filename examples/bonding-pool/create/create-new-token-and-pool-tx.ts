@@ -13,7 +13,7 @@ const DUMMY_TOKEN_METADATA = {
   website: "https://besttokenever.com",
 };
 
-// yarn tsx examples/bonding-pool/create-new-token-and-pool-tx.ts > log.txt 2>&1
+// yarn tsx examples/bonding-pool/create/create-new-token-and-pool-tx.ts > log.txt 2>&1
 export const createNewTokenAndPoolTx = async () => {
   const { createPoolTransaction, createTokenTransaction, memeMintKeypair, poolQuoteVaultId, launchVaultId } =
     await BoundPoolClient.getCreateNewBondingPoolAndTokenTransaction({
