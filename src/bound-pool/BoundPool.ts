@@ -915,7 +915,7 @@ export class BoundPoolClient {
     });
     console.log("Go live signature:", signature);
 
-    return new StakingPool(stakingId, this.client);
+    return StakingPool.fromStakingPoolId({ poolAccountAddressId: stakingId, client: this.client });
   }
 
   public async goLive(input: GoLiveArgs): Promise<[StakingPool]> {
