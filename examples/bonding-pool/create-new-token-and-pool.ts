@@ -23,6 +23,7 @@ export const createNewTokenAndPool = async () => {
     tokenMetadata: DUMMY_TOKEN_METADATA,
   });
   console.log("boundPool:", boundPool);
+  console.log("boundPool:", boundPool.id.toString());
 };
 
 createNewTokenAndPool();
