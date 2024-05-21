@@ -1269,6 +1269,32 @@ export class BoundPoolClient {
     return tickets;
   }
 
+  public static async fetchTicketsByUser(
+    pool: PublicKey,
+    client: MemechanClient,
+    user: PublicKey,
+  ): Promise<MemeTicketFields[]> {
+    const program = client.memechanProgram;
+    const filters: GetProgramAccountsFilter[] = [
+      {
+        memcmp: {
+          bytes: pool.toBase58(),
+          offset: 40,
+        },
+      },
+      {
+        memcmp: {
+          bytes: user.toBase58(),
+          offset: 8,
+        },
+      },
+    ];
+
+    const fetchedTickets = await program.account.memeTicket.all(filters);
+    const tickets = fetchedTickets.map((ticket) => ticket.account);
+    return tickets;
+  }
+
   /**
    * Fetches all unique token holders for pool and returns their number
    */
