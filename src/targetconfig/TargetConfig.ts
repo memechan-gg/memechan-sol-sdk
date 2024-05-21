@@ -1,8 +1,7 @@
-import { Connection, PublicKey, SystemProgram } from "@solana/web3.js";
+import { Connection, Keypair, PublicKey, SystemProgram } from "@solana/web3.js";
 import { MemechanClient } from "../MemechanClient";
 import { CreateTargetConfigArgs } from "./types";
 import BN from "bn.js";
-import { payer } from "../../examples/common";
 import { TargetConfig as CodegenTargetConfig } from "../schema/codegen/accounts";
 
 export class TargetConfig {
@@ -89,7 +88,7 @@ export class TargetConfig {
     )[0];
   }
 
-  public async changeTargetConfig(targetAmount: BN): Promise<string> {
+  public async changeTargetConfig(targetAmount: BN, payer: Keypair): Promise<string> {
     const result = await this.client.memechanProgram.methods
     .changeTargetConfig(
       targetAmount
