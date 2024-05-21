@@ -1210,7 +1210,7 @@ export class BoundPoolClient {
   static getATAAddress(owner: PublicKey, mint: PublicKey, programId: PublicKey) {
     return findProgramAddress(
       [owner.toBuffer(), programId.toBuffer(), mint.toBuffer()],
-      new PublicKey("ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"),
+      new PublicKey(ATA_PROGRAM_ID),
     );
   }
 
