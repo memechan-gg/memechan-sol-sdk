@@ -1,8 +1,5 @@
 import "dotenv/config";
 
-if (!process.env.TEST_PAYER_SECRET_KEY?.length) {
-  throw new Error("Empty TEST_PAYER_SECRET_KEY");
-}
 if (!process.env.TEST_USER_SECRET_KEY?.length) {
   throw new Error("Empty TEST_USER_SECRET_KEY");
 }
@@ -25,7 +22,6 @@ if (!process.env.HELIUS_API_URL?.length) {
   throw new Error("Empty HELIUS_API_URL");
 }
 
-export const TEST_PAYER_SECRET_KEY = process.env.TEST_PAYER_SECRET_KEY;
 export const TEST_USER_SECRET_KEY = process.env.TEST_USER_SECRET_KEY;
 export const ADMIN_PUB_KEY = process.env.ADMIN_PUB_KEY;
 export const RPC_API_CLUSTER = process.env.RPC_API_CLUSTER;
