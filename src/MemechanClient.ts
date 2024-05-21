@@ -8,6 +8,7 @@ export interface MemechanClientConfigArgs {
   rpcConnectionConfig?: ConnectionConfig;
   rpcApiUrl: string;
   wssApiUrl: string;
+  heliusApiUrl: string;
   isTest: boolean;
 }
 
@@ -16,9 +17,10 @@ export class MemechanClient {
   public connection: Connection;
   public memechanProgram: Program<MemechanSol>;
   public anchorProvider: AnchorProvider;
+  public heliusApiUrl: string;
 
   constructor(private config: MemechanClientConfigArgs) {
-    const { wallet, isTest, rpcApiUrl, rpcConnectionConfig, wssApiUrl } = config;
+    const { wallet, isTest, rpcApiUrl, rpcConnectionConfig, wssApiUrl, heliusApiUrl } = config;
 
     this.wallet = wallet;
     this.connection = new Connection(rpcApiUrl, {
@@ -30,6 +32,7 @@ export class MemechanClient {
       ...(rpcConnectionConfig ? rpcConnectionConfig : {}),
     });
 
+    this.heliusApiUrl = heliusApiUrl;
     const provider = new AnchorProvider(this.connection, wallet, { commitment: "confirmed" });
     setProvider(provider);
     this.anchorProvider = provider;
