@@ -1,5 +1,6 @@
 import { Program } from "@coral-xyz/anchor";
 import { GetProgramAccountsFilter, PublicKey } from "@solana/web3.js";
+import BigNumber from "bignumber.js";
 import { MemechanClient } from "../MemechanClient";
 import { MemeTicketFields } from "../schema/codegen/accounts";
 import { MemechanSol } from "../schema/types/memechan_sol";
@@ -131,10 +132,19 @@ export class MemeTicket {
     const tickets = await MemeTicket.fetchTicketsByUser(pool, client, user);
     const currentTimestamp = Date.now();
 
-    return tickets.filter((ticket) => {
+    const availableTickets = tickets.filter((ticket) => {
       const unlockTicketTimestamp = +ticket.untilTimestamp;
 
       return currentTimestamp >= unlockTicketTimestamp;
     });
+
+    const availableAmount = availableTickets
+      .reduce((amount: BigNumber, ticket) => {
+        amount = amount.plus(ticket.amount);
+        return amount;
+      }, new BigNumber(0))
+      .toString();
+
+    return { tickets: availableTickets, availableAmount };
   }
 }
