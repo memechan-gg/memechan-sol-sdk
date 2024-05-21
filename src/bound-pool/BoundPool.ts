@@ -21,18 +21,15 @@ import {
   SYSVAR_CLOCK_PUBKEY,
   SYSVAR_RENT_PUBKEY,
   Transaction,
+  VersionedTransaction,
 } from "@solana/web3.js";
-import { BoundPool as CodegenBoundPool, MemeTicketFields, MemeTicketJSON } from "../schema/codegen/accounts";
+import { BoundPool as CodegenBoundPool, MemeTicketFields } from "../schema/codegen/accounts";
 
 import { AnchorError, BN, Program, Provider } from "@coral-xyz/anchor";
 import { MemechanClient } from "../MemechanClient";
 import { MemeTicket } from "../memeticket/MemeTicket";
 import { ATA_PROGRAM_ID, PROGRAMIDS } from "../raydium/config";
-import {
-  createMarket,
-  getCreateMarketInstructions,
-  getCreateMarketTransactions,
-} from "../raydium/openBookCreateMarket";
+import { createMarket, getCreateMarketTransactions } from "../raydium/openBookCreateMarket";
 import { StakingPool } from "../staking-pool/StakingPool";
 import {
   BoundPoolArgs,
@@ -57,6 +54,7 @@ import { getCreateMintWithPriorityTransaction } from "../token/getCreateMintWith
 import { getCreateAccountInstructions } from "../utils/getCreateAccountInstruction";
 import { getSendAndConfirmTransactionMethod } from "../utils/getSendAndConfirmTransactionMethod";
 import { retry } from "../utils/retry";
+import { sendTx } from "../utils/util";
 
 export class BoundPoolClient {
   private constructor(
@@ -66,7 +64,7 @@ export class BoundPoolClient {
     public quoteVault: PublicKey,
     public memeTokenMint: PublicKey,
     public quoteTokenMint: PublicKey = MEMECHAN_QUOTE_MINT,
-    public memeToken: Token
+    public memeToken: Token,
   ) {
     //
   }
@@ -87,7 +85,7 @@ export class BoundPoolClient {
       poolObjectData.quoteReserve.vault,
       poolObjectData.memeReserve.mint,
       poolObjectData.quoteReserve.mint,
-      new Token(TOKEN_PROGRAM_ID, poolObjectData.memeReserve.mint, 6) // TODO fix 6 decimals
+      new Token(TOKEN_PROGRAM_ID, poolObjectData.memeReserve.mint, 6), // TODO fix 6 decimals
     );
 
     return boundClientInstance;
@@ -283,7 +281,15 @@ export class BoundPoolClient {
 
     const id = this.findBoundPoolPda(memeMint, quoteToken.mint, memechanProgram.programId);
 
-    return new BoundPoolClient(id, client, launchVault, poolQuoteVault, memeMint, quoteToken.mint, new Token(TOKEN_PROGRAM_ID, memeMint, 6));
+    return new BoundPoolClient(
+      id,
+      client,
+      launchVault,
+      poolQuoteVault,
+      memeMint,
+      quoteToken.mint,
+      new Token(TOKEN_PROGRAM_ID, memeMint, 6),
+    );
   }
 
   public static async slowNew(args: BoundPoolArgs): Promise<BoundPoolClient> {
@@ -352,7 +358,15 @@ export class BoundPoolClient {
 
     // console.log("createCoinResponse: " + JSON.stringify(createCoinResponse));
 
-    return new BoundPoolClient(id, client, launchVault, poolQuoteVault, memeMint, quoteToken.mint, new Token(TOKEN_PROGRAM_ID, memeMint, 6));
+    return new BoundPoolClient(
+      id,
+      client,
+      launchVault,
+      poolQuoteVault,
+      memeMint,
+      quoteToken.mint,
+      new Token(TOKEN_PROGRAM_ID, memeMint, 6),
+    );
   }
 
   /**
@@ -637,7 +651,7 @@ export class BoundPoolClient {
 
   public async getInitStakingPoolTransaction(
     input: GetInitStakingPoolTransactionArgs,
-  ): Promise<{ transaction: Transaction; stakingQuoteVault: PublicKey; stakingMemeVault: PublicKey }> {
+  ): Promise<{ transaction: Transaction; stakingQuoteVaultId: Keypair; stakingMemeVaultId: Keypair }> {
     const { user, pool = this.id, boundPoolInfo } = input;
     const tx = input.transaction ?? new Transaction();
 
@@ -648,14 +662,14 @@ export class BoundPoolClient {
     const stakingSigner = StakingPool.findSignerPda(stakingId, this.client.memechanProgram.programId);
     const adminTicketId = BoundPoolClient.findMemeTicketPda(stakingId, this.client.memechanProgram.programId);
 
-    const stakingpoolQuoteVaultId = Keypair.generate();
-    const stakingQuoteVault = stakingpoolQuoteVaultId.publicKey;
+    const stakingQuoteVaultId = Keypair.generate();
+    const stakingQuoteVault = stakingQuoteVaultId.publicKey;
     const createWSolAccountInstructions = await getCreateAccountInstructions(
       this.client.connection,
       user,
       this.quoteTokenMint,
       stakingSigner,
-      stakingpoolQuoteVaultId,
+      stakingQuoteVaultId,
       "confirmed",
     );
 
@@ -704,7 +718,7 @@ export class BoundPoolClient {
 
     tx.add(initStakingPoolInstruction);
 
-    return { transaction: tx, stakingMemeVault, stakingQuoteVault };
+    return { transaction: tx, stakingMemeVaultId, stakingQuoteVaultId };
   }
 
   public async slowInitStakingPool(input: Partial<InitStakingPoolArgs>): Promise<InitStakingPoolResult> {
@@ -787,12 +801,14 @@ export class BoundPoolClient {
   }
 
   public async initStakingPool(input: InitStakingPoolArgs): Promise<InitStakingPoolResult> {
-    const { transaction, stakingMemeVault, stakingQuoteVault } = await this.getInitStakingPoolTransaction(input);
+    const { transaction, stakingMemeVaultId, stakingQuoteVaultId } = await this.getInitStakingPoolTransaction(input);
+    const stakingMemeVault = stakingMemeVaultId.publicKey;
+    const stakingQuoteVault = stakingQuoteVaultId.publicKey;
 
     const signAndConfirmInitStakingPoolTransaction = getSendAndConfirmTransactionMethod({
       connection: this.client.connection,
       transaction,
-      signers: [input.user],
+      signers: [input.user, stakingMemeVaultId, stakingQuoteVaultId],
     });
 
     await retry({
@@ -803,9 +819,11 @@ export class BoundPoolClient {
     return { stakingMemeVault, stakingQuoteVault };
   }
 
-  public async getGoLiveTransaction(
-    args: GetGoLiveTransactionArgs,
-  ): Promise<{ transaction: Transaction; stakingId: PublicKey }> {
+  public async getGoLiveTransaction(args: GetGoLiveTransactionArgs): Promise<{
+    createMarketTransactions: (Transaction | VersionedTransaction)[];
+    goLiveTransaction: Transaction;
+    stakingId: PublicKey;
+  }> {
     const {
       boundPoolInfo,
       user,
@@ -822,16 +840,16 @@ export class BoundPoolClient {
     const baseTokenInfo = new Token(TOKEN_PROGRAM_ID, new PublicKey(boundPoolInfo.memeReserve.mint), 6);
     const quoteTokenInfo = MEMECHAN_QUOTE_TOKEN;
 
-    const { marketId, transactions } = await getCreateMarketTransactions({
+    // TODO: Put all the transactions into one (now they exceed trx size limit)
+    const { marketId, transactions: createMarketTransactions } = await getCreateMarketTransactions({
       baseToken: baseTokenInfo,
       quoteToken: quoteTokenInfo,
       wallet: user.publicKey,
       signer: user,
       connection: this.client.connection,
     });
-    const createMarketInstructions = getCreateMarketInstructions(transactions);
-
-    transaction.add(...createMarketInstructions);
+    // const createMarketInstructions = getCreateMarketInstructions(transactions);
+    // createMarketTransaction.add(...createMarketInstructions);
 
     transaction.add(
       SystemProgram.transfer({
@@ -860,7 +878,6 @@ export class BoundPoolClient {
     const targetOrders = BoundPoolClient.getAssociatedTargetOrders({ programId: PROGRAMIDS.AmmV4, marketId });
     const ammConfig = BoundPoolClient.getAssociatedConfigId({ programId: PROGRAMIDS.AmmV4 });
     const raydiumLpMint = BoundPoolClient.getAssociatedLpMint({ programId: PROGRAMIDS.AmmV4, marketId });
-
     const raydiumMemeVault = BoundPoolClient.getAssociatedBaseVault({ programId: PROGRAMIDS.AmmV4, marketId });
     const raydiumWsolVault = BoundPoolClient.getAssociatedQuoteVault({ programId: PROGRAMIDS.AmmV4, marketId });
 
@@ -903,19 +920,60 @@ export class BoundPoolClient {
 
     transaction.add(goLiveInstruction);
 
-    return { transaction, stakingId };
+    return { createMarketTransactions, goLiveTransaction: transaction, stakingId };
   }
 
   public async goLive2(args: GoLiveArgs): Promise<StakingPool> {
-    const { transaction, stakingId } = await this.getGoLiveTransaction(args);
+    // Get needed transactions
+    const { createMarketTransactions, goLiveTransaction, stakingId } = await this.getGoLiveTransaction(args);
 
-    const signature = await sendAndConfirmTransaction(this.client.connection, transaction, [args.user], {
+    // Send transaction to create market
+    const createMarketSignatures = await sendTx(this.client.connection, args.user, createMarketTransactions, {
+      skipPreflight: true,
+    });
+    console.log("create market signatures:", JSON.stringify(createMarketSignatures));
+
+    // Check market is creared successfully
+    const { blockhash, lastValidBlockHeight } = await this.client.connection.getLatestBlockhash("confirmed");
+    const createMarketTxResult = await this.client.connection.confirmTransaction(
+      {
+        signature: createMarketSignatures[0],
+        blockhash: blockhash,
+        lastValidBlockHeight: lastValidBlockHeight,
+      },
+      "confirmed",
+    );
+
+    if (createMarketTxResult.value.err) {
+      console.error("createMarketTxResult:", createMarketTxResult);
+      throw new Error("createMarketTxResult failed");
+    }
+
+    // Send transaction to go live
+    const goLiveSignature = await sendAndConfirmTransaction(this.client.connection, goLiveTransaction, [args.user], {
       skipPreflight: true,
       commitment: "confirmed",
     });
-    console.log("Go live signature:", signature);
+    console.log("go live signature:", goLiveSignature);
 
-    return new StakingPool(stakingId, this.client);
+    // Check go live succeeded
+    const { blockhash: blockhash1, lastValidBlockHeight: lastValidBlockHeight1 } =
+      await this.client.connection.getLatestBlockhash("confirmed");
+    const goLiveTxResult = await this.client.connection.confirmTransaction(
+      {
+        signature: goLiveSignature,
+        blockhash: blockhash1,
+        lastValidBlockHeight: lastValidBlockHeight1,
+      },
+      "confirmed",
+    );
+
+    if (goLiveTxResult.value.err) {
+      console.error("goLiveTxResult:", goLiveTxResult);
+      throw new Error("goLiveTxResult failed");
+    }
+
+    return await StakingPool.fromStakingPoolId({ poolAccountAddressId: stakingId, client: this.client });
   }
 
   public async goLive(input: GoLiveArgs): Promise<[StakingPool]> {
@@ -1074,10 +1132,12 @@ export class BoundPoolClient {
         .rpc({ skipPreflight: true, commitment: "confirmed" });
       console.log("goLive Transaction successful:", result);
 
-      return [await StakingPool.fromStakingPoolId({
-        client: this.client,
-        poolAccountAddressId: stakingId
-      })]
+      return [
+        await StakingPool.fromStakingPoolId({
+          client: this.client,
+          poolAccountAddressId: stakingId,
+        }),
+      ];
     } catch (error) {
       if (error instanceof AnchorError) {
         console.error("Error details:", error);
@@ -1093,19 +1153,19 @@ export class BoundPoolClient {
   }
 
   public async fetchRelatedTickets() {
-    return BoundPoolClient.fetchRelatedTickets(this.id, this.client)
+    return BoundPoolClient.fetchRelatedTickets(this.id, this.client);
   }
 
   public async getHoldersCount() {
-    return BoundPoolClient.getHoldersCount(this.id, this.client)
+    return BoundPoolClient.getHoldersCount(this.id, this.client);
   }
 
   public async getHoldersMap() {
-    return BoundPoolClient.getHoldersMap(this.id, this.client)
+    return BoundPoolClient.getHoldersMap(this.id, this.client);
   }
 
   public async getHoldersList() {
-    return BoundPoolClient.getHoldersList(this.id, this.client)
+    return BoundPoolClient.getHoldersList(this.id, this.client);
   }
 
   /**
@@ -1118,27 +1178,27 @@ export class BoundPoolClient {
         memcmp: {
           bytes: pool.toBase58(),
           offset: 40,
-        }
-      }
+        },
+      },
     ];
 
     const fetchedTickets = await program.account.memeTicket.all(filters);
-    const tickets = fetchedTickets.map(ticket => ticket.account);
-    return tickets
+    const tickets = fetchedTickets.map((ticket) => ticket.account);
+    return tickets;
   }
 
   /**
    * Fetches all unique token holders for pool and returns their number
    */
   public static async getHoldersCount(pool: PublicKey, client: MemechanClient) {
-    return (await BoundPoolClient.getHoldersList(pool, client)).length
+    return (await BoundPoolClient.getHoldersList(pool, client)).length;
   }
 
   public static async getHoldersMap(pool: PublicKey, client: MemechanClient) {
     const tickets = await BoundPoolClient.fetchRelatedTickets(pool, client);
     const uniqueHolders: Map<string, MemeTicketFields[]> = new Map();
 
-    tickets.forEach(ticket => {
+    tickets.forEach((ticket) => {
       const addr = ticket.owner.toBase58();
       if (!uniqueHolders.has(addr)) {
         uniqueHolders.set(addr, []);
@@ -1146,7 +1206,7 @@ export class BoundPoolClient {
       uniqueHolders.get(addr)?.push(ticket);
     });
 
-    return uniqueHolders
+    return uniqueHolders;
   }
 
   /**
@@ -1155,7 +1215,7 @@ export class BoundPoolClient {
   public static async getHoldersList(pool: PublicKey, client: MemechanClient) {
     const holdersMap = await BoundPoolClient.getHoldersMap(pool, client);
 
-    return Array.from(holdersMap.keys())
+    return Array.from(holdersMap.keys());
   }
 
   static getATAAddress(owner: PublicKey, mint: PublicKey, programId: PublicKey) {
