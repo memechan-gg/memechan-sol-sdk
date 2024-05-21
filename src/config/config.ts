@@ -21,4 +21,13 @@ export const MEMECHAN_PROGRAM_ID = "2WRqhjrZUkMvvKPNg6KLCJwuqNdNjF4cjhGN2VWw1YeK
 
 export const MEMECHAN_QUOTE_MINT = new PublicKey("Do6NqMhU5sHA9p11FVePcPN4rxEjNGu6ZH2B2bCpQfpJ");
 export const MEMECHAN_TARGET_CONFIG = "5cdqbrwSMEeubReme7g72VZ7zLVvab4LMnKwydsqQMCR";
-export const MEMECHAN_QUOTE_TOKEN: Token = new Token(TOKEN_PROGRAM_ID, MEMECHAN_QUOTE_MINT, 9, "SLERF", "SLERF");
+// https://explorer.solana.com/address/7BgBvyjrZX1YKz4oh9mjb8ZScatkkwb8DzFx7LoiVkM3
+export const SLERF_DECIMALS = 9;
+export const MEMECHAN_MEMECOIN_DECIMALS = 6;
+export const MEMECHAN_QUOTE_TOKEN: Token = new Token(
+  TOKEN_PROGRAM_ID,
+  MEMECHAN_QUOTE_MINT,
+  SLERF_DECIMALS,
+  "SLERF",
+  "SLERF",
+);
