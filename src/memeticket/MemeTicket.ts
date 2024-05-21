@@ -13,6 +13,7 @@ import {
   StakingMerge,
   StringifiedMemeTicketFields,
 } from "./types";
+import { getOptimizedTransactions } from "./utils";
 
 export class MemeTicket {
   public constructor(
@@ -58,11 +59,15 @@ export class MemeTicket {
   public async boundMerge(input: BoundMerge): Promise<MemeTicket> {
     const mergeTransaction = await this.getBoundMergeTransaction(input);
 
-    const signature = await sendAndConfirmTransaction(this.client.connection, mergeTransaction, [input.user], {
-      commitment: "confirmed",
-      skipPreflight: true,
-    });
-    console.log("bound merge signature:", signature);
+    const optimizedTransactions = getOptimizedTransactions(mergeTransaction.instructions, input.user.publicKey);
+
+    for (const tx of optimizedTransactions) {
+      const signature = await sendAndConfirmTransaction(this.client.connection, tx, [input.user], {
+        commitment: "confirmed",
+        skipPreflight: true,
+      });
+      console.log("bound merge signature:", signature);
+    }
 
     return this;
   }
@@ -95,11 +100,15 @@ export class MemeTicket {
   public async stakingMerge(input: StakingMerge): Promise<MemeTicket> {
     const mergeTransaction = await this.getStakingMergeTransaction(input);
 
-    const signature = await sendAndConfirmTransaction(this.client.connection, mergeTransaction, [input.user], {
-      commitment: "confirmed",
-      skipPreflight: true,
-    });
-    console.log("staking merge signature:", signature);
+    const optimizedTransactions = getOptimizedTransactions(mergeTransaction.instructions, input.user.publicKey);
+
+    for (const tx of optimizedTransactions) {
+      const signature = await sendAndConfirmTransaction(this.client.connection, tx, [input.user], {
+        commitment: "confirmed",
+        skipPreflight: true,
+      });
+      console.log("staking merge signature:", signature);
+    }
 
     return this;
   }
