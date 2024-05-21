@@ -1,57 +1,51 @@
-import assert from 'assert';
+import assert from "assert";
 
-import {
-  jsonInfo2PoolKeys,
-  LiquidityPoolKeys,
-  Percent,
-  Token,
-  TokenAmount,
-} from '@raydium-io/raydium-sdk';
-import { Connection, Keypair, PublicKey } from '@solana/web3.js';
+import { jsonInfo2PoolKeys, LiquidityPoolKeys, Percent, Token, TokenAmount } from "@raydium-io/raydium-sdk";
+import { Connection, Keypair, PublicKey } from "@solana/web3.js";
 
-import { formatAmmKeysById } from './formatAmmKeysById';
-import { buildAndSendTx, getWalletTokenAccount } from '../utils/util';
-import { makeTxVersion } from './config';
-import { Liquidity, LiquidityPoolInfo } from './MemeLiquidity';
-import { MEMECHAN_MEME_TOKEN_DECIMALS, MEMECHAN_QUOTE_MINT, MEMECHAN_QUOTE_TOKEN_DECIMALS } from '../config/config';
+import { formatAmmKeysById } from "./formatAmmKeysById";
+import { buildAndSendTx, getWalletTokenAccount } from "../utils/util";
+import { makeTxVersion } from "./config";
+import { Liquidity, LiquidityPoolInfo } from "./MemeLiquidity";
+import { MEMECHAN_MEME_TOKEN_DECIMALS, MEMECHAN_QUOTE_MINT, MEMECHAN_QUOTE_TOKEN_DECIMALS } from "../config/config";
 
-export type WalletTokenAccounts = Awaited<ReturnType<typeof getWalletTokenAccount>>
+export type WalletTokenAccounts = Awaited<ReturnType<typeof getWalletTokenAccount>>;
 export type SawpOnlyAmmInputInfo = {
-  outputToken: Token
-  targetPool: string
-  inputTokenAmount: TokenAmount
-  slippage: Percent
-  walletTokenAccounts: WalletTokenAccounts
-  wallet: Keypair,
-  connection: Connection,
+  outputToken: Token;
+  targetPool: string;
+  inputTokenAmount: TokenAmount;
+  slippage: Percent;
+  walletTokenAccounts: WalletTokenAccounts;
+  wallet: Keypair;
+  connection: Connection;
 
-  lpMint: PublicKey,
-  baseVault: PublicKey,
-  quoteVault: PublicKey,
+  // lpMint: PublicKey,
+  // baseVault: PublicKey,
+  // quoteVault: PublicKey,
   //openOrders: PublicKey,
-  marketId: PublicKey,
- // marketEventQueue: PublicKey,
-}
+  // marketId: PublicKey,
+  // marketEventQueue: PublicKey,
+};
 
 export async function swapOnlyAmm(input: SawpOnlyAmmInputInfo) {
   const { connection, wallet } = input;
   // -------- pre-action: get pool info --------
-  const targetPoolInfo = await formatAmmKeysById(input.targetPool, connection)
-  assert(targetPoolInfo, 'cannot find the target pool')
+  const targetPoolInfo = await formatAmmKeysById(input.targetPool, connection);
+  assert(targetPoolInfo, "cannot find the target pool");
 
-  console.log('targetPoolInfo:', targetPoolInfo);
+  console.log("targetPoolInfo:", targetPoolInfo);
 
-  const poolKeys = jsonInfo2PoolKeys(targetPoolInfo) as LiquidityPoolKeys
+  const poolKeys = jsonInfo2PoolKeys(targetPoolInfo) as LiquidityPoolKeys;
 
   // have to manually add these, formatAmmKeys doesnt work somewhy??
-  poolKeys.lpMint = input.lpMint;
-  poolKeys.baseVault = input.baseVault;
-  poolKeys.quoteVault = input.quoteVault;
- // poolKeys.openOrders = input.openOrders;
-  poolKeys.marketId = input.marketId;
- // poolKeys.marketEventQueue = input.marketEventQueue;
+  // poolKeys.lpMint = input.lpMint;
+  // poolKeys.baseVault = input.baseVault;
+  // poolKeys.quoteVault = input.quoteVault;
+  // poolKeys.openOrders = input.openOrders;
+  // poolKeys.marketId = input.marketId;
+  // poolKeys.marketEventQueue = input.marketEventQueue;
 
-  // manual poolkeys 
+  // manual poolkeys
 
   poolKeys.baseMint = input.outputToken.mint;
   poolKeys.quoteMint = MEMECHAN_QUOTE_MINT;
@@ -79,10 +73,7 @@ export async function swapOnlyAmm(input: SawpOnlyAmmInputInfo) {
   const amountOut = new TokenAmount(input.outputToken, 100000);
   const minAmountOut = new TokenAmount(input.outputToken, 10000);
 
-  console.log('amountOut:', amountOut.toFixed(), '  minAmountOut: ', minAmountOut.toFixed())
-
-
-
+  console.log("amountOut:", amountOut.toFixed(), "  minAmountOut: ", minAmountOut.toFixed());
 
   // -------- step 2: create instructions by SDK function --------
   const { innerTransactions } = await Liquidity.makeSwapInstructionSimple({
@@ -94,13 +85,13 @@ export async function swapOnlyAmm(input: SawpOnlyAmmInputInfo) {
     },
     amountIn: input.inputTokenAmount,
     amountOut: minAmountOut,
-    fixedSide: 'in',
+    fixedSide: "in",
     makeTxVersion,
-  })
+  });
 
-  console.log('amountOut:', amountOut.toFixed(), '  minAmountOut: ', minAmountOut.toFixed())
+  console.log("amountOut:", amountOut.toFixed(), "  minAmountOut: ", minAmountOut.toFixed());
 
-  return { txids: await buildAndSendTx(connection, wallet, innerTransactions, { skipPreflight: true }) }
+  return { txids: await buildAndSendTx(connection, wallet, innerTransactions, { skipPreflight: true }) };
 }
 
 // async function howToUse() {
