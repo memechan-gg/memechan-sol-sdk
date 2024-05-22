@@ -3,7 +3,7 @@ import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import { MEMECHAN_MEME_TOKEN_DECIMALS, MEMECHAN_QUOTE_TOKEN } from "../../src/config/config";
 import { swapOnlyAmm } from "../../src/raydium/swapOnlyAmm";
 import { client, connection, payer } from "../common";
-import { getWalletTokenAccount } from "../../src/utils/util";
+import { getWalletTokenAccount } from "../../src/util";
 
 // yarn tsx examples/raydium/swap.ts > swap.txt 2>&1
 export const swap = async () => {
