@@ -64,12 +64,12 @@ import { createMintWithPriority } from "../token/createMintWithPriority";
 import { getCreateMintWithPriorityTransaction } from "../token/getCreateMintWithPriorityTransaction";
 import { NewBPInstructionParsed } from "../tx-parsing/parsers/bonding-pool-creation-parser";
 import { ParseTx } from "../tx-parsing/parsing";
-import { getCreateAccountInstructions } from "../utils/getCreateAccountInstruction";
-import { getSendAndConfirmTransactionMethod } from "../utils/getSendAndConfirmTransactionMethod";
-import { retry } from "../utils/retry";
-import { deductSlippage } from "../utils/trading/deductSlippage";
-import { normalizeInputCoinAmount } from "../utils/trading/normalizeInputCoinAmount";
-import { sendTx } from "../utils/util";
+import { getCreateAccountInstructions } from "../util/getCreateAccountInstruction";
+import { normalizeInputCoinAmount } from "../util/trading/normalizeInputCoinAmount";
+import { deductSlippage } from "../util/trading/deductSlippage";
+import { getSendAndConfirmTransactionMethod } from "../util/getSendAndConfirmTransactionMethod";
+import { retry } from "../util/retry";
+import { sendTx } from "../util";
 
 export class BoundPoolClient {
   private constructor(

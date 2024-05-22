@@ -1,6 +1,6 @@
+import { BE_URL } from "../src/config/config";
 import { PoolAPI } from "../src/token/PoolApi";
 import { solanaLivePool, solanaSeedPool, SolanaSeedPool, solanaStakingPool } from "../src/token/schemas/pools-schema";
-import { BE_URL } from "./helpers";
 
 const api = new PoolAPI(BE_URL);
 
