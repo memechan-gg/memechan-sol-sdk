@@ -22,7 +22,7 @@ describe("StakingPool", () => {
     }
   }, 30000);
 
-  it.skip("swap, unstake", async () => {
+  it("swap, unstake", async () => {
     // //console.log("payer: " + payer.publicKey.toString());
     // // const pool = await BoundPoolClient.slowNew({
     // //   admin,
@@ -59,35 +59,27 @@ describe("StakingPool", () => {
 
     // console.log("swapY ticketId: " + ticketId.id.toBase58());
 
-    const stakingPool = await StakingPool.fromStakingPoolId({client, poolAccountAddressId: STAKING_POOL_ID});
-
-
+  
     const inputToken = MEMECHAN_QUOTE_TOKEN;
-    const outputToken = new Token(TOKEN_PROGRAM_ID, MEME_MINT, MEMECHAN_MEME_TOKEN_DECIMALS)
-    const targetPool = STAKING_POOL_ID.toBase58();
-    const inputTokenAmount = new TokenAmount(inputToken, 1)
-    const slippage = new Percent(10, 100)
+    const outputToken = new Token(TOKEN_PROGRAM_ID, new PublicKey("B1H5ih6EtfSUzbuQTCs4rvMLS74iDZ6a6aYatyiN1d56"), MEMECHAN_MEME_TOKEN_DECIMALS)
+    const targetPool = "3cNwpm7ifYyeTeciEwoCyB1SQFX11JyN84chdQFT8tJv";
+    const inputTokenAmount = new TokenAmount(inputToken, 10000)
+    const slippage = new Percent(5, 100)
     const walletTokenAccounts = await getWalletTokenAccount(client.connection, payer.publicKey)
 
-    // await swapOnlyAmm({
-    //   connection: client.connection,
-    //   outputToken,
-    //   targetPool,
-    //   inputTokenAmount,
-    //   slippage,
-    //   walletTokenAccounts,
-    //   wallet: payer,
-    //   lpMint: stakingPool.lpMint,
-    //   baseVault: stakingPool.memeVault,
-    //   quoteVault: stakingPool.quote_vault,
-    //   //openOrders: stakingPool.openOrders,
-    //   marketId: MARKET_ID,
-    //  // marketEventQueue: stakingPool.marketEventQueue,
+    await swapOnlyAmm({
+      connection: client.connection,
+      outputToken,
+      targetPool,
+      inputTokenAmount,
+      slippage,
+      walletTokenAccounts,
+      wallet: payer,
 
-    // }).then(({ txids }) => {
-    //   /** continue with txids */
-    //   console.log('amm swapresult txids', txids)
-    // })
+    }).then(({ txids }) => {
+      /** continue with txids */
+      console.log('amm swapresult txids', txids)
+    })
 
    // stakingPool.unstake(tickets);
 

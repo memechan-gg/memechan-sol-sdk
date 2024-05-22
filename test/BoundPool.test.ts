@@ -73,7 +73,7 @@ describe("BoundPool", () => {
 
     await sleep(2000);
 
-    const [stakingPool ] = await pool.goLive({
+    const [stakingPool, ammPool ] = await pool.goLive({
       payer: payer,
       user: payer,
       boundPoolInfo,
@@ -82,10 +82,9 @@ describe("BoundPool", () => {
       quoteVault: stakingQuoteVault,
     });
 
-    const poolInfo2 = await formatAmmKeysById(stakingPool.id.toBase58(), client.connection);
-    console.log("poolInfo2: " + JSON.stringify(poolInfo2));
+    console.log("ammPool: " + JSON.stringify(ammPool));
 
-    console.log("golive finished. stakingPool: " + stakingPool.id.toString());
+    console.log("golive finished. stakingPool: " + stakingPool.id.toString() + " ammPool: " + ammPool.id.toString());
   }, 520000);
 
   //   sleep(1000);
