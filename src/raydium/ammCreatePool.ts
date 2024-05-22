@@ -1,10 +1,11 @@
-import { Liquidity, MAINNET_PROGRAM_ID, Token } from "@raydium-io/raydium-sdk";
+import { Liquidity, Token } from "@raydium-io/raydium-sdk";
 import { Connection, Keypair, PublicKey } from "@solana/web3.js";
-import { BN } from "bn.js";
-import { buildAndSendTx, getWalletTokenAccount } from "../utils/util";
-import { PROGRAMIDS, makeTxVersion } from "./config";
 
-const ZERO = new BN(0);
+import { PROGRAMIDS, makeTxVersion } from "./config";
+import { buildAndSendTx, getWalletTokenAccount } from "../util";
+import { BN as AnchorBN } from "@coral-xyz/anchor";
+
+const ZERO = new AnchorBN(0);
 type BN = typeof ZERO;
 
 type CalcStartPrice = {
@@ -60,7 +61,7 @@ export async function ammCreatePool(input: TestTxInputInfo) {
     quoteMintInfo: input.quoteToken,
     baseAmount: input.addBaseAmount,
     quoteAmount: input.addQuoteAmount,
-    startTime: new BN(Math.floor(input.startTime)),
+    startTime: new AnchorBN(Math.floor(input.startTime)),
     ownerInfo: {
       feePayer: input.wallet.publicKey,
       wallet: input.wallet.publicKey,

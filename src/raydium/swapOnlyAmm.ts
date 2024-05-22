@@ -3,9 +3,9 @@ import assert from "assert";
 import { jsonInfo2PoolKeys, Liquidity, LiquidityPoolKeys, Percent, Token, TokenAmount } from "@raydium-io/raydium-sdk";
 import { Connection, Keypair } from "@solana/web3.js";
 import { formatAmmKeysById } from "./formatAmmKeysById";
-import { buildAndSendTx, getWalletTokenAccount } from "../utils/util";
 import { makeTxVersion } from "./config";
 import { MEMECHAN_QUOTE_MINT } from "../config/config";
+import { buildAndSendTx, getWalletTokenAccount } from "../util";
 
 export type WalletTokenAccounts = Awaited<ReturnType<typeof getWalletTokenAccount>>;
 export type SawpOnlyAmmInputInfo = {

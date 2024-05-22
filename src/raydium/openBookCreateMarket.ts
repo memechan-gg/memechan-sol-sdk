@@ -8,8 +8,8 @@ import {
   TransactionMessage,
   VersionedTransaction,
 } from "@solana/web3.js";
-import { buildTxs, sendTx } from "../utils/util";
 import { PROGRAMIDS, makeTxVersion } from "./config";
+import { buildTxs, sendTx } from "../util";
 
 type CreateMarketTxInput = {
   baseToken: Token;
