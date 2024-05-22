@@ -1,5 +1,5 @@
 import { Program } from "@coral-xyz/anchor";
-import { NATIVE_MINT, TOKEN_PROGRAM_ID } from "@solana/spl-token";
+import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import { AccountMeta, Keypair, PublicKey, Transaction } from "@solana/web3.js";
 import { MemechanClient } from "../MemechanClient";
 import { BoundPoolClient } from "../bound-pool/BoundPool";
@@ -17,6 +17,8 @@ import {
   UnstakeArgs,
   WithdrawFeesArgs,
 } from "./types";
+import { MEMECHAN_QUOTE_MINT } from "../config/config";
+import { formatAmmKeysById } from "../raydium/formatAmmKeysById";
 
 export class StakingPool {
   constructor(
@@ -59,9 +61,11 @@ export class StakingPool {
     return PublicKey.findProgramAddressSync([Buffer.from("staking"), publicKey.toBytes()], memechanProgramId)[0];
   }
 
-  public async getAddFeesTransaction({ transaction }: GetAddFeesTransactionArgs): Promise<Transaction> {
+  public async getAddFeesTransaction({ transaction, ammPoolId, payer }: GetAddFeesTransactionArgs): Promise<Transaction> {
     const tx = transaction ?? new Transaction();
     const stakingInfo = await this.fetch();
+
+    const ammPool = await formatAmmKeysById(ammPoolId.toBase58(), this.client.connection);
 
     const addFeesInstruction = await this.client.memechanProgram.methods
       .addFees()
@@ -71,6 +75,23 @@ export class StakingPool {
         staking: this.id,
         stakingSignerPda: this.findSignerPda(),
         tokenProgram: TOKEN_PROGRAM_ID,
+        marketAccount: ammPool.marketId,
+        marketAsks: ammPool.marketAsks,
+        marketBids: ammPool.marketBids,
+        marketEventQueue: ammPool.marketEventQueue,
+        marketCoinVault: ammPool.marketBaseVault,
+        marketPcVault: ammPool.marketQuoteVault,
+        marketProgramId: ammPool.marketProgramId,
+        marketVaultSigner: ammPool.marketAuthority,
+        openOrders: ammPool.openOrders,
+        raydiumAmm: ammPool.id,
+        raydiumAmmAuthority: ammPool.authority,
+        raydiumLpMint: ammPool.lpMint,
+        raydiumMemeVault: ammPool.baseVault,
+        raydiumQuoteVault: ammPool.quoteVault,
+        signer: payer.publicKey,
+        targetOrders: ammPool.targetOrders,
+        stakingLpWallet: ammPool.lpVault
       })
       .instruction();
 
@@ -79,8 +100,8 @@ export class StakingPool {
     return tx;
   }
 
-  public async addFees({ payer, transaction }: AddFeesArgs): Promise<void> {
-    const addFeesTransaction = await this.getAddFeesTransaction({ transaction });
+  public async addFees({ payer, transaction, ammPoolId }: AddFeesArgs): Promise<void> {
+    const addFeesTransaction = await this.getAddFeesTransaction({ transaction, ammPoolId, payer });
 
     const sendAndConfirmAddFeesTransaction = getSendAndConfirmTransactionMethod({
       connection: this.client.connection,
@@ -96,7 +117,7 @@ export class StakingPool {
 
   public async getUnstakeTransaction(
     args: GetUnstakeTransactionArgs,
-  ): Promise<{ transaction: Transaction; memeAccountPublicKey: PublicKey; wSolAccountPublicKey: PublicKey }> {
+  ): Promise<{ transaction: Transaction; memeAccountKeypair: Keypair; quoteAccountKeypair: Keypair }> {
     const tx = args.transaction ?? new Transaction();
     const stakingInfo = await this.fetch();
 
@@ -112,17 +133,17 @@ export class StakingPool {
 
     tx.add(...createMemeAccountInstructions);
 
-    const wSolAccountKeypair = Keypair.generate();
-    const wSolAccountPublicKey = wSolAccountKeypair.publicKey;
-    const createWSolAccountInstructions = await getCreateAccountInstructions(
+    const quoteAccountKeypair = Keypair.generate();
+    const quoteAccountPublicKey = quoteAccountKeypair.publicKey;
+    const createQuoteAccountInstructions = await getCreateAccountInstructions(
       this.client.connection,
       args.user,
-      NATIVE_MINT,
+      MEMECHAN_QUOTE_MINT,
       args.user.publicKey,
-      wSolAccountKeypair,
+      quoteAccountKeypair,
     );
 
-    tx.add(...createWSolAccountInstructions);
+    tx.add(...createQuoteAccountInstructions);
 
     const unstakeInstruction = await this.client.memechanProgram.methods
       .unstake(args.amount)
@@ -134,24 +155,24 @@ export class StakingPool {
         quoteVault: stakingInfo.quoteVault,
         staking: this.id,
         userMeme: memeAccountPublicKey,
-        userQuote: wSolAccountPublicKey,
+        userQuote: quoteAccountPublicKey,
         tokenProgram: TOKEN_PROGRAM_ID,
       })
       .instruction();
 
     tx.add(unstakeInstruction);
 
-    return { transaction: tx, memeAccountPublicKey, wSolAccountPublicKey };
+    return { transaction: tx, memeAccountKeypair, quoteAccountKeypair };
   }
 
   public async unstake(
     args: UnstakeArgs,
-  ): Promise<{ memeAccountPublicKey: PublicKey; wSolAccountPublicKey: PublicKey }> {
-    const { memeAccountPublicKey, transaction, wSolAccountPublicKey } = await this.getUnstakeTransaction(args);
+  ): Promise<{ memeAccountPublicKey: PublicKey; quoteAccountPublicKey: PublicKey }> {
+    const { memeAccountKeypair, transaction, quoteAccountKeypair } = await this.getUnstakeTransaction(args);
 
     const sendAndConfirmUnstakeTransaction = getSendAndConfirmTransactionMethod({
       connection: this.client.connection,
-      signers: [args.user],
+      signers: [args.user, memeAccountKeypair, quoteAccountKeypair],
       transaction,
     });
 
@@ -160,13 +181,13 @@ export class StakingPool {
       functionName: "unstake",
     });
 
-    return { memeAccountPublicKey, wSolAccountPublicKey };
+    return { memeAccountPublicKey: memeAccountKeypair.publicKey, quoteAccountPublicKey: quoteAccountKeypair.publicKey };
   }
 
   public async getWithdrawFeesTransaction(args: GetWithdrawFeesTransactionArgs): Promise<{
     transaction: Transaction;
-    memeAccountPublicKey: PublicKey;
-    wSolAccountPublicKey: PublicKey;
+    memeAccountKeypair: Keypair;
+    quoteAccountKeypair: Keypair;
   }> {
     const tx = args.transaction ?? new Transaction();
     const stakingInfo = await this.fetch();
@@ -183,14 +204,14 @@ export class StakingPool {
 
     tx.add(...createMemeAccountInstructions);
 
-    const wSolAccountKeypair = Keypair.generate();
-    const wSolAccountPublicKey = wSolAccountKeypair.publicKey;
+    const quoteAccountKeypair = Keypair.generate();
+    const quoteAccountPublicKey = quoteAccountKeypair.publicKey;
     const createWSolAccountInstructions = await getCreateAccountInstructions(
       this.client.connection,
       args.user,
-      NATIVE_MINT,
+      MEMECHAN_QUOTE_MINT,
       args.user.publicKey,
-      wSolAccountKeypair,
+      quoteAccountKeypair,
     );
 
     tx.add(...createWSolAccountInstructions);
@@ -204,7 +225,7 @@ export class StakingPool {
         quoteVault: stakingInfo.quoteVault,
         staking: this.id,
         userMeme: memeAccountPublicKey,
-        userQuote: wSolAccountPublicKey,
+        userQuote: quoteAccountPublicKey,
         signer: args.user.publicKey,
         tokenProgram: TOKEN_PROGRAM_ID,
       })
@@ -212,17 +233,17 @@ export class StakingPool {
 
     tx.add(withdrawFeesInstruction);
 
-    return { transaction: tx, memeAccountPublicKey, wSolAccountPublicKey };
+    return { transaction: tx, memeAccountKeypair, quoteAccountKeypair };
   }
 
   public async withdrawFees(
     args: WithdrawFeesArgs,
-  ): Promise<{ memeAccountPublicKey: PublicKey; wSolAccountPublicKey: PublicKey }> {
-    const { memeAccountPublicKey, transaction, wSolAccountPublicKey } = await this.getWithdrawFeesTransaction(args);
+  ): Promise<{ memeAccountPublicKey: PublicKey; quoteAccountPublicKey: PublicKey }> {
+    const { memeAccountKeypair, transaction, quoteAccountKeypair } = await this.getWithdrawFeesTransaction(args);
 
     const sendAndConfirmWithdrawFeesTransaction = getSendAndConfirmTransactionMethod({
       connection: this.client.connection,
-      signers: [args.user],
+      signers: [args.user, memeAccountKeypair, quoteAccountKeypair],
       transaction,
     });
 
@@ -231,7 +252,7 @@ export class StakingPool {
       functionName: "withdrawFees",
     });
 
-    return { memeAccountPublicKey, wSolAccountPublicKey };
+    return { memeAccountPublicKey: memeAccountKeypair.publicKey, quoteAccountPublicKey: quoteAccountKeypair.publicKey };
   }
 
   public async getHoldersCount() {

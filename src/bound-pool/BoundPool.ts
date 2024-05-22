@@ -1,4 +1,4 @@
-import { Token } from "@raydium-io/raydium-sdk";
+import { ApiPoolInfoV4, Token } from "@raydium-io/raydium-sdk";
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
   createAccount,
@@ -70,6 +70,7 @@ import { retry } from "../utils/retry";
 import { deductSlippage } from "../utils/trading/deductSlippage";
 import { normalizeInputCoinAmount } from "../utils/trading/normalizeInputCoinAmount";
 import { sendTx } from "../utils/util";
+import { formatAmmKeysById } from "../raydium/formatAmmKeysById";
 
 export class BoundPoolClient {
   private constructor(
@@ -1080,7 +1081,7 @@ export class BoundPoolClient {
     return stakingPoolInstance;
   }
 
-  public async goLive(input: GoLiveArgs): Promise<[StakingPool]> {
+  public async goLive(input: GoLiveArgs): Promise<[StakingPool, ApiPoolInfoV4]> {
     const user = input.user!;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const boundPoolInfo = input.boundPoolInfo as any;
@@ -1234,7 +1235,7 @@ export class BoundPoolClient {
           userDestinationLpTokenAta: userDestinationLpTokenAta,
           raydiumProgram: PROGRAMIDS.AmmV4,
         })
-        .signers([user]) // ammid?
+        .signers([user])
 
         .preInstructions([modifyComputeUnits, addPriorityFee])
         .rpc({ skipPreflight: true, commitment: "confirmed" });
@@ -1245,6 +1246,7 @@ export class BoundPoolClient {
           client: this.client,
           poolAccountAddressId: stakingId,
         }),
+        await formatAmmKeysById(ammId.toBase58(), this.client.connection)
       ];
     } catch (error) {
       if (error instanceof AnchorError) {
