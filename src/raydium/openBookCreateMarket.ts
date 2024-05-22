@@ -39,9 +39,9 @@ export async function getCreateMarketTransactions(
     baseInfo: input.baseToken,
     quoteInfo: input.quoteToken,
     lotSize: 1,
-    tickSize: 0.000001,
+    tickSize: 0.01,
     dexProgramId: PROGRAMIDS.OPENBOOK_MARKET,
-    makeTxVersion,
+    makeTxVersion
   });
 
   const transactions = await buildTxs(input.connection, input.signer, createMarketInstruments.innerTransactions);
