@@ -1,6 +1,6 @@
 import { PublicKey, Transaction, TransactionInstruction } from "@solana/web3.js";
 import { MAX_TRANSACTION_SIZE } from "../config/config";
-import { getTxSize } from "../utils/get-tx-size";
+import { getTxSize } from "../util/get-tx-size";
 
 /**
  * Splits an array of instructions into multiple transactions, each with a size
