@@ -1722,6 +1722,26 @@ export type MemechanSol = {
   ],
   "types": [
     {
+      "name": "Decimals",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "alpha",
+            "type": "u128"
+          },
+          {
+            "name": "beta",
+            "type": "u128"
+          },
+          {
+            "name": "quote",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
       "name": "Config",
       "type": {
         "kind": "struct",
@@ -1749,6 +1769,12 @@ export type MemechanSol = {
           {
             "name": "omegaM",
             "type": "u64"
+          },
+          {
+            "name": "decimals",
+            "type": {
+              "defined": "Decimals"
+            }
           }
         ]
       }
@@ -2080,65 +2106,77 @@ export type MemechanSol = {
     },
     {
       "code": 6005,
-      "name": "MulDivOverflow"
+      "name": "MathOverflow"
     },
     {
       "code": 6006,
-      "name": "DivideByZero"
+      "name": "MulDivOverflow"
     },
     {
       "code": 6007,
-      "name": "ZeroInAmt"
+      "name": "DivideByZero"
     },
     {
       "code": 6008,
-      "name": "ZeroMemeVault"
+      "name": "ZeroInAmt"
     },
     {
       "code": 6009,
-      "name": "InsufficientBalance"
+      "name": "ZeroMemeVault"
     },
     {
       "code": 6010,
+      "name": "InsufficientBalance"
+    },
+    {
+      "code": 6011,
       "name": "PoolIsLocked",
       "msg": "Pool can't be interacted with until going into live phase"
     },
     {
-      "code": 6011,
+      "code": 6012,
       "name": "NoZeroTokens",
       "msg": "Shouldn't provide zero tokens in"
     },
     {
-      "code": 6012,
+      "code": 6013,
       "name": "NoTokensToWithdraw"
     },
     {
-      "code": 6013,
+      "code": 6014,
       "name": "NotEnoughTicketTokens",
       "msg": "Amount of tokens in ticket is lower than needed to swap"
     },
     {
-      "code": 6014,
+      "code": 6015,
       "name": "TicketTokensLocked",
       "msg": "Not enough time passed to unlock tokens bound to the ticket"
     },
     {
-      "code": 6015,
+      "code": 6016,
       "name": "NonZeroAmountTicket",
       "msg": "Can't close ticket with non-zero bound token amount"
     },
     {
-      "code": 6016,
+      "code": 6017,
       "name": "NotEnoughTokensToRelease",
       "msg": "Can't unstake the required amount of tokens"
     },
     {
-      "code": 6017,
+      "code": 6018,
       "name": "BondingCurveMustBeNegativelySloped"
     },
     {
-      "code": 6018,
+      "code": 6019,
       "name": "BondingCurveInterceptMustBePositive"
+    },
+    {
+      "code": 6020,
+      "name": "EGammaSAboveRelativeLimit"
+    },
+    {
+      "code": 6021,
+      "name": "EScaleTooLow"
     }
   ]
 };
@@ -3867,6 +3905,26 @@ export const IDL: MemechanSol = {
   ],
   "types": [
     {
+      "name": "Decimals",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "alpha",
+            "type": "u128"
+          },
+          {
+            "name": "beta",
+            "type": "u128"
+          },
+          {
+            "name": "quote",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
       "name": "Config",
       "type": {
         "kind": "struct",
@@ -3894,6 +3952,12 @@ export const IDL: MemechanSol = {
           {
             "name": "omegaM",
             "type": "u64"
+          },
+          {
+            "name": "decimals",
+            "type": {
+              "defined": "Decimals"
+            }
           }
         ]
       }
@@ -4225,65 +4289,77 @@ export const IDL: MemechanSol = {
     },
     {
       "code": 6005,
-      "name": "MulDivOverflow"
+      "name": "MathOverflow"
     },
     {
       "code": 6006,
-      "name": "DivideByZero"
+      "name": "MulDivOverflow"
     },
     {
       "code": 6007,
-      "name": "ZeroInAmt"
+      "name": "DivideByZero"
     },
     {
       "code": 6008,
-      "name": "ZeroMemeVault"
+      "name": "ZeroInAmt"
     },
     {
       "code": 6009,
-      "name": "InsufficientBalance"
+      "name": "ZeroMemeVault"
     },
     {
       "code": 6010,
+      "name": "InsufficientBalance"
+    },
+    {
+      "code": 6011,
       "name": "PoolIsLocked",
       "msg": "Pool can't be interacted with until going into live phase"
     },
     {
-      "code": 6011,
+      "code": 6012,
       "name": "NoZeroTokens",
       "msg": "Shouldn't provide zero tokens in"
     },
     {
-      "code": 6012,
+      "code": 6013,
       "name": "NoTokensToWithdraw"
     },
     {
-      "code": 6013,
+      "code": 6014,
       "name": "NotEnoughTicketTokens",
       "msg": "Amount of tokens in ticket is lower than needed to swap"
     },
     {
-      "code": 6014,
+      "code": 6015,
       "name": "TicketTokensLocked",
       "msg": "Not enough time passed to unlock tokens bound to the ticket"
     },
     {
-      "code": 6015,
+      "code": 6016,
       "name": "NonZeroAmountTicket",
       "msg": "Can't close ticket with non-zero bound token amount"
     },
     {
-      "code": 6016,
+      "code": 6017,
       "name": "NotEnoughTokensToRelease",
       "msg": "Can't unstake the required amount of tokens"
     },
     {
-      "code": 6017,
+      "code": 6018,
       "name": "BondingCurveMustBeNegativelySloped"
     },
     {
-      "code": 6018,
+      "code": 6019,
       "name": "BondingCurveInterceptMustBePositive"
+    },
+    {
+      "code": 6020,
+      "name": "EGammaSAboveRelativeLimit"
+    },
+    {
+      "code": 6021,
+      "name": "EScaleTooLow"
     }
   ]
 };

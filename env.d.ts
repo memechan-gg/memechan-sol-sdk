@@ -1,7 +1,6 @@
 // env.d.ts
 declare namespace NodeJS {
   interface ProcessEnv {
-    TEST_PAYER_SECRET_KEY: string | undefined;
     TEST_USER_SECRET_KEY: string | undefined;
     ADMIN_PUB_KEY: string | undefined;
     RPC_API_CLUSTER: string | undefined;
