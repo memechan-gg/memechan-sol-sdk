@@ -1,5 +1,5 @@
 import { Program } from "@coral-xyz/anchor";
-import { NATIVE_MINT, TOKEN_PROGRAM_ID } from "@solana/spl-token";
+import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import { AccountMeta, Keypair, PublicKey, Transaction } from "@solana/web3.js";
 import { MemechanClient } from "../MemechanClient";
 import { BoundPoolClient } from "../bound-pool/BoundPool";
@@ -166,8 +166,8 @@ export class StakingPool {
 
   public async getWithdrawFeesTransaction(args: GetWithdrawFeesTransactionArgs): Promise<{
     transaction: Transaction;
-    memeAccountPublicKey: PublicKey;
-    wSolAccountPublicKey: PublicKey;
+    memeAccountKeypair: Keypair;
+    quoteAccountKeypair: Keypair;
   }> {
     const tx = args.transaction ?? new Transaction();
     const stakingInfo = await this.fetch();
@@ -184,14 +184,14 @@ export class StakingPool {
 
     tx.add(...createMemeAccountInstructions);
 
-    const wSolAccountKeypair = Keypair.generate();
-    const wSolAccountPublicKey = wSolAccountKeypair.publicKey;
+    const quoteAccountKeypair = Keypair.generate();
+    const quoteAccountPublicKey = quoteAccountKeypair.publicKey;
     const createWSolAccountInstructions = await getCreateAccountInstructions(
       this.client.connection,
       args.user,
-      NATIVE_MINT,
+      MEMECHAN_QUOTE_MINT,
       args.user.publicKey,
-      wSolAccountKeypair,
+      quoteAccountKeypair,
     );
 
     tx.add(...createWSolAccountInstructions);
@@ -205,7 +205,7 @@ export class StakingPool {
         quoteVault: stakingInfo.quoteVault,
         staking: this.id,
         userMeme: memeAccountPublicKey,
-        userQuote: wSolAccountPublicKey,
+        userQuote: quoteAccountPublicKey,
         signer: args.user.publicKey,
         tokenProgram: TOKEN_PROGRAM_ID,
       })
@@ -213,17 +213,17 @@ export class StakingPool {
 
     tx.add(withdrawFeesInstruction);
 
-    return { transaction: tx, memeAccountPublicKey, wSolAccountPublicKey };
+    return { transaction: tx, memeAccountKeypair, quoteAccountKeypair };
   }
 
   public async withdrawFees(
     args: WithdrawFeesArgs,
-  ): Promise<{ memeAccountPublicKey: PublicKey; wSolAccountPublicKey: PublicKey }> {
-    const { memeAccountPublicKey, transaction, wSolAccountPublicKey } = await this.getWithdrawFeesTransaction(args);
+  ): Promise<{ memeAccountPublicKey: PublicKey; quoteAccountPublicKey: PublicKey }> {
+    const { memeAccountKeypair, transaction, quoteAccountKeypair } = await this.getWithdrawFeesTransaction(args);
 
     const sendAndConfirmWithdrawFeesTransaction = getSendAndConfirmTransactionMethod({
       connection: this.client.connection,
-      signers: [args.user],
+      signers: [args.user, memeAccountKeypair, quoteAccountKeypair],
       transaction,
     });
 
@@ -232,7 +232,7 @@ export class StakingPool {
       functionName: "withdrawFees",
     });
 
-    return { memeAccountPublicKey, wSolAccountPublicKey };
+    return { memeAccountPublicKey: memeAccountKeypair.publicKey, quoteAccountPublicKey: quoteAccountKeypair.publicKey };
   }
 
   public async getHoldersCount() {
