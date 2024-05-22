@@ -1,4 +1,4 @@
-import { sleepTime } from "./util";
+import { sleepTime } from ".";
 
 /**
  * Parameters for the retry function.

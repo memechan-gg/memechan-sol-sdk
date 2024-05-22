@@ -8,6 +8,7 @@ import { PublicKey } from "@solana/web3.js";
  * @constant {string}
  */
 export const BE_URL = "https://7mgmqkuj18.execute-api.us-east-1.amazonaws.com/prod";
+export const BE_REGION = "us-east-1";
 
 /**
  * The Memechan program ID on Solana.

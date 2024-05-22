@@ -6,9 +6,6 @@ import { BoundPoolClient } from "../bound-pool/BoundPool";
 import { MemeTicket } from "../memeticket/MemeTicket";
 import { MemeTicketFields } from "../schema/codegen/accounts";
 import { MemechanSol } from "../schema/types/memechan_sol";
-import { getCreateAccountInstructions } from "../utils/getCreateAccountInstruction";
-import { getSendAndConfirmTransactionMethod } from "../utils/getSendAndConfirmTransactionMethod";
-import { retry } from "../utils/retry";
 import {
   AddFeesArgs,
   GetAddFeesTransactionArgs,
@@ -17,6 +14,9 @@ import {
   UnstakeArgs,
   WithdrawFeesArgs,
 } from "./types";
+import { getSendAndConfirmTransactionMethod } from "../util/getSendAndConfirmTransactionMethod";
+import { getCreateAccountInstructions } from "../util/getCreateAccountInstruction";
+import { retry } from "../util/retry";
 import { MEMECHAN_QUOTE_MINT } from "../config/config";
 import { formatAmmKeysById } from "../raydium/formatAmmKeysById";
 

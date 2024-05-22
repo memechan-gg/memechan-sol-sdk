@@ -3,23 +3,23 @@ import { BoundPoolClient } from "../src/bound-pool/BoundPool";
 import { sleep } from "../src/common/helpers";
 import { MEMECHAN_MEME_TOKEN_DECIMALS, MEMECHAN_QUOTE_TOKEN } from "../src/config/config";
 import { StakingPool } from "../src/staking-pool/StakingPool";
-import { DUMMY_TOKEN_METADATA, MARKET_ID, MEME_MINT, STAKING_POOL_ID, admin, client, payer} from "./common/common";
+import { DUMMY_TOKEN_METADATA, admin, client, payer} from "./common/common";
 import { FEE_DESTINATION_ID } from "./common/env";
 import { MemeTicket } from "../src/memeticket/MemeTicket";
 import { swapOnlyAmm } from "../src/raydium/swapOnlyAmm";
 import { Percent, TokenAmount, Token } from "@raydium-io/raydium-sdk";
-import { getWalletTokenAccount } from "../src/utils/util";
 import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import { PublicKey, Transaction } from "@solana/web3.js";
+import { getWalletTokenAccount } from "../src/util";
 
 describe("StakingPool", () => {
   it.skip("all", async () => {
-    const all = await StakingPool.all(client.memechanProgram);
+    /*const all = await StakingPool.all(client.memechanProgram);
 
     for (const pool of all) {
       //console.log(JSON.stringify(pool.account));
       //console.log("==================================================");
-    }
+    }*/
   }, 30000);
 
   it.skip("swapy, golive, ammSwap, unstake", async () => {
