@@ -14,14 +14,9 @@ import {
   UnstakeArgs,
   WithdrawFeesArgs,
 } from "./types";
-<<<<<<< HEAD
-import { MemeTicketFields } from "../schema/codegen/accounts";
-import { BoundPoolClient } from "../bound-pool/BoundPool";
 import { getSendAndConfirmTransactionMethod } from "../util/getSendAndConfirmTransactionMethod";
 import { getCreateAccountInstructions } from "../util/getCreateAccountInstruction";
 import { retry } from "../util/retry";
-=======
->>>>>>> ba310f8a8e1d40aae5809a31651436e5b9c51b15
 
 export class StakingPool {
   constructor(
