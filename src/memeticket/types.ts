@@ -1,5 +1,5 @@
 import { Keypair, PublicKey, Transaction } from "@solana/web3.js";
-import { MemeTicketFields } from "../schema/codegen/accounts";
+import { MemeTicketFields, MemeTicketJSON } from "../schema/codegen/accounts";
 import { MemeTicket } from "./MemeTicket";
 
 export interface BoundMerge {
@@ -24,7 +24,4 @@ export interface CloseArgs {
 
 export type GetCloseTransactionArgs = CloseArgs & { transaction?: Transaction };
 
-export type StringifiedMemeTicketFields = Omit<MemeTicketFields, "amount" | "untilTimestamp"> & {
-  amount: string;
-  untilTimestamp: string;
-};
+export type ParsedMemeTicket = { id: PublicKey; fields: MemeTicketFields; jsonFields: MemeTicketJSON };
