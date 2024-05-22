@@ -18,6 +18,7 @@ import {
   WithdrawFeesArgs,
 } from "./types";
 import { MEMECHAN_QUOTE_MINT } from "../config/config";
+import { formatAmmKeysById } from "../raydium/formatAmmKeysById";
 
 export class StakingPool {
   constructor(
@@ -60,9 +61,11 @@ export class StakingPool {
     return PublicKey.findProgramAddressSync([Buffer.from("staking"), publicKey.toBytes()], memechanProgramId)[0];
   }
 
-  public async getAddFeesTransaction({ transaction }: GetAddFeesTransactionArgs): Promise<Transaction> {
+  public async getAddFeesTransaction({ transaction, ammPoolId, payer }: GetAddFeesTransactionArgs): Promise<Transaction> {
     const tx = transaction ?? new Transaction();
     const stakingInfo = await this.fetch();
+
+    const ammPool = await formatAmmKeysById(ammPoolId.toBase58(), this.client.connection);
 
     const addFeesInstruction = await this.client.memechanProgram.methods
       .addFees()
@@ -72,6 +75,23 @@ export class StakingPool {
         staking: this.id,
         stakingSignerPda: this.findSignerPda(),
         tokenProgram: TOKEN_PROGRAM_ID,
+        marketAccount: ammPool.marketId,
+        marketAsks: ammPool.marketAsks,
+        marketBids: ammPool.marketBids,
+        marketEventQueue: ammPool.marketEventQueue,
+        marketCoinVault: ammPool.marketBaseVault,
+        marketPcVault: ammPool.marketQuoteVault,
+        marketProgramId: ammPool.marketProgramId,
+        marketVaultSigner: ammPool.marketAuthority,
+        openOrders: ammPool.openOrders,
+        raydiumAmm: ammPool.id,
+        raydiumAmmAuthority: ammPool.authority,
+        raydiumLpMint: ammPool.lpMint,
+        raydiumMemeVault: ammPool.baseVault,
+        raydiumQuoteVault: ammPool.quoteVault,
+        signer: payer.publicKey,
+        targetOrders: ammPool.targetOrders,
+        stakingLpWallet: ammPool.lpVault
       })
       .instruction();
 
@@ -80,8 +100,8 @@ export class StakingPool {
     return tx;
   }
 
-  public async addFees({ payer, transaction }: AddFeesArgs): Promise<void> {
-    const addFeesTransaction = await this.getAddFeesTransaction({ transaction });
+  public async addFees({ payer, transaction, ammPoolId }: AddFeesArgs): Promise<void> {
+    const addFeesTransaction = await this.getAddFeesTransaction({ transaction, ammPoolId, payer });
 
     const sendAndConfirmAddFeesTransaction = getSendAndConfirmTransactionMethod({
       connection: this.client.connection,
