@@ -1,7 +1,7 @@
 {
   "name": "@avernikoz/memechan-sol-sdk",
   "description": "Typescript SDK for memechan.gg",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "directories": {
@@ -26,8 +26,6 @@
     "deploy": "yarn lint && yarn build && yarn publish --access restricted"
   },
   "dependencies": {
-    "bn.js": "^5.2.1",
-    "bs58": "^5.0.0",
     "@aws-crypto/sha256-browser": "^5.2.0",
     "@aws-sdk/types": "^3.577.0",
     "@coral-xyz/anchor": "0.29.0",
@@ -38,11 +36,13 @@
     "@smithy/signature-v4": "^3.0.0",
     "@solana/spl-token": "^0.4.6",
     "@solana/web3.js": "^1.91.8",
+    "bignumber.js": "^9.1.2",
+    "bn.js": "^5.2.1",
+    "bs58": "^5.0.0",
     "dotenv": "^16.4.5",
     "tweetnacl": "^1.0.3",
     "tweetnacl-util": "^0.15.1",
-    "zod": "^3.23.8",
-    "bignumber.js": "^9.1.2"
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@types/bn.js": "^5.1.5",
