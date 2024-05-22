@@ -18,7 +18,7 @@ describe("TargetConfig", () => {
       payer: payer,
       client,
       mint: mint,
-      targetAmount: new BN(90000 * 1e9),
+      targetAmount: new BN(40000 * 1e9),
     });
     await sleep(1000);
     console.log("targetconfig id: " + targetConfig.id);
@@ -29,6 +29,6 @@ describe("TargetConfig", () => {
     const targetConfig = await TargetConfig.fromTargetConfigId({ client, accountAddressId: MEMECHAN_TARGET_CONFIG });
 
     console.log("original targetConfig: ", targetConfig.tokenTargetAmount);
-    await targetConfig.changeTargetConfig(new BN(90000 * 1e9), payer);
+    await targetConfig.changeTargetConfig(new BN(40000 * 1e9), payer);
   }, 20000);
 });

@@ -13,7 +13,7 @@ describe("QUOTE TOKEN MINT", () => {
     const getAccount1 = await mintUtils.getOrCreateTokenAccount(MEMECHAN_QUOTE_TOKEN.mint, payer, payer.publicKey );
     console.log("getOrCreateTokenAccount getAccount1", getAccount1);
 
-    await mintUtils.mintTo(MEMECHAN_QUOTE_TOKEN.mint, getAccount1.address, 900000 * 1e9);
+    await mintUtils.mintTo(MEMECHAN_QUOTE_TOKEN.mint, getAccount1.address, 40000 * 1e9);
 
     const getAccount2 = await mintUtils.getOrCreateTokenAccount(MEMECHAN_QUOTE_TOKEN.mint, payer, payer.publicKey );
     console.log("getOrCreateTokenAccount getAccount2", getAccount2);
