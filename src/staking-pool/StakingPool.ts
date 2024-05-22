@@ -2,6 +2,9 @@ import { Program } from "@coral-xyz/anchor";
 import { NATIVE_MINT, TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import { AccountMeta, Keypair, PublicKey, Transaction } from "@solana/web3.js";
 import { MemechanClient } from "../MemechanClient";
+import { BoundPoolClient } from "../bound-pool/BoundPool";
+import { MemeTicket } from "../memeticket/MemeTicket";
+import { MemeTicketFields } from "../schema/codegen/accounts";
 import { MemechanSol } from "../schema/types/memechan_sol";
 import {
   AddFeesArgs,
@@ -11,11 +14,14 @@ import {
   UnstakeArgs,
   WithdrawFeesArgs,
 } from "./types";
+<<<<<<< HEAD
 import { MemeTicketFields } from "../schema/codegen/accounts";
 import { BoundPoolClient } from "../bound-pool/BoundPool";
 import { getSendAndConfirmTransactionMethod } from "../util/getSendAndConfirmTransactionMethod";
 import { getCreateAccountInstructions } from "../util/getCreateAccountInstruction";
 import { retry } from "../util/retry";
+=======
+>>>>>>> ba310f8a8e1d40aae5809a31651436e5b9c51b15
 
 export class StakingPool {
   constructor(
@@ -37,6 +43,8 @@ export class StakingPool {
     poolAccountAddressId: PublicKey;
   }) {
     const stakingPoolObjectData = await client.memechanProgram.account.stakingPool.fetch(poolAccountAddressId);
+
+    console.log("stakingPoolObjectData:", stakingPoolObjectData);
 
     const boundClientInstance = new StakingPool(
       poolAccountAddressId,
@@ -243,7 +251,7 @@ export class StakingPool {
    * Fetches all tickets for corresponding pool id
    */
   public async fetchRelatedTickets(pool = this.pool, client = this.client): Promise<MemeTicketFields[]> {
-    return BoundPoolClient.fetchRelatedTickets(pool, client);
+    return MemeTicket.fetchRelatedTickets(pool, client);
   }
 
   /**

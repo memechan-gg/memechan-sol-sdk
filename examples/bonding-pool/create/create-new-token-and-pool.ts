@@ -1,6 +1,6 @@
-import { BoundPoolClient } from "../../src/bound-pool/BoundPool";
-import { MEMECHAN_QUOTE_TOKEN } from "../../src/config/config";
-import { admin, client, payer } from "../common";
+import { BoundPoolClient } from "../../../src/bound-pool/BoundPool";
+import { MEMECHAN_QUOTE_TOKEN } from "../../../src/config/config";
+import { admin, client, payer } from "../../common";
 
 const DUMMY_TOKEN_METADATA = {
   name: "Best Token Ever",
@@ -12,7 +12,7 @@ const DUMMY_TOKEN_METADATA = {
   website: "https://besttokenever.com",
 };
 
-// yarn tsx examples/bonding-pool/create-new-token-and-pool.ts > log.txt 2>&1
+// yarn tsx examples/bonding-pool/create/create-new-token-and-pool.ts > log.txt 2>&1
 export const createNewTokenAndPool = async () => {
   const boundPool = await BoundPoolClient.new({
     admin,
@@ -23,6 +23,7 @@ export const createNewTokenAndPool = async () => {
     tokenMetadata: DUMMY_TOKEN_METADATA,
   });
   console.log("boundPool:", boundPool);
+  console.log("boundPool:", boundPool.id.toString());
 };
 
 createNewTokenAndPool();
