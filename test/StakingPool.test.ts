@@ -22,66 +22,90 @@ describe("StakingPool", () => {
     }
   }, 30000);
 
-  it("swap, unstake", async () => {
-    // //console.log("payer: " + payer.publicKey.toString());
-    // // const pool = await BoundPoolClient.slowNew({
-    // //   admin,
-    // //   payer,
-    // //   signer: payer,
-    // //   client,
-    // //   quoteToken: MEMECHAN_QUOTE_TOKEN,
-    // //   tokenMetadata: DUMMY_TOKEN_METADATA,
-    // // });
+  it("swapy, golive, ammSwap, unstake", async () => {
+    const boundPool = await BoundPoolClient.slowNew({
+      admin,
+      payer,
+      signer: payer,
+      client,
+      quoteToken: MEMECHAN_QUOTE_TOKEN,
+      tokenMetadata: DUMMY_TOKEN_METADATA,
+    });
 
-    // // console.log("==== pool id: " + pool.id.toString());
-    // // await sleep(2000);
+    console.log("==== pool id: " + boundPool.id.toString());
+    await sleep(2000);
 
-    // const pool = await BoundPoolClient.slowNew({
-    //   admin,
-    //   payer,
-    //   signer: payer,
-    //   client,
-    //   quoteToken: MEMECHAN_QUOTE_TOKEN,
-    //   tokenMetadata: DUMMY_TOKEN_METADATA,
-    // });
+    const boundPoolInfo = await BoundPoolClient.fetch2(client.connection, boundPool.id);
 
-    // console.log("==== pool id: " + pool.id.toString());
-    // await sleep(2000);
+    console.log("boundPoolInfo:", boundPoolInfo);
 
-    // const ticketId = await pool.swapY({
-    //   payer: payer,
-    //   user: payer,
-    //   memeTokensOut: new BN(100),
-    //   quoteAmountIn: new BN(100000),
-    //   quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
-    //   pool: pool.id,
-    // });
+    const { stakingMemeVault, stakingQuoteVault } = await boundPool.slowInitStakingPool({
+      payer: payer,
+      user: payer,
+      boundPoolInfo,
+    });
 
-    // console.log("swapY ticketId: " + ticketId.id.toBase58());
+    const [stakingPool, ammPool ] = await boundPool.goLive({
+      payer: payer,
+      user: payer,
+      boundPoolInfo,
+      feeDestinationWalletAddress: FEE_DESTINATION_ID,
+      memeVault: stakingMemeVault,
+      quoteVault: stakingQuoteVault,
+    });
+    console.log("ammPool: " + JSON.stringify(ammPool));
 
-  
+    const tickets: MemeTicket[] = [];
+
+    const ticketId = await boundPool.swapY({
+      payer: payer,
+      user: payer,
+      memeTokensOut: new BN(1000),
+      quoteAmountIn: new BN(100000),
+      quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
+      pool: boundPool.id,
+    });
+
+    tickets.push(new MemeTicket(ticketId.id, client));
+    console.log("swapY ticketId: " + ticketId.id.toBase58());
+
+    const ticketId2 = await boundPool.swapY({
+      payer: payer,
+      user: payer,
+      memeTokensOut: new BN(1000),
+      quoteAmountIn: new BN(100000),
+      quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
+      pool: boundPool.id,
+    });
+
+    tickets.push(new MemeTicket(ticketId2.id, client));
+    console.log("swapY ticketId2: " + ticketId2.id.toBase58());
+
     const inputToken = MEMECHAN_QUOTE_TOKEN;
-    const outputToken = new Token(TOKEN_PROGRAM_ID, new PublicKey("B1H5ih6EtfSUzbuQTCs4rvMLS74iDZ6a6aYatyiN1d56"), MEMECHAN_MEME_TOKEN_DECIMALS)
-    const targetPool = "3cNwpm7ifYyeTeciEwoCyB1SQFX11JyN84chdQFT8tJv";
+    const outputToken = new Token(TOKEN_PROGRAM_ID, ammPool.baseMint, MEMECHAN_MEME_TOKEN_DECIMALS)
     const inputTokenAmount = new TokenAmount(inputToken, 10000)
     const slippage = new Percent(5, 100)
     const walletTokenAccounts = await getWalletTokenAccount(client.connection, payer.publicKey)
 
-    await swapOnlyAmm({
+    const swapTxIds = await swapOnlyAmm({
       connection: client.connection,
       outputToken,
-      targetPool,
+      targetPool: ammPool.id,
       inputTokenAmount,
       slippage,
       walletTokenAccounts,
       wallet: payer,
+    });
 
-    }).then(({ txids }) => {
-      /** continue with txids */
-      console.log('amm swapresult txids', txids)
-    })
+    console.log('amm swapresult txids: ', swapTxIds)
 
-   // stakingPool.unstake(tickets);
+    const unstakeResult = await stakingPool.unstake({
+      amount: new BN(10),
+      user: payer,
+      ticket: tickets[0],
+    });
+
+    console.log("unstakeResult: ", unstakeResult);
 
   }, 550000);
 });

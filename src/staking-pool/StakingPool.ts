@@ -17,6 +17,7 @@ import {
   UnstakeArgs,
   WithdrawFeesArgs,
 } from "./types";
+import { MEMECHAN_QUOTE_MINT } from "../config/config";
 
 export class StakingPool {
   constructor(
@@ -96,7 +97,7 @@ export class StakingPool {
 
   public async getUnstakeTransaction(
     args: GetUnstakeTransactionArgs,
-  ): Promise<{ transaction: Transaction; memeAccountPublicKey: PublicKey; wSolAccountPublicKey: PublicKey }> {
+  ): Promise<{ transaction: Transaction; memeAccountKeypair: Keypair; quoteAccountKeypair: Keypair }> {
     const tx = args.transaction ?? new Transaction();
     const stakingInfo = await this.fetch();
 
@@ -112,17 +113,17 @@ export class StakingPool {
 
     tx.add(...createMemeAccountInstructions);
 
-    const wSolAccountKeypair = Keypair.generate();
-    const wSolAccountPublicKey = wSolAccountKeypair.publicKey;
-    const createWSolAccountInstructions = await getCreateAccountInstructions(
+    const quoteAccountKeypair = Keypair.generate();
+    const quoteAccountPublicKey = quoteAccountKeypair.publicKey;
+    const createQuoteAccountInstructions = await getCreateAccountInstructions(
       this.client.connection,
       args.user,
-      NATIVE_MINT,
+      MEMECHAN_QUOTE_MINT,
       args.user.publicKey,
-      wSolAccountKeypair,
+      quoteAccountKeypair,
     );
 
-    tx.add(...createWSolAccountInstructions);
+    tx.add(...createQuoteAccountInstructions);
 
     const unstakeInstruction = await this.client.memechanProgram.methods
       .unstake(args.amount)
@@ -134,24 +135,24 @@ export class StakingPool {
         quoteVault: stakingInfo.quoteVault,
         staking: this.id,
         userMeme: memeAccountPublicKey,
-        userQuote: wSolAccountPublicKey,
+        userQuote: quoteAccountPublicKey,
         tokenProgram: TOKEN_PROGRAM_ID,
       })
       .instruction();
 
     tx.add(unstakeInstruction);
 
-    return { transaction: tx, memeAccountPublicKey, wSolAccountPublicKey };
+    return { transaction: tx, memeAccountKeypair, quoteAccountKeypair };
   }
 
   public async unstake(
     args: UnstakeArgs,
-  ): Promise<{ memeAccountPublicKey: PublicKey; wSolAccountPublicKey: PublicKey }> {
-    const { memeAccountPublicKey, transaction, wSolAccountPublicKey } = await this.getUnstakeTransaction(args);
+  ): Promise<{ memeAccountPublicKey: PublicKey; quoteAccountPublicKey: PublicKey }> {
+    const { memeAccountKeypair, transaction, quoteAccountKeypair } = await this.getUnstakeTransaction(args);
 
     const sendAndConfirmUnstakeTransaction = getSendAndConfirmTransactionMethod({
       connection: this.client.connection,
-      signers: [args.user],
+      signers: [args.user, memeAccountKeypair, quoteAccountKeypair],
       transaction,
     });
 
@@ -160,7 +161,7 @@ export class StakingPool {
       functionName: "unstake",
     });
 
-    return { memeAccountPublicKey, wSolAccountPublicKey };
+    return { memeAccountPublicKey: memeAccountKeypair.publicKey, quoteAccountPublicKey: quoteAccountKeypair.publicKey };
   }
 
   public async getWithdrawFeesTransaction(args: GetWithdrawFeesTransactionArgs): Promise<{
