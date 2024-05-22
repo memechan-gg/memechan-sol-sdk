@@ -38,8 +38,9 @@ export async function getCreateMarketTransactions(
     wallet: input.wallet,
     baseInfo: input.baseToken,
     quoteInfo: input.quoteToken,
+    // set based on https://docs.raydium.io/raydium/updates/archive/creating-an-openbook-amm-pool
     lotSize: 1,
-    tickSize: 0.01,
+    tickSize: 0.000001,
     dexProgramId: PROGRAMIDS.OPENBOOK_MARKET,
     makeTxVersion
   });
