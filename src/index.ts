@@ -11,3 +11,4 @@ export * from "./tx-parsing/parsers/go-live-parser";
 export * from "./tx-parsing/parsers/init-staking-parser";
 export * from "./tx-parsing/parsers/swap-x-parser";
 export * from "./tx-parsing/parsers/swap-y-parser";
+export * from './tx-parsing/parsers/create-metadata-parser';
