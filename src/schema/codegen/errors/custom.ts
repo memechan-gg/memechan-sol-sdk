@@ -4,6 +4,7 @@ export type CustomError =
   | SlippageExceeded
   | InvariantViolation
   | InvalidTokenMints
+  | MathOverflow
   | MulDivOverflow
   | DivideByZero
   | ZeroInAmt
@@ -18,6 +19,8 @@ export type CustomError =
   | NotEnoughTokensToRelease
   | BondingCurveMustBeNegativelySloped
   | BondingCurveInterceptMustBePositive
+  | EGammaSAboveRelativeLimit
+  | EScaleTooLow
 
 export class InvalidAccountInput extends Error {
   readonly code = 6000
@@ -77,9 +80,9 @@ export class InvalidTokenMints extends Error {
   }
 }
 
-export class MulDivOverflow extends Error {
+export class MathOverflow extends Error {
   readonly code = 6005
-  readonly name = "MulDivOverflow"
+  readonly name = "MathOverflow"
   readonly msg = "undefined"
 
   constructor() {
@@ -87,9 +90,9 @@ export class MulDivOverflow extends Error {
   }
 }
 
-export class DivideByZero extends Error {
+export class MulDivOverflow extends Error {
   readonly code = 6006
-  readonly name = "DivideByZero"
+  readonly name = "MulDivOverflow"
   readonly msg = "undefined"
 
   constructor() {
@@ -97,9 +100,9 @@ export class DivideByZero extends Error {
   }
 }
 
-export class ZeroInAmt extends Error {
+export class DivideByZero extends Error {
   readonly code = 6007
-  readonly name = "ZeroInAmt"
+  readonly name = "DivideByZero"
   readonly msg = "undefined"
 
   constructor() {
@@ -107,9 +110,9 @@ export class ZeroInAmt extends Error {
   }
 }
 
-export class ZeroMemeVault extends Error {
+export class ZeroInAmt extends Error {
   readonly code = 6008
-  readonly name = "ZeroMemeVault"
+  readonly name = "ZeroInAmt"
   readonly msg = "undefined"
 
   constructor() {
@@ -117,9 +120,9 @@ export class ZeroMemeVault extends Error {
   }
 }
 
-export class InsufficientBalance extends Error {
+export class ZeroMemeVault extends Error {
   readonly code = 6009
-  readonly name = "InsufficientBalance"
+  readonly name = "ZeroMemeVault"
   readonly msg = "undefined"
 
   constructor() {
@@ -127,93 +130,123 @@ export class InsufficientBalance extends Error {
   }
 }
 
-export class PoolIsLocked extends Error {
+export class InsufficientBalance extends Error {
   readonly code = 6010
+  readonly name = "InsufficientBalance"
+  readonly msg = "undefined"
+
+  constructor() {
+    super("6010: undefined")
+  }
+}
+
+export class PoolIsLocked extends Error {
+  readonly code = 6011
   readonly name = "PoolIsLocked"
   readonly msg = "Pool can't be interacted with until going into live phase"
 
   constructor() {
-    super("6010: Pool can't be interacted with until going into live phase")
+    super("6011: Pool can't be interacted with until going into live phase")
   }
 }
 
 export class NoZeroTokens extends Error {
-  readonly code = 6011
+  readonly code = 6012
   readonly name = "NoZeroTokens"
   readonly msg = "Shouldn't provide zero tokens in"
 
   constructor() {
-    super("6011: Shouldn't provide zero tokens in")
+    super("6012: Shouldn't provide zero tokens in")
   }
 }
 
 export class NoTokensToWithdraw extends Error {
-  readonly code = 6012
+  readonly code = 6013
   readonly name = "NoTokensToWithdraw"
   readonly msg = "undefined"
 
   constructor() {
-    super("6012: undefined")
+    super("6013: undefined")
   }
 }
 
 export class NotEnoughTicketTokens extends Error {
-  readonly code = 6013
+  readonly code = 6014
   readonly name = "NotEnoughTicketTokens"
   readonly msg = "Amount of tokens in ticket is lower than needed to swap"
 
   constructor() {
-    super("6013: Amount of tokens in ticket is lower than needed to swap")
+    super("6014: Amount of tokens in ticket is lower than needed to swap")
   }
 }
 
 export class TicketTokensLocked extends Error {
-  readonly code = 6014
+  readonly code = 6015
   readonly name = "TicketTokensLocked"
   readonly msg = "Not enough time passed to unlock tokens bound to the ticket"
 
   constructor() {
-    super("6014: Not enough time passed to unlock tokens bound to the ticket")
+    super("6015: Not enough time passed to unlock tokens bound to the ticket")
   }
 }
 
 export class NonZeroAmountTicket extends Error {
-  readonly code = 6015
+  readonly code = 6016
   readonly name = "NonZeroAmountTicket"
   readonly msg = "Can't close ticket with non-zero bound token amount"
 
   constructor() {
-    super("6015: Can't close ticket with non-zero bound token amount")
+    super("6016: Can't close ticket with non-zero bound token amount")
   }
 }
 
 export class NotEnoughTokensToRelease extends Error {
-  readonly code = 6016
+  readonly code = 6017
   readonly name = "NotEnoughTokensToRelease"
   readonly msg = "Can't unstake the required amount of tokens"
 
   constructor() {
-    super("6016: Can't unstake the required amount of tokens")
+    super("6017: Can't unstake the required amount of tokens")
   }
 }
 
 export class BondingCurveMustBeNegativelySloped extends Error {
-  readonly code = 6017
+  readonly code = 6018
   readonly name = "BondingCurveMustBeNegativelySloped"
   readonly msg = "undefined"
 
   constructor() {
-    super("6017: undefined")
+    super("6018: undefined")
   }
 }
 
 export class BondingCurveInterceptMustBePositive extends Error {
-  readonly code = 6018
+  readonly code = 6019
   readonly name = "BondingCurveInterceptMustBePositive"
   readonly msg = "undefined"
 
   constructor() {
-    super("6018: undefined")
+    super("6019: undefined")
+  }
+}
+
+export class EGammaSAboveRelativeLimit extends Error {
+  readonly code = 6020
+  readonly name = "EGammaSAboveRelativeLimit"
+  readonly msg = "undefined"
+
+  constructor() {
+    super("6020: undefined")
+  }
+}
+
+export class EScaleTooLow extends Error {
+  readonly code = 6021
+  readonly name = "EScaleTooLow"
+  readonly msg = "undefined"
+
+  constructor() {
+    super("6021: undefined")
   }
 }
 
@@ -230,33 +263,39 @@ export function fromCode(code: number): CustomError | null {
     case 6004:
       return new InvalidTokenMints()
     case 6005:
-      return new MulDivOverflow()
+      return new MathOverflow()
     case 6006:
-      return new DivideByZero()
+      return new MulDivOverflow()
     case 6007:
-      return new ZeroInAmt()
+      return new DivideByZero()
     case 6008:
-      return new ZeroMemeVault()
+      return new ZeroInAmt()
     case 6009:
-      return new InsufficientBalance()
+      return new ZeroMemeVault()
     case 6010:
-      return new PoolIsLocked()
+      return new InsufficientBalance()
     case 6011:
-      return new NoZeroTokens()
+      return new PoolIsLocked()
     case 6012:
-      return new NoTokensToWithdraw()
+      return new NoZeroTokens()
     case 6013:
-      return new NotEnoughTicketTokens()
+      return new NoTokensToWithdraw()
     case 6014:
-      return new TicketTokensLocked()
+      return new NotEnoughTicketTokens()
     case 6015:
-      return new NonZeroAmountTicket()
+      return new TicketTokensLocked()
     case 6016:
-      return new NotEnoughTokensToRelease()
+      return new NonZeroAmountTicket()
     case 6017:
-      return new BondingCurveMustBeNegativelySloped()
+      return new NotEnoughTokensToRelease()
     case 6018:
+      return new BondingCurveMustBeNegativelySloped()
+    case 6019:
       return new BondingCurveInterceptMustBePositive()
+    case 6020:
+      return new EGammaSAboveRelativeLimit()
+    case 6021:
+      return new EScaleTooLow()
   }
 
   return null
