@@ -5,7 +5,7 @@ import { swapOnlyAmm } from "../../src/raydium/swapOnlyAmm";
 import { client, connection, payer } from "../common";
 import { getWalletTokenAccount } from "../../src/util";
 
-// yarn tsx examples/raydium/swap.ts > swap.txt 2>&1
+// yarn tsx examples/live-pool/swap.ts > swap.txt 2>&1
 export const swap = async () => {
   const poolAddress = "BY6xstuufxC7sii4iqYXToSzYrT8wBcLkrwrVatHXkQs";
   const quoteAmountIn = new TokenAmount(MEMECHAN_QUOTE_TOKEN, 10000000);
