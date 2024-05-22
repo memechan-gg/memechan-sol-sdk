@@ -2,7 +2,7 @@ import { Program } from "@coral-xyz/anchor";
 import { GetProgramAccountsFilter, PublicKey, Transaction, sendAndConfirmTransaction } from "@solana/web3.js";
 import BigNumber from "bignumber.js";
 import { MemechanClient } from "../MemechanClient";
-import { MemeTicketFields } from "../schema/codegen/accounts";
+import { MemeTicket as CodegenMemeTicket, MemeTicketFields } from "../schema/codegen/accounts";
 import { MemechanSol } from "../schema/types/memechan_sol";
 import {
   BoundMerge,
@@ -10,8 +10,8 @@ import {
   GetBoundMergeTransactionArgs,
   GetCloseTransactionArgs,
   GetStakingMergeTransactionArgs,
+  ParsedMemeTicket,
   StakingMerge,
-  StringifiedMemeTicketFields,
 } from "./types";
 import { getOptimizedTransactions } from "./utils";
 
@@ -60,6 +60,7 @@ export class MemeTicket {
     const mergeTransaction = await this.getBoundMergeTransaction(input);
 
     const optimizedTransactions = getOptimizedTransactions(mergeTransaction.instructions, input.user.publicKey);
+    console.log("optimizedTransactions length:", optimizedTransactions.length);
 
     for (const tx of optimizedTransactions) {
       const signature = await sendAndConfirmTransaction(this.client.connection, tx, [input.user], {
@@ -164,7 +165,7 @@ export class MemeTicket {
     pool: PublicKey,
     client: MemechanClient,
     user: PublicKey,
-  ): Promise<StringifiedMemeTicketFields[]> {
+  ): Promise<ParsedMemeTicket[]> {
     const program = client.memechanProgram;
     const filters: GetProgramAccountsFilter[] = [
       {
@@ -182,17 +183,18 @@ export class MemeTicket {
     ];
 
     const fetchedTickets = await program.account.memeTicket.all(filters);
-    const tickets = fetchedTickets.map((ticket) => ticket.account);
 
-    const stringifiedTickets = tickets.map((ticket) => {
+    const parsedTickets = fetchedTickets.map((ticket) => {
+      const jsonTicket = new CodegenMemeTicket(ticket.account).toJSON();
+
       return {
-        ...ticket,
-        amount: ticket.amount.toString(),
-        untilTimestamp: ticket.untilTimestamp.toString(),
+        id: ticket.publicKey,
+        jsonFields: jsonTicket,
+        fields: ticket.account,
       };
     });
 
-    return stringifiedTickets;
+    return parsedTickets;
   }
 
   public static async fetchAvailableTicketsByUser(pool: PublicKey, client: MemechanClient, user: PublicKey) {
@@ -200,14 +202,14 @@ export class MemeTicket {
     const currentTimestamp = Date.now();
 
     const availableTickets = tickets.filter((ticket) => {
-      const unlockTicketTimestamp = +ticket.untilTimestamp;
+      const unlockTicketTimestamp = +ticket.jsonFields.untilTimestamp;
 
       return currentTimestamp >= unlockTicketTimestamp;
     });
 
     const availableAmount = availableTickets
       .reduce((amount: BigNumber, ticket) => {
-        amount = amount.plus(ticket.amount);
+        amount = amount.plus(ticket.jsonFields.amount);
         return amount;
       }, new BigNumber(0))
       .toString();
