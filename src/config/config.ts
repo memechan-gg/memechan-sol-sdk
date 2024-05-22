@@ -18,11 +18,11 @@ export const BE_REGION = "us-east-1";
  *
  * @constant {string}
  */
-export const MEMECHAN_PROGRAM_ID = "FJuQ8pqDRKTmzrLASriYJBYUKRiRo9WWBJJwLe7C6ZLu";
+export const MEMECHAN_PROGRAM_ID = "3dKJG4mqodZQxDsmDbVsnPMVxSiBQz3EsA73cai41J3a";
 
-export const MEMECHAN_QUOTE_MINT = new PublicKey("Do6NqMhU5sHA9p11FVePcPN4rxEjNGu6ZH2B2bCpQfpJ");
-export const MEMECHAN_TARGET_CONFIG = new PublicKey("F3fnjGGcvsaK5CCrSYryBqcgcrpaTcBCPGNpjd5HSqL1");
-export const MEMECHAN_QUOTE_TOKEN_DECIMALS = 6; // current devnet quote token decimals
+export const MEMECHAN_QUOTE_MINT = new PublicKey("HX2pp5za2aBkrA5X5iTioZXcrpWb2q9DiaeWPW3qKMaw");
+export const MEMECHAN_TARGET_CONFIG = new PublicKey("6tmbgNyQXPTZyDcuxMVqDVetbwNJLWgpH4rvfH7KYQoi");
+export const MEMECHAN_QUOTE_TOKEN_DECIMALS = 9; // current devnet quote token decimals
 export const MEMECHAN_QUOTE_TOKEN: Token = new Token(
   TOKEN_PROGRAM_ID,
   MEMECHAN_QUOTE_MINT,
