@@ -10,9 +10,9 @@ export interface UnstakeArgs {
 
 export type GetUnstakeTransactionArgs = UnstakeArgs & { transaction?: Transaction };
 
-export type AddFeesArgs = GetAddFeesTransactionArgs & { payer: Keypair };
+export type AddFeesArgs = GetAddFeesTransactionArgs 
 
-export type GetAddFeesTransactionArgs = { transaction?: Transaction };
+export type GetAddFeesTransactionArgs = { transaction?: Transaction, ammPoolId: PublicKey, payer: Keypair  };
 
 export interface WithdrawFeesArgs {
   ticket: MemeTicket;

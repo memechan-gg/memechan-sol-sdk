@@ -1,0 +1,47 @@
+yarn run v1.22.19
+$ C:\src\memechan\memechan-sol-sdk\node_modules\.bin\tsx examples/bonding-pool/create/create-new-token-and-pool-tx.ts
+program id: FJuQ8pqDRKTmzrLASriYJBYUKRiRo9WWBJJwLe7C6ZLu
+connection rpc: https://rpc.ankr.com/solana_devnet/568b9d1429100aea0382352b147fd75ef28bb7add4c1e983951c110f084e6c20
+mintAuthority: 8SKU97MDsRcNiyddjg7dA2nAXwMud7brvFEXktYH6gWX
+metadataUri: https://cf-ipfs.com/ipfs/QmY8fNYSPDPvL9zgm7Eytgr4NiAstZDo6YA8xkF8nq8MDz
+createPoolSignature: MWkunyLi3KoNDuC1aqkdkQWr4bDnyWexsmz9mub2RpnobyVFPMsgNk8EScWFhMfVuQUeyExEhDCMLk7di2RouhP
+createTokenSignature: 5iH4couebSnNe1fv8i54EQMcwiEPiFC3v6XkisHXW7BGZNnRDmgEvkhjf6Deax5Ho2V3sM44ZhXQqMB3efSDiMBj
+id:  PublicKey [PublicKey(3Lg7jerkS623FmrmzQy16RTaYob3ir3RD1JrQBpuPWjW)] {
+  _bn: <BN: 22c1a352188e4a9fbe050160f1c640fea430c3d447eaa1a2f13157bcd58020c5>
+}
+boundPool: BoundPool {
+  memeReserve: Reserve {
+    tokens: <BN: 3328b944c4000>,
+    mint: PublicKey [PublicKey(6UQ9h6iBaWHHzVsRhGE3UhyGaLumumLmyzY1dw7p9HeH)] {
+      _bn: <BN: 514f4ac6d8b546a51b36ad7d161ba864f99033feb88bd152db46defae4856922>
+    },
+    vault: PublicKey [PublicKey(C5ji4jTT8BLnYUf8XzoD1fA6QmtgFTvru4CA9fzZ1cw4)] {
+      _bn: <BN: a4a72b65d2c3b8b7b162a8570017d8b6d02286445c18e3e3fa539e8c67cc0f4b>
+    }
+  },
+  quoteReserve: Reserve {
+    tokens: <BN: 0>,
+    mint: PublicKey [PublicKey(Do6NqMhU5sHA9p11FVePcPN4rxEjNGu6ZH2B2bCpQfpJ)] {
+      _bn: <BN: be1b0a1c8b1836a10cd9769a2481f36004d8dc77c40fddcdd05d8d283cd35e77>
+    },
+    vault: PublicKey [PublicKey(5cyLrwMt5uco3dCkabtAgQsJEPm66EDJV8t5foTduLsd)] {
+      _bn: <BN: 44a5c8594d8045703c2cc42ed9fe5d089a8da734b4d183bb307ed6376b16ca44>
+    }
+  },
+  adminFeesMeme: <BN: 0>,
+  adminFeesQuote: <BN: 0>,
+  adminVaultQuote: PublicKey [PublicKey(B7g98r2eYxwMEGNcmx7qHyV1EDaDX62s2MVZ4rxWTcZD)] {
+    _bn: <BN: 964a9c33181c8349a2f17841944dc17ea279251adf8ddb37947c5f22ae4b1d38>
+  },
+  fees: Fees { feeInPercent: <BN: f4240>, feeOutPercent: <BN: f4240> },
+  config: Config {
+    alphaAbs: <BN: 9184e72a000>,
+    beta: <BN: 31bced02db0000>,
+    priceFactor: <BN: 2>,
+    gammaS: <BN: 3e8>,
+    gammaM: <BN: 3328b944c4000>,
+    omegaM: <BN: b5e620f48000>,
+    decimals: Decimals { alpha: <BN: 2710>, beta: <BN: 2710>, quote: <BN: 6> }
+  },
+  locked: false
+}
