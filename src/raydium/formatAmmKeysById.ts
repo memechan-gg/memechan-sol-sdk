@@ -7,7 +7,6 @@ import {
   SPL_MINT_LAYOUT,
 } from "@raydium-io/raydium-sdk";
 import { Connection, PublicKey } from "@solana/web3.js";
-import { MEMECHAN_MEME_TOKEN_DECIMALS, MEMECHAN_QUOTE_TOKEN_DECIMALS } from "../config/config";
 
 export async function formatAmmKeysById(id: string, connection: Connection): Promise<ApiPoolInfoV4> {
   console.log("formatAmmKeysById id: " + id);
@@ -24,16 +23,16 @@ export async function formatAmmKeysById(id: string, connection: Connection): Pro
   const lpMint = info.lpMint;
   const lpMintAccount = await connection.getAccountInfo(lpMint, "confirmed");
   if (lpMintAccount === null) throw Error(" get lp mint info error");
-  //const lpMintInfo = SPL_MINT_LAYOUT.decode(lpMintAccount.data); // throws RangeError: The value of "offset" is out of range. It must be >= 0 and <= 13. Received 44
+  const lpMintInfo = SPL_MINT_LAYOUT.decode(lpMintAccount.data);
 
   return {
     id,
     baseMint: info.baseMint.toString(),
     quoteMint: info.quoteMint.toString(),
     lpMint: info.lpMint.toString(),
-    baseDecimals: MEMECHAN_MEME_TOKEN_DECIMALS, //safeBNToNumber(info.baseDecimal),
-    quoteDecimals: MEMECHAN_QUOTE_TOKEN_DECIMALS, //safeBNToNumber(info.quoteDecimal),
-    lpDecimals: MEMECHAN_MEME_TOKEN_DECIMALS,//lpMintInfo.decimals,
+    baseDecimals: info.baseDecimal.toNumber(),
+    quoteDecimals: info.quoteDecimal.toNumber(),
+    lpDecimals: lpMintInfo.decimals,
     version: 4,
     programId: account.owner.toString(),
     authority: Liquidity.getAssociatedAuthority({ programId: account.owner }).publicKey.toString(),
