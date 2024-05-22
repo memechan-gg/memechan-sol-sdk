@@ -3,14 +3,14 @@ import { sleep } from "../src/common/helpers";
 import { client, payer } from "./common/common";
 import BN from "bn.js";
 import { MintUtils } from "../src/token/mintUtils";
-import { MEMECHAN_MEME_TOKEN_DECIMALS, MEMECHAN_TARGET_CONFIG } from "../src/config/config";
+import { MEMECHAN_MEME_TOKEN_DECIMALS, MEMECHAN_QUOTE_TOKEN, MEMECHAN_TARGET_CONFIG } from "../src/config/config";
 
 describe("TargetConfig", () => {
   it.skip("creates target config", async () => {
     const mintUtils = new MintUtils(client.connection, payer);
-    const mint = await mintUtils.createMint(MEMECHAN_MEME_TOKEN_DECIMALS);
+    //const mint = await mintUtils.createMint(MEMECHAN_MEME_TOKEN_DECIMALS);
 
-    //const mint = MEMECHAN_QUOTE_TOKEN.mint;
+    const mint = MEMECHAN_QUOTE_TOKEN.mint;
 
     console.log("targetconfig mint: " + mint.toString());
 
@@ -18,7 +18,7 @@ describe("TargetConfig", () => {
       payer: payer,
       client,
       mint: mint,
-      targetAmount: new BN(1000000000),
+      targetAmount: new BN(90000),
     });
     await sleep(1000);
     console.log("targetconfig id: " + targetConfig.id);
