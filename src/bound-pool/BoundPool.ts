@@ -834,6 +834,7 @@ export class BoundPoolClient {
     createMarketTransactions: (Transaction | VersionedTransaction)[];
     goLiveTransaction: Transaction;
     stakingId: PublicKey;
+    ammId: PublicKey;
   }> {
     const {
       boundPoolInfo,
@@ -935,12 +936,12 @@ export class BoundPoolClient {
 
     transaction.add(goLiveInstruction);
 
-    return { createMarketTransactions, goLiveTransaction: transaction, stakingId };
+    return { createMarketTransactions, goLiveTransaction: transaction, stakingId, ammId };
   }
 
-  public async goLive2(args: GoLiveArgs): Promise<StakingPool> {
+  public async goLive(args: GoLiveArgs): Promise<[StakingPool, ApiPoolInfoV4]> {
     // Get needed transactions
-    const { createMarketTransactions, goLiveTransaction, stakingId } = await this.getGoLiveTransaction(args);
+    const { createMarketTransactions, goLiveTransaction, stakingId, ammId } = await this.getGoLiveTransaction(args);
 
     // Send transaction to create market
     const createMarketSignatures = await sendTx(this.client.connection, args.user, createMarketTransactions, {
@@ -993,188 +994,9 @@ export class BoundPoolClient {
       poolAccountAddressId: stakingId,
     });
 
-    return stakingPoolInstance;
-  }
+    const ammPool = await formatAmmKeysById(ammId.toBase58(), this.client.connection);
 
-  public async goLive(input: GoLiveArgs): Promise<[StakingPool, ApiPoolInfoV4]> {
-    const user = input.user!;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const boundPoolInfo = input.boundPoolInfo as any;
-    const stakingId = BoundPoolClient.findStakingPda(
-      boundPoolInfo.memeReserve.mint,
-      this.client.memechanProgram.programId,
-    );
-    const stakingSigner = StakingPool.findSignerPda(stakingId, this.client.memechanProgram.programId);
-
-    console.log("goLive.boundPoolInfo: " + JSON.stringify(boundPoolInfo));
-
-    const baseTokenInfo = new Token(
-      TOKEN_PROGRAM_ID,
-      new PublicKey(boundPoolInfo.memeReserve.mint),
-      MEMECHAN_MEME_TOKEN_DECIMALS,
-    );
-    //const marketId = new PublicKey("AHZCwnUuiB3CUEyk2nybsU5c85WVDTHVP2UwuQwpVaR1");
-    const quoteTokenInfo = MEMECHAN_QUOTE_TOKEN;
-
-    const { txids: createMarketTxIds, marketId } = await createMarket({
-      baseToken: baseTokenInfo,
-      quoteToken: quoteTokenInfo,
-      wallet: user.publicKey,
-      signer: user,
-      connection: this.client.connection,
-    });
-
-    console.log("createMarketTxIds: " + JSON.stringify(createMarketTxIds));
-
-    const createMarkeLatestBH0 = await this.client.connection.getLatestBlockhash("confirmed");
-    const createMarketTxResult = await this.client.connection.confirmTransaction(
-      {
-        signature: createMarketTxIds[0],
-        blockhash: createMarkeLatestBH0.blockhash,
-        lastValidBlockHeight: createMarkeLatestBH0.lastValidBlockHeight,
-      },
-      "confirmed",
-    );
-
-    if (createMarketTxResult.value.err) {
-      console.error("createMarketTxResult", createMarketTxResult);
-      throw new Error("createMarketTxResult failed");
-    }
-
-    console.log("marketId", marketId.toBase58());
-    console.log("stakingId: " + stakingId.toBase58());
-
-    // const modifyComputeUnits = ComputeBudgetProgram.setComputeUnitLimit({
-    //   units: 300,
-    // });
-
-    // const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
-    //   microLamports: 20000,
-    // });
-
-    const transferTx = new Transaction().add(
-      // modifyComputeUnits,
-      // addPriorityFee,
-      SystemProgram.transfer({
-        fromPubkey: user.publicKey,
-        toPubkey: stakingSigner,
-        lamports: 2_000_000_000,
-      }),
-    );
-
-    const transferSignature = await sendAndConfirmTransaction(this.client.connection, transferTx, [user], {
-      skipPreflight: true,
-      commitment: "confirmed",
-    });
-
-    console.log("transferSignature: " + transferSignature);
-
-    const transferTxBH0 = await this.client.connection.getLatestBlockhash("confirmed");
-    const transferTxSyncResult = await this.client.connection.confirmTransaction(
-      {
-        signature: transferSignature,
-        blockhash: transferTxBH0.blockhash,
-        lastValidBlockHeight: transferTxBH0.lastValidBlockHeight,
-      },
-      "confirmed",
-    );
-
-    if (transferTxSyncResult.value.err) {
-      console.error("transferTxSyncResult error: ", JSON.stringify(transferTxSyncResult));
-      throw new Error("transferTxSyncResult failed");
-    } else {
-      console.log("transferTxSyncResult: " + JSON.stringify(transferTxSyncResult));
-    }
-
-    const feeDestination = new PublicKey(input.feeDestinationWalletAddress);
-    const ammId = BoundPoolClient.getAssociatedId({ programId: PROGRAMIDS.AmmV4, marketId });
-    const raydiumAmmAuthority = BoundPoolClient.getAssociatedAuthority({ programId: PROGRAMIDS.AmmV4 });
-    const openOrders = BoundPoolClient.getAssociatedOpenOrders({ programId: PROGRAMIDS.AmmV4, marketId });
-    const targetOrders = BoundPoolClient.getAssociatedTargetOrders({ programId: PROGRAMIDS.AmmV4, marketId });
-    const ammConfig = BoundPoolClient.getAssociatedConfigId({ programId: PROGRAMIDS.AmmV4 });
-    const raydiumLpMint = BoundPoolClient.getAssociatedLpMint({ programId: PROGRAMIDS.AmmV4, marketId });
-
-    const raydiumMemeVault = BoundPoolClient.getAssociatedBaseVault({ programId: PROGRAMIDS.AmmV4, marketId });
-    const raydiumWsolVault = BoundPoolClient.getAssociatedQuoteVault({ programId: PROGRAMIDS.AmmV4, marketId });
-
-    const userDestinationLpTokenAta = BoundPoolClient.getATAAddress(
-      stakingSigner,
-      raydiumLpMint,
-      TOKEN_PROGRAM_ID,
-    ).publicKey;
-
-    const modifyComputeUnits = ComputeBudgetProgram.setComputeUnitLimit({
-      units: 250000,
-    });
-
-    const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
-      microLamports: 5000000,
-    });
-
-    // const data = Buffer.from(
-    //   Uint8Array.of(0, ...new BN(500000).toArray("le", 4))
-    // );
-    // const additionalComputeBudgetInstruction = new TransactionInstruction({
-    //   keys: [],
-    //   programId: new PublicKey("ComputeBudget111111111111111111111111111111"),
-    //   data,
-    // });
-
-    try {
-      const result = await this.client.memechanProgram.methods
-        .goLive(raydiumAmmAuthority.nonce)
-        .accounts({
-          signer: user.publicKey,
-          poolMemeVault: input.memeVault,
-          poolQuoteVault: input.quoteVault,
-          quoteMint: this.quoteTokenMint,
-          staking: stakingId,
-          stakingPoolSignerPda: stakingSigner,
-          raydiumLpMint: raydiumLpMint,
-          raydiumAmm: ammId,
-          raydiumAmmAuthority: raydiumAmmAuthority.publicKey,
-          raydiumMemeVault: raydiumMemeVault,
-          raydiumQuoteVault: raydiumWsolVault,
-          marketProgramId: PROGRAMIDS.OPENBOOK_MARKET,
-          systemProgram: SystemProgram.programId,
-          tokenProgram: TOKEN_PROGRAM_ID,
-          marketAccount: marketId,
-          clock: SYSVAR_CLOCK_PUBKEY,
-          rent: SYSVAR_RENT_PUBKEY,
-          openOrders: openOrders,
-          targetOrders: targetOrders,
-          memeMint: boundPoolInfo.memeReserve.mint,
-          ammConfig: ammConfig,
-          ataProgram: ATA_PROGRAM_ID,
-          feeDestinationInfo: feeDestination,
-          userDestinationLpTokenAta: userDestinationLpTokenAta,
-          raydiumProgram: PROGRAMIDS.AmmV4,
-        })
-        .signers([user])
-
-        .preInstructions([modifyComputeUnits, addPriorityFee])
-        .rpc({ skipPreflight: true, commitment: "confirmed" });
-      console.log("goLive Transaction successful:", result);
-
-      return [
-        await StakingPool.fromStakingPoolId({
-          client: this.client,
-          poolAccountAddressId: stakingId,
-        }),
-        await formatAmmKeysById(ammId.toBase58(), this.client.connection)
-      ];
-    } catch (error) {
-      if (error instanceof AnchorError) {
-        console.error("Error details:", error);
-        if (error.logs) {
-          error.logs.forEach((log) => console.log("Program log:", log));
-        }
-      } else {
-        console.error("Unexpected error:", error);
-      }
-
-      throw error;
-    }
+    return [stakingPoolInstance, ammPool];
   }
 
   public async fetchRelatedTickets() {
