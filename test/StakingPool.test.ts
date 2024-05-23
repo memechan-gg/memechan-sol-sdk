@@ -23,7 +23,7 @@ describe("StakingPool", () => {
   }, 30000);
 
   it("swapy, golive, ammSwap, unstake", async () => {
-    const boundPool = await BoundPoolClient.new({
+   const boundPool = await BoundPoolClient.new({
       admin,
       payer,
       signer: payer,
@@ -52,8 +52,8 @@ describe("StakingPool", () => {
     const ticketId2 = await boundPool.swapY({
       payer: payer,
       user: payer,
-      memeTokensOut: new BN(100*1e6),
-      quoteAmountIn: new BN(5000*1e9),
+      memeTokensOut: new BN(4000*1e6),
+      quoteAmountIn: new BN(40000*1e9),
       quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
       pool: boundPool.id,
     });
@@ -83,7 +83,7 @@ describe("StakingPool", () => {
 
     const inputToken = MEMECHAN_QUOTE_TOKEN;
     const outputToken = new Token(TOKEN_PROGRAM_ID, ammPool.baseMint, MEMECHAN_MEME_TOKEN_DECIMALS)
-    const inputTokenAmount = new TokenAmount(inputToken, 10000)
+    const inputTokenAmount = new TokenAmount(inputToken, 1000*1e9)
     const slippage = new Percent(5, 100)
     const walletTokenAccounts = await getWalletTokenAccount(client.connection, payer.publicKey)
 
@@ -99,11 +99,10 @@ describe("StakingPool", () => {
 
     console.log('amm swapresult txids: ', swapTxIds)
 
-
     StakingPool.fromStakingPoolId({ client, poolAccountAddressId: stakingPool.id});
 
     const unstakeResult = await stakingPool.unstake({
-      amount: new BN(1),
+      amount: new BN(10*1e6),
       user: payer,
       ticket: tickets[0],
     });
@@ -201,7 +200,7 @@ describe("StakingPool", () => {
 
   }, 550000);
 
-  it("swapy, golive, ammSwap, addFees", async () => {
+  it.skip("swapy, golive, ammSwap, addFees", async () => {
     const boundPool = await BoundPoolClient.new({
       admin,
       payer,

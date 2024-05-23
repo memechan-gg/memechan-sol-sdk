@@ -3,9 +3,6 @@ import { TOKEN_PROGRAM_ID, createInitializeAccountInstruction } from '@solana/sp
 import { Connection, PublicKey, SYSVAR_RENT_PUBKEY, SystemProgram, TransactionInstruction } from '@solana/web3.js'
 import BN from 'bn.js'
 
-//const ADDITIONAL_LAMPORTS = 400;
-const LAMPORTS_MULTIPLIER = 2;
-
 function accountFlagsLayout(property = 'accountFlags') {
   const ACCOUNT_FLAGS_LAYOUT = new WideBits(property)
   ACCOUNT_FLAGS_LAYOUT.addBoolean('initialized')
@@ -172,7 +169,7 @@ export class MarketV2 extends Base {
     }
   }) {
     const ins1: TransactionInstruction[] = []
-    const accountLamports = await connection.getMinimumBalanceForRentExemption(165 * LAMPORTS_MULTIPLIER);
+    const accountLamports = await connection.getMinimumBalanceForRentExemption(165);
     console.log("accountLamports: ", accountLamports);
     ins1.push(
       SystemProgram.createAccountWithSeed({
@@ -198,11 +195,14 @@ export class MarketV2 extends Base {
     )
 
     const ins2: TransactionInstruction[] = []
-    const lamports2 = await connection.getMinimumBalanceForRentExemption(MARKET_STATE_LAYOUT_V2.span * LAMPORTS_MULTIPLIER);
-    const lamports3 = await connection.getMinimumBalanceForRentExemption((5120 + 12) * LAMPORTS_MULTIPLIER);
-    const lamports4 = await connection.getMinimumBalanceForRentExemption((262144 + 12) * LAMPORTS_MULTIPLIER );
-    const lamports5 = await connection.getMinimumBalanceForRentExemption((65536 + 12) * LAMPORTS_MULTIPLIER);
-    const lamports6 = await connection.getMinimumBalanceForRentExemption((65536 + 12) * LAMPORTS_MULTIPLIER);
+    const lamports2 = await connection.getMinimumBalanceForRentExemption(MARKET_STATE_LAYOUT_V2.span);
+    const lamports3 = await connection.getMinimumBalanceForRentExemption((5120 + 12));
+    //const lamports3 = 0;
+    const lamports4 = await connection.getMinimumBalanceForRentExemption((262144 + 12));
+    //const lamports4 = 0;
+    const lamports5 = await connection.getMinimumBalanceForRentExemption((65536 + 12));
+    const lamports6 = await connection.getMinimumBalanceForRentExemption((65536 + 12));
+    //const lamports6 = 0;
 
     console.log("lamports2: ", lamports2);
     console.log("lamports3: ", lamports3);
