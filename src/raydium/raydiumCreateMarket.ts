@@ -3,7 +3,7 @@ import { TOKEN_PROGRAM_ID, createInitializeAccountInstruction } from '@solana/sp
 import { Connection, PublicKey, SYSVAR_RENT_PUBKEY, SystemProgram, TransactionInstruction } from '@solana/web3.js'
 import BN from 'bn.js'
 
-const ADDITIONAL_LAMPORTS = 20;
+const ADDITIONAL_LAMPORTS = 400;
 
 function accountFlagsLayout(property = 'accountFlags') {
   const ACCOUNT_FLAGS_LAYOUT = new WideBits(property)
