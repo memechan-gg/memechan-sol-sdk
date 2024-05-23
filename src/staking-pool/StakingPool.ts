@@ -1,5 +1,5 @@
 import { Program } from "@coral-xyz/anchor";
-import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
+import { TOKEN_PROGRAM_ID, createAccount } from "@solana/spl-token";
 import { AccountMeta, Keypair, PublicKey, Transaction } from "@solana/web3.js";
 import { MemechanClient } from "../MemechanClient";
 import { BoundPoolClient } from "../bound-pool/BoundPool";
@@ -67,21 +67,36 @@ export class StakingPool {
 
     const ammPool = await formatAmmKeysById(ammPoolId.toBase58(), this.client.connection);
 
+    // const createStakingLpWalletInstructions = await getCreateAccountInstructions(
+    //   this.client.connection,
+    //   payer,
+    //   stakingInfo.lpMint,
+    //   stakingSignerPda,
+    //   stakingLpWalletKeypair,
+    //   "confirmed",
+    //   this.client.memechanProgram.programId,
+    // );
+
+    // tx.add(...createStakingLpWalletInstructions);
+
+    
     const stakingSignerPda = this.findSignerPda();
     const stakingLpWalletKeypair = Keypair.generate();
-    const stakingLpWallet = stakingLpWalletKeypair.publicKey;
+    const stakingLpWalletPublicKey = stakingLpWalletKeypair.publicKey;
 
-    const createStakingLpWalletInstructions = await getCreateAccountInstructions(
+    console.log("stakingLpWalletPublicKey: ", stakingLpWalletPublicKey);
+
+    const stakingLpWallet = await createAccount(
       this.client.connection,
       payer,
       stakingInfo.lpMint,
       stakingSignerPda,
       stakingLpWalletKeypair,
-      "confirmed",
-      this.client.memechanProgram.programId,
-    );
+      { 
+        commitment: "confirmed",
+        skipPreflight: true,
+      });
 
-    tx.add(...createStakingLpWalletInstructions);
 
     const addFeesInstruction = await this.client.memechanProgram.methods
       .addFees()
@@ -107,7 +122,8 @@ export class StakingPool {
         raydiumQuoteVault: ammPool.quoteVault,
         signer: payer.publicKey,
         targetOrders: ammPool.targetOrders,
-        stakingLpWallet: stakingLpWallet
+        stakingLpWallet: stakingLpWallet,
+        raydiumProgram: ammPool.programId,
       })
       .instruction();
 
@@ -128,6 +144,7 @@ export class StakingPool {
     await retry({
       fn: sendAndConfirmAddFeesTransaction,
       functionName: "addFees",
+      retries: 1
     });
   }
 
