@@ -1,6 +1,8 @@
 import { BN } from "@coral-xyz/anchor";
-import { MemeTicket } from "../memeticket/MemeTicket";
 import { Keypair, PublicKey, Transaction } from "@solana/web3.js";
+import { MemeTicket } from "../memeticket/MemeTicket";
+import { MemeTicketFields } from "../schema/codegen/accounts";
+import { VestingConfig } from "../schema/codegen/types";
 
 export interface UnstakeArgs {
   ticket: MemeTicket;
@@ -8,11 +10,16 @@ export interface UnstakeArgs {
   user: Keypair;
 }
 
+export type GetAvailableUnstakeAmountArgs = {
+  tickets: MemeTicketFields[];
+  stakingPoolVestingConfig: VestingConfig;
+};
+
 export type GetUnstakeTransactionArgs = UnstakeArgs & { transaction?: Transaction };
 
-export type AddFeesArgs = GetAddFeesTransactionArgs 
+export type AddFeesArgs = GetAddFeesTransactionArgs;
 
-export type GetAddFeesTransactionArgs = { transaction?: Transaction, ammPoolId: PublicKey, payer: Keypair  };
+export type GetAddFeesTransactionArgs = { transaction?: Transaction; ammPoolId: PublicKey; payer: Keypair };
 
 export interface WithdrawFeesArgs {
   ticket: MemeTicket;
