@@ -3,6 +3,9 @@ import { TOKEN_PROGRAM_ID, createInitializeAccountInstruction } from '@solana/sp
 import { Connection, PublicKey, SYSVAR_RENT_PUBKEY, SystemProgram, TransactionInstruction } from '@solana/web3.js'
 import BN from 'bn.js'
 
+//const DATA_LENGTH = 165 // original in raydium sdk
+const DATA_LENGTH = 180;
+
 function accountFlagsLayout(property = 'accountFlags') {
   const ACCOUNT_FLAGS_LAYOUT = new WideBits(property)
   ACCOUNT_FLAGS_LAYOUT.addBoolean('initialized')
@@ -169,7 +172,7 @@ export class MarketV2 extends Base {
     }
   }) {
     const ins1: TransactionInstruction[] = []
-    const accountLamports = await connection.getMinimumBalanceForRentExemption(165)
+    const accountLamports = await connection.getMinimumBalanceForRentExemption(DATA_LENGTH)
     ins1.push(
       SystemProgram.createAccountWithSeed({
         fromPubkey: wallet,
@@ -177,7 +180,7 @@ export class MarketV2 extends Base {
         seed: marketInfo.baseVault.seed,
         newAccountPubkey: marketInfo.baseVault.publicKey,
         lamports: accountLamports,
-        space: 165,
+        space: DATA_LENGTH,
         programId: TOKEN_PROGRAM_ID,
       }),
       SystemProgram.createAccountWithSeed({
@@ -186,7 +189,7 @@ export class MarketV2 extends Base {
         seed: marketInfo.quoteVault.seed,
         newAccountPubkey: marketInfo.quoteVault.publicKey,
         lamports: accountLamports,
-        space: 165,
+        space: DATA_LENGTH,
         programId: TOKEN_PROGRAM_ID,
       }),
       createInitializeAccountInstruction(marketInfo.baseVault.publicKey, marketInfo.baseMint, marketInfo.vaultOwner),

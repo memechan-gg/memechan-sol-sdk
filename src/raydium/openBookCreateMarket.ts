@@ -1,4 +1,4 @@
-import { MarketV2, Token } from "@raydium-io/raydium-sdk";
+import { Token } from "@raydium-io/raydium-sdk";
 import {
   Connection,
   Keypair,
@@ -10,6 +10,7 @@ import {
 } from "@solana/web3.js";
 import { PROGRAMIDS, makeTxVersion } from "./config";
 import { buildTxs, sendTx } from "../util";
+import { MarketV2 } from "./raydiumCreateMarket";
 
 type CreateMarketTxInput = {
   baseToken: Token;
