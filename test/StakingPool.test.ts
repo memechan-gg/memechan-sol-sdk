@@ -23,7 +23,7 @@ describe("StakingPool", () => {
   }, 30000);
 
   it.skip("swapy, golive, ammSwap, unstake", async () => {
-    const boundPool = await BoundPoolClient.slowNew({
+    const boundPool = await BoundPoolClient.new({
       admin,
       payer,
       signer: payer,
@@ -113,7 +113,7 @@ describe("StakingPool", () => {
   }, 550000);
 
   it.skip("swapy, golive, ammSwap, withdrawfees", async () => {
-    const boundPool = await BoundPoolClient.slowNew({
+    const boundPool = await BoundPoolClient.new({
       admin,
       payer,
       signer: payer,
@@ -202,7 +202,7 @@ describe("StakingPool", () => {
   }, 550000);
 
   it("swapy, golive, ammSwap, addFees", async () => {
-    const boundPool = await BoundPoolClient.slowNew({
+    const boundPool = await BoundPoolClient.new({
       admin,
       payer,
       signer: payer,

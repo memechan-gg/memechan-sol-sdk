@@ -71,7 +71,7 @@ describe("MemeTicket", () => {
   }, 220000);
 
   it.skip("merge tickets live", async () => {
-    const pool = await BoundPoolClient.slowNew({
+    const pool = await BoundPoolClient.new({
       admin,
       payer,
       signer: payer,

@@ -7,7 +7,7 @@ import { MEMECHAN_QUOTE_TOKEN } from "../src/config/config";
 
 describe("BoundPool", () => {
   it.skip("creates bound pool", async () => {
-    const boundPool = await BoundPoolClient.slowNew({
+    const boundPool = await BoundPoolClient.new({
       admin,
       payer,
       signer: payer,
@@ -34,7 +34,7 @@ describe("BoundPool", () => {
 
   it.skip("init staking pool then go live", async () => {
     console.log("payer: " + payer.publicKey.toString());
-    const pool = await BoundPoolClient.slowNew({
+    const pool = await BoundPoolClient.new({
       admin,
       payer,
       signer: payer,
