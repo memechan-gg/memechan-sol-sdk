@@ -49,8 +49,8 @@ describe("BoundPool", () => {
     const ticketId = await pool.swapY({
       payer: payer,
       user: payer,
-      memeTokensOut: new BN(10000),
-      quoteAmountIn: new BN(10000000),
+      memeTokensOut: new BN(1000*1e6),
+      quoteAmountIn: new BN(100000*1e9),
       quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
       pool: pool.id,
     });
@@ -84,7 +84,7 @@ describe("BoundPool", () => {
     console.log("ammPool: " + JSON.stringify(ammPool));
 
     console.log("golive finished. stakingPool: " + stakingPool.id.toString() + " ammPool: " + ammPool.id.toString());
-  }, 520000);
+  }, 300000);
 
   //   sleep(1000);
 
