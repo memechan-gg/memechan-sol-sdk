@@ -23,6 +23,7 @@ export const DUMMY_TOKEN_METADATA = {
   twitter: "https://twitter.com/BestTokenEver",
   telegram: "https://t.me/BestTokenEver",
   website: "https://besttokenever.com",
+  discord: "",
 };
 
 export const LIVE_BOUND_POOL_ID = new PublicKey("9pEBW3vNF7uxaPyJbATK1AdCLSxAzJyXs5bPCbuyRHhB");

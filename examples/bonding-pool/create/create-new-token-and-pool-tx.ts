@@ -1,18 +1,8 @@
 import { Transaction, sendAndConfirmTransaction } from "@solana/web3.js";
 import { BoundPoolClient } from "../../../src/bound-pool/BoundPool";
 import { MEMECHAN_QUOTE_TOKEN } from "../../../src/config/config";
-import { admin, payer, client } from "../../common";
+import { admin, payer, client, DUMMY_TOKEN_METADATA } from "../../common";
 import { getTxSize } from "../../../src/util/get-tx-size";
-
-const DUMMY_TOKEN_METADATA = {
-  name: "Best Token Ever",
-  symbol: "BTE",
-  image: "https://cf-ipfs.com/ipfs/QmVevMfxFpfgBu5kHuYUPmDMaV6pWkAn3zw5XaCXxKdaBh",
-  description: "This is the best token ever",
-  twitter: "https://twitter.com/BestTokenEver",
-  telegram: "https://t.me/BestTokenEver",
-  website: "https://besttokenever.com",
-};
 
 // yarn tsx examples/bonding-pool/create/create-new-token-and-pool-tx.ts > log.txt 2>&1
 export const createNewTokenAndPoolTx = async () => {

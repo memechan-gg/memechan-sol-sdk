@@ -23,4 +23,5 @@ export const DUMMY_TOKEN_METADATA = {
   twitter: "https://twitter.com/BestTokenEver",
   telegram: "https://t.me/BestTokenEver",
   website: "https://besttokenever.com",
+  discord: "",
 };
