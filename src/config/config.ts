@@ -47,3 +47,5 @@ export const DECIMALS_ALPHA = 1_000_000; // consider increase
 export const DECIMALS_BETA = 1_000_000; // consider increase
 
 export const MAX_TRANSACTION_SIZE = 1232;
+
+export const ADMIN_PUB_KEY = new PublicKey("8SvkUtJZCyJwSQGkiszwcRcPv7c8pPSr8GVEppGNN7DV");
