@@ -219,8 +219,8 @@ describe("StakingPool", () => {
     const ticketId = await boundPool.swapY({
       payer: payer,
       user: payer,
-      memeTokensOut: new BN(100),
-      quoteAmountIn: new BN(1000),
+      memeTokensOut: new BN(100*1e6),
+      quoteAmountIn: new BN(5000*1e9),
       quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
       pool: boundPool.id,
     });
@@ -231,8 +231,8 @@ describe("StakingPool", () => {
     const ticketId2 = await boundPool.swapY({
       payer: payer,
       user: payer,
-      memeTokensOut: new BN(1000),
-      quoteAmountIn: new BN(100000),
+      memeTokensOut: new BN(4000*1e6),
+      quoteAmountIn: new BN(40000*1e9),
       quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
       pool: boundPool.id,
     });
