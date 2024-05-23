@@ -23,6 +23,8 @@ type CreateMarketTxInput = {
 export async function createMarket(input: CreateMarketTxInput) {
   const { transactions: createMarketTransactions, marketId } = await getCreateMarketTransactions(input);
 
+  console.log("createMarketTransactions:", JSON.stringify(createMarketTransactions));
+
   return {
     txids: await sendTx(input.connection, input.signer, createMarketTransactions, {
       skipPreflight: true,
