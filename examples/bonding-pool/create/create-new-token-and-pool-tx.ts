@@ -1,7 +1,8 @@
-import { sendAndConfirmTransaction } from "@solana/web3.js";
+import { Transaction, sendAndConfirmTransaction } from "@solana/web3.js";
 import { BoundPoolClient } from "../../../src/bound-pool/BoundPool";
 import { MEMECHAN_QUOTE_TOKEN } from "../../../src/config/config";
 import { admin, payer, client } from "../../common";
+import { getTxSize } from "../../../src/util/get-tx-size";
 
 const DUMMY_TOKEN_METADATA = {
   name: "Best Token Ever",
@@ -28,21 +29,24 @@ export const createNewTokenAndPoolTx = async () => {
   const memeMint = memeMintKeypair.publicKey;
 
   try {
-    const createPoolSignature = await sendAndConfirmTransaction(
+    const transaction = new Transaction().add(
+      ...createPoolTransaction.instructions,
+      ...createTokenTransaction.instructions,
+    );
+
+    const size = getTxSize(transaction, payer.publicKey);
+    console.debug("createPoolAndTokenSignature size: ", size);
+
+    const createPoolAndTokenSignature = await sendAndConfirmTransaction(
       client.connection,
-      createPoolTransaction,
+      transaction,
       [payer, memeMintKeypair, poolQuoteVaultId, launchVaultId],
       {
         commitment: "confirmed",
-        // skipPreflight: true,
+        skipPreflight: true,
       },
     );
-    console.log("createPoolSignature:", createPoolSignature);
-
-    const createTokenSignature = await sendAndConfirmTransaction(client.connection, createTokenTransaction, [payer], {
-      commitment: "confirmed",
-    });
-    console.log("createTokenSignature:", createTokenSignature);
+    console.log("createPoolAndTokenSignature:", createPoolAndTokenSignature);
 
     const id = BoundPoolClient.findBoundPoolPda(memeMint, MEMECHAN_QUOTE_TOKEN.mint, client.memechanProgram.programId);
     console.debug("id: ", id);
