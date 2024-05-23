@@ -22,7 +22,7 @@ describe("StakingPool", () => {
     }*/
   }, 30000);
 
-  it.skip("swapy, golive, ammSwap, unstake", async () => {
+  it("swapy, golive, ammSwap, unstake", async () => {
     const boundPool = await BoundPoolClient.new({
       admin,
       payer,
@@ -40,8 +40,8 @@ describe("StakingPool", () => {
     const ticketId = await boundPool.swapY({
       payer: payer,
       user: payer,
-      memeTokensOut: new BN(100),
-      quoteAmountIn: new BN(1000),
+      memeTokensOut: new BN(100*1e6),
+      quoteAmountIn: new BN(5000*1e9),
       quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
       pool: boundPool.id,
     });
@@ -52,8 +52,8 @@ describe("StakingPool", () => {
     const ticketId2 = await boundPool.swapY({
       payer: payer,
       user: payer,
-      memeTokensOut: new BN(1000),
-      quoteAmountIn: new BN(100000),
+      memeTokensOut: new BN(100*1e6),
+      quoteAmountIn: new BN(5000*1e9),
       quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
       pool: boundPool.id,
     });
@@ -65,7 +65,7 @@ describe("StakingPool", () => {
 
     console.log("boundPoolInfo:", boundPoolInfo);
 
-    const { stakingMemeVault, stakingQuoteVault } = await boundPool.slowInitStakingPool({
+    const { stakingMemeVault, stakingQuoteVault } = await boundPool.initStakingPool({
       payer: payer,
       user: payer,
       boundPoolInfo,
@@ -130,8 +130,8 @@ describe("StakingPool", () => {
     const ticketId = await boundPool.swapY({
       payer: payer,
       user: payer,
-      memeTokensOut: new BN(100),
-      quoteAmountIn: new BN(1000),
+      memeTokensOut: new BN(100*1e6),
+      quoteAmountIn: new BN(5000*1e9),
       quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
       pool: boundPool.id,
     });
@@ -142,8 +142,8 @@ describe("StakingPool", () => {
     const ticketId2 = await boundPool.swapY({
       payer: payer,
       user: payer,
-      memeTokensOut: new BN(1000),
-      quoteAmountIn: new BN(100000),
+      memeTokensOut: new BN(100*1e6),
+      quoteAmountIn: new BN(5000*1e9),
       quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
       pool: boundPool.id,
     });
@@ -155,7 +155,7 @@ describe("StakingPool", () => {
 
     console.log("boundPoolInfo:", boundPoolInfo);
 
-    const { stakingMemeVault, stakingQuoteVault } = await boundPool.slowInitStakingPool({
+    const { stakingMemeVault, stakingQuoteVault } = await boundPool.initStakingPool({
       payer: payer,
       user: payer,
       boundPoolInfo,
@@ -244,7 +244,7 @@ describe("StakingPool", () => {
 
     console.log("boundPoolInfo:", boundPoolInfo);
 
-    const { stakingMemeVault, stakingQuoteVault } = await boundPool.slowInitStakingPool({
+    const { stakingMemeVault, stakingQuoteVault } = await boundPool.initStakingPool({
       payer: payer,
       user: payer,
       boundPoolInfo,

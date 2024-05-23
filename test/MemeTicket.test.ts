@@ -125,7 +125,7 @@ describe("MemeTicket", () => {
 
     console.log("boundPoolInfo:", boundPoolInfo);
 
-    const { stakingMemeVault, stakingQuoteVault } = await pool.slowInitStakingPool({
+    const { stakingMemeVault, stakingQuoteVault } = await pool.initStakingPool({
       payer: payer,
       user: payer,
       boundPoolInfo,
