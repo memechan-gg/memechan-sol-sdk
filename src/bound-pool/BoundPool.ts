@@ -71,6 +71,7 @@ import { normalizeInputCoinAmount } from "../util/trading/normalizeInputCoinAmou
 import { deductSlippage } from "../util/trading/deductSlippage";
 import { getSendAndConfirmTransactionMethod } from "../util/getSendAndConfirmTransactionMethod";
 import { sendTx } from "../util";
+import { getTxSize } from "../util/get-tx-size";
 
 export class BoundPoolClient {
   private constructor(
@@ -319,23 +320,24 @@ export class BoundPoolClient {
     const poolQuoteVault = poolQuoteVaultId.publicKey;
     const launchVault = launchVaultId.publicKey;
 
-    // TODO: We can remove 2 calls here and combine it into one, once we'll have lookup table implementation on smart-contract side
-    const createPoolSignature = await sendAndConfirmTransaction(
+    const transaction = new Transaction().add(
+      ...createPoolTransaction.instructions,
+      ...createTokenTransaction.instructions,
+    );
+
+    const size = getTxSize(transaction, payer.publicKey);
+    console.debug("createPoolAndTokenSignature size: ", size);
+
+    const createPoolAndTokenSignature = await sendAndConfirmTransaction(
       connection,
-      createPoolTransaction,
+      transaction,
       [payer, memeMintKeypair, poolQuoteVaultId, launchVaultId],
       {
         commitment: "confirmed",
         skipPreflight: true,
       },
     );
-    console.log("Create new pool signature:", createPoolSignature);
-
-    const createTokenSignature = await sendAndConfirmTransaction(connection, createTokenTransaction, [payer], {
-      commitment: "confirmed",
-      skipPreflight: true,
-    });
-    console.log("Create new token signature:", createTokenSignature);
+    console.log("createPoolAndTokenSignature:", createPoolAndTokenSignature);
 
     const id = this.findBoundPoolPda(memeMint, quoteToken.mint, memechanProgram.programId);
 
@@ -1246,7 +1248,7 @@ export class BoundPoolClient {
           client: this.client,
           poolAccountAddressId: stakingId,
         }),
-        await formatAmmKeysById(ammId.toBase58(), this.client.connection)
+        await formatAmmKeysById(ammId.toBase58(), this.client.connection),
       ];
     } catch (error) {
       if (error instanceof AnchorError) {
