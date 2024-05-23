@@ -137,7 +137,7 @@ export class StakingPool {
 
     const sendAndConfirmAddFeesTransaction = getSendAndConfirmTransactionMethod({
       connection: this.client.connection,
-      signers: [payer, stakingLpWalletKeypair],
+      signers: [payer],
       transaction: addFeesTransaction,
     });
 
