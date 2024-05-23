@@ -1,24 +1,26 @@
 import { Program } from "@coral-xyz/anchor";
 import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
-import { AccountMeta, Keypair, PublicKey, Transaction } from "@solana/web3.js";
+import { AccountMeta, Keypair, PublicKey, Transaction, sendAndConfirmTransaction } from "@solana/web3.js";
+import BigNumber from "bignumber.js";
 import { MemechanClient } from "../MemechanClient";
 import { BoundPoolClient } from "../bound-pool/BoundPool";
+import { MEMECHAN_QUOTE_MINT } from "../config/config";
 import { MemeTicket } from "../memeticket/MemeTicket";
+import { formatAmmKeysById } from "../raydium/formatAmmKeysById";
 import { MemeTicketFields } from "../schema/codegen/accounts";
 import { MemechanSol } from "../schema/types/memechan_sol";
+import { getCreateAccountInstructions } from "../util/getCreateAccountInstruction";
+import { getSendAndConfirmTransactionMethod } from "../util/getSendAndConfirmTransactionMethod";
+import { retry } from "../util/retry";
 import {
   AddFeesArgs,
   GetAddFeesTransactionArgs,
+  GetAvailableUnstakeAmountArgs,
   GetUnstakeTransactionArgs,
   GetWithdrawFeesTransactionArgs,
   UnstakeArgs,
   WithdrawFeesArgs,
 } from "./types";
-import { getSendAndConfirmTransactionMethod } from "../util/getSendAndConfirmTransactionMethod";
-import { getCreateAccountInstructions } from "../util/getCreateAccountInstruction";
-import { retry } from "../util/retry";
-import { MEMECHAN_QUOTE_MINT } from "../config/config";
-import { formatAmmKeysById } from "../raydium/formatAmmKeysById";
 
 export class StakingPool {
   constructor(
@@ -41,7 +43,7 @@ export class StakingPool {
   }) {
     const stakingPoolObjectData = await client.memechanProgram.account.stakingPool.fetch(poolAccountAddressId);
 
-    console.log("stakingPoolObjectData:", stakingPoolObjectData);
+    // console.log("stakingPoolObjectData:", stakingPoolObjectData);
 
     const boundClientInstance = new StakingPool(
       poolAccountAddressId,
@@ -174,18 +176,65 @@ export class StakingPool {
   ): Promise<{ memeAccountPublicKey: PublicKey; quoteAccountPublicKey: PublicKey }> {
     const { memeAccountKeypair, transaction, quoteAccountKeypair } = await this.getUnstakeTransaction(args);
 
-    const sendAndConfirmUnstakeTransaction = getSendAndConfirmTransactionMethod({
-      connection: this.client.connection,
-      signers: [args.user, memeAccountKeypair, quoteAccountKeypair],
+    const signature = await sendAndConfirmTransaction(
+      this.client.connection,
       transaction,
-    });
-
-    await retry({
-      fn: sendAndConfirmUnstakeTransaction,
-      functionName: "unstake",
-    });
+      [args.user, memeAccountKeypair, quoteAccountKeypair],
+      { commitment: "confirmed", skipPreflight: true },
+    );
+    console.log("unstake signature:", signature);
 
     return { memeAccountPublicKey: memeAccountKeypair.publicKey, quoteAccountPublicKey: quoteAccountKeypair.publicKey };
+  }
+
+  public async getAvailableUnstakeAmount({
+    tickets,
+    stakingPoolVestingConfig,
+  }: GetAvailableUnstakeAmountArgs): Promise<string> {
+    const { cliffTs, endTs, startTs } = stakingPoolVestingConfig;
+    const currentTimeInMs = Date.now();
+    const startTsInMs = new BigNumber(startTs.toString()).multipliedBy(1_000);
+    const cliffTsInMs = new BigNumber(cliffTs.toString()).multipliedBy(1_000);
+    const endTsInMs = new BigNumber(endTs.toString()).multipliedBy(1_000);
+    console.log("currentTimeInMs:", currentTimeInMs.toString());
+    console.log("startTsInMs:", startTsInMs.toString());
+    console.log("cliffTsInMs:", cliffTsInMs.toString());
+    console.log("endTsInMs:", endTsInMs.toString());
+
+    // If linear unlock didn't start yet, return 0
+    if (cliffTsInMs.gt(currentTimeInMs)) {
+      return "0";
+    }
+
+    const stakedAmount = tickets.reduce((staked, { vesting: { notional, released } }) => {
+      const notionalString = notional.toString();
+      const releasedString = released.toString();
+      const rest = new BigNumber(notionalString).minus(releasedString);
+
+      return staked.plus(rest);
+    }, new BigNumber(0));
+    console.log("stakedAmount:", stakedAmount.toString());
+
+    const unlockDurationInMs = endTsInMs.minus(cliffTsInMs);
+    console.log("unlockDurationInMs:", unlockDurationInMs.toString());
+    const unlockProgressInMs = new BigNumber(currentTimeInMs).minus(cliffTsInMs);
+    console.log("unlockProgressInMs:", unlockProgressInMs.toString());
+    const unlockProgressInAbsolutePercent = new BigNumber(unlockProgressInMs).div(unlockDurationInMs).toNumber();
+    console.log("unlockProgressInAbsolutePercent:", unlockProgressInAbsolutePercent);
+
+    // Extra safety net in case unlock progress is less than zero
+    const unlockProgressWithLowerBound = Math.max(unlockProgressInAbsolutePercent, 0);
+    console.log("unlockProgressWithLowerBound:", unlockProgressWithLowerBound);
+
+    // Calculated unlock progress can be greater than 1, when it is already over
+    const unlockProgressWithUpperBound = Math.min(unlockProgressWithLowerBound, 1);
+    console.log("unlockProgressWithUpperBound:", unlockProgressWithUpperBound);
+
+    // Unstake amount must be bignumerish, so `toFixed(0)`
+    const availableUnstakeAmount = stakedAmount.multipliedBy(unlockProgressWithUpperBound).toFixed(0);
+    console.log("availableUnstakeAmount:", availableUnstakeAmount.toString());
+
+    return availableUnstakeAmount;
   }
 
   public async getWithdrawFeesTransaction(args: GetWithdrawFeesTransactionArgs): Promise<{
@@ -257,6 +306,24 @@ export class StakingPool {
     });
 
     return { memeAccountPublicKey: memeAccountKeypair.publicKey, quoteAccountPublicKey: quoteAccountKeypair.publicKey };
+  }
+
+  public async getAvailableWithdrawFeesAmount(
+    args: WithdrawFeesArgs,
+  ) /*: Promise<{ availableAmount: number; error?: TransactionError; logs?: string[] | null }>*/ {
+    const { memeAccountKeypair, transaction, quoteAccountKeypair } = await this.getWithdrawFeesTransaction(args);
+
+    const result = await this.client.connection.simulateTransaction(
+      transaction,
+      [args.user, memeAccountKeypair, quoteAccountKeypair],
+      true,
+    );
+
+    if (result.value.err) {
+      return { availableAmount: 0, error: result.value.err, logs: result.value.logs };
+    }
+
+    return result;
   }
 
   public async getHoldersCount() {
