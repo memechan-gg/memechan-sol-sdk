@@ -4,7 +4,6 @@ import {
   Connection,
   Keypair,
   PublicKey,
-  Signer,
   SystemProgram,
   Transaction,
   TransactionInstruction,
@@ -12,7 +11,7 @@ import {
 
 export async function getCreateAccountInstructions(
   connection: Connection,
-  payer: Signer,
+  payer: PublicKey,
   mint: PublicKey,
   owner: PublicKey,
   keypair: Keypair,
@@ -26,7 +25,7 @@ export async function getCreateAccountInstructions(
 
   const transaction = new Transaction().add(
     SystemProgram.createAccount({
-      fromPubkey: payer.publicKey,
+      fromPubkey: payer,
       newAccountPubkey: keypair.publicKey,
       space,
       lamports,
