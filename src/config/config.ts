@@ -20,6 +20,8 @@ export const BE_REGION = "us-east-1";
  */
 export const MEMECHAN_PROGRAM_ID = "3dKJG4mqodZQxDsmDbVsnPMVxSiBQz3EsA73cai41J3a";
 
+export const SLERF_MINT = new PublicKey("7BgBvyjrZX1YKz4oh9mjb8ZScatkkwb8DzFx7LoiVkM3");
+
 export const MEMECHAN_QUOTE_MINT = new PublicKey("HX2pp5za2aBkrA5X5iTioZXcrpWb2q9DiaeWPW3qKMaw");
 export const MEMECHAN_TARGET_CONFIG = new PublicKey("6tmbgNyQXPTZyDcuxMVqDVetbwNJLWgpH4rvfH7KYQoi");
 export const MEMECHAN_QUOTE_TOKEN_DECIMALS = 9; // current devnet quote token decimals
