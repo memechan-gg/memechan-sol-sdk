@@ -14,6 +14,6 @@ export * from "./tx-parsing/parsers/swap-x-parser";
 export * from "./tx-parsing/parsers/swap-y-parser";
 export * from "./tx-parsing/parsers/create-metadata-parser";
 export * from "./bound-pool/BoundPool";
-
+export * from './schema/codegen/accounts/BoundPool';
 // Utils
 export * from "./util/wallet/NoWalletAdapter";
