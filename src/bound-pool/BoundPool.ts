@@ -183,7 +183,6 @@ export class BoundPoolClient {
     const {
       admin,
       payer,
-      signer,
       client,
       quoteToken,
       transaction = new Transaction(),
@@ -275,7 +274,7 @@ export class BoundPoolClient {
         memeMint: memeMint,
         pool: id,
         poolSigner: poolSigner,
-        sender: signer.publicKey,
+        sender: payer,
         quoteMint: quoteToken.mint,
         tokenProgram: TOKEN_PROGRAM_ID,
         systemProgram: SystemProgram.programId,
@@ -344,7 +343,7 @@ export class BoundPoolClient {
   }
 
   public static async slowNew(args: BoundPoolArgs): Promise<BoundPoolClient> {
-    const { admin, payer, signer, client, quoteToken } = args;
+    const { admin, payer, client, quoteToken } = args;
     const { connection, memechanProgram } = client;
 
     const memeMintKeypair = Keypair.generate();
@@ -397,13 +396,13 @@ export class BoundPoolClient {
         memeMint: memeMint,
         pool: id,
         poolSigner: poolSigner,
-        sender: signer.publicKey,
+        sender: payer.publicKey,
         quoteMint: quoteToken.mint,
         tokenProgram: TOKEN_PROGRAM_ID,
         systemProgram: SystemProgram.programId,
         targetConfig: MEMECHAN_TARGET_CONFIG,
       })
-      .signers([signer])
+      .signers([payer])
       .rpc({ skipPreflight: true });
 
     console.log("new pool tx result: " + newPoolTxDigest);

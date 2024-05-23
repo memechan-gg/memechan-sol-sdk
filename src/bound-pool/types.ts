@@ -77,7 +77,6 @@ export type GetInitStakingPoolTransactionArgs = Omit<InitStakingPoolArgs, "user"
 export interface BoundPoolArgs {
   admin: PublicKey;
   payer: Signer;
-  signer: Keypair;
   client: MemechanClient;
   quoteToken: Token;
   tokenMetadata: TokenMetadata;

@@ -20,7 +20,6 @@ export const createNewTokenAndPoolTx = async () => {
     await BoundPoolClient.getCreateNewBondingPoolAndTokenTransaction({
       admin,
       payer: payer.publicKey,
-      signer: payer,
       client,
       quoteToken: MEMECHAN_QUOTE_TOKEN,
       tokenMetadata: DUMMY_TOKEN_METADATA,

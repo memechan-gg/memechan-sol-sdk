@@ -10,7 +10,6 @@ describe("BoundPool", () => {
     const boundPool = await BoundPoolClient.slowNew({
       admin,
       payer,
-      signer: payer,
       client,
       quoteToken: MEMECHAN_QUOTE_TOKEN,
       tokenMetadata: DUMMY_TOKEN_METADATA,
@@ -37,7 +36,6 @@ describe("BoundPool", () => {
     const pool = await BoundPoolClient.slowNew({
       admin,
       payer,
-      signer: payer,
       client,
       quoteToken: MEMECHAN_QUOTE_TOKEN,
       tokenMetadata: DUMMY_TOKEN_METADATA,
@@ -72,7 +70,7 @@ describe("BoundPool", () => {
 
     await sleep(2000);
 
-    const [stakingPool, ammPool ] = await pool.goLive({
+    const [stakingPool, ammPool] = await pool.goLive({
       payer: payer,
       user: payer,
       boundPoolInfo,

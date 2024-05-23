@@ -17,7 +17,6 @@ export const createNewTokenAndPoolSlow = async () => {
   const boundPool = await BoundPoolClient.slowNew({
     admin,
     payer,
-    signer: payer,
     client,
     quoteToken: MEMECHAN_QUOTE_TOKEN,
     tokenMetadata: DUMMY_TOKEN_METADATA,
