@@ -715,6 +715,11 @@ export type MemechanSol = {
           "isSigner": false
         },
         {
+          "name": "raydiumProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "marketProgramId",
           "isMut": false,
           "isSigner": false
@@ -2894,6 +2899,11 @@ export const IDL: MemechanSol = {
         },
         {
           "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "raydiumProgram",
           "isMut": false,
           "isSigner": false
         },
