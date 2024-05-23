@@ -8,7 +8,10 @@ import { uploadMetadataToIpfs } from "./uploadMetadataToIpfs";
 const TOKEN_METADATA_PROGRAM_ID = new PublicKey("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s");
 
 export async function createMetadata(client: MemechanClient, input: CreateMetadataInfo): Promise<string> {
-  const createMetadataTransaction = await getCreateMetadataTransaction(client, input);
+  const createMetadataTransaction = await getCreateMetadataTransaction(client, {
+    ...input,
+    payer: input.payer.publicKey,
+  });
 
   const signature = await sendAndConfirmTransaction(client.connection, createMetadataTransaction, [input.payer], {
     skipPreflight: true,
@@ -21,7 +24,7 @@ export async function createMetadata(client: MemechanClient, input: CreateMetada
 
 export async function getCreateMetadataTransaction(
   client: MemechanClient,
-  input: CreateMetadataInfo,
+  input: Omit<CreateMetadataInfo, "payer"> & { payer: PublicKey },
 ): Promise<Transaction> {
   const metadata = input.metadata;
   const metadataUri = await uploadMetadataToIpfs(metadata);
@@ -34,7 +37,7 @@ export async function getCreateMetadataTransaction(
       pool: input.poolId,
       poolSigner: input.poolSigner,
       memeMplMetadata: pda,
-      sender: input.payer.publicKey,
+      sender: input.payer,
       rent: SYSVAR_RENT_PUBKEY,
       memeMint: input.mint,
       metadataProgram: TOKEN_METADATA_PROGRAM_ID,

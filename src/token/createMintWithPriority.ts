@@ -26,7 +26,7 @@ export async function createMintWithPriority(
 ): Promise<PublicKey> {
   const transaction = await getCreateMintWithPriorityTransaction(
     connection,
-    payer,
+    payer.publicKey,
     mintAuthority,
     freezeAuthority,
     decimals,
