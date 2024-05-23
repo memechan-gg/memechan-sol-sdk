@@ -3,8 +3,7 @@ import { TOKEN_PROGRAM_ID, createInitializeAccountInstruction } from '@solana/sp
 import { Connection, PublicKey, SYSVAR_RENT_PUBKEY, SystemProgram, TransactionInstruction } from '@solana/web3.js'
 import BN from 'bn.js'
 
-//const DATA_LENGTH = 165 // original in raydium sdk
-const DATA_LENGTH = 180;
+const ADDITIONAL_LAMPORTS = 20;
 
 function accountFlagsLayout(property = 'accountFlags') {
   const ACCOUNT_FLAGS_LAYOUT = new WideBits(property)
@@ -172,7 +171,7 @@ export class MarketV2 extends Base {
     }
   }) {
     const ins1: TransactionInstruction[] = []
-    const accountLamports = await connection.getMinimumBalanceForRentExemption(DATA_LENGTH)
+    const accountLamports = await connection.getMinimumBalanceForRentExemption(165 + ADDITIONAL_LAMPORTS)
     ins1.push(
       SystemProgram.createAccountWithSeed({
         fromPubkey: wallet,
@@ -180,7 +179,7 @@ export class MarketV2 extends Base {
         seed: marketInfo.baseVault.seed,
         newAccountPubkey: marketInfo.baseVault.publicKey,
         lamports: accountLamports,
-        space: DATA_LENGTH,
+        space: 165,
         programId: TOKEN_PROGRAM_ID,
       }),
       SystemProgram.createAccountWithSeed({
@@ -189,7 +188,7 @@ export class MarketV2 extends Base {
         seed: marketInfo.quoteVault.seed,
         newAccountPubkey: marketInfo.quoteVault.publicKey,
         lamports: accountLamports,
-        space: DATA_LENGTH,
+        space: 165,
         programId: TOKEN_PROGRAM_ID,
       }),
       createInitializeAccountInstruction(marketInfo.baseVault.publicKey, marketInfo.baseMint, marketInfo.vaultOwner),
@@ -203,7 +202,7 @@ export class MarketV2 extends Base {
         basePubkey: wallet,
         seed: marketInfo.id.seed,
         newAccountPubkey: marketInfo.id.publicKey,
-        lamports: await connection.getMinimumBalanceForRentExemption(MARKET_STATE_LAYOUT_V2.span),
+        lamports: await connection.getMinimumBalanceForRentExemption(MARKET_STATE_LAYOUT_V2.span + ADDITIONAL_LAMPORTS),
         space: MARKET_STATE_LAYOUT_V2.span,
         programId: marketInfo.programId,
       }),
@@ -212,7 +211,7 @@ export class MarketV2 extends Base {
         basePubkey: wallet,
         seed: marketInfo.requestQueue.seed,
         newAccountPubkey: marketInfo.requestQueue.publicKey,
-        lamports: await connection.getMinimumBalanceForRentExemption(5120 + 12),
+        lamports: await connection.getMinimumBalanceForRentExemption(5120 + 12 + ADDITIONAL_LAMPORTS),
         space: 5120 + 12,
         programId: marketInfo.programId,
       }),
@@ -221,7 +220,7 @@ export class MarketV2 extends Base {
         basePubkey: wallet,
         seed: marketInfo.eventQueue.seed,
         newAccountPubkey: marketInfo.eventQueue.publicKey,
-        lamports: await connection.getMinimumBalanceForRentExemption(262144 + 12),
+        lamports: await connection.getMinimumBalanceForRentExemption(262144 + 12 + ADDITIONAL_LAMPORTS),
         space: 262144 + 12,
         programId: marketInfo.programId,
       }),
@@ -230,7 +229,7 @@ export class MarketV2 extends Base {
         basePubkey: wallet,
         seed: marketInfo.bids.seed,
         newAccountPubkey: marketInfo.bids.publicKey,
-        lamports: await connection.getMinimumBalanceForRentExemption(65536 + 12),
+        lamports: await connection.getMinimumBalanceForRentExemption(65536 + 12 + ADDITIONAL_LAMPORTS),
         space: 65536 + 12,
         programId: marketInfo.programId,
       }),
@@ -239,7 +238,7 @@ export class MarketV2 extends Base {
         basePubkey: wallet,
         seed: marketInfo.asks.seed,
         newAccountPubkey: marketInfo.asks.publicKey,
-        lamports: await connection.getMinimumBalanceForRentExemption(65536 + 12),
+        lamports: await connection.getMinimumBalanceForRentExemption(65536 + 12 + ADDITIONAL_LAMPORTS),
         space: 65536 + 12,
         programId: marketInfo.programId,
       }),
