@@ -45,6 +45,8 @@ export async function getCreateMarketTransactions(
     makeTxVersion
   });
 
+  console.log("createMarketInstruments:", createMarketInstruments);
+
   const transactions = await buildTxs(input.connection, input.signer, createMarketInstruments.innerTransactions);
 
   return { transactions, marketId: createMarketInstruments.address.marketId };
