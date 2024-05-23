@@ -18,7 +18,7 @@ export const createNewTokenAndPoolTx = async () => {
   const { createPoolTransaction, createTokenTransaction, memeMintKeypair, poolQuoteVaultId, launchVaultId } =
     await BoundPoolClient.getCreateNewBondingPoolAndTokenTransaction({
       admin,
-      payer,
+      payer: payer.publicKey,
       signer: payer,
       client,
       quoteToken: MEMECHAN_QUOTE_TOKEN,

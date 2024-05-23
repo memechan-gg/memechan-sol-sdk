@@ -1,13 +1,5 @@
 import { MINT_SIZE, TOKEN_PROGRAM_ID, createInitializeMintInstruction } from "@solana/spl-token";
-import {
-  ComputeBudgetProgram,
-  Connection,
-  Keypair,
-  PublicKey,
-  Signer,
-  SystemProgram,
-  Transaction,
-} from "@solana/web3.js";
+import { ComputeBudgetProgram, Connection, Keypair, PublicKey, SystemProgram, Transaction } from "@solana/web3.js";
 
 /**
  * Get a transaction for creating and initializing a new mint
@@ -23,7 +15,7 @@ import {
  */
 export async function getCreateMintWithPriorityTransaction(
   connection: Connection,
-  payer: Signer,
+  payer: PublicKey,
   mintAuthority: PublicKey,
   freezeAuthority: PublicKey | null,
   decimals: number,
@@ -40,7 +32,7 @@ export async function getCreateMintWithPriorityTransaction(
   console.log("mintAuthority: " + mintAuthority.toBase58());
 
   const createMintAccountInstruction = SystemProgram.createAccount({
-    fromPubkey: payer.publicKey,
+    fromPubkey: payer,
     newAccountPubkey: keypair.publicKey,
     lamports: await connection.getMinimumBalanceForRentExemption(MINT_SIZE),
     space: MINT_SIZE,

@@ -228,7 +228,7 @@ export class BoundPoolClient {
       // If the quote account for the admin doesn't exist, add an instruction to create it
       if (!adminQuoteVault) {
         const associatedTransactionInstruction = createAssociatedTokenAccountInstruction(
-          payer.publicKey,
+          payer,
           associatedToken,
           admin,
           quoteToken.mint,
@@ -313,7 +313,7 @@ export class BoundPoolClient {
     const { connection, memechanProgram } = client;
 
     const { createPoolTransaction, createTokenTransaction, memeMintKeypair, poolQuoteVaultId, launchVaultId } =
-      await this.getCreateNewBondingPoolAndTokenTransaction(args);
+      await this.getCreateNewBondingPoolAndTokenTransaction({ ...args, payer: payer.publicKey });
 
     const memeMint = memeMintKeypair.publicKey;
     const poolQuoteVault = poolQuoteVaultId.publicKey;
@@ -786,7 +786,7 @@ export class BoundPoolClient {
 
     const methodArgs = {
       pool,
-      signer: user.publicKey,
+      signer: user,
       boundPoolSignerPda: this.findSignerPda(),
       memeTicket: adminTicketId,
       poolMemeVault: boundPoolInfo.memeReserve.vault,
@@ -897,7 +897,10 @@ export class BoundPoolClient {
   }
 
   public async initStakingPool(input: InitStakingPoolArgs): Promise<InitStakingPoolResult> {
-    const { transaction, stakingMemeVaultId, stakingQuoteVaultId } = await this.getInitStakingPoolTransaction(input);
+    const { transaction, stakingMemeVaultId, stakingQuoteVaultId } = await this.getInitStakingPoolTransaction({
+      ...input,
+      user: input.user.publicKey,
+    });
     const stakingMemeVault = stakingMemeVaultId.publicKey;
     const stakingQuoteVault = stakingQuoteVaultId.publicKey;
 
@@ -1246,7 +1249,7 @@ export class BoundPoolClient {
           client: this.client,
           poolAccountAddressId: stakingId,
         }),
-        await formatAmmKeysById(ammId.toBase58(), this.client.connection)
+        await formatAmmKeysById(ammId.toBase58(), this.client.connection),
       ];
     } catch (error) {
       if (error instanceof AnchorError) {
