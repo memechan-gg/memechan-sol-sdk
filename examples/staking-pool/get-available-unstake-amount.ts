@@ -9,6 +9,7 @@ export const getAvailableUnstakeAmount = async () => {
   const boundPoolAddress = new PublicKey("B36EwUzBiZqLeKTwJrwPNbwfJaPRwfKcbCyHPLix3xF9");
   const stakingPoolAddress = new PublicKey("EeckpiLcg6FZLkjSR31wf9Z8VZUhyWncB5x4Hks5A8ve");
 
+  // Get staking pool
   const stakingPool = await StakingPool.fromStakingPoolId({ client, poolAccountAddressId: stakingPoolAddress });
   const fetchedStakingPool = await CodegenStakingPool.fetch(connection, stakingPoolAddress);
   console.log("fetchedStakingPool:", fetchedStakingPool?.toJSON());
@@ -17,9 +18,11 @@ export const getAvailableUnstakeAmount = async () => {
     throw new Error("[getAvailableUnstakeAmount] No staking pool found.");
   }
 
+  // Get all user tickets
   const { tickets } = await MemeTicket.fetchAvailableTicketsByUser(boundPoolAddress, client, payer.publicKey);
   console.log("tickets:", tickets);
 
+  // Get available unstake amount
   const amount = await stakingPool.getAvailableUnstakeAmount({
     tickets: tickets.map((ticket) => ticket.fields),
     stakingPoolVestingConfig: fetchedStakingPool.vestingConfig,
