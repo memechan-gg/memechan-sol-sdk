@@ -1,4 +1,4 @@
-import NodeWallet from "@coral-xyz/anchor/dist/cjs/nodewallet";
+import NodeWallet from "@coral-xyz/anchor/dist/esm/nodewallet";
 import { Connection, Keypair, PublicKey } from "@solana/web3.js";
 import { MemechanClient } from "../src";
 import {

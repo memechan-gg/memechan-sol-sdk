@@ -7,7 +7,7 @@ import {
   TEST_USER_SECRET_KEY,
   WSS_API_CLUSTER,
 } from "./env";
-import NodeWallet from "@coral-xyz/anchor/dist/cjs/nodewallet";
+import NodeWallet from "@coral-xyz/anchor/dist/esm/nodewallet";
 import { MemechanClient } from "../../src/MemechanClient";
 
 export const admin = new PublicKey(ADMIN_PUB_KEY);
