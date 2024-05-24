@@ -26,6 +26,7 @@ export interface AddFeesAccounts {
   marketBids: PublicKey
   marketAsks: PublicKey
   tokenProgram: PublicKey
+  raydiumProgram: PublicKey
   marketProgramId: PublicKey
 }
 
@@ -34,7 +35,7 @@ export function addFees(accounts: AddFeesAccounts) {
     { pubkey: accounts.staking, isSigner: false, isWritable: true },
     { pubkey: accounts.memeVault, isSigner: false, isWritable: true },
     { pubkey: accounts.quoteVault, isSigner: false, isWritable: true },
-    { pubkey: accounts.stakingSignerPda, isSigner: false, isWritable: false },
+    { pubkey: accounts.stakingSignerPda, isSigner: false, isWritable: true },
     { pubkey: accounts.stakingLpWallet, isSigner: false, isWritable: true },
     { pubkey: accounts.signer, isSigner: true, isWritable: true },
     { pubkey: accounts.raydiumAmm, isSigner: false, isWritable: true },
@@ -56,6 +57,7 @@ export function addFees(accounts: AddFeesAccounts) {
     { pubkey: accounts.marketBids, isSigner: false, isWritable: true },
     { pubkey: accounts.marketAsks, isSigner: false, isWritable: true },
     { pubkey: accounts.tokenProgram, isSigner: false, isWritable: false },
+    { pubkey: accounts.raydiumProgram, isSigner: false, isWritable: false },
     { pubkey: accounts.marketProgramId, isSigner: false, isWritable: false },
   ]
   const identifier = Buffer.from([145, 48, 8, 226, 201, 146, 35, 94])

@@ -4,13 +4,11 @@ import { DUMMY_TOKEN_METADATA, admin, client, payer } from "./common/common";
 import { MEMECHAN_QUOTE_TOKEN } from "../src/config/config";
 import { sleep } from "../src/common/helpers";
 
-
 describe("SwapY", () => {
   it.skip("swaps quote token->memecoin", async () => {
-    const pool = await BoundPoolClient.slowNew({
+    const pool = await BoundPoolClient.new({
       admin,
       payer,
-      signer: payer,
       client,
       quoteToken: MEMECHAN_QUOTE_TOKEN,
       tokenMetadata: DUMMY_TOKEN_METADATA,

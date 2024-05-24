@@ -1,7 +1,6 @@
-import { IAMCredentials } from "../auth/Auth";
+import { IAMCredentials } from "../api/auth/Auth";
 import { BE_REGION } from "../config/config";
 import { createSignedFetcher } from "./sigv4";
-
 
 export const jsonFetch = async (
   input: string | URL | globalThis.Request,
@@ -47,7 +46,6 @@ export const unsignedMultipartRequest = async (input: string, file: File) => {
   }
 };
 
-
 export const signedJsonFetch = async (
   input: string,
   credentials: IAMCredentials,
@@ -72,4 +70,3 @@ export const signedJsonFetch = async (
   }
   return r.json();
 };
-

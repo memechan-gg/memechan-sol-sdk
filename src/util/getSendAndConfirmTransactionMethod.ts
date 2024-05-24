@@ -7,6 +7,7 @@ export function getSendAndConfirmTransactionMethod({
   options = {
     commitment: "confirmed",
     skipPreflight: true,
+    preflightCommitment: "confirmed",
   },
 }: {
   connection: Connection;
@@ -15,6 +16,7 @@ export function getSendAndConfirmTransactionMethod({
   options?: ConfirmOptions;
 }): () => Promise<void> {
   return async () => {
-    await sendAndConfirmTransaction(connection, transaction, signers, options);
+    const tx = await sendAndConfirmTransaction(connection, transaction, signers, options);
+    console.log("Transaction confirmed: ", tx);
   };
 }

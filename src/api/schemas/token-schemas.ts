@@ -1,4 +1,5 @@
 import { z, ZodRawShape } from "zod";
+import { tokenStatus } from "./token-status-schema";
 
 export const paginatedResultSchema = <T extends ZodRawShape>(result: z.ZodObject<T>) =>
   z.object({
@@ -11,8 +12,6 @@ export const solanaTokensSortableColumns = z
   .or(z.literal("creationTime"))
   .or(z.literal("lastReply"));
 
-export const tokenStatus = z.literal("LIVE").or(z.literal("PRESALE"));
-
 export const solanaSocialLinks = z.object({
   telegram: z.string().nullish(),
   website: z.string().nullish(),
@@ -20,25 +19,26 @@ export const solanaSocialLinks = z.object({
   discord: z.string().nullish(),
 });
 
-export const createCoinRequestBodySchema = z.object({
+export const createSolanaTokenRequestBodySchema = z.object({
   txDigest: z.string(),
-  socialLinks: solanaSocialLinks.nullish(),
+  socialLinks: solanaSocialLinks,
 });
 
+// old one
 export const querySolanaTokensRequestParamsSchema = z.object({
   sortBy: solanaTokensSortableColumns,
-  status: z.literal("PRESALE").or(z.literal("LIVE")),
+  status: z.literal("PRESALE").or(z.literal("LIVE")), // ?
   direction: z.literal("asc").or(z.literal("desc")),
   paginationToken: z.string().nullish(),
 });
 
 export const solanaTokenSchema = z.object({
-  name: z.string(),
+  name: z.string().optional(),
   address: z.string(),
   decimals: z.number(),
-  symbol: z.string(),
-  description: z.string(),
-  image: z.string(),
+  symbol: z.string().optional(),
+  description: z.string().optional(),
+  image: z.string().optional(),
   lastReply: z.number(),
   marketcap: z.number(),
   creator: z.string(),
@@ -56,22 +56,34 @@ export const solanaTokenMetadata = z.object({
   symbol: z.string(),
 });
 
-export const socialLinks = z.object({
-  twitter: z.string().nullish(),
-  discord: z.string().nullish(),
-  telegram: z.string().nullish(),
-  website: z.string().nullish(),
+export const solanaTokenRecordSchema = solanaTokenSchema.extend({
+  pk: z.literal("SOLANA_TOKEN#LIVE").or(z.literal("SOLANA_TOKEN#PRESALE")),
+  sk: z.string(),
+  "lsi-string-0": z.string(),
+  "lsi-string-1": z.string(),
+  "lsi-numeric-0": z.number(),
+  "lsi-numeric-1": z.number(),
+  "lsi-numeric-2": z.number(),
+});
+
+export const createCoinRequestBodySchema = z.object({
+  txDigest: z.string(),
+  socialLinks: solanaSocialLinks.nullish(),
 });
 
 export const createTokenRequestBodySchema = z.object({
   txDigest: z.string(),
-  socialLinks: socialLinks.nullish(),
+  socialLinks: solanaSocialLinks.nullish(),
 });
 
 export type SolanaTokenMetadata = z.infer<typeof solanaTokenMetadata>;
 export type SolanaToken = z.infer<typeof solanaTokenSchema>;
+export type SolanaTokenRecordItem = z.infer<typeof solanaTokenRecordSchema>;
 export type SortableColumn = z.infer<typeof solanaTokensSortableColumns>;
+export type QuerySolanaTokensRequestParams = z.infer<typeof querySolanaTokensRequestParamsSchema>;
+export type SolanaSocialLinks = z.infer<typeof solanaSocialLinks>;
+export type CoinStatus = z.infer<typeof tokenStatus>;
+export type TokenStatus = z.infer<typeof tokenStatus>;
+export type TicketStatus = z.infer<typeof tokenStatus>;
 export type QueryTokensRequestParams = z.infer<typeof querySolanaTokensRequestParamsSchema>;
 export type CreateTokenRequestBody = z.infer<typeof createTokenRequestBodySchema>;
-export type SolanaSocialLinks = z.infer<typeof solanaSocialLinks>;
-export type TokenStatus = z.infer<typeof tokenStatus>;

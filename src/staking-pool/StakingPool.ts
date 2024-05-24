@@ -61,31 +61,13 @@ export class StakingPool {
     return PublicKey.findProgramAddressSync([Buffer.from("staking"), publicKey.toBytes()], memechanProgramId)[0];
   }
 
-  public async getAddFeesTransaction({
-    transaction,
-    ammPoolId,
-    payer,
-  }: GetAddFeesTransactionArgs): Promise<{ tx: Transaction; stakingLpWalletKeypair: Keypair }> {
+  public async getAddFeesTransaction({ transaction, ammPoolId, payer }: GetAddFeesTransactionArgs): Promise<Transaction> {
     const tx = transaction ?? new Transaction();
     const stakingInfo = await this.fetch();
 
     const ammPool = await formatAmmKeysById(ammPoolId.toBase58(), this.client.connection);
 
     const stakingSignerPda = this.findSignerPda();
-    const stakingLpWalletKeypair = Keypair.generate();
-    const stakingLpWallet = stakingLpWalletKeypair.publicKey;
-
-    const createStakingLpWalletInstructions = await getCreateAccountInstructions(
-      this.client.connection,
-      payer.publicKey,
-      stakingInfo.lpMint,
-      stakingSignerPda,
-      stakingLpWalletKeypair,
-      "confirmed",
-      this.client.memechanProgram.programId,
-    );
-
-    tx.add(...createStakingLpWalletInstructions);
 
     const addFeesInstruction = await this.client.memechanProgram.methods
       .addFees()
@@ -111,31 +93,29 @@ export class StakingPool {
         raydiumQuoteVault: ammPool.quoteVault,
         signer: payer.publicKey,
         targetOrders: ammPool.targetOrders,
-        stakingLpWallet: stakingLpWallet,
+        stakingLpWallet: this.lpVault,
+        raydiumProgram: ammPool.programId,
       })
       .instruction();
 
     tx.add(addFeesInstruction);
 
-    return { tx, stakingLpWalletKeypair };
+    return tx;
   }
 
   public async addFees({ payer, transaction, ammPoolId }: AddFeesArgs): Promise<void> {
-    const { tx: addFeesTransaction, stakingLpWalletKeypair } = await this.getAddFeesTransaction({
-      transaction,
-      ammPoolId,
-      payer,
-    });
+    const addFeesTransaction = await this.getAddFeesTransaction({ transaction, ammPoolId, payer });
 
     const sendAndConfirmAddFeesTransaction = getSendAndConfirmTransactionMethod({
       connection: this.client.connection,
-      signers: [payer, stakingLpWalletKeypair],
+      signers: [payer],
       transaction: addFeesTransaction,
     });
 
     await retry({
       fn: sendAndConfirmAddFeesTransaction,
       functionName: "addFees",
+      retries: 1
     });
   }
 

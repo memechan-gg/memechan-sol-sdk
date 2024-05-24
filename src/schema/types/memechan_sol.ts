@@ -626,7 +626,7 @@ export type MemechanSol = {
         },
         {
           "name": "stakingSignerPda",
-          "isMut": false,
+          "isMut": true,
           "isSigner": false
         },
         {
@@ -711,6 +711,11 @@ export type MemechanSol = {
         },
         {
           "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "raydiumProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -1104,256 +1109,6 @@ export type MemechanSol = {
               "init amm pool fee amount"
             ],
             "type": "u64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "ammInfo",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "status",
-            "docs": [
-              "Initialized status."
-            ],
-            "type": "u64"
-          },
-          {
-            "name": "nonce",
-            "docs": [
-              "Nonce used in program address.",
-              "The program address is created deterministically with the nonce,",
-              "amm program id, and amm account pubkey.  This program address has",
-              "authority over the amm's token coin account, token pc account, and pool",
-              "token mint."
-            ],
-            "type": "u64"
-          },
-          {
-            "name": "orderNum",
-            "docs": [
-              "max order count"
-            ],
-            "type": "u64"
-          },
-          {
-            "name": "depth",
-            "docs": [
-              "within this range, 5 => 5% range"
-            ],
-            "type": "u64"
-          },
-          {
-            "name": "coinDecimals",
-            "docs": [
-              "coin decimal"
-            ],
-            "type": "u64"
-          },
-          {
-            "name": "pcDecimals",
-            "docs": [
-              "pc decimal"
-            ],
-            "type": "u64"
-          },
-          {
-            "name": "state",
-            "docs": [
-              "amm machine state"
-            ],
-            "type": "u64"
-          },
-          {
-            "name": "resetFlag",
-            "docs": [
-              "amm reset_flag"
-            ],
-            "type": "u64"
-          },
-          {
-            "name": "minSize",
-            "docs": [
-              "min size 1->0.000001"
-            ],
-            "type": "u64"
-          },
-          {
-            "name": "volMaxCutRatio",
-            "docs": [
-              "vol_max_cut_ratio numerator, sys_decimal_value as denominator"
-            ],
-            "type": "u64"
-          },
-          {
-            "name": "amountWave",
-            "docs": [
-              "amount wave numerator, sys_decimal_value as denominator"
-            ],
-            "type": "u64"
-          },
-          {
-            "name": "coinLotSize",
-            "docs": [
-              "coinLotSize 1 -> 0.000001"
-            ],
-            "type": "u64"
-          },
-          {
-            "name": "pcLotSize",
-            "docs": [
-              "pcLotSize 1 -> 0.000001"
-            ],
-            "type": "u64"
-          },
-          {
-            "name": "minPriceMultiplier",
-            "docs": [
-              "min_cur_price: (2 * amm.order_num * amm.pc_lot_size) * max_price_multiplier"
-            ],
-            "type": "u64"
-          },
-          {
-            "name": "maxPriceMultiplier",
-            "docs": [
-              "max_cur_price: (2 * amm.order_num * amm.pc_lot_size) * max_price_multiplier"
-            ],
-            "type": "u64"
-          },
-          {
-            "name": "sysDecimalValue",
-            "docs": [
-              "system decimal value, used to normalize the value of coin and pc amount"
-            ],
-            "type": "u64"
-          },
-          {
-            "name": "fees",
-            "docs": [
-              "All fee information"
-            ],
-            "type": {
-              "defined": "RaydiumFees"
-            }
-          },
-          {
-            "name": "stateData",
-            "docs": [
-              "Statistical data"
-            ],
-            "type": {
-              "defined": "StateData"
-            }
-          },
-          {
-            "name": "coinVault",
-            "docs": [
-              "Coin vault"
-            ],
-            "type": "publicKey"
-          },
-          {
-            "name": "pcVault",
-            "docs": [
-              "Pc vault"
-            ],
-            "type": "publicKey"
-          },
-          {
-            "name": "coinVaultMint",
-            "docs": [
-              "Coin vault mint"
-            ],
-            "type": "publicKey"
-          },
-          {
-            "name": "pcVaultMint",
-            "docs": [
-              "Pc vault mint"
-            ],
-            "type": "publicKey"
-          },
-          {
-            "name": "lpMint",
-            "docs": [
-              "lp mint"
-            ],
-            "type": "publicKey"
-          },
-          {
-            "name": "openOrders",
-            "docs": [
-              "open_orders key"
-            ],
-            "type": "publicKey"
-          },
-          {
-            "name": "market",
-            "docs": [
-              "market key"
-            ],
-            "type": "publicKey"
-          },
-          {
-            "name": "marketProgram",
-            "docs": [
-              "market program key"
-            ],
-            "type": "publicKey"
-          },
-          {
-            "name": "targetOrders",
-            "docs": [
-              "target_orders key"
-            ],
-            "type": "publicKey"
-          },
-          {
-            "name": "padding1",
-            "docs": [
-              "padding"
-            ],
-            "type": {
-              "array": [
-                "u64",
-                8
-              ]
-            }
-          },
-          {
-            "name": "ammOwner",
-            "docs": [
-              "amm owner key"
-            ],
-            "type": "publicKey"
-          },
-          {
-            "name": "lpAmount",
-            "docs": [
-              "pool lp amount"
-            ],
-            "type": "u64"
-          },
-          {
-            "name": "clientOrderId",
-            "docs": [
-              "client order id"
-            ],
-            "type": "u64"
-          },
-          {
-            "name": "padding2",
-            "docs": [
-              "padding"
-            ],
-            "type": {
-              "array": [
-                "u64",
-                2
-              ]
-            }
           }
         ]
       }
@@ -2177,6 +1932,22 @@ export type MemechanSol = {
     {
       "code": 6021,
       "name": "EScaleTooLow"
+    },
+    {
+      "code": 6022,
+      "name": "InvalidAmmAccountOwner"
+    },
+    {
+      "code": 6023,
+      "name": "ExpectedAccount"
+    },
+    {
+      "code": 6024,
+      "name": "InvalidStatus"
+    },
+    {
+      "code": 6025,
+      "name": "CantUnstakeBeforeCliff"
     }
   ]
 };
@@ -2809,7 +2580,7 @@ export const IDL: MemechanSol = {
         },
         {
           "name": "stakingSignerPda",
-          "isMut": false,
+          "isMut": true,
           "isSigner": false
         },
         {
@@ -2894,6 +2665,11 @@ export const IDL: MemechanSol = {
         },
         {
           "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "raydiumProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -3287,256 +3063,6 @@ export const IDL: MemechanSol = {
               "init amm pool fee amount"
             ],
             "type": "u64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "ammInfo",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "status",
-            "docs": [
-              "Initialized status."
-            ],
-            "type": "u64"
-          },
-          {
-            "name": "nonce",
-            "docs": [
-              "Nonce used in program address.",
-              "The program address is created deterministically with the nonce,",
-              "amm program id, and amm account pubkey.  This program address has",
-              "authority over the amm's token coin account, token pc account, and pool",
-              "token mint."
-            ],
-            "type": "u64"
-          },
-          {
-            "name": "orderNum",
-            "docs": [
-              "max order count"
-            ],
-            "type": "u64"
-          },
-          {
-            "name": "depth",
-            "docs": [
-              "within this range, 5 => 5% range"
-            ],
-            "type": "u64"
-          },
-          {
-            "name": "coinDecimals",
-            "docs": [
-              "coin decimal"
-            ],
-            "type": "u64"
-          },
-          {
-            "name": "pcDecimals",
-            "docs": [
-              "pc decimal"
-            ],
-            "type": "u64"
-          },
-          {
-            "name": "state",
-            "docs": [
-              "amm machine state"
-            ],
-            "type": "u64"
-          },
-          {
-            "name": "resetFlag",
-            "docs": [
-              "amm reset_flag"
-            ],
-            "type": "u64"
-          },
-          {
-            "name": "minSize",
-            "docs": [
-              "min size 1->0.000001"
-            ],
-            "type": "u64"
-          },
-          {
-            "name": "volMaxCutRatio",
-            "docs": [
-              "vol_max_cut_ratio numerator, sys_decimal_value as denominator"
-            ],
-            "type": "u64"
-          },
-          {
-            "name": "amountWave",
-            "docs": [
-              "amount wave numerator, sys_decimal_value as denominator"
-            ],
-            "type": "u64"
-          },
-          {
-            "name": "coinLotSize",
-            "docs": [
-              "coinLotSize 1 -> 0.000001"
-            ],
-            "type": "u64"
-          },
-          {
-            "name": "pcLotSize",
-            "docs": [
-              "pcLotSize 1 -> 0.000001"
-            ],
-            "type": "u64"
-          },
-          {
-            "name": "minPriceMultiplier",
-            "docs": [
-              "min_cur_price: (2 * amm.order_num * amm.pc_lot_size) * max_price_multiplier"
-            ],
-            "type": "u64"
-          },
-          {
-            "name": "maxPriceMultiplier",
-            "docs": [
-              "max_cur_price: (2 * amm.order_num * amm.pc_lot_size) * max_price_multiplier"
-            ],
-            "type": "u64"
-          },
-          {
-            "name": "sysDecimalValue",
-            "docs": [
-              "system decimal value, used to normalize the value of coin and pc amount"
-            ],
-            "type": "u64"
-          },
-          {
-            "name": "fees",
-            "docs": [
-              "All fee information"
-            ],
-            "type": {
-              "defined": "RaydiumFees"
-            }
-          },
-          {
-            "name": "stateData",
-            "docs": [
-              "Statistical data"
-            ],
-            "type": {
-              "defined": "StateData"
-            }
-          },
-          {
-            "name": "coinVault",
-            "docs": [
-              "Coin vault"
-            ],
-            "type": "publicKey"
-          },
-          {
-            "name": "pcVault",
-            "docs": [
-              "Pc vault"
-            ],
-            "type": "publicKey"
-          },
-          {
-            "name": "coinVaultMint",
-            "docs": [
-              "Coin vault mint"
-            ],
-            "type": "publicKey"
-          },
-          {
-            "name": "pcVaultMint",
-            "docs": [
-              "Pc vault mint"
-            ],
-            "type": "publicKey"
-          },
-          {
-            "name": "lpMint",
-            "docs": [
-              "lp mint"
-            ],
-            "type": "publicKey"
-          },
-          {
-            "name": "openOrders",
-            "docs": [
-              "open_orders key"
-            ],
-            "type": "publicKey"
-          },
-          {
-            "name": "market",
-            "docs": [
-              "market key"
-            ],
-            "type": "publicKey"
-          },
-          {
-            "name": "marketProgram",
-            "docs": [
-              "market program key"
-            ],
-            "type": "publicKey"
-          },
-          {
-            "name": "targetOrders",
-            "docs": [
-              "target_orders key"
-            ],
-            "type": "publicKey"
-          },
-          {
-            "name": "padding1",
-            "docs": [
-              "padding"
-            ],
-            "type": {
-              "array": [
-                "u64",
-                8
-              ]
-            }
-          },
-          {
-            "name": "ammOwner",
-            "docs": [
-              "amm owner key"
-            ],
-            "type": "publicKey"
-          },
-          {
-            "name": "lpAmount",
-            "docs": [
-              "pool lp amount"
-            ],
-            "type": "u64"
-          },
-          {
-            "name": "clientOrderId",
-            "docs": [
-              "client order id"
-            ],
-            "type": "u64"
-          },
-          {
-            "name": "padding2",
-            "docs": [
-              "padding"
-            ],
-            "type": {
-              "array": [
-                "u64",
-                2
-              ]
-            }
           }
         ]
       }
@@ -4360,6 +3886,22 @@ export const IDL: MemechanSol = {
     {
       "code": 6021,
       "name": "EScaleTooLow"
+    },
+    {
+      "code": 6022,
+      "name": "InvalidAmmAccountOwner"
+    },
+    {
+      "code": 6023,
+      "name": "ExpectedAccount"
+    },
+    {
+      "code": 6024,
+      "name": "InvalidStatus"
+    },
+    {
+      "code": 6025,
+      "name": "CantUnstakeBeforeCliff"
     }
   ]
 };
