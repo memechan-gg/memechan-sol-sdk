@@ -194,28 +194,35 @@ export class MarketV2 extends Base {
       createInitializeAccountInstruction(marketInfo.quoteVault.publicKey, marketInfo.quoteMint, marketInfo.vaultOwner),
     )
 
-    const ins2: TransactionInstruction[] = []
-    const lamports2 = await connection.getMinimumBalanceForRentExemption(MARKET_STATE_LAYOUT_V2.span);
-    const lamports3 = await connection.getMinimumBalanceForRentExemption((5120 + 12));
-    //const lamports3 = 0;
-    const lamports4 = await connection.getMinimumBalanceForRentExemption((262144 + 12));
-    //const lamports4 = 0;
-    const lamports5 = await connection.getMinimumBalanceForRentExemption((65536 + 12));
-    const lamports6 = await connection.getMinimumBalanceForRentExemption((65536 + 12));
-    //const lamports6 = 0;
+    // const requestQueueSpace = 5120 + 12;
+    // const eventQueueSpace = 262144 + 12;
+    // const bidsSpace = 65536 + 12;
+    // const asksSpace = 65536 + 12;
 
-    console.log("lamports2: ", lamports2);
-    console.log("lamports3: ", lamports3);
-    console.log("lamports4: ", lamports4);
-    console.log("lamports5: ", lamports5);
-    console.log("lamports6: ", lamports6);
+    const requestQueueSpace = 1120 + 12;
+    const eventQueueSpace = 12144 + 12;
+    const bidsSpace = 15536 + 12;
+    const asksSpace = 15536 + 12;
+    
+    const ins2: TransactionInstruction[] = []
+    const marketInfoLamports = await connection.getMinimumBalanceForRentExemption(MARKET_STATE_LAYOUT_V2.span);
+    const requestQueueLamports = await connection.getMinimumBalanceForRentExemption(requestQueueSpace);
+    const eventQueueLamports = await connection.getMinimumBalanceForRentExemption(eventQueueSpace);
+    const bidsLamports = await connection.getMinimumBalanceForRentExemption(bidsSpace);
+    const asksLamports = await connection.getMinimumBalanceForRentExemption(asksSpace);
+
+    console.log("marketInfoLamports: ", marketInfoLamports);
+    console.log("requestQueueLamports: ", requestQueueLamports);
+    console.log("eventQueueLamports: ", eventQueueLamports);
+    console.log("bidsLamports: ", bidsLamports);
+    console.log("asksLamports: ", asksLamports);
     ins2.push(
       SystemProgram.createAccountWithSeed({
         fromPubkey: wallet,
         basePubkey: wallet,
         seed: marketInfo.id.seed,
         newAccountPubkey: marketInfo.id.publicKey,
-        lamports: lamports2,
+        lamports: marketInfoLamports,
         space: MARKET_STATE_LAYOUT_V2.span,
         programId: marketInfo.programId,
       }),
@@ -224,8 +231,8 @@ export class MarketV2 extends Base {
         basePubkey: wallet,
         seed: marketInfo.requestQueue.seed,
         newAccountPubkey: marketInfo.requestQueue.publicKey,
-        lamports: lamports3,
-        space: 5120 + 12,
+        lamports: requestQueueLamports,
+        space: requestQueueSpace,
         programId: marketInfo.programId,
       }),
       SystemProgram.createAccountWithSeed({
@@ -233,8 +240,8 @@ export class MarketV2 extends Base {
         basePubkey: wallet,
         seed: marketInfo.eventQueue.seed,
         newAccountPubkey: marketInfo.eventQueue.publicKey,
-        lamports: lamports4,
-        space: 262144 + 12,
+        lamports: eventQueueLamports,
+        space: eventQueueSpace,
         programId: marketInfo.programId,
       }),
       SystemProgram.createAccountWithSeed({
@@ -242,8 +249,8 @@ export class MarketV2 extends Base {
         basePubkey: wallet,
         seed: marketInfo.bids.seed,
         newAccountPubkey: marketInfo.bids.publicKey,
-        lamports: lamports5,
-        space: 65536 + 12,
+        lamports: bidsLamports,
+        space: bidsSpace,
         programId: marketInfo.programId,
       }),
       SystemProgram.createAccountWithSeed({
@@ -251,8 +258,8 @@ export class MarketV2 extends Base {
         basePubkey: wallet,
         seed: marketInfo.asks.seed,
         newAccountPubkey: marketInfo.asks.publicKey,
-        lamports: lamports6,
-        space: 65536 + 12,
+        lamports: asksLamports,
+        space: asksSpace,
         programId: marketInfo.programId,
       }),
       this.initializeMarketInstruction({
