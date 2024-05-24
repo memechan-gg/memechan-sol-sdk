@@ -27,7 +27,7 @@ export class TokenAPI {
    * @return {Promise<GetTokenResponse>} A promise that resolves with the coin data.
    */
   getToken(status: TokenStatus, tokenAddress: string): Promise<GetTokenResponse> {
-    return jsonFetch(`${this.url}/${status.toLowerCase()}/sol/token?tokenAddress=${tokenAddress}`, {
+    return jsonFetch(`${this.url}/sol/${status.toLowerCase()}/token?tokenAddress=${tokenAddress}`, {
       method: "GET",
     });
   }
@@ -40,7 +40,7 @@ export class TokenAPI {
    */
   queryTokens(params: QueryTokensRequestParams): Promise<QueryTokensResponse> {
     const queryParams = new URLSearchParams(params as Record<string, string>);
-    return jsonFetch(`${this.url}/${params.status.toLowerCase()}/sol/tokens?${queryParams.toString()}`, {
+    return jsonFetch(`${this.url}/sol/${params.status.toLowerCase()}/tokens?${queryParams.toString()}`, {
       method: "GET",
     });
   }
