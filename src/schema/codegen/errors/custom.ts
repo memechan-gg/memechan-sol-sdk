@@ -21,6 +21,9 @@ export type CustomError =
   | BondingCurveInterceptMustBePositive
   | EGammaSAboveRelativeLimit
   | EScaleTooLow
+  | InvalidAmmAccountOwner
+  | ExpectedAccount
+  | InvalidStatus
 
 export class InvalidAccountInput extends Error {
   readonly code = 6000
@@ -250,6 +253,36 @@ export class EScaleTooLow extends Error {
   }
 }
 
+export class InvalidAmmAccountOwner extends Error {
+  readonly code = 6022
+  readonly name = "InvalidAmmAccountOwner"
+  readonly msg = "undefined"
+
+  constructor() {
+    super("6022: undefined")
+  }
+}
+
+export class ExpectedAccount extends Error {
+  readonly code = 6023
+  readonly name = "ExpectedAccount"
+  readonly msg = "undefined"
+
+  constructor() {
+    super("6023: undefined")
+  }
+}
+
+export class InvalidStatus extends Error {
+  readonly code = 6024
+  readonly name = "InvalidStatus"
+  readonly msg = "undefined"
+
+  constructor() {
+    super("6024: undefined")
+  }
+}
+
 export function fromCode(code: number): CustomError | null {
   switch (code) {
     case 6000:
@@ -296,6 +329,12 @@ export function fromCode(code: number): CustomError | null {
       return new EGammaSAboveRelativeLimit()
     case 6021:
       return new EScaleTooLow()
+    case 6022:
+      return new InvalidAmmAccountOwner()
+    case 6023:
+      return new ExpectedAccount()
+    case 6024:
+      return new InvalidStatus()
   }
 
   return null
