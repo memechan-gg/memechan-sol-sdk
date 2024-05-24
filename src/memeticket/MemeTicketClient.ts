@@ -15,7 +15,7 @@ import {
 } from "./types";
 import { getOptimizedTransactions } from "./utils";
 
-export class MemeTicket {
+export class MemeTicketClient {
   public constructor(
     public id: PublicKey,
     public client: MemechanClient,
@@ -56,7 +56,7 @@ export class MemeTicket {
     return tx;
   }
 
-  public async boundMerge(input: BoundMerge): Promise<MemeTicket> {
+  public async boundMerge(input: BoundMerge): Promise<MemeTicketClient> {
     const mergeTransaction = await this.getBoundMergeTransaction(input);
 
     const optimizedTransactions = getOptimizedTransactions(mergeTransaction.instructions, input.user.publicKey);
@@ -98,7 +98,7 @@ export class MemeTicket {
     return tx;
   }
 
-  public async stakingMerge(input: StakingMerge): Promise<MemeTicket> {
+  public async stakingMerge(input: StakingMerge): Promise<MemeTicketClient> {
     const mergeTransaction = await this.getStakingMergeTransaction(input);
 
     const optimizedTransactions = getOptimizedTransactions(mergeTransaction.instructions, input.user.publicKey);
@@ -130,7 +130,7 @@ export class MemeTicket {
     return tx;
   }
 
-  public async close(input: CloseArgs): Promise<MemeTicket> {
+  public async close(input: CloseArgs): Promise<MemeTicketClient> {
     const closeTransaction = await this.getCloseTransaction(input);
 
     const signature = await sendAndConfirmTransaction(this.client.connection, closeTransaction, [input.user], {
@@ -198,7 +198,7 @@ export class MemeTicket {
   }
 
   public static async fetchAvailableTicketsByUser(pool: PublicKey, client: MemechanClient, user: PublicKey) {
-    const tickets = await MemeTicket.fetchTicketsByUser(pool, client, user);
+    const tickets = await MemeTicketClient.fetchTicketsByUser(pool, client, user);
     const currentTimestamp = Date.now();
 
     const availableTickets = tickets.filter((ticket) => {

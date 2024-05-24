@@ -1,4 +1,4 @@
-import { BoundPoolClient } from "../../../src/bound-pool/BoundPool";
+import { BoundPoolClient } from "../../../src/bound-pool/BoundPoolClient";
 import { MEMECHAN_QUOTE_TOKEN } from "../../../src/config/config";
 import { DUMMY_TOKEN_METADATA, admin, client, payer } from "../../common";
 

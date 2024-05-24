@@ -1,17 +1,17 @@
 import { PublicKey } from "@solana/web3.js";
-import { MemeTicket } from "../../src/memeticket/MemeTicket";
+import { MemeTicketClient } from "../../src/memeticket/MemeTicketClient";
 import { client, payer } from "../common";
 
 // yarn tsx examples/meme-ticket/bound-merge.ts > bound-merge.txt 2>&1
 export const boundMerge = async () => {
   const poolAddress = new PublicKey("8ijpxuSMQH44dZ1xkUTv1Qw7Xa2dVJmG3pzLuj9VCG1x");
-  const { tickets } = await MemeTicket.fetchAvailableTicketsByUser(poolAddress, client, payer.publicKey);
+  const { tickets } = await MemeTicketClient.fetchAvailableTicketsByUser(poolAddress, client, payer.publicKey);
 
   if (tickets.length > 1) {
     const [destinationTicket, ...sourceTickets] = tickets;
 
-    const destinationMemeTicket = new MemeTicket(destinationTicket.id, client);
-    const sourceMemeTickets = sourceTickets.map((ticket) => new MemeTicket(ticket.id, client));
+    const destinationMemeTicket = new MemeTicketClient(destinationTicket.id, client);
+    const sourceMemeTickets = sourceTickets.map((ticket) => new MemeTicketClient(ticket.id, client));
 
     await destinationMemeTicket.boundMerge({ pool: poolAddress, ticketsToMerge: sourceMemeTickets, user: payer });
 

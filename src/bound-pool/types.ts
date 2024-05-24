@@ -2,7 +2,7 @@ import { BN } from "@coral-xyz/anchor";
 import { Token } from "@raydium-io/raydium-sdk";
 import { Keypair, PublicKey, Signer, Transaction } from "@solana/web3.js";
 import { MemechanClient } from "../MemechanClient";
-import { MemeTicket } from "../memeticket/MemeTicket";
+import { MemeTicketClient } from "../memeticket/MemeTicketClient";
 import { BoundPool } from "../schema/codegen/accounts";
 import { TokenMetadata } from "../api/types";
 
@@ -41,7 +41,7 @@ export interface SwapXArgs {
   //poolSignerPda: PublicKey;
   memeAmountIn: BN;
   minQuoteAmountOut: BN;
-  userMemeTicket: MemeTicket;
+  userMemeTicket: MemeTicketClient;
   userQuoteAcc: PublicKey;
   quoteMint: PublicKey;
 }
