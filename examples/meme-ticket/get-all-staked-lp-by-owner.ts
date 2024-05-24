@@ -4,7 +4,7 @@ import { client, payer } from "../common";
 
 // yarn tsx examples/meme-ticket/get-all-staked-lp-by-owner.ts > all-staked-lp.txt 2>&1
 export const getAllStakedLpByOwner = async () => {
-  const poolAddress = new PublicKey("9Qy1JawWD9Ue7rWfCJUwcTDWqSSbS48e8MhqgGsprrcV");
+  const poolAddress = new PublicKey("8T83gG397gcCaFh8hLiMECmhrmkLS7vtptMeLvCgwKde");
 
   const tickets = await MemeTicketClient.fetchTicketsByUser(poolAddress, client, payer.publicKey);
 

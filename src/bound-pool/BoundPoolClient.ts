@@ -72,6 +72,7 @@ import { getSendAndConfirmTransactionMethod } from "../util/getSendAndConfirmTra
 import { retry } from "../util/retry";
 import { deductSlippage } from "../util/trading/deductSlippage";
 import { normalizeInputCoinAmount } from "../util/trading/normalizeInputCoinAmount";
+import { extractSwapDataFromSimulation } from "../util/trading/extractSwapDataFromSimulation";
 
 export class BoundPoolClient {
   private constructor(
@@ -556,19 +557,44 @@ export class BoundPoolClient {
     return { tx: transaction, memeTicketKeypair, inputTokenAccount };
   }
 
+  // TODO(?): Handle for 0 input
+  // TODO(?): Handle for very huge number
   public async getOutputAmountForBuyMeme(input: GetOutputAmountForBuyMeme) {
-    const { tx, memeTicketKeypair } = await this.getBuyMemeTransaction({ ...input, minOutputAmount: "0" });
+    const { inputAmount, slippagePercentage, transaction = new Transaction() } = input;
+    const pool = this.id;
 
-    const result = await this.client.connection.simulateTransaction(tx, [input.signer, memeTicketKeypair], true);
+    // input & output
+    const inputAmountWithDecimals = normalizeInputCoinAmount(inputAmount, MEMECHAN_QUOTE_TOKEN_DECIMALS);
+    const inputAmountBN = new BN(inputAmountWithDecimals.toString());
+    const minOutputBN = new BN(0);
+
+    const getOutputAmountBuyMemeInstruction = await this.client.memechanProgram.methods
+      .getSwapYAmt(inputAmountBN, minOutputBN)
+      .accounts({
+        pool: pool,
+        quoteVault: this.quoteVault,
+      })
+      .instruction();
+
+    transaction.add(getOutputAmountBuyMemeInstruction);
+
+    const result = await this.client.connection.simulateTransaction(transaction, [this.client.simulationKeypair], true);
 
     // If error happened (e.g. pool is locked)
     if (result.value.err) {
-      return { outputAmount: 0, error: result.value.err, logs: result.value.logs };
+      console.debug("[getOutputAmountForBuyMeme] error on simulation ", JSON.stringify(result.value));
+      throw new Error("Simulation results for getOutputAmountForBuyMeme returned error");
     }
 
-    // TODO: Decode the result of swap simulation
+    const { swapOutAmount } = extractSwapDataFromSimulation(result);
 
-    return result;
+    // output
+    // Note: Be aware, we relay on the fact that `MEMECOIN_DECIMALS` would be always set same for all memecoins
+    // As well as the fact that memecoins and tickets decimals are always the same
+    const outputAmount = new BigNumber(swapOutAmount).div(10 ** MEMECHAN_MEME_TOKEN_DECIMALS);
+    const outputAmountRespectingSlippage = deductSlippage(outputAmount, slippagePercentage);
+
+    return outputAmountRespectingSlippage.toString();
   }
 
   public async isMemeCoinReadyToLivePhase() {

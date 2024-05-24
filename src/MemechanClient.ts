@@ -1,5 +1,5 @@
 import { AnchorProvider, Program, Wallet, setProvider } from "@coral-xyz/anchor";
-import { Connection, ConnectionConfig, PublicKey } from "@solana/web3.js";
+import { Connection, ConnectionConfig, Keypair, PublicKey } from "@solana/web3.js";
 import { IDL, MemechanSol } from "./schema/types/memechan_sol";
 import { MEMECHAN_PROGRAM_ID } from "./config/config";
 
@@ -10,6 +10,7 @@ export interface MemechanClientConfigArgs {
   wssApiUrl: string;
   heliusApiUrl: string;
   isTest: boolean;
+  simulationKeypair: Keypair;
 }
 
 export class MemechanClient {
@@ -18,6 +19,7 @@ export class MemechanClient {
   public memechanProgram: Program<MemechanSol>;
   public anchorProvider: AnchorProvider;
   public heliusApiUrl: string;
+  public simulationKeypair: Keypair;
 
   constructor(private config: MemechanClientConfigArgs) {
     const { wallet, isTest, rpcApiUrl, rpcConnectionConfig, wssApiUrl, heliusApiUrl } = config;
@@ -41,5 +43,6 @@ export class MemechanClient {
     console.log("connection rpc: " + this.connection.rpcEndpoint);
 
     this.memechanProgram = new Program<MemechanSol>(IDL, new PublicKey(MEMECHAN_PROGRAM_ID), provider);
+    this.simulationKeypair = config.simulationKeypair;
   }
 }
