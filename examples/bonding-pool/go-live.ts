@@ -37,7 +37,7 @@ export const goLive = async () => {
   console.log("stakingMemeVault: " + stakingMemeVault.toString());
   console.log("stakingQuoteVault: " + stakingQuoteVault.toString());
 
-  const stakingPool = await boundPool.goLive2({
+  const [stakingPool] = await boundPool.goLive({
     payer: payer,
     user: payer,
     boundPoolInfo,

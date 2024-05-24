@@ -23,7 +23,7 @@ describe("StakingPool", () => {
   }, 30000);
 
   it.skip("swapy, golive, ammSwap, unstake", async () => {
-    const boundPool = await BoundPoolClient.slowNew({
+   const boundPool = await BoundPoolClient.new({
       admin,
       payer,
       client,
@@ -39,20 +39,25 @@ describe("StakingPool", () => {
     const ticketId = await boundPool.swapY({
       payer: payer,
       user: payer,
-      memeTokensOut: new BN(100),
-      quoteAmountIn: new BN(1000),
+      memeTokensOut: new BN(100*1e6),
+      quoteAmountIn: new BN(5000*1e9),
       quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
       pool: boundPool.id,
     });
 
-    tickets.push(new MemeTicket(ticketId.id, client));
     console.log("swapY ticketId: " + ticketId.id.toBase58());
+
+    const ticket1 = new MemeTicket(ticketId.id, client);
+    tickets.push(ticket1);
+
+    const ticket1Data = await ticket1.fetch();
+    console.log("ticket1Data: amount: %s, notional: %s, released: %s ", ticket1Data.amount.toString(), ticket1Data.vesting.notional.toString(), ticket1Data.vesting.released.toString());
 
     const ticketId2 = await boundPool.swapY({
       payer: payer,
       user: payer,
-      memeTokensOut: new BN(1000),
-      quoteAmountIn: new BN(100000),
+      memeTokensOut: new BN(4000*1e6),
+      quoteAmountIn: new BN(40000*1e9),
       quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
       pool: boundPool.id,
     });
@@ -64,13 +69,13 @@ describe("StakingPool", () => {
 
     console.log("boundPoolInfo:", boundPoolInfo);
 
-    const { stakingMemeVault, stakingQuoteVault } = await boundPool.slowInitStakingPool({
+    const { stakingMemeVault, stakingQuoteVault } = await boundPool.initStakingPool({
       payer: payer,
       user: payer,
       boundPoolInfo,
     });
 
-    const [stakingPool, ammPool] = await boundPool.goLive({
+    const [stakingPool, livePool] = await boundPool.goLive({
       payer: payer,
       user: payer,
       boundPoolInfo,
@@ -78,13 +83,15 @@ describe("StakingPool", () => {
       memeVault: stakingMemeVault,
       quoteVault: stakingQuoteVault,
     });
+
+    const ammPool = livePool.ammPoolInfo;
     console.log("ammPool: " + JSON.stringify(ammPool));
 
     const inputToken = MEMECHAN_QUOTE_TOKEN;
-    const outputToken = new Token(TOKEN_PROGRAM_ID, ammPool.baseMint, MEMECHAN_MEME_TOKEN_DECIMALS);
-    const inputTokenAmount = new TokenAmount(inputToken, 10000);
-    const slippage = new Percent(5, 100);
-    const walletTokenAccounts = await getWalletTokenAccount(client.connection, payer.publicKey);
+    const outputToken = new Token(TOKEN_PROGRAM_ID, ammPool.baseMint, MEMECHAN_MEME_TOKEN_DECIMALS)
+    const inputTokenAmount = new TokenAmount(inputToken, 1000*1e9)
+    const slippage = new Percent(5, 100)
+    const walletTokenAccounts = await getWalletTokenAccount(client.connection, payer.publicKey)
 
     const swapTxIds = await swapOnlyAmm({
       connection: client.connection,
@@ -98,19 +105,23 @@ describe("StakingPool", () => {
 
     console.log("amm swapresult txids: ", swapTxIds);
 
-    StakingPool.fromStakingPoolId({ client, poolAccountAddressId: stakingPool.id });
+    await sleep(180000); // sleep 3 min cliff
 
     const unstakeResult = await stakingPool.unstake({
-      amount: new BN(1),
+      amount: new BN(10*1e6),
       user: payer,
       ticket: tickets[0],
     });
 
     console.log("unstakeResult: ", unstakeResult);
-  }, 550000);
 
-  it.skip("swapy, golive, ammSwap, withdrawfees", async () => {
-    const boundPool = await BoundPoolClient.slowNew({
+    const ticketDataUpdated = await ticket1.fetch();
+    console.log("ticketDataUpdated: amount: %s, notional: %s, released: %s ", ticketDataUpdated.amount.toString(), ticketDataUpdated.vesting.notional.toString(), ticketDataUpdated.vesting.released.toString());
+
+  }, 850000);
+
+  it("swapy, golive, ammSwap, addFees, withdrawfees", async () => {
+    const boundPool = await BoundPoolClient.new({
       admin,
       payer,
       client,
@@ -126,8 +137,8 @@ describe("StakingPool", () => {
     const ticketId = await boundPool.swapY({
       payer: payer,
       user: payer,
-      memeTokensOut: new BN(100),
-      quoteAmountIn: new BN(1000),
+      memeTokensOut: new BN(100*1e6),
+      quoteAmountIn: new BN(5000*1e9),
       quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
       pool: boundPool.id,
     });
@@ -138,8 +149,8 @@ describe("StakingPool", () => {
     const ticketId2 = await boundPool.swapY({
       payer: payer,
       user: payer,
-      memeTokensOut: new BN(1000),
-      quoteAmountIn: new BN(100000),
+      memeTokensOut: new BN(100*1e6),
+      quoteAmountIn: new BN(40000*1e9),
       quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
       pool: boundPool.id,
     });
@@ -151,13 +162,13 @@ describe("StakingPool", () => {
 
     console.log("boundPoolInfo:", boundPoolInfo);
 
-    const { stakingMemeVault, stakingQuoteVault } = await boundPool.slowInitStakingPool({
+    const { stakingMemeVault, stakingQuoteVault } = await boundPool.initStakingPool({
       payer: payer,
       user: payer,
       boundPoolInfo,
     });
 
-    const [stakingPool, ammPool] = await boundPool.goLive({
+    const [stakingPool, livePool] = await boundPool.goLive({
       payer: payer,
       user: payer,
       boundPoolInfo,
@@ -165,13 +176,15 @@ describe("StakingPool", () => {
       memeVault: stakingMemeVault,
       quoteVault: stakingQuoteVault,
     });
+
+    const ammPool = livePool.ammPoolInfo;
     console.log("ammPool: " + JSON.stringify(ammPool));
 
     const inputToken = MEMECHAN_QUOTE_TOKEN;
-    const outputToken = new Token(TOKEN_PROGRAM_ID, ammPool.baseMint, MEMECHAN_MEME_TOKEN_DECIMALS);
-    const inputTokenAmount = new TokenAmount(inputToken, 10000);
-    const slippage = new Percent(5, 100);
-    const walletTokenAccounts = await getWalletTokenAccount(client.connection, payer.publicKey);
+    const outputToken = new Token(TOKEN_PROGRAM_ID, ammPool.baseMint, MEMECHAN_MEME_TOKEN_DECIMALS)
+    const inputTokenAmount = new TokenAmount(inputToken, 1000*1e9)
+    const slippage = new Percent(5, 100)
+    const walletTokenAccounts = await getWalletTokenAccount(client.connection, payer.publicKey)
 
     const swapTxIds = await swapOnlyAmm({
       connection: client.connection,
@@ -185,18 +198,21 @@ describe("StakingPool", () => {
 
     console.log("amm swapresult txids: ", swapTxIds);
 
-    StakingPool.fromStakingPoolId({ client, poolAccountAddressId: stakingPool.id });
+    await stakingPool.addFees({payer, transaction: new Transaction(), ammPoolId: new PublicKey(ammPool.id)});
 
-    const withrdawResult = await stakingPool.withdrawFees({
+    StakingPool.fromStakingPoolId({ client, poolAccountAddressId: stakingPool.id});
+
+    const withdrawResult = await stakingPool.withdrawFees({
       user: payer,
       ticket: tickets[0],
     });
 
-    console.log("withrdawResult: ", withrdawResult);
+    console.log("withrdawResult: ", withdrawResult);
+
   }, 550000);
 
-  it("swapy, golive, ammSwap, addFees", async () => {
-    const boundPool = await BoundPoolClient.slowNew({
+  it.skip("swapy, golive, ammSwap, addFees", async () => {
+    const boundPool = await BoundPoolClient.new({
       admin,
       payer,
       client,
@@ -206,14 +222,13 @@ describe("StakingPool", () => {
 
     console.log("==== pool id: " + boundPool.id.toString());
     await sleep(2000);
-
     const tickets: MemeTicket[] = [];
 
     const ticketId = await boundPool.swapY({
       payer: payer,
       user: payer,
-      memeTokensOut: new BN(100),
-      quoteAmountIn: new BN(1000),
+      memeTokensOut: new BN(100*1e6),
+      quoteAmountIn: new BN(5000*1e9),
       quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
       pool: boundPool.id,
     });
@@ -224,8 +239,8 @@ describe("StakingPool", () => {
     const ticketId2 = await boundPool.swapY({
       payer: payer,
       user: payer,
-      memeTokensOut: new BN(1000),
-      quoteAmountIn: new BN(100000),
+      memeTokensOut: new BN(4000*1e6),
+      quoteAmountIn: new BN(40000*1e9),
       quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
       pool: boundPool.id,
     });
@@ -237,13 +252,13 @@ describe("StakingPool", () => {
 
     console.log("boundPoolInfo:", boundPoolInfo);
 
-    const { stakingMemeVault, stakingQuoteVault } = await boundPool.slowInitStakingPool({
+    const { stakingMemeVault, stakingQuoteVault } = await boundPool.initStakingPool({
       payer: payer,
       user: payer,
       boundPoolInfo,
     });
 
-    const [stakingPool, ammPool] = await boundPool.goLive({
+    const [stakingPool, livePool] = await boundPool.goLive({
       payer: payer,
       user: payer,
       boundPoolInfo,
@@ -251,6 +266,8 @@ describe("StakingPool", () => {
       memeVault: stakingMemeVault,
       quoteVault: stakingQuoteVault,
     });
+    
+    const ammPool = livePool.ammPoolInfo;
     console.log("ammPool: " + JSON.stringify(ammPool));
 
     const inputToken = MEMECHAN_QUOTE_TOKEN;
@@ -273,12 +290,9 @@ describe("StakingPool", () => {
 
     StakingPool.fromStakingPoolId({ client, poolAccountAddressId: stakingPool.id });
 
-    const addFeesResult = await stakingPool.addFees({
-      payer,
-      transaction: new Transaction(),
-      ammPoolId: new PublicKey(ammPool.id),
-    });
+    await stakingPool.addFees({payer, transaction: new Transaction(), ammPoolId: new PublicKey(ammPool.id)});
 
-    console.log("addFeesResult: ", addFeesResult);
+    console.log("addFeesResult completed" );
+
   }, 550000);
 });

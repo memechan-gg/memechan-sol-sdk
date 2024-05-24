@@ -6,7 +6,7 @@ import { sleep } from "../src/common/helpers";
 
 describe("SwapY", () => {
   it.skip("swaps quote token->memecoin", async () => {
-    const pool = await BoundPoolClient.slowNew({
+    const pool = await BoundPoolClient.new({
       admin,
       payer,
       client,
