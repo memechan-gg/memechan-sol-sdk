@@ -35,7 +35,7 @@ export function addFees(accounts: AddFeesAccounts) {
     { pubkey: accounts.staking, isSigner: false, isWritable: true },
     { pubkey: accounts.memeVault, isSigner: false, isWritable: true },
     { pubkey: accounts.quoteVault, isSigner: false, isWritable: true },
-    { pubkey: accounts.stakingSignerPda, isSigner: false, isWritable: false },
+    { pubkey: accounts.stakingSignerPda, isSigner: false, isWritable: true },
     { pubkey: accounts.stakingLpWallet, isSigner: false, isWritable: true },
     { pubkey: accounts.signer, isSigner: true, isWritable: true },
     { pubkey: accounts.raydiumAmm, isSigner: false, isWritable: true },
