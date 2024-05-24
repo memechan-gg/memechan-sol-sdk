@@ -1,5 +1,5 @@
 import { z, ZodRawShape } from "zod";
-import { tokenStatus } from "./token-schema";
+import { tokenStatus } from "./token-status-schema";
 
 export const paginatedResultSchema = <T extends ZodRawShape>(result: z.ZodObject<T>) =>
   z.object({

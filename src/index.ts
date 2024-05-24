@@ -11,8 +11,10 @@ export * from "./api/TokenAPI";
 export * from "./api/social/SocialAPI";
 export * from "./api/social/schemas";
 
+// API schemas
 export * from "./api/schemas/pools-schema";
 export * from "./api/schemas/token-schemas";
+export * from "./api/schemas/token-status-schema";
 
 export * from "./api/types";
 export * from "./api/uploadMetadataToIpfs";
