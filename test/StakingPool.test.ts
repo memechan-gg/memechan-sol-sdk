@@ -121,7 +121,7 @@ describe("StakingPool", () => {
 
   }, 850000);
 
-  it("swapy, golive, ammSwap, withdrawfees", async () => {
+  it("swapy, golive, ammSwap, addFees, withdrawfees", async () => {
     const boundPool = await BoundPoolClient.new({
       admin,
       payer,
@@ -198,6 +198,7 @@ describe("StakingPool", () => {
 
     console.log('amm swapresult txids: ', swapTxIds)
 
+    await stakingPool.addFees({payer, transaction: new Transaction(), ammPoolId: new PublicKey(ammPool.id)});
 
     StakingPool.fromStakingPoolId({ client, poolAccountAddressId: stakingPool.id});
 
