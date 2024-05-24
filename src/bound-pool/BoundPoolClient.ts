@@ -69,7 +69,7 @@ import { getSendAndConfirmTransactionMethod } from "../util/getSendAndConfirmTra
 import { retry } from "../util/retry";
 import { deductSlippage } from "../util/trading/deductSlippage";
 import { normalizeInputCoinAmount } from "../util/trading/normalizeInputCoinAmount";
-import { LivePool } from "../live-pool/LivePool";
+import { LivePoolClient } from "../live-pool/LivePoolClient";
 
 export class BoundPoolClient {
   private constructor(
@@ -853,7 +853,7 @@ export class BoundPoolClient {
     return { createMarketTransactions, goLiveTransaction: transaction, stakingId, ammId };
   }
 
-  public async goLive(args: GoLiveArgs): Promise<[StakingPool, LivePool]> {
+  public async goLive(args: GoLiveArgs): Promise<[StakingPool, LivePoolClient]> {
     // Get needed transactions
     const { createMarketTransactions, goLiveTransaction, stakingId, ammId } = await this.getGoLiveTransaction(args);
 
@@ -908,7 +908,7 @@ export class BoundPoolClient {
       poolAccountAddressId: stakingId,
     });
 
-    const livePool = await LivePool.fromAmmId(ammId, this.client);
+    const livePool = await LivePoolClient.fromAmmId(ammId, this.client);
 
     return [stakingPoolInstance, livePool];
   }

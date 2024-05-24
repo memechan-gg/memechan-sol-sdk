@@ -1,4 +1,4 @@
-import { LivePool } from "../../../src/live-pool/LivePool";
+import { LivePoolClient } from "../../../src/live-pool/LivePoolClient";
 import { buildAndSendTx, getWalletTokenAccount } from "../../../src/util";
 import { connection, payer } from "../../common";
 
@@ -10,7 +10,7 @@ export const sellMeme = async () => {
 
   const walletTokenAccounts = await getWalletTokenAccount(connection, payer.publicKey);
 
-  const sellTransactions = await LivePool.getSellMemeTransactions({
+  const sellTransactions = await LivePoolClient.getSellMemeTransactions({
     poolAddress,
     memeCoinMint: memeMint,
     amountIn,
