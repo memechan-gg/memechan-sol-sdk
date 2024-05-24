@@ -130,6 +130,3 @@ dist
 .pnp.*
 .DS_Store
 .vscode/settings.json
-
-#env
-endpoints.ts
