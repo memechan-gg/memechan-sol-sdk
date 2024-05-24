@@ -1,0 +1,7 @@
+yarn run v1.22.19
+$ C:\src\memechan\memechan-sol-sdk\node_modules\.bin\tsx examples/target-config/fetch-target-config.ts
+program id: 3ZSoMaLkD4QBVY94hiqRsi7wtxhXHn1cQxKzPnXyB2KP
+connection rpc: https://rpc.ankr.com/solana_devnet/568b9d1429100aea0382352b147fd75ef28bb7add4c1e983951c110f084e6c20
+Fetching targetConfigId: 83VcLXAURSYBqVKAZpKTFuKomeSiQ6t7EZoA4LmUsedZ
+targetConfig:  {"tokenTargetAmount":"40000000000000","tokenMint":"HX2pp5za2aBkrA5X5iTioZXcrpWb2q9DiaeWPW3qKMaw"}
+Done in 2.65s.
