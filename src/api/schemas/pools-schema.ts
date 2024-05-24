@@ -3,27 +3,40 @@ import { z } from "zod";
 export const querySolanaSeedPoolsParams = z.object({
   tokenAddress: z.string().nullish(),
   seedPoolId: z.string().nullish(),
-  paginationToken: z.string().nullish()
+  paginationToken: z.string().nullish(),
 });
 
 export const querySolanaStakingPoolsParams = z.object({
   tokenAddress: z.string().nullish(),
   stakingPoolId: z.string().nullish(),
-  paginationToken: z.string().nullish()
+  paginationToken: z.string().nullish(),
 });
-
 
 export const querySolanaLivePoolsParams = z.object({
   tokenAddress: z.string().nullish(),
   livePoolId: z.string().nullish(),
-  paginationToken: z.string().nullish()
+  paginationToken: z.string().nullish(),
 });
 
 export const solanaSeedPool = z.object({
   address: z.string(),
   tokenAddress: z.string(),
   createdTime: z.number(),
-  txDigest: z.string()
+  txDigest: z.string(),
+});
+
+export const solanaSeedPoolRecord = solanaSeedPool.extend({
+  pk: z.literal("SOLANA_SEED_POOL"),
+  sk: z.string(),
+  "lsi-string-0": z.string(),
+  "lsi-numeric-0": z.number(),
+});
+
+export const seedPoolRecord = solanaSeedPool.extend({
+  pk: z.literal("SEED_POOL"),
+  sk: z.string(),
+  "lsi-string-0": z.string(),
+  "lsi-numeric-0": z.number(),
 });
 
 export const solanaLivePool = z.object({
@@ -48,21 +61,33 @@ export const solanaLivePool = z.object({
   xcpProfitA: z.number().or(z.bigint()),
   notAdjusted: z.boolean(),
   txDigest: z.string(),
-  creationDate: z.number()
+  creationDate: z.number(),
 });
 
 export const solanaStakingPool = z.object({
   address: z.string(),
-  memeCoinType: z.string(),
-  lpCoinType: z.string(),
-  totalSupply: z.string(),
-  ammPool: z.string(),
-  balanceLp: z.string(),
-  poolAdmin: z.string(),
+  tokeAddress: z.string(),
+  lpMint: z.string(),
+  lpVault: z.string(),
+  memeVault: z.string(),
+  quoteVault: z.string(),
   creationDate: z.number(),
-  txDigest: z.string()
-})
+  txDigest: z.string(),
+});
 
+export const solanaLivePoolRecord = solanaLivePool.extend({
+  pk: z.literal("SOLANA_LIVE_POOL"),
+  sk: z.string(),
+  "lsi-string-0": z.string(),
+  "lsi-numeric-0": z.number(),
+});
+
+export const solanaStakingPoolRecord = solanaStakingPool.extend({
+  pk: z.literal("SOLANA_STAKING_POOL"),
+  sk: z.string(),
+  "lsi-string-0": z.string(),
+  "lsi-numeric-0": z.number(),
+});
 
 export type SolanaSeedPool = z.infer<typeof solanaSeedPool>;
 export type SolanaLivePool = z.infer<typeof solanaLivePool>;
