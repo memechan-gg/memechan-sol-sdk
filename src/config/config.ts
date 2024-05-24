@@ -19,6 +19,8 @@ export const BE_REGION = "us-east-1";
  * @constant {string}
  */
 export const MEMECHAN_PROGRAM_ID = "3ZSoMaLkD4QBVY94hiqRsi7wtxhXHn1cQxKzPnXyB2KP";
+export const RAYDIUM_PROTOCOL_FEE = 1_000_000_000; // 1 SOL on Devnet. TODO on Mainnet, it's only 0.4 SOL
+export const TRANSFER_FEE = 60_000_000;
 
 export const SLERF_MINT = new PublicKey("7BgBvyjrZX1YKz4oh9mjb8ZScatkkwb8DzFx7LoiVkM3");
 
