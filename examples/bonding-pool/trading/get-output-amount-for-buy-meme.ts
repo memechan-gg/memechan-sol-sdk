@@ -8,7 +8,7 @@ import { client } from "../../common";
   const boundPoolInstance = await BoundPoolClient.fromBoundPoolId({ client, poolAccountAddressId });
 
   const res = await boundPoolInstance.getOutputAmountForBuyMeme({
-    inputAmount: "1",
+    inputAmount: "0.568",
     slippagePercentage: 0,
   });
 

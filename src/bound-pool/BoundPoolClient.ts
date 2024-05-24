@@ -609,14 +609,10 @@ export class BoundPoolClient {
 
     const result = await this.client.connection.simulateTransaction(transaction, [this.client.simulationKeypair], true);
 
-    // TODO: Maybe throw error here?
     // If error happened (e.g. pool is locked)
     if (result.value.err) {
-      console.warn(
-        `[getOutputAmountForBuyMeme] warning: error happened during simulation: `,
-        JSON.stringify(result.value.err),
-      );
-      return { outputAmount: 0, error: result.value.err, logs: result.value.logs };
+      console.debug("[getOutputAmountForBuyMeme] error on simulation ", JSON.stringify(result.value));
+      throw new Error("Simulation results for getOutputAmountForBuyMeme returned error");
     }
 
     const { swapOutAmount } = extractSwapDataFromSimulation(result);
@@ -624,13 +620,10 @@ export class BoundPoolClient {
     // output
     // Note: Be aware, we relay on the fact that `MEMECOIN_DECIMALS` would be always set same for all memecoins
     // As well as the fact that memecoins and tickets decimals are always the same
-    const minOutputWithSlippage = deductSlippage(new BigNumber(swapOutAmount), slippagePercentage);
-    const minOutputNormalized = normalizeInputCoinAmount(
-      minOutputWithSlippage.toString(),
-      MEMECHAN_MEME_TOKEN_DECIMALS,
-    );
+    const outputAmount = new BigNumber(swapOutAmount).div(10 ** MEMECHAN_MEME_TOKEN_DECIMALS);
+    const outputAmountRespectingSlippage = deductSlippage(outputAmount, slippagePercentage);
 
-    return minOutputNormalized.toString();
+    return outputAmountRespectingSlippage.toString();
   }
 
   public async isMemeCoinReadyToLivePhase() {

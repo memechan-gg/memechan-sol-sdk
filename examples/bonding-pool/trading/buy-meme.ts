@@ -4,23 +4,21 @@ import { client, payer } from "../../common";
 
 // yarn tsx examples/bonding-pool/trading/buy-meme.ts
 (async () => {
-  const poolAccountAddressId = new PublicKey("HFpBiAWW3uJ3rdT6SvT4xo9A2Pi2uAhNjNnNLmbxjG94");
+  const poolAccountAddressId = new PublicKey("8T83gG397gcCaFh8hLiMECmhrmkLS7vtptMeLvCgwKde");
   const boundPoolInstance = await BoundPoolClient.fromBoundPoolId({ client, poolAccountAddressId });
 
-  // console.debug("payer: ", payer);
-  // console.debug("payer.publicKey: ", payer.publicKey.toString());
-  // console.debug("payer.secretKey: ", payer.secretKey);
+  const inputAmount = "0.568";
 
-  // const res = await boundPoolInstance.getOutputAmountForBuyMeme({
-  //   inputAmount: "100",
-  //   slippagePercentage: 0,
-  //   user: payer.publicKey,
-  //   signer: payer,
-  // });
+  const minOutputAmount = await boundPoolInstance.getOutputAmountForBuyMeme({
+    inputAmount: inputAmount,
+    slippagePercentage: 0,
+  });
+
+  console.debug("minOutputAmount: ", minOutputAmount);
 
   const res = await boundPoolInstance.buyMeme({
-    inputAmount: "100",
-    minOutputAmount: "0",
+    inputAmount: inputAmount,
+    minOutputAmount: minOutputAmount,
     slippagePercentage: 0,
     user: payer.publicKey,
     signer: payer,
