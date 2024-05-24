@@ -1,5 +1,6 @@
 import { TOKEN_PROGRAM_ID, Token } from "@raydium-io/raydium-sdk";
 import { PublicKey } from "@solana/web3.js";
+import BigNumber from "bignumber.js";
 
 /**
  * The base URL for the backend API for fetching off-chain data.
@@ -49,3 +50,7 @@ export const DECIMALS_BETA = 1_000_000; // consider increase
 export const MAX_TRANSACTION_SIZE = 1232;
 
 export const ADMIN_PUB_KEY = new PublicKey("8SvkUtJZCyJwSQGkiszwcRcPv7c8pPSr8GVEppGNN7DV");
+export const FULL_MEME_AMOUNT_CONVERTED = new BigNumber(DEFAULT_MAX_M_LP)
+  .plus(DEFAULT_MAX_M)
+  .div(10 ** MEMECHAN_MEME_TOKEN_DECIMALS)
+  .toString();

@@ -50,13 +50,14 @@ import {
 import { findProgramAddress } from "../common/helpers";
 import {
   DEFAULT_MAX_M,
-  DEFAULT_MAX_M_LP,
+  FULL_MEME_AMOUNT_CONVERTED,
   MEMECHAN_MEME_TOKEN_DECIMALS,
   MEMECHAN_QUOTE_MINT,
   MEMECHAN_QUOTE_TOKEN,
   MEMECHAN_QUOTE_TOKEN_DECIMALS,
   MEMECHAN_TARGET_CONFIG,
 } from "../config/config";
+import { LivePool } from "../live-pool/LivePool";
 import { MemechanSol } from "../schema/types/memechan_sol";
 import { getCreateMetadataTransaction } from "../token/createMetadata";
 import { getCreateMintWithPriorityTransaction } from "../token/getCreateMintWithPriorityTransaction";
@@ -69,7 +70,6 @@ import { getSendAndConfirmTransactionMethod } from "../util/getSendAndConfirmTra
 import { retry } from "../util/retry";
 import { deductSlippage } from "../util/trading/deductSlippage";
 import { normalizeInputCoinAmount } from "../util/trading/normalizeInputCoinAmount";
-import { LivePool } from "../live-pool/LivePool";
 
 export class BoundPoolClient {
   private constructor(
@@ -985,11 +985,7 @@ export class BoundPoolClient {
   }
 
   public static getMemeMarketCap({ memePriceInUsd }: { memePriceInUsd: string }): string {
-    const fullMemeAmountConverted = new BigNumber(DEFAULT_MAX_M_LP)
-      .plus(DEFAULT_MAX_M)
-      .div(10 ** MEMECHAN_MEME_TOKEN_DECIMALS);
-
-    const marketCap = fullMemeAmountConverted.multipliedBy(memePriceInUsd).toString();
+    const marketCap = new BigNumber(FULL_MEME_AMOUNT_CONVERTED).multipliedBy(memePriceInUsd).toString();
 
     return marketCap;
   }
