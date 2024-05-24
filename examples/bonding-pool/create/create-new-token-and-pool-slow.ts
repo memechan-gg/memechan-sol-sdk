@@ -4,7 +4,7 @@ import { admin, payer, client, DUMMY_TOKEN_METADATA } from "../../common";
 
 // yarn tsx examples/bonding-pool/create/create-new-token-and-pool-slow.ts > log.txt 2>&1
 export const createNewTokenAndPoolSlow = async () => {
-  const boundPool = await BoundPoolClient.slowNew({
+  const boundPool = await BoundPoolClient.new({
     admin,
     payer,
     client,
