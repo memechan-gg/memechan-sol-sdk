@@ -27,7 +27,7 @@ export class MintUtils {
       null,
       //this.authority.publicKey,
       nb_decimals,
-      kp
+      kp,
     );
   }
 
@@ -35,7 +35,7 @@ export class MintUtils {
     return await Promise.all(
       Array.from(Array(nbMints).keys()).map((_) => {
         return this.createMint();
-      })
+      }),
     );
   }
 
@@ -50,37 +50,16 @@ export class MintUtils {
     return tokenData;
   }
 
-  public async createTokenAccount(
-    mint: PublicKey,
-    payer: Keypair,
-    owner: PublicKey
-  ) {
+  public async createTokenAccount(mint: PublicKey, payer: Keypair, owner: PublicKey) {
     const account = Keypair.generate();
     return splToken.createAccount(this.conn, payer, mint, owner, account);
   }
 
-  public async getOrCreateTokenAccount(
-    mint: PublicKey,
-    payer: Keypair,
-    owner: PublicKey
-  ) {
-    return await splToken.getOrCreateAssociatedTokenAccount(
-      this.conn,
-      payer,
-      mint,
-      owner,
-      false
-    );
+  public async getOrCreateTokenAccount(mint: PublicKey, payer: Keypair, owner: PublicKey) {
+    return await splToken.getOrCreateAssociatedTokenAccount(this.conn, payer, mint, owner, false);
   }
 
   public async mintTo(mint: PublicKey, tokenAccount: PublicKey, amount: number = 1000000000000) {
-    await splToken.mintTo(
-      this.conn,
-      this.authority,
-      mint,
-      tokenAccount,
-      this.authority,
-      amount
-    );
+    await splToken.mintTo(this.conn, this.authority, mint, tokenAccount, this.authority, amount);
   }
 }

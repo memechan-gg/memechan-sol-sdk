@@ -57,4 +57,3 @@ export async function formatAmmKeysById(id: string, connection: Connection): Pro
     lookupTableAccount: PublicKey.default.toString(),
   };
 }
-

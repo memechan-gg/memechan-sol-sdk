@@ -1,33 +1,33 @@
-import { TransactionInstruction, PublicKey } from "@solana/web3.js" // eslint-disable-line @typescript-eslint/no-unused-vars
-import BN from "bn.js" // eslint-disable-line @typescript-eslint/no-unused-vars
-import * as borsh from "@project-serum/borsh" // eslint-disable-line @typescript-eslint/no-unused-vars
-import * as types from "../types" // eslint-disable-line @typescript-eslint/no-unused-vars
-import { PROGRAM_ID } from "../programId"
+import { TransactionInstruction, PublicKey } from "@solana/web3.js"; // eslint-disable-line @typescript-eslint/no-unused-vars
+import BN from "bn.js"; // eslint-disable-line @typescript-eslint/no-unused-vars
+import * as borsh from "@project-serum/borsh"; // eslint-disable-line @typescript-eslint/no-unused-vars
+import * as types from "../types"; // eslint-disable-line @typescript-eslint/no-unused-vars
+import { PROGRAM_ID } from "../programId";
 
 export interface AddFeesAccounts {
-  staking: PublicKey
-  memeVault: PublicKey
-  quoteVault: PublicKey
-  stakingSignerPda: PublicKey
-  stakingLpWallet: PublicKey
-  signer: PublicKey
-  raydiumAmm: PublicKey
-  raydiumAmmAuthority: PublicKey
-  raydiumMemeVault: PublicKey
-  raydiumQuoteVault: PublicKey
-  raydiumLpMint: PublicKey
-  openOrders: PublicKey
-  targetOrders: PublicKey
-  marketAccount: PublicKey
-  marketEventQueue: PublicKey
-  marketCoinVault: PublicKey
-  marketPcVault: PublicKey
-  marketVaultSigner: PublicKey
-  marketBids: PublicKey
-  marketAsks: PublicKey
-  tokenProgram: PublicKey
-  raydiumProgram: PublicKey
-  marketProgramId: PublicKey
+  staking: PublicKey;
+  memeVault: PublicKey;
+  quoteVault: PublicKey;
+  stakingSignerPda: PublicKey;
+  stakingLpWallet: PublicKey;
+  signer: PublicKey;
+  raydiumAmm: PublicKey;
+  raydiumAmmAuthority: PublicKey;
+  raydiumMemeVault: PublicKey;
+  raydiumQuoteVault: PublicKey;
+  raydiumLpMint: PublicKey;
+  openOrders: PublicKey;
+  targetOrders: PublicKey;
+  marketAccount: PublicKey;
+  marketEventQueue: PublicKey;
+  marketCoinVault: PublicKey;
+  marketPcVault: PublicKey;
+  marketVaultSigner: PublicKey;
+  marketBids: PublicKey;
+  marketAsks: PublicKey;
+  tokenProgram: PublicKey;
+  raydiumProgram: PublicKey;
+  marketProgramId: PublicKey;
 }
 
 export function addFees(accounts: AddFeesAccounts) {
@@ -59,9 +59,9 @@ export function addFees(accounts: AddFeesAccounts) {
     { pubkey: accounts.tokenProgram, isSigner: false, isWritable: false },
     { pubkey: accounts.raydiumProgram, isSigner: false, isWritable: false },
     { pubkey: accounts.marketProgramId, isSigner: false, isWritable: false },
-  ]
-  const identifier = Buffer.from([145, 48, 8, 226, 201, 146, 35, 94])
-  const data = identifier
-  const ix = new TransactionInstruction({ keys, programId: PROGRAM_ID, data })
-  return ix
+  ];
+  const identifier = Buffer.from([145, 48, 8, 226, 201, 146, 35, 94]);
+  const data = identifier;
+  const ix = new TransactionInstruction({ keys, programId: PROGRAM_ID, data });
+  return ix;
 }

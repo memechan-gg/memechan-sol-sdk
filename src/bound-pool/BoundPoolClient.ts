@@ -851,7 +851,7 @@ export class BoundPoolClient {
   }
 
   public async goLive(args: GoLiveArgs): Promise<[StakingPoolClient, LivePoolClient]> {
-    return await retry({fn: () => this.goLiveInternal(args), functionName: "goLive", retries: 10});
+    return await retry({ fn: () => this.goLiveInternal(args), functionName: "goLive", retries: 10 });
   }
 
   private async goLiveInternal(args: GoLiveArgs): Promise<[StakingPoolClient, LivePoolClient]> {
