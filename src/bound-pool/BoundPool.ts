@@ -785,7 +785,7 @@ export class BoundPoolClient {
       SystemProgram.transfer({
         fromPubkey: user.publicKey,
         toPubkey: stakingSigner,
-        lamports: 2_000_000_000,
+        lamports: 1_200_000_000,
       }),
     );
 
