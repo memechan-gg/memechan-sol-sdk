@@ -1,8 +1,7 @@
-import { ApiPoolInfoV4, Token } from "@raydium-io/raydium-sdk";
+import { Token } from "@raydium-io/raydium-sdk";
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
   TOKEN_PROGRAM_ID,
-  createAccount,
   createAssociatedTokenAccountInstruction,
   getAccount,
   getAssociatedTokenAddressSync,
@@ -25,11 +24,11 @@ import {
 import BigNumber from "bignumber.js";
 import { BoundPool, BoundPool as CodegenBoundPool, MemeTicketFields } from "../schema/codegen/accounts";
 
-import { AnchorError, BN, Program, Provider } from "@coral-xyz/anchor";
+import { BN, Program, Provider } from "@coral-xyz/anchor";
 import { MemechanClient } from "../MemechanClient";
 import { MemeTicket } from "../memeticket/MemeTicket";
 import { ATA_PROGRAM_ID, PROGRAMIDS } from "../raydium/config";
-import { createMarket, getCreateMarketTransactions } from "../raydium/openBookCreateMarket";
+import { getCreateMarketTransactions } from "../raydium/openBookCreateMarket";
 import { StakingPool } from "../staking-pool/StakingPool";
 import {
   BoundPoolArgs,
@@ -58,10 +57,8 @@ import {
   MEMECHAN_QUOTE_TOKEN_DECIMALS,
   MEMECHAN_TARGET_CONFIG,
 } from "../config/config";
-import { formatAmmKeysById } from "../raydium/formatAmmKeysById";
 import { MemechanSol } from "../schema/types/memechan_sol";
-import { createMetadata, getCreateMetadataTransaction } from "../token/createMetadata";
-import { createMintWithPriority } from "../token/createMintWithPriority";
+import { getCreateMetadataTransaction } from "../token/createMetadata";
 import { getCreateMintWithPriorityTransaction } from "../token/getCreateMintWithPriorityTransaction";
 import { NewBPInstructionParsed } from "../tx-parsing/parsers/bonding-pool-creation-parser";
 import { ParseTx } from "../tx-parsing/parsing";
@@ -72,6 +69,7 @@ import { getSendAndConfirmTransactionMethod } from "../util/getSendAndConfirmTra
 import { retry } from "../util/retry";
 import { deductSlippage } from "../util/trading/deductSlippage";
 import { normalizeInputCoinAmount } from "../util/trading/normalizeInputCoinAmount";
+import { LivePool } from "../live-pool/LivePool";
 
 export class BoundPoolClient {
   private constructor(
@@ -855,7 +853,7 @@ export class BoundPoolClient {
     return { createMarketTransactions, goLiveTransaction: transaction, stakingId, ammId };
   }
 
-  public async goLive(args: GoLiveArgs): Promise<[StakingPool, ApiPoolInfoV4]> {
+  public async goLive(args: GoLiveArgs): Promise<[StakingPool, LivePool]> {
     // Get needed transactions
     const { createMarketTransactions, goLiveTransaction, stakingId, ammId } = await this.getGoLiveTransaction(args);
 
@@ -910,9 +908,9 @@ export class BoundPoolClient {
       poolAccountAddressId: stakingId,
     });
 
-    const ammPool = await formatAmmKeysById(ammId.toBase58(), this.client.connection);
+    const livePool = await LivePool.fromAmmId(ammId, this.client);
 
-    return [stakingPoolInstance, ammPool];
+    return [stakingPoolInstance, livePool];
   }
 
   public async fetchRelatedTickets() {

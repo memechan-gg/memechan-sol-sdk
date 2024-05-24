@@ -75,7 +75,7 @@ describe("StakingPool", () => {
       boundPoolInfo,
     });
 
-    const [stakingPool, ammPool] = await boundPool.goLive({
+    const [stakingPool, livePool] = await boundPool.goLive({
       payer: payer,
       user: payer,
       boundPoolInfo,
@@ -83,6 +83,8 @@ describe("StakingPool", () => {
       memeVault: stakingMemeVault,
       quoteVault: stakingQuoteVault,
     });
+
+    const ammPool = livePool.ammPoolInfo;
     console.log("ammPool: " + JSON.stringify(ammPool));
 
     const inputToken = MEMECHAN_QUOTE_TOKEN;
@@ -166,7 +168,7 @@ describe("StakingPool", () => {
       boundPoolInfo,
     });
 
-    const [stakingPool, ammPool] = await boundPool.goLive({
+    const [stakingPool, livePool] = await boundPool.goLive({
       payer: payer,
       user: payer,
       boundPoolInfo,
@@ -174,6 +176,8 @@ describe("StakingPool", () => {
       memeVault: stakingMemeVault,
       quoteVault: stakingQuoteVault,
     });
+
+    const ammPool = livePool.ammPoolInfo;
     console.log("ammPool: " + JSON.stringify(ammPool));
 
     const inputToken = MEMECHAN_QUOTE_TOKEN;
@@ -254,7 +258,7 @@ describe("StakingPool", () => {
       boundPoolInfo,
     });
 
-    const [stakingPool, ammPool] = await boundPool.goLive({
+    const [stakingPool, livePool] = await boundPool.goLive({
       payer: payer,
       user: payer,
       boundPoolInfo,
@@ -262,6 +266,8 @@ describe("StakingPool", () => {
       memeVault: stakingMemeVault,
       quoteVault: stakingQuoteVault,
     });
+    
+    const ammPool = livePool.ammPoolInfo;
     console.log("ammPool: " + JSON.stringify(ammPool));
 
     const inputToken = MEMECHAN_QUOTE_TOKEN;
