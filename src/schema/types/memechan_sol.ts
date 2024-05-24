@@ -1944,6 +1944,10 @@ export type MemechanSol = {
     {
       "code": 6024,
       "name": "InvalidStatus"
+    },
+    {
+      "code": 6025,
+      "name": "CantUnstakeBeforeCliff"
     }
   ]
 };
@@ -3894,6 +3898,10 @@ export const IDL: MemechanSol = {
     {
       "code": 6024,
       "name": "InvalidStatus"
+    },
+    {
+      "code": 6025,
+      "name": "CantUnstakeBeforeCliff"
     }
   ]
 };
