@@ -24,6 +24,7 @@ export type CustomError =
   | InvalidAmmAccountOwner
   | ExpectedAccount
   | InvalidStatus
+  | CantUnstakeBeforeCliff
 
 export class InvalidAccountInput extends Error {
   readonly code = 6000
@@ -283,6 +284,16 @@ export class InvalidStatus extends Error {
   }
 }
 
+export class CantUnstakeBeforeCliff extends Error {
+  readonly code = 6025
+  readonly name = "CantUnstakeBeforeCliff"
+  readonly msg = "undefined"
+
+  constructor() {
+    super("6025: undefined")
+  }
+}
+
 export function fromCode(code: number): CustomError | null {
   switch (code) {
     case 6000:
@@ -335,6 +346,8 @@ export function fromCode(code: number): CustomError | null {
       return new ExpectedAccount()
     case 6024:
       return new InvalidStatus()
+    case 6025:
+      return new CantUnstakeBeforeCliff()
   }
 
   return null

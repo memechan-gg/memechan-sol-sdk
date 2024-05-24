@@ -3,7 +3,7 @@ import { IdlAccounts } from "@coral-xyz/anchor";
 import { MemechanClient } from "../../MemechanClient";
 import { MemechanSol } from "../../schema/types/memechan_sol";
 
-export type MemeTicket = IdlAccounts<MemechanSol>["memeTicket"];
+type MemeTicket = IdlAccounts<MemechanSol>["memeTicket"];
 
 export type SwapYInstructionParsed = {
   sender: PublicKey;

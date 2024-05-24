@@ -1944,8 +1944,12 @@
     {
       "code": 6024,
       "name": "InvalidStatus"
+    },
+    {
+      "code": 6025,
+      "name": "CantUnstakeBeforeCliff"
     }
-  ],
+   ],
   "metadata": {
     "address": "3ZSoMaLkD4QBVY94hiqRsi7wtxhXHn1cQxKzPnXyB2KP"
   }

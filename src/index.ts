@@ -1,5 +1,10 @@
-// MemechanClient
+// Clients
 export * from "./MemechanClient";
+export * from "./bound-pool/BoundPoolClient";
+export * from "./live-pool/LivePoolClient";
+export * from "./memeticket/MemeTicketClient";
+export * from "./staking-pool/StakingPoolClient";
+export * from "./targetconfig/TargetConfigClient";
 
 // Config
 export * from "./config/config";
@@ -19,10 +24,6 @@ export * from "./api/schemas/token-status-schema";
 export * from "./api/types";
 export * from "./api/uploadMetadataToIpfs";
 
-// Target config
-export * from "./targetconfig/TargetConfig";
-export * from "./targetconfig/TargetConfig";
-
 // Parsing
 export * from "./tx-parsing/parsing";
 export * from "./tx-parsing/parsers/bonding-pool-creation-parser";
@@ -32,9 +33,11 @@ export * from "./tx-parsing/parsers/swap-x-parser";
 export * from "./tx-parsing/parsers/swap-y-parser";
 export * from "./tx-parsing/parsers/create-metadata-parser";
 
-// Bound Pool
-export * from "./bound-pool/BoundPool";
+// Codegen
 export * from "./schema/codegen/accounts/BoundPool";
+export * from "./schema/codegen/accounts/MemeTicket";
+export * from "./schema/codegen/accounts/StakingPool";
+export * from "./schema/codegen/accounts/TargetConfig";
 
 // Utils
 export * from "./common/helpers";

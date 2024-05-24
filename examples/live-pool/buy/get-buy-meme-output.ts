@@ -1,4 +1,4 @@
-import { LivePool } from "../../../src/live-pool/LivePool";
+import { LivePoolClient } from "../../../src/live-pool/LivePoolClient";
 import { connection } from "../../common";
 
 // yarn tsx examples/live-pool/buy/get-buy-meme-output.ts > buy-meme-output.txt 2>&1
@@ -7,7 +7,7 @@ export const getBuyMemeOutput = async () => {
   const memeMint = "5vj496NTttpUESayDt2Mpn5jRQBqvLkMwwvJTBPVR4w1";
   const amountIn = "100"; // That's a formatted amount
 
-  const { minAmountOut, wrappedAmountIn } = await LivePool.getBuyMemeOutput({
+  const { minAmountOut, wrappedAmountIn } = await LivePoolClient.getBuyMemeOutput({
     poolAddress,
     memeCoinMint: memeMint,
     amountIn,
