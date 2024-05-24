@@ -1,21 +1,21 @@
 import { BN } from "@coral-xyz/anchor";
-import { MemeTicket } from "../memeticket/MemeTicket";
+import { MemeTicketClient } from "../memeticket/MemeTicketClient";
 import { Keypair, PublicKey, Transaction } from "@solana/web3.js";
 
 export interface UnstakeArgs {
-  ticket: MemeTicket;
+  ticket: MemeTicketClient;
   amount: BN;
   user: Keypair;
 }
 
 export type GetUnstakeTransactionArgs = UnstakeArgs & { transaction?: Transaction };
 
-export type AddFeesArgs = GetAddFeesTransactionArgs 
+export type AddFeesArgs = GetAddFeesTransactionArgs;
 
-export type GetAddFeesTransactionArgs = { transaction?: Transaction, ammPoolId: PublicKey, payer: Keypair  };
+export type GetAddFeesTransactionArgs = { transaction?: Transaction; ammPoolId: PublicKey; payer: Keypair };
 
 export interface WithdrawFeesArgs {
-  ticket: MemeTicket;
+  ticket: MemeTicketClient;
   user: Keypair;
 }
 

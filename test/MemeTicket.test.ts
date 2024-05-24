@@ -2,14 +2,14 @@ import BN from "bn.js";
 import { BoundPoolClient } from "../src/bound-pool/BoundPoolClient";
 import { sleep } from "../src/common/helpers";
 import { MEMECHAN_QUOTE_TOKEN } from "../src/config/config";
-import { MemeTicket } from "../src/memeticket/MemeTicket";
+import { MemeTicketClient } from "../src/memeticket/MemeTicketClient";
 import { MintUtils } from "../src/token/mintUtils";
 import { DUMMY_TOKEN_METADATA, LIVE_BOUND_POOL_ID, admin, client, payer } from "./common/common";
 import { FEE_DESTINATION_ID } from "./common/env";
 
-describe("MemeTicket", () => {
+describe("MemeTicketClient", () => {
   it.skip("all", async () => {
-    const all = await MemeTicket.all(client.memechanProgram);
+    const all = await MemeTicketClient.all(client.memechanProgram);
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     for (const pool of all) {
@@ -21,7 +21,7 @@ describe("MemeTicket", () => {
   it.skip("merge tickets presale", async () => {
     const pool = await BoundPoolClient.fromBoundPoolId({ client, poolAccountAddressId: LIVE_BOUND_POOL_ID });
 
-    const tickets: MemeTicket[] = [];
+    const tickets: MemeTicketClient[] = [];
 
     tickets.push(
       await pool.swapY({
@@ -80,7 +80,7 @@ describe("MemeTicket", () => {
       tokenMetadata: DUMMY_TOKEN_METADATA,
     });
 
-    const tickets: MemeTicket[] = [];
+    const tickets: MemeTicketClient[] = [];
 
     tickets.push(
       await pool.swapY({

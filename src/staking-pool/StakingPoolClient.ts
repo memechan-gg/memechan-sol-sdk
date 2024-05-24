@@ -3,7 +3,7 @@ import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import { AccountMeta, Keypair, PublicKey, Transaction } from "@solana/web3.js";
 import { MemechanClient } from "../MemechanClient";
 import { BoundPoolClient } from "../bound-pool/BoundPoolClient";
-import { MemeTicket } from "../memeticket/MemeTicket";
+import { MemeTicketClient } from "../memeticket/MemeTicketClient";
 import { MemeTicketFields } from "../schema/codegen/accounts";
 import { MemechanSol } from "../schema/types/memechan_sol";
 import {
@@ -275,7 +275,7 @@ export class StakingPoolClient {
    * Fetches all tickets for corresponding pool id
    */
   public async fetchRelatedTickets(pool = this.pool, client = this.client): Promise<MemeTicketFields[]> {
-    return MemeTicket.fetchRelatedTickets(pool, client);
+    return MemeTicketClient.fetchRelatedTickets(pool, client);
   }
 
   /**

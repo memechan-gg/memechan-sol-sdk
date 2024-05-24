@@ -4,7 +4,7 @@ import { sleep } from "../src/common/helpers";
 import { DUMMY_TOKEN_METADATA, admin, client, payer } from "./common/common";
 import { FEE_DESTINATION_ID } from "./common/env";
 import { MEMECHAN_QUOTE_TOKEN } from "../src/config/config";
-import { MemeTicket } from "../src/memeticket/MemeTicket";
+import { MemeTicketClient } from "../src/memeticket/MemeTicketClient";
 
 describe("BoundPool", () => {
   it.skip("creates bound pool", async () => {
@@ -44,7 +44,7 @@ describe("BoundPool", () => {
     console.log("==== pool id: " + boundPool.id.toString());
     await sleep(2000);
 
-    const tickets: MemeTicket[] = [];
+    const tickets: MemeTicketClient[] = [];
 
     const ticketId = await boundPool.swapY({
       payer: payer,
@@ -55,7 +55,7 @@ describe("BoundPool", () => {
       pool: boundPool.id,
     });
 
-    tickets.push(new MemeTicket(ticketId.id, client));
+    tickets.push(new MemeTicketClient(ticketId.id, client));
     console.log("swapY ticketId: " + ticketId.id.toBase58());
 
     const ticketId2 = await boundPool.swapY({
@@ -67,7 +67,7 @@ describe("BoundPool", () => {
       pool: boundPool.id,
     });
 
-    tickets.push(new MemeTicket(ticketId2.id, client));
+    tickets.push(new MemeTicketClient(ticketId2.id, client));
     console.log("swapY ticketId2: " + ticketId2.id.toBase58());
 
     const boundPoolInfo = await BoundPoolClient.fetch2(client.connection, boundPool.id);

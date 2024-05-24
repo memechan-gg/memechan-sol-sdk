@@ -5,7 +5,7 @@ import { MEMECHAN_MEME_TOKEN_DECIMALS, MEMECHAN_QUOTE_TOKEN } from "../src/confi
 import { StakingPoolClient } from "../src/staking-pool/StakingPoolClient";
 import { DUMMY_TOKEN_METADATA, admin, client, payer } from "./common/common";
 import { FEE_DESTINATION_ID } from "./common/env";
-import { MemeTicket } from "../src/memeticket/MemeTicket";
+import { MemeTicketClient } from "../src/memeticket/MemeTicketClient";
 import { swapOnlyAmm } from "../src/raydium/swapOnlyAmm";
 import { Percent, TokenAmount, Token } from "@raydium-io/raydium-sdk";
 import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
@@ -34,7 +34,7 @@ describe("StakingPoolClient", () => {
     console.log("==== pool id: " + boundPool.id.toString());
     await sleep(2000);
 
-    const tickets: MemeTicket[] = [];
+    const tickets: MemeTicketClient[] = [];
 
     const ticketId = await boundPool.swapY({
       payer: payer,
@@ -47,7 +47,7 @@ describe("StakingPoolClient", () => {
 
     console.log("swapY ticketId: " + ticketId.id.toBase58());
 
-    const ticket1 = new MemeTicket(ticketId.id, client);
+    const ticket1 = new MemeTicketClient(ticketId.id, client);
     tickets.push(ticket1);
 
     const ticket1Data = await ticket1.fetch();
@@ -67,7 +67,7 @@ describe("StakingPoolClient", () => {
       pool: boundPool.id,
     });
 
-    tickets.push(new MemeTicket(ticketId2.id, client));
+    tickets.push(new MemeTicketClient(ticketId2.id, client));
     console.log("swapY ticketId2: " + ticketId2.id.toBase58());
 
     const boundPoolInfo = await BoundPoolClient.fetch2(client.connection, boundPool.id);
@@ -141,7 +141,7 @@ describe("StakingPoolClient", () => {
     console.log("==== pool id: " + boundPool.id.toString());
     await sleep(2000);
 
-    const tickets: MemeTicket[] = [];
+    const tickets: MemeTicketClient[] = [];
 
     const ticketId = await boundPool.swapY({
       payer: payer,
@@ -152,7 +152,7 @@ describe("StakingPoolClient", () => {
       pool: boundPool.id,
     });
 
-    tickets.push(new MemeTicket(ticketId.id, client));
+    tickets.push(new MemeTicketClient(ticketId.id, client));
     console.log("swapY ticketId: " + ticketId.id.toBase58());
 
     const ticketId2 = await boundPool.swapY({
@@ -164,7 +164,7 @@ describe("StakingPoolClient", () => {
       pool: boundPool.id,
     });
 
-    tickets.push(new MemeTicket(ticketId2.id, client));
+    tickets.push(new MemeTicketClient(ticketId2.id, client));
     console.log("swapY ticketId2: " + ticketId2.id.toBase58());
 
     const boundPoolInfo = await BoundPoolClient.fetch2(client.connection, boundPool.id);
@@ -230,7 +230,7 @@ describe("StakingPoolClient", () => {
 
     console.log("==== pool id: " + boundPool.id.toString());
     await sleep(2000);
-    const tickets: MemeTicket[] = [];
+    const tickets: MemeTicketClient[] = [];
 
     const ticketId = await boundPool.swapY({
       payer: payer,
@@ -241,7 +241,7 @@ describe("StakingPoolClient", () => {
       pool: boundPool.id,
     });
 
-    tickets.push(new MemeTicket(ticketId.id, client));
+    tickets.push(new MemeTicketClient(ticketId.id, client));
     console.log("swapY ticketId: " + ticketId.id.toBase58());
 
     const ticketId2 = await boundPool.swapY({
@@ -253,7 +253,7 @@ describe("StakingPoolClient", () => {
       pool: boundPool.id,
     });
 
-    tickets.push(new MemeTicket(ticketId2.id, client));
+    tickets.push(new MemeTicketClient(ticketId2.id, client));
     console.log("swapY ticketId2: " + ticketId2.id.toBase58());
 
     const boundPoolInfo = await BoundPoolClient.fetch2(client.connection, boundPool.id);

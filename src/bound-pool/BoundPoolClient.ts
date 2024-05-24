@@ -26,7 +26,7 @@ import { BoundPool, BoundPool as CodegenBoundPool, MemeTicketFields } from "../s
 
 import { BN, Program, Provider } from "@coral-xyz/anchor";
 import { MemechanClient } from "../MemechanClient";
-import { MemeTicket } from "../memeticket/MemeTicket";
+import { MemeTicketClient } from "../memeticket/MemeTicketClient";
 import { ATA_PROGRAM_ID, PROGRAMIDS } from "../raydium/config";
 import { getCreateMarketTransactions } from "../raydium/openBookCreateMarket";
 import { StakingPoolClient } from "../staking-pool/StakingPoolClient";
@@ -407,7 +407,7 @@ export class BoundPoolClient {
     return mintTo(provider.connection, payer, mint, wallet, authority, amount);
   }
 
-  public async swapY(input: SwapYArgs): Promise<MemeTicket> {
+  public async swapY(input: SwapYArgs): Promise<MemeTicketClient> {
     const id = Keypair.generate();
     const user = input.user!;
     const payer = input.payer!;
@@ -478,7 +478,7 @@ export class BoundPoolClient {
       .rpc({ skipPreflight: true, commitment: "confirmed" })
       .catch((e) => console.error(e));
 
-    return new MemeTicket(id.publicKey, this.client);
+    return new MemeTicketClient(id.publicKey, this.client);
   }
 
   /**
@@ -914,7 +914,7 @@ export class BoundPoolClient {
   }
 
   public async fetchRelatedTickets() {
-    return MemeTicket.fetchRelatedTickets(this.id, this.client);
+    return MemeTicketClient.fetchRelatedTickets(this.id, this.client);
   }
 
   public async getHoldersCount() {
@@ -937,7 +937,7 @@ export class BoundPoolClient {
   }
 
   public static async getHoldersMap(pool: PublicKey, client: MemechanClient) {
-    const tickets = await MemeTicket.fetchRelatedTickets(pool, client);
+    const tickets = await MemeTicketClient.fetchRelatedTickets(pool, client);
     const uniqueHolders: Map<string, MemeTicketFields[]> = new Map();
 
     tickets.forEach((ticket) => {
