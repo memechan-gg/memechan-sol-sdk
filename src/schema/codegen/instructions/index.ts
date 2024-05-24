@@ -4,7 +4,17 @@ export {
   CreateMetadataArgs,
   CreateMetadataAccounts,
 } from "./createMetadata"
+export {
+  getSwapXAmt,
+  GetSwapXAmtArgs,
+  GetSwapXAmtAccounts,
+} from "./getSwapXAmt"
 export { swapX, SwapXArgs, SwapXAccounts } from "./swapX"
+export {
+  getSwapYAmt,
+  GetSwapYAmtArgs,
+  GetSwapYAmtAccounts,
+} from "./getSwapYAmt"
 export { swapY, SwapYArgs, SwapYAccounts } from "./swapY"
 export { initStakingPool, InitStakingPoolAccounts } from "./initStakingPool"
 export {
