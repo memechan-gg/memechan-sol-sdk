@@ -1,6 +1,6 @@
 import { PublicKey } from "@solana/web3.js";
 import { BoundPoolClient } from "../../../src/bound-pool/BoundPoolClient";
-import { client, payer } from "../../common";
+import { client } from "../../common";
 
 // yarn tsx examples/bonding-pool/trading/get-output-amount-for-buy-meme.ts
 (async () => {
@@ -10,8 +10,6 @@ import { client, payer } from "../../common";
   const res = await boundPoolInstance.getOutputAmountForBuyMeme({
     inputAmount: "1",
     slippagePercentage: 0,
-    user: payer.publicKey,
-    signer: payer,
   });
 
   console.debug("res: ");
