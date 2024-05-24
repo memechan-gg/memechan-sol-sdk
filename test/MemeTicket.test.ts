@@ -1,5 +1,5 @@
 import BN from "bn.js";
-import { BoundPoolClient } from "../src/bound-pool/BoundPool";
+import { BoundPoolClient } from "../src/bound-pool/BoundPoolClient";
 import { sleep } from "../src/common/helpers";
 import { MEMECHAN_QUOTE_TOKEN } from "../src/config/config";
 import { MemeTicket } from "../src/memeticket/MemeTicket";

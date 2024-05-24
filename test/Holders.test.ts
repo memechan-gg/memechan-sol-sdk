@@ -1,6 +1,6 @@
 import { PublicKey } from "@solana/web3.js";
-import { BoundPoolClient } from "../src/bound-pool/BoundPool";
-import { StakingPool } from "../src/staking-pool/StakingPool";
+import { BoundPoolClient } from "../src/bound-pool/BoundPoolClient";
+import { StakingPoolClient } from "../src/staking-pool/StakingPoolClient";
 import { client } from "./common/common";
 
 describe.skip("Holders endpoints", () => {
@@ -16,7 +16,7 @@ describe.skip("Holders endpoints", () => {
 
   it("live", async () => {
     const poolAddr = new PublicKey("DitzVtU8GKzXaJP5wmiYxEceT4G6PG3SNpbTNUwtParZ");
-    const staking = await StakingPool.fromStakingPoolId({
+    const staking = await StakingPoolClient.fromStakingPoolId({
       poolAccountAddressId: poolAddr,
       client,
     });

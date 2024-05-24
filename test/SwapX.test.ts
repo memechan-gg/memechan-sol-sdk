@@ -1,4 +1,4 @@
-import { BoundPoolClient } from "../src/bound-pool/BoundPool";
+import { BoundPoolClient } from "../src/bound-pool/BoundPoolClient";
 import { DUMMY_TOKEN_METADATA, admin, client, payer } from "./common/common";
 import BN from "bn.js";
 import { sleep } from "../src/common/helpers";

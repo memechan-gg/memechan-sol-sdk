@@ -29,7 +29,7 @@ import { MemechanClient } from "../MemechanClient";
 import { MemeTicket } from "../memeticket/MemeTicket";
 import { ATA_PROGRAM_ID, PROGRAMIDS } from "../raydium/config";
 import { getCreateMarketTransactions } from "../raydium/openBookCreateMarket";
-import { StakingPool } from "../staking-pool/StakingPool";
+import { StakingPoolClient } from "../staking-pool/StakingPoolClient";
 import {
   BoundPoolArgs,
   BuyMemeArgs,
@@ -660,7 +660,7 @@ export class BoundPoolClient {
       boundPoolInfo.memeReserve.mint,
       this.client.memechanProgram.programId,
     );
-    const stakingSigner = StakingPool.findSignerPda(stakingId, this.client.memechanProgram.programId);
+    const stakingSigner = StakingPoolClient.findSignerPda(stakingId, this.client.memechanProgram.programId);
     const adminTicketId = BoundPoolClient.findMemeTicketPda(stakingId, this.client.memechanProgram.programId);
 
     const stakingQuoteVaultId = Keypair.generate();
@@ -762,7 +762,7 @@ export class BoundPoolClient {
       boundPoolInfo.memeReserve.mint,
       this.client.memechanProgram.programId,
     );
-    const stakingSigner = StakingPool.findSignerPda(stakingId, this.client.memechanProgram.programId);
+    const stakingSigner = StakingPoolClient.findSignerPda(stakingId, this.client.memechanProgram.programId);
     const baseTokenInfo = new Token(
       TOKEN_PROGRAM_ID,
       new PublicKey(boundPoolInfo.memeReserve.mint),
@@ -853,7 +853,7 @@ export class BoundPoolClient {
     return { createMarketTransactions, goLiveTransaction: transaction, stakingId, ammId };
   }
 
-  public async goLive(args: GoLiveArgs): Promise<[StakingPool, LivePoolClient]> {
+  public async goLive(args: GoLiveArgs): Promise<[StakingPoolClient, LivePoolClient]> {
     // Get needed transactions
     const { createMarketTransactions, goLiveTransaction, stakingId, ammId } = await this.getGoLiveTransaction(args);
 
@@ -903,7 +903,7 @@ export class BoundPoolClient {
       throw new Error("goLiveTxResult failed");
     }
 
-    const stakingPoolInstance = await StakingPool.fromStakingPoolId({
+    const stakingPoolInstance = await StakingPoolClient.fromStakingPoolId({
       client: this.client,
       poolAccountAddressId: stakingId,
     });

@@ -20,7 +20,7 @@ import { retry } from "../util/retry";
 import { MEMECHAN_QUOTE_MINT } from "../config/config";
 import { formatAmmKeysById } from "../raydium/formatAmmKeysById";
 
-export class StakingPool {
+export class StakingPoolClient {
   constructor(
     public id: PublicKey,
     private client: MemechanClient,
@@ -43,7 +43,7 @@ export class StakingPool {
 
     console.log("stakingPoolObjectData:", stakingPoolObjectData);
 
-    const boundClientInstance = new StakingPool(
+    const boundClientInstance = new StakingPoolClient(
       poolAccountAddressId,
       client,
       stakingPoolObjectData.pool,
@@ -264,11 +264,11 @@ export class StakingPool {
   }
 
   public async getHoldersCount() {
-    return StakingPool.getHoldersCount(this.pool, this.memeMint, this.client);
+    return StakingPoolClient.getHoldersCount(this.pool, this.memeMint, this.client);
   }
 
   public async getHoldersList() {
-    return StakingPool.getHoldersList(this.pool, this.memeMint, this.client);
+    return StakingPoolClient.getHoldersList(this.pool, this.memeMint, this.client);
   }
 
   /**
@@ -282,7 +282,7 @@ export class StakingPool {
    * Fetches all unique token holders and memetickets owners for pool; then returns their number
    */
   public static async getHoldersCount(pool: PublicKey, mint: PublicKey, client: MemechanClient) {
-    return (await StakingPool.getHoldersList(pool, mint, client)).length;
+    return (await StakingPoolClient.getHoldersList(pool, mint, client)).length;
   }
 
   /**
@@ -290,7 +290,7 @@ export class StakingPool {
    */
   public static async getHoldersList(pool: PublicKey, mint: PublicKey, client: MemechanClient) {
     const ticketHolderList = await BoundPoolClient.getHoldersList(pool, client);
-    const tokenHolderList = await StakingPool.getTokenHolderListHelius(mint, client.heliusApiUrl);
+    const tokenHolderList = await StakingPoolClient.getTokenHolderListHelius(mint, client.heliusApiUrl);
 
     ticketHolderList.forEach((holder) => {
       tokenHolderList.add(holder);
@@ -344,7 +344,7 @@ export class StakingPool {
   }
 
   public findSignerPda(): PublicKey {
-    return StakingPool.findSignerPda(this.id, this.client.memechanProgram.programId);
+    return StakingPoolClient.findSignerPda(this.id, this.client.memechanProgram.programId);
   }
 
   private getAccountMeta(pubkey: PublicKey): AccountMeta {
