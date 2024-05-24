@@ -1,45 +1,45 @@
-import { PublicKey } from "@solana/web3.js" // eslint-disable-line @typescript-eslint/no-unused-vars
-import BN from "bn.js" // eslint-disable-line @typescript-eslint/no-unused-vars
-import * as types from "../types" // eslint-disable-line @typescript-eslint/no-unused-vars
-import * as borsh from "@project-serum/borsh"
+import { PublicKey } from "@solana/web3.js"; // eslint-disable-line @typescript-eslint/no-unused-vars
+import BN from "bn.js"; // eslint-disable-line @typescript-eslint/no-unused-vars
+import * as types from "../types"; // eslint-disable-line @typescript-eslint/no-unused-vars
+import * as borsh from "@project-serum/borsh";
 
 export interface ConfigFields {
-  alphaAbs: BN
-  beta: BN
-  priceFactor: BN
-  gammaS: BN
-  gammaM: BN
-  omegaM: BN
-  decimals: types.DecimalsFields
+  alphaAbs: BN;
+  beta: BN;
+  priceFactor: BN;
+  gammaS: BN;
+  gammaM: BN;
+  omegaM: BN;
+  decimals: types.DecimalsFields;
 }
 
 export interface ConfigJSON {
-  alphaAbs: string
-  beta: string
-  priceFactor: string
-  gammaS: string
-  gammaM: string
-  omegaM: string
-  decimals: types.DecimalsJSON
+  alphaAbs: string;
+  beta: string;
+  priceFactor: string;
+  gammaS: string;
+  gammaM: string;
+  omegaM: string;
+  decimals: types.DecimalsJSON;
 }
 
 export class Config {
-  readonly alphaAbs: BN
-  readonly beta: BN
-  readonly priceFactor: BN
-  readonly gammaS: BN
-  readonly gammaM: BN
-  readonly omegaM: BN
-  readonly decimals: types.Decimals
+  readonly alphaAbs: BN;
+  readonly beta: BN;
+  readonly priceFactor: BN;
+  readonly gammaS: BN;
+  readonly gammaM: BN;
+  readonly omegaM: BN;
+  readonly decimals: types.Decimals;
 
   constructor(fields: ConfigFields) {
-    this.alphaAbs = fields.alphaAbs
-    this.beta = fields.beta
-    this.priceFactor = fields.priceFactor
-    this.gammaS = fields.gammaS
-    this.gammaM = fields.gammaM
-    this.omegaM = fields.omegaM
-    this.decimals = new types.Decimals({ ...fields.decimals })
+    this.alphaAbs = fields.alphaAbs;
+    this.beta = fields.beta;
+    this.priceFactor = fields.priceFactor;
+    this.gammaS = fields.gammaS;
+    this.gammaM = fields.gammaM;
+    this.omegaM = fields.omegaM;
+    this.decimals = new types.Decimals({ ...fields.decimals });
   }
 
   static layout(property?: string) {
@@ -53,8 +53,8 @@ export class Config {
         borsh.u64("omegaM"),
         types.Decimals.layout("decimals"),
       ],
-      property
-    )
+      property,
+    );
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -67,7 +67,7 @@ export class Config {
       gammaM: obj.gammaM,
       omegaM: obj.omegaM,
       decimals: types.Decimals.fromDecoded(obj.decimals),
-    })
+    });
   }
 
   static toEncodable(fields: ConfigFields) {
@@ -79,7 +79,7 @@ export class Config {
       gammaM: fields.gammaM,
       omegaM: fields.omegaM,
       decimals: types.Decimals.toEncodable(fields.decimals),
-    }
+    };
   }
 
   toJSON(): ConfigJSON {
@@ -91,7 +91,7 @@ export class Config {
       gammaM: this.gammaM.toString(),
       omegaM: this.omegaM.toString(),
       decimals: this.decimals.toJSON(),
-    }
+    };
   }
 
   static fromJSON(obj: ConfigJSON): Config {
@@ -103,10 +103,10 @@ export class Config {
       gammaM: new BN(obj.gammaM),
       omegaM: new BN(obj.omegaM),
       decimals: types.Decimals.fromJSON(obj.decimals),
-    })
+    });
   }
 
   toEncodable() {
-    return Config.toEncodable(this)
+    return Config.toEncodable(this);
   }
 }

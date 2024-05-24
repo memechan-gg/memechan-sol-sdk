@@ -1,44 +1,60 @@
-import { WideBits, struct, blob, publicKey, u64, Base, TxVersion, CacheLTA, generatePubKey, ZERO, splitTxAndSigners, InstructionType, u8, u32, u16 } from '@raydium-io/raydium-sdk'
-import { TOKEN_PROGRAM_ID, createInitializeAccountInstruction } from '@solana/spl-token'
-import { Connection, PublicKey, SYSVAR_RENT_PUBKEY, SystemProgram, TransactionInstruction } from '@solana/web3.js'
-import BN from 'bn.js'
+import {
+  WideBits,
+  struct,
+  blob,
+  publicKey,
+  u64,
+  Base,
+  TxVersion,
+  CacheLTA,
+  generatePubKey,
+  ZERO,
+  splitTxAndSigners,
+  InstructionType,
+  u8,
+  u32,
+  u16,
+} from "@raydium-io/raydium-sdk";
+import { TOKEN_PROGRAM_ID, createInitializeAccountInstruction } from "@solana/spl-token";
+import { Connection, PublicKey, SYSVAR_RENT_PUBKEY, SystemProgram, TransactionInstruction } from "@solana/web3.js";
+import BN from "bn.js";
 
-function accountFlagsLayout(property = 'accountFlags') {
-  const ACCOUNT_FLAGS_LAYOUT = new WideBits(property)
-  ACCOUNT_FLAGS_LAYOUT.addBoolean('initialized')
-  ACCOUNT_FLAGS_LAYOUT.addBoolean('market')
-  ACCOUNT_FLAGS_LAYOUT.addBoolean('openOrders')
-  ACCOUNT_FLAGS_LAYOUT.addBoolean('requestQueue')
-  ACCOUNT_FLAGS_LAYOUT.addBoolean('eventQueue')
-  ACCOUNT_FLAGS_LAYOUT.addBoolean('bids')
-  ACCOUNT_FLAGS_LAYOUT.addBoolean('asks')
-  return ACCOUNT_FLAGS_LAYOUT
+function accountFlagsLayout(property = "accountFlags") {
+  const ACCOUNT_FLAGS_LAYOUT = new WideBits(property);
+  ACCOUNT_FLAGS_LAYOUT.addBoolean("initialized");
+  ACCOUNT_FLAGS_LAYOUT.addBoolean("market");
+  ACCOUNT_FLAGS_LAYOUT.addBoolean("openOrders");
+  ACCOUNT_FLAGS_LAYOUT.addBoolean("requestQueue");
+  ACCOUNT_FLAGS_LAYOUT.addBoolean("eventQueue");
+  ACCOUNT_FLAGS_LAYOUT.addBoolean("bids");
+  ACCOUNT_FLAGS_LAYOUT.addBoolean("asks");
+  return ACCOUNT_FLAGS_LAYOUT;
 }
 
 export const MARKET_STATE_LAYOUT_V2 = struct([
   blob(5),
-  accountFlagsLayout('accountFlags'),
-  publicKey('ownAddress'),
-  u64('vaultSignerNonce'),
-  publicKey('baseMint'),
-  publicKey('quoteMint'),
-  publicKey('baseVault'),
-  u64('baseDepositsTotal'),
-  u64('baseFeesAccrued'),
-  publicKey('quoteVault'),
-  u64('quoteDepositsTotal'),
-  u64('quoteFeesAccrued'),
-  u64('quoteDustThreshold'),
-  publicKey('requestQueue'),
-  publicKey('eventQueue'),
-  publicKey('bids'),
-  publicKey('asks'),
-  u64('baseLotSize'),
-  u64('quoteLotSize'),
-  u64('feeRateBps'),
-  u64('referrerRebatesAccrued'),
+  accountFlagsLayout("accountFlags"),
+  publicKey("ownAddress"),
+  u64("vaultSignerNonce"),
+  publicKey("baseMint"),
+  publicKey("quoteMint"),
+  publicKey("baseVault"),
+  u64("baseDepositsTotal"),
+  u64("baseFeesAccrued"),
+  publicKey("quoteVault"),
+  u64("quoteDepositsTotal"),
+  u64("quoteFeesAccrued"),
+  u64("quoteDustThreshold"),
+  publicKey("requestQueue"),
+  publicKey("eventQueue"),
+  publicKey("bids"),
+  publicKey("asks"),
+  u64("baseLotSize"),
+  u64("quoteLotSize"),
+  u64("feeRateBps"),
+  u64("referrerRebatesAccrued"),
   blob(7),
-])
+]);
 
 export class MarketV2 extends Base {
   static async makeCreateMarketInstructionSimple<T extends TxVersion>({
@@ -52,55 +68,55 @@ export class MarketV2 extends Base {
     makeTxVersion,
     lookupTableCache,
   }: {
-    makeTxVersion: T
-    lookupTableCache?: CacheLTA
-    connection: Connection
-    wallet: PublicKey
+    makeTxVersion: T;
+    lookupTableCache?: CacheLTA;
+    connection: Connection;
+    wallet: PublicKey;
     baseInfo: {
-      mint: PublicKey
-      decimals: number
-    }
+      mint: PublicKey;
+      decimals: number;
+    };
     quoteInfo: {
-      mint: PublicKey
-      decimals: number
-    }
-    lotSize: number
-    tickSize: number
-    dexProgramId: PublicKey
+      mint: PublicKey;
+      decimals: number;
+    };
+    lotSize: number;
+    tickSize: number;
+    dexProgramId: PublicKey;
   }) {
-    const market = generatePubKey({ fromPublicKey: wallet, programId: dexProgramId })
-    const requestQueue = generatePubKey({ fromPublicKey: wallet, programId: dexProgramId })
-    const eventQueue = generatePubKey({ fromPublicKey: wallet, programId: dexProgramId })
-    const bids = generatePubKey({ fromPublicKey: wallet, programId: dexProgramId })
-    const asks = generatePubKey({ fromPublicKey: wallet, programId: dexProgramId })
-    const baseVault = generatePubKey({ fromPublicKey: wallet, programId: TOKEN_PROGRAM_ID })
-    const quoteVault = generatePubKey({ fromPublicKey: wallet, programId: TOKEN_PROGRAM_ID })
-    const feeRateBps = 0
-    const quoteDustThreshold = new BN(100)
+    const market = generatePubKey({ fromPublicKey: wallet, programId: dexProgramId });
+    const requestQueue = generatePubKey({ fromPublicKey: wallet, programId: dexProgramId });
+    const eventQueue = generatePubKey({ fromPublicKey: wallet, programId: dexProgramId });
+    const bids = generatePubKey({ fromPublicKey: wallet, programId: dexProgramId });
+    const asks = generatePubKey({ fromPublicKey: wallet, programId: dexProgramId });
+    const baseVault = generatePubKey({ fromPublicKey: wallet, programId: TOKEN_PROGRAM_ID });
+    const quoteVault = generatePubKey({ fromPublicKey: wallet, programId: TOKEN_PROGRAM_ID });
+    const feeRateBps = 0;
+    const quoteDustThreshold = new BN(100);
 
     function getVaultOwnerAndNonce() {
-      const vaultSignerNonce = new BN(0)
+      const vaultSignerNonce = new BN(0);
       // eslint-disable-next-line no-constant-condition
       while (true) {
         try {
           const vaultOwner = PublicKey.createProgramAddressSync(
-            [market.publicKey.toBuffer(), vaultSignerNonce.toArrayLike(Buffer, 'le', 8)],
+            [market.publicKey.toBuffer(), vaultSignerNonce.toArrayLike(Buffer, "le", 8)],
             dexProgramId,
-          )
-          return { vaultOwner, vaultSignerNonce }
+          );
+          return { vaultOwner, vaultSignerNonce };
         } catch (e) {
-          vaultSignerNonce.iaddn(1)
-          if (vaultSignerNonce.gt(new BN(25555))) throw Error('find vault owner error')
+          vaultSignerNonce.iaddn(1);
+          if (vaultSignerNonce.gt(new BN(25555))) throw Error("find vault owner error");
         }
       }
     }
-    const { vaultOwner, vaultSignerNonce } = getVaultOwnerAndNonce()
+    const { vaultOwner, vaultSignerNonce } = getVaultOwnerAndNonce();
 
-    const baseLotSize = new BN(Math.round(10 ** baseInfo.decimals * lotSize))
-    const quoteLotSize = new BN(Math.round(lotSize * 10 ** quoteInfo.decimals * tickSize))
+    const baseLotSize = new BN(Math.round(10 ** baseInfo.decimals * lotSize));
+    const quoteLotSize = new BN(Math.round(lotSize * 10 ** quoteInfo.decimals * tickSize));
 
-    if (baseLotSize.eq(ZERO)) throw Error('lot size is too small')
-    if (quoteLotSize.eq(ZERO)) throw Error('tick size or lot size is too small')
+    if (baseLotSize.eq(ZERO)) throw Error("lot size is too small");
+    if (quoteLotSize.eq(ZERO)) throw Error("tick size or lot size is too small");
 
     const ins = await this.makeCreateMarketInstruction({
       connection,
@@ -124,7 +140,7 @@ export class MarketV2 extends Base {
         baseLotSize,
         quoteLotSize,
       },
-    })
+    });
 
     return {
       address: ins.address,
@@ -136,7 +152,7 @@ export class MarketV2 extends Base {
         innerTransaction: ins.innerTransactions,
         lookupTableCache,
       }),
-    }
+    };
   }
 
   static async makeCreateMarketInstruction({
@@ -144,31 +160,31 @@ export class MarketV2 extends Base {
     wallet,
     marketInfo,
   }: {
-    connection: Connection
-    wallet: PublicKey
+    connection: Connection;
+    wallet: PublicKey;
     marketInfo: {
-      programId: PublicKey
-      id: { publicKey: PublicKey; seed: string }
-      baseMint: PublicKey
-      quoteMint: PublicKey
-      baseVault: { publicKey: PublicKey; seed: string }
-      quoteVault: { publicKey: PublicKey; seed: string }
-      vaultOwner: PublicKey
+      programId: PublicKey;
+      id: { publicKey: PublicKey; seed: string };
+      baseMint: PublicKey;
+      quoteMint: PublicKey;
+      baseVault: { publicKey: PublicKey; seed: string };
+      quoteVault: { publicKey: PublicKey; seed: string };
+      vaultOwner: PublicKey;
 
-      requestQueue: { publicKey: PublicKey; seed: string }
-      eventQueue: { publicKey: PublicKey; seed: string }
-      bids: { publicKey: PublicKey; seed: string }
-      asks: { publicKey: PublicKey; seed: string }
+      requestQueue: { publicKey: PublicKey; seed: string };
+      eventQueue: { publicKey: PublicKey; seed: string };
+      bids: { publicKey: PublicKey; seed: string };
+      asks: { publicKey: PublicKey; seed: string };
 
-      feeRateBps: number
-      vaultSignerNonce: BN
-      quoteDustThreshold: BN
+      feeRateBps: number;
+      vaultSignerNonce: BN;
+      quoteDustThreshold: BN;
 
-      baseLotSize: BN
-      quoteLotSize: BN
-    }
+      baseLotSize: BN;
+      quoteLotSize: BN;
+    };
   }) {
-    const ins1: TransactionInstruction[] = []
+    const ins1: TransactionInstruction[] = [];
     const accountLamports = await connection.getMinimumBalanceForRentExemption(165);
     console.log("accountLamports: ", accountLamports);
     ins1.push(
@@ -192,7 +208,7 @@ export class MarketV2 extends Base {
       }),
       createInitializeAccountInstruction(marketInfo.baseVault.publicKey, marketInfo.baseMint, marketInfo.vaultOwner),
       createInitializeAccountInstruction(marketInfo.quoteVault.publicKey, marketInfo.quoteMint, marketInfo.vaultOwner),
-    )
+    );
 
     // const requestQueueSpace = 5120 + 12;
     // const eventQueueSpace = 262144 + 12;
@@ -203,8 +219,8 @@ export class MarketV2 extends Base {
     const eventQueueSpace = 12156;
     const bidsSpace = 14548;
     const asksSpace = 14548;
-    
-    const ins2: TransactionInstruction[] = []
+
+    const ins2: TransactionInstruction[] = [];
     const marketInfoLamports = await connection.getMinimumBalanceForRentExemption(MARKET_STATE_LAYOUT_V2.span);
     const requestQueueLamports = await connection.getMinimumBalanceForRentExemption(requestQueueSpace);
     const eventQueueLamports = await connection.getMinimumBalanceForRentExemption(eventQueueSpace);
@@ -282,7 +298,7 @@ export class MarketV2 extends Base {
           quoteDustThreshold: marketInfo.quoteDustThreshold,
         },
       }),
-    )
+    );
 
     return {
       address: {
@@ -320,43 +336,43 @@ export class MarketV2 extends Base {
           ],
         },
       ],
-    }
+    };
   }
 
   static initializeMarketInstruction({
     programId,
     marketInfo,
   }: {
-    programId: PublicKey
+    programId: PublicKey;
     marketInfo: {
-      id: PublicKey
-      requestQueue: PublicKey
-      eventQueue: PublicKey
-      bids: PublicKey
-      asks: PublicKey
-      baseVault: PublicKey
-      quoteVault: PublicKey
-      baseMint: PublicKey
-      quoteMint: PublicKey
-      authority?: PublicKey
-      pruneAuthority?: PublicKey
+      id: PublicKey;
+      requestQueue: PublicKey;
+      eventQueue: PublicKey;
+      bids: PublicKey;
+      asks: PublicKey;
+      baseVault: PublicKey;
+      quoteVault: PublicKey;
+      baseMint: PublicKey;
+      quoteMint: PublicKey;
+      authority?: PublicKey;
+      pruneAuthority?: PublicKey;
 
-      baseLotSize: BN
-      quoteLotSize: BN
-      feeRateBps: number
-      vaultSignerNonce: BN
-      quoteDustThreshold: BN
-    }
+      baseLotSize: BN;
+      quoteLotSize: BN;
+      feeRateBps: number;
+      vaultSignerNonce: BN;
+      quoteDustThreshold: BN;
+    };
   }) {
     const dataLayout = struct([
-      u8('version'),
-      u32('instruction'),
-      u64('baseLotSize'),
-      u64('quoteLotSize'),
-      u16('feeRateBps'),
-      u64('vaultSignerNonce'),
-      u64('quoteDustThreshold'),
-    ])
+      u8("version"),
+      u32("instruction"),
+      u64("baseLotSize"),
+      u64("quoteLotSize"),
+      u16("feeRateBps"),
+      u64("vaultSignerNonce"),
+      u64("quoteDustThreshold"),
+    ]);
 
     const keys = [
       { pubkey: marketInfo.id, isSigner: false, isWritable: true },
@@ -380,9 +396,9 @@ export class MarketV2 extends Base {
         marketInfo.authority && marketInfo.pruneAuthority
           ? { pubkey: marketInfo.pruneAuthority, isSigner: false, isWritable: false }
           : [],
-      )
+      );
 
-    const data = Buffer.alloc(dataLayout.span)
+    const data = Buffer.alloc(dataLayout.span);
     dataLayout.encode(
       {
         version: 0,
@@ -394,12 +410,12 @@ export class MarketV2 extends Base {
         quoteDustThreshold: marketInfo.quoteDustThreshold,
       },
       data,
-    )
+    );
 
     return new TransactionInstruction({
       keys,
       programId,
       data,
-    })
+    });
   }
 }

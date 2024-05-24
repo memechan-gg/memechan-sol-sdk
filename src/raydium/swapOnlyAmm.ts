@@ -35,7 +35,7 @@ export async function swapOnlyAmm(input: SawpOnlyAmmInputInfo) {
 
   const poolInfo = await Liquidity.fetchInfo({ connection, poolKeys });
 
-  console.log('poolInfo:', poolInfo)
+  console.log("poolInfo:", poolInfo);
 
   const { amountOut, minAmountOut } = Liquidity.computeAmountOut({
     poolKeys: poolKeys,
@@ -43,7 +43,7 @@ export async function swapOnlyAmm(input: SawpOnlyAmmInputInfo) {
     amountIn: input.inputTokenAmount,
     currencyOut: input.outputToken,
     slippage: input.slippage,
-  })
+  });
 
   console.log("amountOut:", amountOut.toFixed(), "  minAmountOut: ", minAmountOut.toFixed());
 
