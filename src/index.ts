@@ -33,7 +33,7 @@ export * from "./tx-parsing/parsers/swap-y-parser";
 export * from "./tx-parsing/parsers/create-metadata-parser";
 
 // Bound Pool
-export * from "./bound-pool/BoundPool";
+export * from "./bound-pool/BoundPoolClient";
 export * from "./schema/codegen/accounts/BoundPool";
 
 // Utils

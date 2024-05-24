@@ -2,7 +2,7 @@ import { Program } from "@coral-xyz/anchor";
 import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import { AccountMeta, Keypair, PublicKey, Transaction } from "@solana/web3.js";
 import { MemechanClient } from "../MemechanClient";
-import { BoundPoolClient } from "../bound-pool/BoundPool";
+import { BoundPoolClient } from "../bound-pool/BoundPoolClient";
 import { MemeTicket } from "../memeticket/MemeTicket";
 import { MemeTicketFields } from "../schema/codegen/accounts";
 import { MemechanSol } from "../schema/types/memechan_sol";
@@ -61,7 +61,11 @@ export class StakingPool {
     return PublicKey.findProgramAddressSync([Buffer.from("staking"), publicKey.toBytes()], memechanProgramId)[0];
   }
 
-  public async getAddFeesTransaction({ transaction, ammPoolId, payer }: GetAddFeesTransactionArgs): Promise<Transaction> {
+  public async getAddFeesTransaction({
+    transaction,
+    ammPoolId,
+    payer,
+  }: GetAddFeesTransactionArgs): Promise<Transaction> {
     const tx = transaction ?? new Transaction();
     const stakingInfo = await this.fetch();
 
@@ -115,7 +119,7 @@ export class StakingPool {
     await retry({
       fn: sendAndConfirmAddFeesTransaction,
       functionName: "addFees",
-      retries: 1
+      retries: 1,
     });
   }
 

@@ -1,4 +1,4 @@
-import { BoundPoolClient } from "../../src/bound-pool/BoundPool";
+import { BoundPoolClient } from "../../src/bound-pool/BoundPoolClient";
 import { LivePool } from "../../src/live-pool/LivePool";
 import { connection } from "../common";
 

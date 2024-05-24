@@ -1,5 +1,5 @@
 import { sendAndConfirmTransaction } from "@solana/web3.js";
-import { BoundPoolClient } from "../../../src/bound-pool/BoundPool";
+import { BoundPoolClient } from "../../../src/bound-pool/BoundPoolClient";
 import { MEMECHAN_QUOTE_TOKEN } from "../../../src/config/config";
 import { admin, payer, client, DUMMY_TOKEN_METADATA } from "../../common";
 import { getTxSize } from "../../../src/util/get-tx-size";
