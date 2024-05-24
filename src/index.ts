@@ -24,9 +24,6 @@ export * from "./api/schemas/token-status-schema";
 export * from "./api/types";
 export * from "./api/uploadMetadataToIpfs";
 
-// Target config
-export * from "./targetconfig/TargetConfigClient";
-
 // Parsing
 export * from "./tx-parsing/parsing";
 export * from "./tx-parsing/parsers/bonding-pool-creation-parser";
