@@ -4,6 +4,7 @@ import { sleep } from "../src/common/helpers";
 import { DUMMY_TOKEN_METADATA, admin, client, payer } from "./common/common";
 import { FEE_DESTINATION_ID } from "./common/env";
 import { MEMECHAN_QUOTE_TOKEN } from "../src/config/config";
+import { MemeTicket } from "../src/memeticket/MemeTicket";
 
 describe("BoundPool", () => {
   it.skip("creates bound pool", async () => {
@@ -31,6 +32,58 @@ describe("BoundPool", () => {
 
     console.log(all);
   }, 30000);
+
+   it("swapy, golive, should fail below tresholds", async () => {
+    const boundPool = await BoundPoolClient.new({
+      admin,
+      payer,
+      signer: payer,
+      client,
+      quoteToken: MEMECHAN_QUOTE_TOKEN,
+      tokenMetadata: DUMMY_TOKEN_METADATA,
+    });
+
+    console.log("==== pool id: " + boundPool.id.toString());
+    await sleep(2000);
+    
+    const tickets: MemeTicket[] = [];
+
+    const ticketId = await boundPool.swapY({
+      payer: payer,
+      user: payer,
+      memeTokensOut: new BN(100*1e6),
+      quoteAmountIn: new BN(5000*1e9),
+      quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
+      pool: boundPool.id,
+    });
+
+    tickets.push(new MemeTicket(ticketId.id, client));
+    console.log("swapY ticketId: " + ticketId.id.toBase58());
+
+    const ticketId2 = await boundPool.swapY({
+      payer: payer,
+      user: payer,
+      memeTokensOut: new BN(100*1e6),
+      quoteAmountIn: new BN(3499*1e9),
+      quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
+      pool: boundPool.id,
+    });
+
+    tickets.push(new MemeTicket(ticketId2.id, client));
+    console.log("swapY ticketId2: " + ticketId2.id.toBase58());
+
+    const boundPoolInfo = await BoundPoolClient.fetch2(client.connection, boundPool.id);
+
+    console.log("boundPoolInfo:", boundPoolInfo);
+
+    await expect(boundPool.initStakingPool({
+      payer: payer,
+      user: payer,
+      boundPoolInfo,
+    })).rejects.toThrow();
+
+  }, 550000);
+
 
   it.skip("init staking pool then go live", async () => {
     console.log("payer: " + payer.publicKey.toString());
