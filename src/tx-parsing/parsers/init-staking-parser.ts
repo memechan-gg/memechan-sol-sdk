@@ -3,7 +3,7 @@ import { ParsedTransactionWithMeta, PublicKey } from "@solana/web3.js";
 import { MemechanClient } from "../../MemechanClient";
 import { MemechanSol } from "../../schema/types/memechan_sol";
 
-export type StakingPool = IdlAccounts<MemechanSol>["stakingPool"];
+type StakingPool = IdlAccounts<MemechanSol>["stakingPool"];
 
 export type InitStakingPoolInstructionParsed = {
   poolAddr: PublicKey;
