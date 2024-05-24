@@ -24,8 +24,17 @@ export const createSolanaTokenRequestBodySchema = z.object({
   socialLinks: solanaSocialLinks,
 });
 
+// new one
+// export const querySolanaTokensRequestParamsSchema = z.object({
+//   sortBy: solanaTokensSortableColumns,
+//   direction: z.literal("asc").or(z.literal("desc")),
+//   paginationToken: z.string().nullish(),
+// });
+
+// old one
 export const querySolanaTokensRequestParamsSchema = z.object({
   sortBy: solanaTokensSortableColumns,
+  status: z.literal("PRESALE").or(z.literal("LIVE")),
   direction: z.literal("asc").or(z.literal("desc")),
   paginationToken: z.string().nullish(),
 });
@@ -64,6 +73,16 @@ export const solanaTokenRecordSchema = solanaTokenSchema.extend({
   "lsi-numeric-2": z.number(),
 });
 
+export const createCoinRequestBodySchema = z.object({
+  txDigest: z.string(),
+  socialLinks: solanaSocialLinks.nullish(),
+});
+
+export const createTokenRequestBodySchema = z.object({
+  txDigest: z.string(),
+  socialLinks: solanaSocialLinks.nullish(),
+});
+
 export type SolanaTokenMetadata = z.infer<typeof solanaTokenMetadata>;
 export type SolanaToken = z.infer<typeof solanaTokenSchema>;
 export type SolanaTokenRecordItem = z.infer<typeof solanaTokenRecordSchema>;
@@ -71,4 +90,7 @@ export type SortableColumn = z.infer<typeof solanaTokensSortableColumns>;
 export type QuerySolanaTokensRequestParams = z.infer<typeof querySolanaTokensRequestParamsSchema>;
 export type SolanaSocialLinks = z.infer<typeof solanaSocialLinks>;
 export type CoinStatus = z.infer<typeof coinStatus>;
+export type TokenStatus = z.infer<typeof coinStatus>;
 export type TicketStatus = z.infer<typeof coinStatus>;
+export type QueryTokensRequestParams = z.infer<typeof querySolanaTokensRequestParamsSchema>;
+export type CreateTokenRequestBody = z.infer<typeof createTokenRequestBodySchema>;
