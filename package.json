@@ -19,7 +19,7 @@
     "audit": "yarn audit --groups dependencies",
     "format": "prettier --write src/**/*.ts",
     "lint": "tsc --noEmit && eslint src/**/*.ts",
-    "build": "yarn rimraf dist && yarn lint && tsup",
+    "build": "yarn rimraf dist && tsup",
     "build:watch": "tsc --watch",
     "prettier-format": "prettier --config .prettierrc 'src/**/*.ts' --write",
     "codegen": "yarn run rimraf src/schema/codegen/ && yarn run anchor-client-gen src/schema/idl/memechan_sol.json src/schema/codegen/",
