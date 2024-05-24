@@ -1,4 +1,4 @@
-import { BoundPoolClient } from "../../../src/bound-pool/BoundPool";
+import { BoundPoolClient } from "../../../src/bound-pool/BoundPoolClient";
 import { client } from "../../common";
 
 // yarn tsx examples/bonding-pool/from/bound-pool-from-tx-signature.ts

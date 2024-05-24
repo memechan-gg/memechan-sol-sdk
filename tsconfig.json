@@ -16,6 +16,6 @@
     "allowJs": true
   },
   "compileOnSave": true,
-  "include": ["env.d.ts", "src", "examples", "tests", "jest.config.js"],
-  "exclude": ["node_modules", "dist", "test"]
+  "include": ["env.d.ts", "src", "examples", "test", "jest.config.js"],
+  "exclude": ["node_modules", "dist", "test/reference"]
 }
