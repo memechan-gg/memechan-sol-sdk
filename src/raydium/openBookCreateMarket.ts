@@ -10,7 +10,7 @@ import {
 } from "@solana/web3.js";
 import { PROGRAMIDS, makeTxVersion } from "./config";
 import { buildTxs, sendTx } from "../util";
-import { MarketV2 } from "./raydiumCreateMarket";
+import { MarketV2 } from "./raydiumMarket";
 
 type CreateMarketTxInput = {
   baseToken: Token;

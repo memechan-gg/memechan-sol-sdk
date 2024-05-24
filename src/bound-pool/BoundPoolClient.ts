@@ -56,6 +56,8 @@ import {
   MEMECHAN_QUOTE_TOKEN,
   MEMECHAN_QUOTE_TOKEN_DECIMALS,
   MEMECHAN_TARGET_CONFIG,
+  RAYDIUM_PROTOCOL_FEE,
+  TRANSFER_FEE,
 } from "../config/config";
 import { LivePoolClient } from "../live-pool/LivePoolClient";
 import { MemechanSol } from "../schema/types/memechan_sol";
@@ -431,37 +433,6 @@ export class BoundPoolClient {
         )
       ).address;
 
-    // const balance = await this.client.connection.getBalance(payer.publicKey);
-    // console.log(`${balance / LAMPORTS_PER_SOL} SOL`);
-
-    // const modifyComputeUnits = ComputeBudgetProgram.setComputeUnitLimit({
-    //   units: 300,
-    // });
-
-    // const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
-    //   microLamports: 20000,
-    // });
-
-    //   transfer(this.client.connection, payer,
-
-    // const transferTx = new Transaction().add(
-    //   //  modifyComputeUnits,
-    //   // addPriorityFee,
-    //   SystemProgram.transfer({
-    //     fromPubkey: payer.publicKey,
-    //     toPubkey: userSolAcc,
-    //     lamports: BigInt(sol_in.toString()),
-    //   }),
-    //   createSyncNativeInstruction(userSolAcc),
-    // );
-
-    // const transferResult = await sendAndConfirmTransaction(this.client.connection, transferTx, [payer], {
-    //   skipPreflight: true,
-    //   commitment: "confirmed",
-    // });
-
-    //console.log("3 transferResult: " + transferResult);
-
     await this.client.memechanProgram.methods
       .swapY(new BN(sol_in), new BN(meme_out))
       .accounts({
@@ -785,7 +756,7 @@ export class BoundPoolClient {
       SystemProgram.transfer({
         fromPubkey: user.publicKey,
         toPubkey: stakingSigner,
-        lamports: 1_200_000_000,
+        lamports: RAYDIUM_PROTOCOL_FEE + TRANSFER_FEE,
       }),
     );
 
@@ -854,6 +825,10 @@ export class BoundPoolClient {
   }
 
   public async goLive(args: GoLiveArgs): Promise<[StakingPoolClient, LivePoolClient]> {
+    return await retry({fn: () => this.goLiveInternal(args), functionName: "goLive", retries: 10});
+  }
+
+  private async goLiveInternal(args: GoLiveArgs): Promise<[StakingPoolClient, LivePoolClient]> {
     // Get needed transactions
     const { createMarketTransactions, goLiveTransaction, stakingId, ammId } = await this.getGoLiveTransaction(args);
 
@@ -863,7 +838,7 @@ export class BoundPoolClient {
     });
     console.log("create market signatures:", JSON.stringify(createMarketSignatures));
 
-    // Check market is creared successfully
+    // Check market is created successfully
     const { blockhash, lastValidBlockHeight } = await this.client.connection.getLatestBlockhash("confirmed");
     const createMarketTxResult = await this.client.connection.confirmTransaction(
       {
