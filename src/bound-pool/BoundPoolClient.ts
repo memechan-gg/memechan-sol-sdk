@@ -26,10 +26,10 @@ import { BoundPool, BoundPool as CodegenBoundPool, MemeTicketFields } from "../s
 
 import { BN, Program, Provider } from "@coral-xyz/anchor";
 import { MemechanClient } from "../MemechanClient";
-import { MemeTicket } from "../memeticket/MemeTicket";
+import { MemeTicketClient } from "../memeticket/MemeTicketClient";
 import { ATA_PROGRAM_ID, PROGRAMIDS } from "../raydium/config";
 import { getCreateMarketTransactions } from "../raydium/openBookCreateMarket";
-import { StakingPool } from "../staking-pool/StakingPool";
+import { StakingPoolClient } from "../staking-pool/StakingPoolClient";
 import {
   BoundPoolArgs,
   BuyMemeArgs,
@@ -50,13 +50,14 @@ import {
 import { findProgramAddress } from "../common/helpers";
 import {
   DEFAULT_MAX_M,
-  DEFAULT_MAX_M_LP,
+  FULL_MEME_AMOUNT_CONVERTED,
   MEMECHAN_MEME_TOKEN_DECIMALS,
   MEMECHAN_QUOTE_MINT,
   MEMECHAN_QUOTE_TOKEN,
   MEMECHAN_QUOTE_TOKEN_DECIMALS,
   MEMECHAN_TARGET_CONFIG,
 } from "../config/config";
+import { LivePoolClient } from "../live-pool/LivePoolClient";
 import { MemechanSol } from "../schema/types/memechan_sol";
 import { getCreateMetadataTransaction } from "../token/createMetadata";
 import { getCreateMintWithPriorityTransaction } from "../token/getCreateMintWithPriorityTransaction";
@@ -69,7 +70,6 @@ import { getSendAndConfirmTransactionMethod } from "../util/getSendAndConfirmTra
 import { retry } from "../util/retry";
 import { deductSlippage } from "../util/trading/deductSlippage";
 import { normalizeInputCoinAmount } from "../util/trading/normalizeInputCoinAmount";
-import { LivePool } from "../live-pool/LivePool";
 
 export class BoundPoolClient {
   private constructor(
@@ -407,7 +407,7 @@ export class BoundPoolClient {
     return mintTo(provider.connection, payer, mint, wallet, authority, amount);
   }
 
-  public async swapY(input: SwapYArgs): Promise<MemeTicket> {
+  public async swapY(input: SwapYArgs): Promise<MemeTicketClient> {
     const id = Keypair.generate();
     const user = input.user!;
     const payer = input.payer!;
@@ -478,7 +478,7 @@ export class BoundPoolClient {
       .rpc({ skipPreflight: true, commitment: "confirmed" })
       .catch((e) => console.error(e));
 
-    return new MemeTicket(id.publicKey, this.client);
+    return new MemeTicketClient(id.publicKey, this.client);
   }
 
   /**
@@ -660,7 +660,7 @@ export class BoundPoolClient {
       boundPoolInfo.memeReserve.mint,
       this.client.memechanProgram.programId,
     );
-    const stakingSigner = StakingPool.findSignerPda(stakingId, this.client.memechanProgram.programId);
+    const stakingSigner = StakingPoolClient.findSignerPda(stakingId, this.client.memechanProgram.programId);
     const adminTicketId = BoundPoolClient.findMemeTicketPda(stakingId, this.client.memechanProgram.programId);
 
     const stakingQuoteVaultId = Keypair.generate();
@@ -762,7 +762,7 @@ export class BoundPoolClient {
       boundPoolInfo.memeReserve.mint,
       this.client.memechanProgram.programId,
     );
-    const stakingSigner = StakingPool.findSignerPda(stakingId, this.client.memechanProgram.programId);
+    const stakingSigner = StakingPoolClient.findSignerPda(stakingId, this.client.memechanProgram.programId);
     const baseTokenInfo = new Token(
       TOKEN_PROGRAM_ID,
       new PublicKey(boundPoolInfo.memeReserve.mint),
@@ -785,7 +785,7 @@ export class BoundPoolClient {
       SystemProgram.transfer({
         fromPubkey: user.publicKey,
         toPubkey: stakingSigner,
-        lamports: 2_000_000_000,
+        lamports: 1_200_000_000,
       }),
     );
 
@@ -853,7 +853,7 @@ export class BoundPoolClient {
     return { createMarketTransactions, goLiveTransaction: transaction, stakingId, ammId };
   }
 
-  public async goLive(args: GoLiveArgs): Promise<[StakingPool, LivePool]> {
+  public async goLive(args: GoLiveArgs): Promise<[StakingPoolClient, LivePoolClient]> {
     // Get needed transactions
     const { createMarketTransactions, goLiveTransaction, stakingId, ammId } = await this.getGoLiveTransaction(args);
 
@@ -903,18 +903,18 @@ export class BoundPoolClient {
       throw new Error("goLiveTxResult failed");
     }
 
-    const stakingPoolInstance = await StakingPool.fromStakingPoolId({
+    const stakingPoolInstance = await StakingPoolClient.fromStakingPoolId({
       client: this.client,
       poolAccountAddressId: stakingId,
     });
 
-    const livePool = await LivePool.fromAmmId(ammId, this.client);
+    const livePool = await LivePoolClient.fromAmmId(ammId, this.client);
 
     return [stakingPoolInstance, livePool];
   }
 
   public async fetchRelatedTickets() {
-    return MemeTicket.fetchRelatedTickets(this.id, this.client);
+    return MemeTicketClient.fetchRelatedTickets(this.id, this.client);
   }
 
   public async getHoldersCount() {
@@ -937,7 +937,7 @@ export class BoundPoolClient {
   }
 
   public static async getHoldersMap(pool: PublicKey, client: MemechanClient) {
-    const tickets = await MemeTicket.fetchRelatedTickets(pool, client);
+    const tickets = await MemeTicketClient.fetchRelatedTickets(pool, client);
     const uniqueHolders: Map<string, MemeTicketFields[]> = new Map();
 
     tickets.forEach((ticket) => {
@@ -985,11 +985,7 @@ export class BoundPoolClient {
   }
 
   public static getMemeMarketCap({ memePriceInUsd }: { memePriceInUsd: string }): string {
-    const fullMemeAmountConverted = new BigNumber(DEFAULT_MAX_M_LP)
-      .plus(DEFAULT_MAX_M)
-      .div(10 ** MEMECHAN_MEME_TOKEN_DECIMALS);
-
-    const marketCap = fullMemeAmountConverted.multipliedBy(memePriceInUsd).toString();
+    const marketCap = new BigNumber(FULL_MEME_AMOUNT_CONVERTED).multipliedBy(memePriceInUsd).toString();
 
     return marketCap;
   }

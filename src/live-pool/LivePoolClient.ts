@@ -14,16 +14,15 @@ import {
 import { getNumeratorAndDenominator } from "./utils";
 import { MemechanClient } from "../MemechanClient";
 
-export class LivePool {
+export class LivePoolClient {
   private constructor(
     public ammId: PublicKey,
     public ammPoolInfo: ApiPoolInfoV4,
     public client: MemechanClient,
-  ) { 
-  }
+  ) {}
 
-  public static async fromAmmId(ammId: PublicKey, client: MemechanClient): Promise<LivePool> {
-    return new LivePool(ammId, await formatAmmKeysById(ammId.toBase58(), client.connection), client);
+  public static async fromAmmId(ammId: PublicKey, client: MemechanClient): Promise<LivePoolClient> {
+    return new LivePoolClient(ammId, await formatAmmKeysById(ammId.toBase58(), client.connection), client);
   }
 
   public static async getBuyMemeOutput({
@@ -41,7 +40,7 @@ export class LivePool {
     const targetPoolInfo = await formatAmmKeysById(poolAddress, connection);
 
     if (!targetPoolInfo) {
-      throw new Error(`[LivePool.getBuyMemeOutput] Cannot find data for pool ${poolAddress}`);
+      throw new Error(`[LivePoolClient.getBuyMemeOutput] Cannot find data for pool ${poolAddress}`);
     }
 
     const poolKeys = jsonInfo2PoolKeys(targetPoolInfo);
@@ -91,7 +90,7 @@ export class LivePool {
     connection,
     walletTokenAccounts,
   }: GetSwapMemeTransactionsArgs) {
-    const { minAmountOut, poolKeys, wrappedAmountIn } = await LivePool.getBuyMemeOutput({
+    const { minAmountOut, poolKeys, wrappedAmountIn } = await LivePoolClient.getBuyMemeOutput({
       poolAddress,
       memeCoinMint,
       amountIn,
@@ -99,7 +98,7 @@ export class LivePool {
       slippagePercentage,
     });
 
-    const innerTransactions = await LivePool.getBuyMemeTransactionsByOutput({
+    const innerTransactions = await LivePoolClient.getBuyMemeTransactionsByOutput({
       connection,
       minAmountOut,
       payer,
@@ -127,7 +126,7 @@ export class LivePool {
     const targetPoolInfo = await formatAmmKeysById(poolAddress, connection);
 
     if (!targetPoolInfo) {
-      throw new Error(`[LivePool.getSellMemeOutput] Cannot find data for pool ${poolAddress}`);
+      throw new Error(`[LivePoolClient.getSellMemeOutput] Cannot find data for pool ${poolAddress}`);
     }
 
     const poolKeys = jsonInfo2PoolKeys(targetPoolInfo);
@@ -177,7 +176,7 @@ export class LivePool {
     connection,
     walletTokenAccounts,
   }: GetSwapMemeTransactionsArgs) {
-    const { minAmountOut, poolKeys, wrappedAmountIn } = await LivePool.getSellMemeOutput({
+    const { minAmountOut, poolKeys, wrappedAmountIn } = await LivePoolClient.getSellMemeOutput({
       poolAddress,
       memeCoinMint,
       amountIn,
@@ -185,7 +184,7 @@ export class LivePool {
       slippagePercentage,
     });
 
-    const innerTransactions = await LivePool.getSellMemeTransactionsByOutput({
+    const innerTransactions = await LivePoolClient.getSellMemeTransactionsByOutput({
       connection,
       minAmountOut,
       payer,

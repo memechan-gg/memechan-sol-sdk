@@ -1,5 +1,6 @@
 import { TOKEN_PROGRAM_ID, Token } from "@raydium-io/raydium-sdk";
 import { PublicKey } from "@solana/web3.js";
+import BigNumber from "bignumber.js";
 
 /**
  * The base URL for the backend API for fetching off-chain data.
@@ -35,17 +36,20 @@ export const MEMECHAN_QUOTE_TOKEN: Token = new Token(
 export const MEMECHAN_MEME_TOKEN_DECIMALS = 6;
 
 // Contract constants
-export const MAX_TICKET_TOKENS = 900_000_000;
-export const MAX_MEME_TOKENS = 1_125_000_000;
+export const MEME_TOKEN_DECIMALS = 1_000_000;
+export const WSOL_DECIMALS = 1_000_000_000;
+export const MAX_TICKET_TOKENS = 800_000_000;
+export const MAX_MEME_TOKENS = 1_000_000_000;
 
 export const DEFAULT_PRICE_FACTOR = 2;
 export const DEFAULT_MAX_M_LP = 200_000_000_000_000;
-export const DEFAULT_MAX_M = 900_000_000_000_000;
-export const DEFAULT_MAX_S = 300;
+export const DEFAULT_MAX_M = 800_000_000_000_000;
 
-export const DECIMALS_ALPHA = 1_000_000; // consider increase
-export const DECIMALS_BETA = 1_000_000; // consider increase
+export const DECIMALS_S = 1_000_000_000;
 
 export const MAX_TRANSACTION_SIZE = 1232;
-
 export const ADMIN_PUB_KEY = new PublicKey("8SvkUtJZCyJwSQGkiszwcRcPv7c8pPSr8GVEppGNN7DV");
+export const FULL_MEME_AMOUNT_CONVERTED = new BigNumber(DEFAULT_MAX_M_LP)
+  .plus(DEFAULT_MAX_M)
+  .div(10 ** MEMECHAN_MEME_TOKEN_DECIMALS)
+  .toString();
