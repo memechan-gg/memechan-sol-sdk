@@ -1,9 +1,9 @@
-import { TargetConfig } from "../src/targetconfig/TargetConfig";
-import { sleep } from "../src/common/helpers";
-import { client, payer } from "./common/common";
 import BN from "bn.js";
+import { sleep } from "../src/common/helpers";
+import { MEMECHAN_QUOTE_TOKEN, MEMECHAN_TARGET_CONFIG } from "../src/config/config";
+import { TargetConfig } from "../src/targetconfig/TargetConfig";
 import { MintUtils } from "../src/token/mintUtils";
-import { MEMECHAN_MEME_TOKEN_DECIMALS, MEMECHAN_QUOTE_TOKEN, MEMECHAN_TARGET_CONFIG } from "../src/config/config";
+import { client, payer } from "./common/common";
 
 describe("TargetConfig", () => {
   it.skip("creates target config", async () => {
