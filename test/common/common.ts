@@ -13,6 +13,7 @@ export const client = new MemechanClient({
   rpcApiUrl: RPC_API_CLUSTER,
   wssApiUrl: WSS_API_CLUSTER,
   isTest: IS_TEST_ENV,
+  simulationKeypair: payer,
 });
 
 export const DUMMY_TOKEN_METADATA = {

@@ -199,10 +199,10 @@ export class MarketV2 extends Base {
     // const bidsSpace = 65536 + 12;
     // const asksSpace = 65536 + 12;
 
-    const requestQueueSpace = 1120 + 12;
-    const eventQueueSpace = 12144 + 12;
-    const bidsSpace = 15536 + 12;
-    const asksSpace = 15536 + 12;
+    const requestQueueSpace = 1132;
+    const eventQueueSpace = 12156;
+    const bidsSpace = 14548;
+    const asksSpace = 14548;
     
     const ins2: TransactionInstruction[] = []
     const marketInfoLamports = await connection.getMinimumBalanceForRentExemption(MARKET_STATE_LAYOUT_V2.span);
