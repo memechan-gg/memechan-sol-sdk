@@ -20,8 +20,7 @@ export * from "./api/types";
 export * from "./api/uploadMetadataToIpfs";
 
 // Target config
-export * from "./targetconfig/TargetConfig";
-export * from "./targetconfig/TargetConfig";
+export * from "./targetconfig/TargetConfigClient";
 
 // Parsing
 export * from "./tx-parsing/parsing";
