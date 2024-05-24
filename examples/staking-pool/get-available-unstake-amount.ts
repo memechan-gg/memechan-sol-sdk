@@ -6,8 +6,8 @@ import { client, connection, payer } from "../common";
 
 // yarn tsx examples/staking-pool/get-available-unstake-amount.ts > available-unstake-amount.txt 2>&1
 export const getAvailableUnstakeAmount = async () => {
-  const boundPoolAddress = new PublicKey("B36EwUzBiZqLeKTwJrwPNbwfJaPRwfKcbCyHPLix3xF9");
-  const stakingPoolAddress = new PublicKey("EeckpiLcg6FZLkjSR31wf9Z8VZUhyWncB5x4Hks5A8ve");
+  const boundPoolAddress = new PublicKey("D3fRV97S8MheYhvm1ofu2N8xsKQuwuHycUFwhMfRDGoi");
+  const stakingPoolAddress = new PublicKey("FMyKyPPmgRHdCVsfvdyuR6Y4BAgNvsQCPQtMAtEcysmm");
 
   // Get staking pool
   const stakingPool = await StakingPool.fromStakingPoolId({ client, poolAccountAddressId: stakingPoolAddress });
