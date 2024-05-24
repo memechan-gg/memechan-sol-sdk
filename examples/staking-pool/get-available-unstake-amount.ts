@@ -1,8 +1,7 @@
 import { PublicKey } from "@solana/web3.js";
-import { MemeTicket } from "../../src/memeticket/MemeTicket";
 import { StakingPool as CodegenStakingPool } from "../../src/schema/codegen/accounts";
-import { StakingPool } from "../../src/staking-pool/StakingPool";
 import { client, connection, payer } from "../common";
+import { MemeTicketClient, StakingPoolClient } from "../../src";
 
 // yarn tsx examples/staking-pool/get-available-unstake-amount.ts > available-unstake-amount.txt 2>&1
 export const getAvailableUnstakeAmount = async () => {
@@ -10,7 +9,7 @@ export const getAvailableUnstakeAmount = async () => {
   const stakingPoolAddress = new PublicKey("FMyKyPPmgRHdCVsfvdyuR6Y4BAgNvsQCPQtMAtEcysmm");
 
   // Get staking pool
-  const stakingPool = await StakingPool.fromStakingPoolId({ client, poolAccountAddressId: stakingPoolAddress });
+  const stakingPool = await StakingPoolClient.fromStakingPoolId({ client, poolAccountAddressId: stakingPoolAddress });
   const fetchedStakingPool = await CodegenStakingPool.fetch(connection, stakingPoolAddress);
   console.log("fetchedStakingPool:", fetchedStakingPool?.toJSON());
 
@@ -19,7 +18,7 @@ export const getAvailableUnstakeAmount = async () => {
   }
 
   // Get all user tickets
-  const { tickets } = await MemeTicket.fetchAvailableTicketsByUser(boundPoolAddress, client, payer.publicKey);
+  const { tickets } = await MemeTicketClient.fetchAvailableTicketsByUser(boundPoolAddress, client, payer.publicKey);
   console.log("tickets:", tickets);
 
   // Get available unstake amount

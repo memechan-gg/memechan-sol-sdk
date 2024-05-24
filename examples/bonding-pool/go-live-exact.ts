@@ -1,7 +1,7 @@
 import { PublicKey } from "@solana/web3.js";
-import { BoundPoolClient } from "../../src/bound-pool/BoundPool";
 import { client, payer } from "../common";
 import { FEE_DESTINATION_ID } from "../env";
+import { BoundPoolClient } from "../../src";
 
 // yarn tsx examples/bonding-pool/go-live-exact.ts > go-live-exact.txt 2>&1
 export const goLiveExact = async () => {

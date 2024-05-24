@@ -19,6 +19,8 @@ import {
   UnstakeArgs,
   WithdrawFeesArgs,
 } from "./types";
+import { MEMECHAN_QUOTE_MINT } from "../config/config";
+import { formatAmmKeysById } from "../raydium/formatAmmKeysById";
 
 export class StakingPoolClient {
   constructor(
