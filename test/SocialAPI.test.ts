@@ -1,10 +1,10 @@
-import {SocialAPI} from "../src/social/SocialAPI";
-import {TokenAPI} from "../src/token/TokenAPI";
-import {SolanaToken} from "../src/token/schemas/token-schemas";
-import { Auth } from "../src/auth/Auth";
 import { Keypair } from "@solana/web3.js";
 import nacl from "tweetnacl";
 import { BE_URL, isSorted } from "./utils";
+import { TokenAPI } from "../src/api/TokenAPI";
+import { Auth } from "../src/api/auth/Auth";
+import { SocialAPI } from "../src/api/social/SocialAPI";
+import { SolanaToken } from "../src/api/schemas/token-schemas";
 
 const socialAPI = new SocialAPI(BE_URL);
 
@@ -16,14 +16,14 @@ describe("Threads fetching", () => {
     const authService = new Auth(BE_URL);
     const keypair = new Keypair();
     const messageToSign = await authService.requestMessageToSign(keypair.publicKey.toBase58());
-    console.log('message to sign', messageToSign, keypair.publicKey.toBase58());
+    console.log("message to sign", messageToSign, keypair.publicKey.toBase58());
     const signature = nacl.sign.detached(Buffer.from(messageToSign), keypair.secretKey);
     await authService.refreshSession({
-        walletAddress: keypair.publicKey.toBase58(),
-        signedMessage: Buffer.from(signature).toString('hex'),
+      walletAddress: keypair.publicKey.toBase58(),
+      signedMessage: Buffer.from(signature).toString("hex"),
     });
     const tokenApi = new TokenAPI();
-    const {token: tokenFetched} = await tokenApi.createToken({
+    const { token: tokenFetched } = await tokenApi.createToken({
       txDigest: "HFKiTCkDmw1ZRuhSSBmRde7Lt6GnqwbcE3wqgQ2tVf55",
       socialLinks: {
         twitter: "mytwitter",

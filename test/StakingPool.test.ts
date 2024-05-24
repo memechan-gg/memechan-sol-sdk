@@ -3,7 +3,7 @@ import { BoundPoolClient } from "../src/bound-pool/BoundPool";
 import { sleep } from "../src/common/helpers";
 import { MEMECHAN_MEME_TOKEN_DECIMALS, MEMECHAN_QUOTE_TOKEN } from "../src/config/config";
 import { StakingPool } from "../src/staking-pool/StakingPool";
-import { DUMMY_TOKEN_METADATA, admin, client, payer} from "./common/common";
+import { DUMMY_TOKEN_METADATA, admin, client, payer } from "./common/common";
 import { FEE_DESTINATION_ID } from "./common/env";
 import { MemeTicket } from "../src/memeticket/MemeTicket";
 import { swapOnlyAmm } from "../src/raydium/swapOnlyAmm";
@@ -26,7 +26,6 @@ describe("StakingPool", () => {
     const boundPool = await BoundPoolClient.slowNew({
       admin,
       payer,
-      signer: payer,
       client,
       quoteToken: MEMECHAN_QUOTE_TOKEN,
       tokenMetadata: DUMMY_TOKEN_METADATA,
@@ -34,7 +33,7 @@ describe("StakingPool", () => {
 
     console.log("==== pool id: " + boundPool.id.toString());
     await sleep(2000);
-    
+
     const tickets: MemeTicket[] = [];
 
     const ticketId = await boundPool.swapY({
@@ -71,7 +70,7 @@ describe("StakingPool", () => {
       boundPoolInfo,
     });
 
-    const [stakingPool, ammPool ] = await boundPool.goLive({
+    const [stakingPool, ammPool] = await boundPool.goLive({
       payer: payer,
       user: payer,
       boundPoolInfo,
@@ -82,10 +81,10 @@ describe("StakingPool", () => {
     console.log("ammPool: " + JSON.stringify(ammPool));
 
     const inputToken = MEMECHAN_QUOTE_TOKEN;
-    const outputToken = new Token(TOKEN_PROGRAM_ID, ammPool.baseMint, MEMECHAN_MEME_TOKEN_DECIMALS)
-    const inputTokenAmount = new TokenAmount(inputToken, 10000)
-    const slippage = new Percent(5, 100)
-    const walletTokenAccounts = await getWalletTokenAccount(client.connection, payer.publicKey)
+    const outputToken = new Token(TOKEN_PROGRAM_ID, ammPool.baseMint, MEMECHAN_MEME_TOKEN_DECIMALS);
+    const inputTokenAmount = new TokenAmount(inputToken, 10000);
+    const slippage = new Percent(5, 100);
+    const walletTokenAccounts = await getWalletTokenAccount(client.connection, payer.publicKey);
 
     const swapTxIds = await swapOnlyAmm({
       connection: client.connection,
@@ -97,10 +96,9 @@ describe("StakingPool", () => {
       wallet: payer,
     });
 
-    console.log('amm swapresult txids: ', swapTxIds)
+    console.log("amm swapresult txids: ", swapTxIds);
 
-
-    StakingPool.fromStakingPoolId({ client, poolAccountAddressId: stakingPool.id});
+    StakingPool.fromStakingPoolId({ client, poolAccountAddressId: stakingPool.id });
 
     const unstakeResult = await stakingPool.unstake({
       amount: new BN(1),
@@ -109,14 +107,12 @@ describe("StakingPool", () => {
     });
 
     console.log("unstakeResult: ", unstakeResult);
-
   }, 550000);
 
   it.skip("swapy, golive, ammSwap, withdrawfees", async () => {
     const boundPool = await BoundPoolClient.slowNew({
       admin,
       payer,
-      signer: payer,
       client,
       quoteToken: MEMECHAN_QUOTE_TOKEN,
       tokenMetadata: DUMMY_TOKEN_METADATA,
@@ -124,7 +120,7 @@ describe("StakingPool", () => {
 
     console.log("==== pool id: " + boundPool.id.toString());
     await sleep(2000);
-    
+
     const tickets: MemeTicket[] = [];
 
     const ticketId = await boundPool.swapY({
@@ -161,7 +157,7 @@ describe("StakingPool", () => {
       boundPoolInfo,
     });
 
-    const [stakingPool, ammPool ] = await boundPool.goLive({
+    const [stakingPool, ammPool] = await boundPool.goLive({
       payer: payer,
       user: payer,
       boundPoolInfo,
@@ -172,10 +168,10 @@ describe("StakingPool", () => {
     console.log("ammPool: " + JSON.stringify(ammPool));
 
     const inputToken = MEMECHAN_QUOTE_TOKEN;
-    const outputToken = new Token(TOKEN_PROGRAM_ID, ammPool.baseMint, MEMECHAN_MEME_TOKEN_DECIMALS)
-    const inputTokenAmount = new TokenAmount(inputToken, 10000)
-    const slippage = new Percent(5, 100)
-    const walletTokenAccounts = await getWalletTokenAccount(client.connection, payer.publicKey)
+    const outputToken = new Token(TOKEN_PROGRAM_ID, ammPool.baseMint, MEMECHAN_MEME_TOKEN_DECIMALS);
+    const inputTokenAmount = new TokenAmount(inputToken, 10000);
+    const slippage = new Percent(5, 100);
+    const walletTokenAccounts = await getWalletTokenAccount(client.connection, payer.publicKey);
 
     const swapTxIds = await swapOnlyAmm({
       connection: client.connection,
@@ -187,10 +183,9 @@ describe("StakingPool", () => {
       wallet: payer,
     });
 
-    console.log('amm swapresult txids: ', swapTxIds)
+    console.log("amm swapresult txids: ", swapTxIds);
 
-
-    StakingPool.fromStakingPoolId({ client, poolAccountAddressId: stakingPool.id});
+    StakingPool.fromStakingPoolId({ client, poolAccountAddressId: stakingPool.id });
 
     const withrdawResult = await stakingPool.withdrawFees({
       user: payer,
@@ -198,14 +193,12 @@ describe("StakingPool", () => {
     });
 
     console.log("withrdawResult: ", withrdawResult);
-
   }, 550000);
 
   it("swapy, golive, ammSwap, addFees", async () => {
     const boundPool = await BoundPoolClient.slowNew({
       admin,
       payer,
-      signer: payer,
       client,
       quoteToken: MEMECHAN_QUOTE_TOKEN,
       tokenMetadata: DUMMY_TOKEN_METADATA,
@@ -213,7 +206,7 @@ describe("StakingPool", () => {
 
     console.log("==== pool id: " + boundPool.id.toString());
     await sleep(2000);
-    
+
     const tickets: MemeTicket[] = [];
 
     const ticketId = await boundPool.swapY({
@@ -250,7 +243,7 @@ describe("StakingPool", () => {
       boundPoolInfo,
     });
 
-    const [stakingPool, ammPool ] = await boundPool.goLive({
+    const [stakingPool, ammPool] = await boundPool.goLive({
       payer: payer,
       user: payer,
       boundPoolInfo,
@@ -261,10 +254,10 @@ describe("StakingPool", () => {
     console.log("ammPool: " + JSON.stringify(ammPool));
 
     const inputToken = MEMECHAN_QUOTE_TOKEN;
-    const outputToken = new Token(TOKEN_PROGRAM_ID, ammPool.baseMint, MEMECHAN_MEME_TOKEN_DECIMALS)
-    const inputTokenAmount = new TokenAmount(inputToken, 10000)
-    const slippage = new Percent(5, 100)
-    const walletTokenAccounts = await getWalletTokenAccount(client.connection, payer.publicKey)
+    const outputToken = new Token(TOKEN_PROGRAM_ID, ammPool.baseMint, MEMECHAN_MEME_TOKEN_DECIMALS);
+    const inputTokenAmount = new TokenAmount(inputToken, 10000);
+    const slippage = new Percent(5, 100);
+    const walletTokenAccounts = await getWalletTokenAccount(client.connection, payer.publicKey);
 
     const swapTxIds = await swapOnlyAmm({
       connection: client.connection,
@@ -276,13 +269,16 @@ describe("StakingPool", () => {
       wallet: payer,
     });
 
-    console.log('amm swapresult txids: ', swapTxIds)
+    console.log("amm swapresult txids: ", swapTxIds);
 
-    StakingPool.fromStakingPoolId({ client, poolAccountAddressId: stakingPool.id});
+    StakingPool.fromStakingPoolId({ client, poolAccountAddressId: stakingPool.id });
 
-    const addFeesResult = await stakingPool.addFees({payer, transaction: new Transaction(), ammPoolId: new PublicKey(ammPool.id)});
+    const addFeesResult = await stakingPool.addFees({
+      payer,
+      transaction: new Transaction(),
+      ammPoolId: new PublicKey(ammPool.id),
+    });
 
     console.log("addFeesResult: ", addFeesResult);
-
   }, 550000);
 });
