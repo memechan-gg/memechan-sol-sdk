@@ -24,17 +24,10 @@ export const createSolanaTokenRequestBodySchema = z.object({
   socialLinks: solanaSocialLinks,
 });
 
-// new one
-// export const querySolanaTokensRequestParamsSchema = z.object({
-//   sortBy: solanaTokensSortableColumns,
-//   direction: z.literal("asc").or(z.literal("desc")),
-//   paginationToken: z.string().nullish(),
-// });
-
 // old one
 export const querySolanaTokensRequestParamsSchema = z.object({
   sortBy: solanaTokensSortableColumns,
-  status: z.literal("PRESALE").or(z.literal("LIVE")),
+  status: z.literal("PRESALE").or(z.literal("LIVE")), // ?
   direction: z.literal("asc").or(z.literal("desc")),
   paginationToken: z.string().nullish(),
 });
