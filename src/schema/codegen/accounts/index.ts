@@ -7,7 +7,6 @@ export {
   TargetConfigJSON,
 } from "./TargetConfig"
 export { AmmConfig, AmmConfigFields, AmmConfigJSON } from "./AmmConfig"
-export { AmmInfo, AmmInfoFields, AmmInfoJSON } from "./AmmInfo"
 export {
   TargetOrders,
   TargetOrdersFields,
