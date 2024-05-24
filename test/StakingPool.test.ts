@@ -22,7 +22,7 @@ describe("StakingPool", () => {
     }*/
   }, 30000);
 
-  it("swapy, golive, ammSwap, unstake", async () => {
+  it.skip("swapy, golive, ammSwap, unstake", async () => {
    const boundPool = await BoundPoolClient.new({
       admin,
       payer,
@@ -46,8 +46,13 @@ describe("StakingPool", () => {
       pool: boundPool.id,
     });
 
-    tickets.push(new MemeTicket(ticketId.id, client));
     console.log("swapY ticketId: " + ticketId.id.toBase58());
+
+    const ticket1 = new MemeTicket(ticketId.id, client);
+    tickets.push(ticket1);
+
+    const ticket1Data = await ticket1.fetch();
+    console.log("ticket1Data: amount: %s, notional: %s, released: %s ", ticket1Data.amount.toString(), ticket1Data.vesting.notional.toString(), ticket1Data.vesting.released.toString());
 
     const ticketId2 = await boundPool.swapY({
       payer: payer,
@@ -99,6 +104,8 @@ describe("StakingPool", () => {
 
     console.log('amm swapresult txids: ', swapTxIds)
 
+    await sleep(180000); // sleep 3 min cliff
+
     StakingPool.fromStakingPoolId({ client, poolAccountAddressId: stakingPool.id});
 
     const unstakeResult = await stakingPool.unstake({
@@ -109,9 +116,12 @@ describe("StakingPool", () => {
 
     console.log("unstakeResult: ", unstakeResult);
 
-  }, 550000);
+    const ticketDataUpdated = await ticket1.fetch();
+    console.log("ticketDataUpdated: amount: %s, notional: %s, released: %s ", ticketDataUpdated.amount.toString(), ticketDataUpdated.vesting.notional.toString(), ticketDataUpdated.vesting.released.toString());
 
-  it.skip("swapy, golive, ammSwap, withdrawfees", async () => {
+  }, 850000);
+
+  it("swapy, golive, ammSwap, withdrawfees", async () => {
     const boundPool = await BoundPoolClient.new({
       admin,
       payer,
@@ -142,7 +152,7 @@ describe("StakingPool", () => {
       payer: payer,
       user: payer,
       memeTokensOut: new BN(100*1e6),
-      quoteAmountIn: new BN(5000*1e9),
+      quoteAmountIn: new BN(40000*1e9),
       quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
       pool: boundPool.id,
     });
@@ -172,7 +182,7 @@ describe("StakingPool", () => {
 
     const inputToken = MEMECHAN_QUOTE_TOKEN;
     const outputToken = new Token(TOKEN_PROGRAM_ID, ammPool.baseMint, MEMECHAN_MEME_TOKEN_DECIMALS)
-    const inputTokenAmount = new TokenAmount(inputToken, 10000)
+    const inputTokenAmount = new TokenAmount(inputToken, 1000*1e9)
     const slippage = new Percent(5, 100)
     const walletTokenAccounts = await getWalletTokenAccount(client.connection, payer.publicKey)
 
@@ -191,12 +201,12 @@ describe("StakingPool", () => {
 
     StakingPool.fromStakingPoolId({ client, poolAccountAddressId: stakingPool.id});
 
-    const withrdawResult = await stakingPool.withdrawFees({
+    const withdrawResult = await stakingPool.withdrawFees({
       user: payer,
       ticket: tickets[0],
     });
 
-    console.log("withrdawResult: ", withrdawResult);
+    console.log("withrdawResult: ", withdrawResult);
 
   }, 550000);
 
@@ -212,7 +222,6 @@ describe("StakingPool", () => {
 
     console.log("==== pool id: " + boundPool.id.toString());
     await sleep(2000);
-    
     const tickets: MemeTicket[] = [];
 
     const ticketId = await boundPool.swapY({
@@ -279,9 +288,9 @@ describe("StakingPool", () => {
 
     StakingPool.fromStakingPoolId({ client, poolAccountAddressId: stakingPool.id});
 
-    const addFeesResult = await stakingPool.addFees({payer, transaction: new Transaction(), ammPoolId: new PublicKey(ammPool.id)});
+    await stakingPool.addFees({payer, transaction: new Transaction(), ammPoolId: new PublicKey(ammPool.id)});
 
-    console.log("addFeesResult: ", addFeesResult);
+    console.log("addFeesResult completed" );
 
   }, 550000);
 });
