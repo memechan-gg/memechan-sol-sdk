@@ -1,25 +1,14 @@
 import { BN } from "bn.js";
 import { BoundPoolClient } from "../../src/bound-pool/BoundPool";
 import { MEMECHAN_QUOTE_TOKEN } from "../../src/config/config";
-import { admin, client, payer } from "../common";
+import { DUMMY_TOKEN_METADATA, admin, client, payer } from "../common";
 import { FEE_DESTINATION_ID } from "../env";
-
-const DUMMY_TOKEN_METADATA = {
-  name: "Best Token Ever",
-  symbol: "BTE",
-  image: "https://cf-ipfs.com/ipfs/QmVevMfxFpfgBu5kHuYUPmDMaV6pWkAn3zw5XaCXxKdaBh",
-  description: "This is the best token ever",
-  twitter: "https://twitter.com/BestTokenEver",
-  telegram: "https://t.me/BestTokenEver",
-  website: "https://besttokenever.com",
-};
 
 // yarn tsx examples/bonding-pool/go-live.ts > go-live.txt 2>&1
 export const goLive = async () => {
   const boundPool = await BoundPoolClient.new({
     admin,
     payer,
-    signer: payer,
     client,
     quoteToken: MEMECHAN_QUOTE_TOKEN,
     tokenMetadata: DUMMY_TOKEN_METADATA,

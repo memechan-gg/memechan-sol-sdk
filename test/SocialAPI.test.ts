@@ -4,8 +4,7 @@ import {SolanaToken} from "../src/token/schemas/token-schemas";
 import { Auth } from "../src/auth/Auth";
 import { Keypair } from "@solana/web3.js";
 import nacl from "tweetnacl";
-import { BE_URL } from "../src/config/config";
-import { isSorted } from "./utils";
+import { BE_URL, isSorted } from "./utils";
 
 const socialAPI = new SocialAPI(BE_URL);
 

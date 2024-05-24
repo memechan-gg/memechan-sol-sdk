@@ -69,18 +69,21 @@ export interface InitStakingPoolArgs {
   boundPoolInfo: BoundPool;
 }
 
-export type GetInitStakingPoolTransactionArgs = InitStakingPoolArgs & { transaction?: Transaction };
+export type GetInitStakingPoolTransactionArgs = Omit<InitStakingPoolArgs, "user"> & {
+  user: PublicKey;
+  transaction?: Transaction;
+};
 
 export interface BoundPoolArgs {
   admin: PublicKey;
   payer: Signer;
-  signer: Keypair;
   client: MemechanClient;
   quoteToken: Token;
   tokenMetadata: TokenMetadata;
 }
 
-export type GetCreateNewBondingPoolAndTokenTransactionArgs = BoundPoolArgs & {
+export type GetCreateNewBondingPoolAndTokenTransactionArgs = Omit<BoundPoolArgs, "payer"> & {
+  payer: PublicKey;
   transaction?: Transaction;
   adminSolPublicKey?: PublicKey;
 };

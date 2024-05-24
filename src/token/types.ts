@@ -4,21 +4,22 @@ import { SolanaToken, solanaTokenSchema } from "./schemas/token-schemas";
 import { solanaLivePool, SolanaSeedPool, solanaSeedPool, solanaStakingPool } from "./schemas/pools-schema";
 
 export interface TokenMetadata {
-    name: string;
-    symbol: string;
-    image: string;
-    description: string;
-    twitter: string;
-    telegram: string;
-    website: string;
+  name: string;
+  symbol: string;
+  image: string;
+  description: string;
+  twitter: string;
+  telegram: string;
+  website: string;
+  discord: string;
 }
 
 export interface CreateMetadataInfo {
-    metadata: TokenMetadata;
-    payer: Signer,
-    mint: PublicKey,
-    poolId: PublicKey,
-    poolSigner: PublicKey,
+  metadata: TokenMetadata;
+  payer: Signer;
+  mint: PublicKey;
+  poolId: PublicKey;
+  poolSigner: PublicKey;
 }
 
 const paginatedResultSchema = <T extends ZodRawShape>(result: z.ZodObject<T>) =>
@@ -26,7 +27,6 @@ const paginatedResultSchema = <T extends ZodRawShape>(result: z.ZodObject<T>) =>
     paginationToken: z.string().nullish(),
     result: z.array(result),
   });
-
 
 export const paginatedTokenResultSchema = () => paginatedResultSchema(solanaTokenSchema);
 export type QueryTokensResponse = z.infer<ReturnType<typeof paginatedTokenResultSchema>>;
@@ -52,5 +52,5 @@ export type UploadFileResponse = {
 };
 
 export type CreateTokenResponse = {
-    token: SolanaToken;
-}
+  token: SolanaToken;
+};

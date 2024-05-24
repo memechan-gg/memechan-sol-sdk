@@ -129,7 +129,7 @@ export class StakingPool {
     const memeAccountPublicKey = memeAccountKeypair.publicKey;
     const createMemeAccountInstructions = await getCreateAccountInstructions(
       this.client.connection,
-      args.user,
+      args.user.publicKey,
       stakingInfo.memeMint,
       args.user.publicKey,
       memeAccountKeypair,
@@ -141,7 +141,7 @@ export class StakingPool {
     const quoteAccountPublicKey = quoteAccountKeypair.publicKey;
     const createQuoteAccountInstructions = await getCreateAccountInstructions(
       this.client.connection,
-      args.user,
+      args.user.publicKey,
       MEMECHAN_QUOTE_MINT,
       args.user.publicKey,
       quoteAccountKeypair,
@@ -200,7 +200,7 @@ export class StakingPool {
     const memeAccountPublicKey = memeAccountKeypair.publicKey;
     const createMemeAccountInstructions = await getCreateAccountInstructions(
       this.client.connection,
-      args.user,
+      args.user.publicKey,
       stakingInfo.memeMint,
       args.user.publicKey,
       memeAccountKeypair,
@@ -212,7 +212,7 @@ export class StakingPool {
     const quoteAccountPublicKey = quoteAccountKeypair.publicKey;
     const createWSolAccountInstructions = await getCreateAccountInstructions(
       this.client.connection,
-      args.user,
+      args.user.publicKey,
       MEMECHAN_QUOTE_MINT,
       args.user.publicKey,
       quoteAccountKeypair,

@@ -1,25 +1,15 @@
 import { sendAndConfirmTransaction } from "@solana/web3.js";
 import { BoundPoolClient } from "../../../src/bound-pool/BoundPool";
 import { MEMECHAN_QUOTE_TOKEN } from "../../../src/config/config";
-import { admin, payer, client } from "../../common";
-
-const DUMMY_TOKEN_METADATA = {
-  name: "Best Token Ever",
-  symbol: "BTE",
-  image: "https://cf-ipfs.com/ipfs/QmVevMfxFpfgBu5kHuYUPmDMaV6pWkAn3zw5XaCXxKdaBh",
-  description: "This is the best token ever",
-  twitter: "https://twitter.com/BestTokenEver",
-  telegram: "https://t.me/BestTokenEver",
-  website: "https://besttokenever.com",
-};
+import { admin, payer, client, DUMMY_TOKEN_METADATA } from "../../common";
+import { getTxSize } from "../../../src/util/get-tx-size";
 
 // yarn tsx examples/bonding-pool/create/create-new-token-and-pool-tx.ts > log.txt 2>&1
 export const createNewTokenAndPoolTx = async () => {
-  const { createPoolTransaction, createTokenTransaction, memeMintKeypair, poolQuoteVaultId, launchVaultId } =
+  const { transaction, memeMintKeypair, poolQuoteVaultId, launchVaultId } =
     await BoundPoolClient.getCreateNewBondingPoolAndTokenTransaction({
       admin,
-      payer,
-      signer: payer,
+      payer: payer.publicKey,
       client,
       quoteToken: MEMECHAN_QUOTE_TOKEN,
       tokenMetadata: DUMMY_TOKEN_METADATA,
@@ -28,21 +18,19 @@ export const createNewTokenAndPoolTx = async () => {
   const memeMint = memeMintKeypair.publicKey;
 
   try {
-    const createPoolSignature = await sendAndConfirmTransaction(
+    const size = getTxSize(transaction, payer.publicKey);
+    console.debug("createPoolAndTokenSignature size: ", size);
+
+    const createPoolAndTokenSignature = await sendAndConfirmTransaction(
       client.connection,
-      createPoolTransaction,
+      transaction,
       [payer, memeMintKeypair, poolQuoteVaultId, launchVaultId],
       {
         commitment: "confirmed",
-        // skipPreflight: true,
+        skipPreflight: true,
       },
     );
-    console.log("createPoolSignature:", createPoolSignature);
-
-    const createTokenSignature = await sendAndConfirmTransaction(client.connection, createTokenTransaction, [payer], {
-      commitment: "confirmed",
-    });
-    console.log("createTokenSignature:", createTokenSignature);
+    console.log("createPoolAndTokenSignature:", createPoolAndTokenSignature);
 
     const id = BoundPoolClient.findBoundPoolPda(memeMint, MEMECHAN_QUOTE_TOKEN.mint, client.memechanProgram.programId);
     console.debug("id: ", id);

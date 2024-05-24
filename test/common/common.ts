@@ -1,18 +1,12 @@
 import { Keypair, PublicKey } from "@solana/web3.js";
-import {
-  ADMIN_PUB_KEY,
-  HELIUS_API_URL,
-  IS_TEST_ENV,
-  RPC_API_CLUSTER,
-  TEST_USER_SECRET_KEY,
-  WSS_API_CLUSTER,
-} from "./env";
-import NodeWallet from "@coral-xyz/anchor/dist/cjs/nodewallet";
+import { HELIUS_API_URL, IS_TEST_ENV, RPC_API_CLUSTER, TEST_USER_SECRET_KEY, WSS_API_CLUSTER } from "./env";
+import { Wallet } from "@coral-xyz/anchor";
 import { MemechanClient } from "../../src/MemechanClient";
+import { ADMIN_PUB_KEY } from "../../src/config/config";
 
-export const admin = new PublicKey(ADMIN_PUB_KEY);
+export const admin = ADMIN_PUB_KEY;
 export const payer = Keypair.fromSecretKey(Buffer.from(JSON.parse(TEST_USER_SECRET_KEY)));
-export const wallet = new NodeWallet(payer);
+export const wallet = new Wallet(payer);
 export const client = new MemechanClient({
   wallet,
   heliusApiUrl: HELIUS_API_URL,
@@ -29,6 +23,7 @@ export const DUMMY_TOKEN_METADATA = {
   twitter: "https://twitter.com/BestTokenEver",
   telegram: "https://t.me/BestTokenEver",
   website: "https://besttokenever.com",
+  discord: "",
 };
 
 export const LIVE_BOUND_POOL_ID = new PublicKey("9pEBW3vNF7uxaPyJbATK1AdCLSxAzJyXs5bPCbuyRHhB");
