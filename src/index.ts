@@ -6,6 +6,13 @@ export * from "./memeticket/MemeTicketClient";
 export * from "./staking-pool/StakingPoolClient";
 export * from "./targetconfig/TargetConfigClient";
 
+// Client types
+export * from "./bound-pool/types";
+export * from "./live-pool/types";
+export * from "./memeticket/types";
+export * from "./staking-pool/types";
+export * from "./targetconfig/types";
+
 // Config
 export * from "./config/config";
 
