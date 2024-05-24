@@ -38,6 +38,9 @@ export * from "./tx-parsing/parsers/create-metadata-parser";
 
 // Codegen
 export * from "./schema/codegen/accounts/BoundPool";
+export * from "./schema/codegen/accounts/MemeTicket";
+export * from "./schema/codegen/accounts/StakingPool";
+export * from "./schema/codegen/accounts/TargetConfig";
 
 // Utils
 export * from "./common/helpers";
