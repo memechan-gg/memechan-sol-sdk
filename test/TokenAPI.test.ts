@@ -1,9 +1,9 @@
 import { Keypair } from "@solana/web3.js";
-import { Auth } from "../src/auth/Auth";
+import { Auth } from "../src/api/auth/Auth";
 import { BE_URL, isSorted } from "./utils";
 import nacl from "tweetnacl";
-import { TokenAPI } from "../src/token/TokenAPI";
-import { SolanaToken, solanaTokenSchema } from "../src/token/schemas/token-schemas";
+import { TokenAPI } from "../src/api/TokenAPI";
+import { SolanaToken, solanaTokenSchema } from "../src/api/schemas/token-schemas";
 // eslint-disable-next-line max-len
 
 describe("TokenService authenticated operations", () => {
@@ -11,11 +11,11 @@ describe("TokenService authenticated operations", () => {
     const authService = new Auth(BE_URL);
     const keypair = new Keypair();
     const messageToSign = await authService.requestMessageToSign(keypair.publicKey.toBase58());
-    console.log('message to sign', messageToSign, keypair.publicKey.toBase58());
+    console.log("message to sign", messageToSign, keypair.publicKey.toBase58());
     const signature = nacl.sign.detached(Buffer.from(messageToSign), keypair.secretKey);
     await authService.refreshSession({
-        walletAddress: keypair.publicKey.toBase58(),
-        signedMessage: Buffer.from(signature).toString('hex'),
+      walletAddress: keypair.publicKey.toBase58(),
+      signedMessage: Buffer.from(signature).toString("hex"),
     });
     console.log("Wallet authenticated");
   });

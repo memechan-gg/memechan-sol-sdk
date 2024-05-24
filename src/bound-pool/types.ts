@@ -4,7 +4,7 @@ import { Keypair, PublicKey, Signer, Transaction } from "@solana/web3.js";
 import { MemechanClient } from "../MemechanClient";
 import { MemeTicket } from "../memeticket/MemeTicket";
 import { BoundPool } from "../schema/codegen/accounts";
-import { TokenMetadata } from "../token/types";
+import { TokenMetadata } from "../api/types";
 
 export interface SwapYArgs {
   payer: Signer;

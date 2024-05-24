@@ -4,9 +4,9 @@ export * from "./common/helpers";
 export * from "./config/config";
 
 // API
-export * from "./auth/Auth";
-export * from "./token/PoolApi";
-export * from "./token/TokenAPI";
+export * from "./api/auth/Auth";
+export * from "./api/PoolApi";
+export * from "./api/TokenAPI";
 
 export * from "./targetconfig/TargetConfig";
 export * from "./targetconfig/TargetConfig";

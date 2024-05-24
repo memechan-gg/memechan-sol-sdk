@@ -11,6 +11,7 @@ describe("MemeTicket", () => {
   it.skip("all", async () => {
     const all = await MemeTicket.all(client.memechanProgram);
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     for (const pool of all) {
       //console.log(JSON.stringify(pool.account));
       //console.log("==================================================");
@@ -74,7 +75,6 @@ describe("MemeTicket", () => {
     const pool = await BoundPoolClient.slowNew({
       admin,
       payer,
-      signer: payer,
       client,
       quoteToken: MEMECHAN_QUOTE_TOKEN,
       tokenMetadata: DUMMY_TOKEN_METADATA,

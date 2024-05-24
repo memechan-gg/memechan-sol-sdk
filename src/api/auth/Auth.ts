@@ -1,5 +1,5 @@
-import { BE_URL } from "../config/config";
-import { jsonFetch } from "../util/fetch";
+import { BE_URL } from "../../config/config";
+import { jsonFetch } from "../../util/fetch";
 
 export interface AuthParams {
   url: string;
@@ -11,7 +11,6 @@ export interface IAMCredentials {
   sessionToken?: string;
   expiration?: Date;
 }
-
 
 /**
  * Class to handle authentication processes with SUI wallet.
