@@ -22,7 +22,12 @@ import {
   sendAndConfirmTransaction,
 } from "@solana/web3.js";
 import BigNumber from "bignumber.js";
-import { BoundPool, BoundPool as CodegenBoundPool, MemeTicketFields } from "../schema/codegen/accounts";
+import {
+  BoundPool,
+  BoundPoolFields,
+  BoundPool as CodegenBoundPool,
+  MemeTicketFields,
+} from "../schema/codegen/accounts";
 
 import { BN, Program, Provider } from "@coral-xyz/anchor";
 import { MemechanClient } from "../MemechanClient";
@@ -71,8 +76,8 @@ import { getCreateAccountInstructions } from "../util/getCreateAccountInstructio
 import { getSendAndConfirmTransactionMethod } from "../util/getSendAndConfirmTransactionMethod";
 import { retry } from "../util/retry";
 import { deductSlippage } from "../util/trading/deductSlippage";
-import { normalizeInputCoinAmount } from "../util/trading/normalizeInputCoinAmount";
 import { extractSwapDataFromSimulation } from "../util/trading/extractSwapDataFromSimulation";
+import { normalizeInputCoinAmount } from "../util/trading/normalizeInputCoinAmount";
 
 export class BoundPoolClient {
   private constructor(
@@ -391,8 +396,13 @@ export class BoundPoolClient {
     });
   }
 
-  public static async all(program: Program<MemechanSol>) {
-    return await program.account.boundPool.all();
+  public static async all(
+    program: Program<MemechanSol>,
+  ): Promise<{ account: BoundPoolFields; publicKey: PublicKey }[]> {
+    const rawPools = await program.account.boundPool.all();
+    const pools = rawPools.map((el) => el);
+
+    return pools;
   }
 
   public findSignerPda(): PublicKey {
