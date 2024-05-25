@@ -187,7 +187,8 @@ export class BoundPoolClient {
   public static async getCreateNewBondingPoolAndTokenTransaction(
     args: GetCreateNewBondingPoolAndTokenTransactionArgs,
   ): Promise<{
-    transaction: Transaction;
+    createPoolTransaction: Transaction;
+    createTokenTransaction: Transaction;
     memeMintKeypair: Keypair;
     poolQuoteVaultId: Keypair;
     launchVaultId: Keypair;
@@ -197,7 +198,7 @@ export class BoundPoolClient {
       payer,
       client,
       quoteToken,
-      transaction = new Transaction(),
+      transaction: createPoolTransaction = new Transaction(),
       adminSolPublicKey,
       tokenMetadata,
     } = args;
@@ -219,7 +220,7 @@ export class BoundPoolClient {
       )
     ).instructions;
 
-    transaction.add(...createMemeMintWithPriorityInstructions);
+    createPoolTransaction.add(...createMemeMintWithPriorityInstructions);
 
     let adminQuoteVault: PublicKey | undefined = adminSolPublicKey;
 
@@ -247,7 +248,7 @@ export class BoundPoolClient {
           ASSOCIATED_TOKEN_PROGRAM_ID,
         );
 
-        transaction.add(associatedTransactionInstruction);
+        createPoolTransaction.add(associatedTransactionInstruction);
 
         adminQuoteVault = associatedToken;
       }
@@ -263,7 +264,7 @@ export class BoundPoolClient {
       poolQuoteVaultId,
     );
 
-    transaction.add(...createPoolQuoteVaultInstructions);
+    createPoolTransaction.add(...createPoolQuoteVaultInstructions);
 
     const launchVaultId = Keypair.generate();
     const launchVault = launchVaultId.publicKey;
@@ -275,7 +276,7 @@ export class BoundPoolClient {
       launchVaultId,
     );
 
-    transaction.add(...createLaunchVaultInstructions);
+    createPoolTransaction.add(...createLaunchVaultInstructions);
 
     const createPoolInstruction = await memechanProgram.methods
       .newPool()
@@ -295,7 +296,9 @@ export class BoundPoolClient {
       })
       .instruction();
 
-    transaction.add(createPoolInstruction);
+    createPoolTransaction.add(createPoolInstruction);
+
+    const createTokenTransaction = new Transaction();
 
     const createTokenInstructions = (
       await getCreateMetadataTransaction(client, {
@@ -307,10 +310,11 @@ export class BoundPoolClient {
       })
     ).instructions;
 
-    transaction.add(...createTokenInstructions);
+    createTokenTransaction.add(...createTokenInstructions);
 
     return {
-      transaction,
+      createPoolTransaction,
+      createTokenTransaction,
       memeMintKeypair,
       poolQuoteVaultId,
       launchVaultId,
@@ -319,28 +323,37 @@ export class BoundPoolClient {
 
   public static async new(args: BoundPoolArgs): Promise<BoundPoolClient> {
     const { payer, client, quoteToken } = args;
-    const { connection, memechanProgram } = client;
+    const { memechanProgram } = client;
 
-    const { transaction, memeMintKeypair, poolQuoteVaultId, launchVaultId } =
+    const { createPoolTransaction, createTokenTransaction, memeMintKeypair, poolQuoteVaultId, launchVaultId } =
       await this.getCreateNewBondingPoolAndTokenTransaction({ ...args, payer: payer.publicKey });
 
     const memeMint = memeMintKeypair.publicKey;
     const poolQuoteVault = poolQuoteVaultId.publicKey;
     const launchVault = launchVaultId.publicKey;
 
-    const size = getTxSize(transaction, payer.publicKey);
-    console.debug("createPoolAndTokenSignature size: ", size);
+    const createPoolTransactionSize = getTxSize(createPoolTransaction, payer.publicKey);
+    console.debug("createPoolTransaction size: ", createPoolTransactionSize);
 
-    const createPoolAndTokenSignature = await sendAndConfirmTransaction(
-      connection,
-      transaction,
+    const createTokenTransactionSize = getTxSize(createTokenTransaction, payer.publicKey);
+    console.debug("createTokenTransaction size: ", createTokenTransactionSize);
+
+    const createPoolSignature = await sendAndConfirmTransaction(
+      client.connection,
+      createPoolTransaction,
       [payer, memeMintKeypair, poolQuoteVaultId, launchVaultId],
       {
         commitment: "confirmed",
         skipPreflight: true,
       },
     );
-    console.log("createPoolAndTokenSignature:", createPoolAndTokenSignature);
+    console.log("createPoolSignature:", createPoolSignature);
+
+    const createTokenSignature = await sendAndConfirmTransaction(client.connection, createTokenTransaction, [payer], {
+      commitment: "confirmed",
+      skipPreflight: true,
+    });
+    console.log("createTokenSignature:", createTokenSignature);
 
     const id = this.findBoundPoolPda(memeMint, quoteToken.mint, memechanProgram.programId);
 
