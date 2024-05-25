@@ -45,6 +45,7 @@ export * from "./schema/codegen/accounts/BoundPool";
 export * from "./schema/codegen/accounts/MemeTicket";
 export * from "./schema/codegen/accounts/StakingPool";
 export * from "./schema/codegen/accounts/TargetConfig";
+export * from "./schema/types/memechan_sol";
 
 // Utils
 export * from "./common/helpers";
