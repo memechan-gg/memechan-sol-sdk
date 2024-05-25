@@ -31,7 +31,7 @@ export class StakingPoolClient {
     public memeMint: PublicKey,
     public lpVault: PublicKey,
     public lpMint: PublicKey,
-    public quote_vault: PublicKey,
+    public quoteVault: PublicKey,
   ) {}
 
   public static async fromStakingPoolId({
@@ -320,7 +320,7 @@ export class StakingPoolClient {
 
   public async getAvailableWithdrawFeesAmount(
     args: WithdrawFeesArgs,
-  ) /*: Promise<{ availableAmount: number; error?: TransactionError; logs?: string[] | null }>*/ {
+  ) /* : Promise<{ availableAmount: number; error?: TransactionError; logs?: string[] | null }>*/ {
     const { memeAccountKeypair, transaction, quoteAccountKeypair } = await this.getWithdrawFeesTransaction({
       ...args,
       user: args.user.publicKey,

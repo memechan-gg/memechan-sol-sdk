@@ -50,7 +50,8 @@ export class PoolAPI {
   /**
    * Retrieves staking pool by coin type.
    * @param {string} tokenAddress - The type of coin for filtering seed pools.
-   * @return {Promise<QueryAllStakingPoolsResponse>} A Promise that resolves with the live pool matching the specified coin type.
+   * @return {Promise<QueryAllStakingPoolsResponse>} A Promise that resolves with the
+   * live pool matching the specified coin type.
    */
   getStakingPoolByCoinType(tokenAddress: string): Promise<QueryAllStakingPoolsResponse> {
     return jsonFetch(`${this.url}/sol/staking-pools?tokenAddress=${tokenAddress}`, {
@@ -61,7 +62,8 @@ export class PoolAPI {
   /**
    * Retrieves seed pools filtered by coin type.
    * @param {string} [paginationToken] - A token for pagination, if more results are available beyond the first page.
-   * @return {Promise<QueryAllLivePoolsResponse>} A Promise that resolves with the list of seed pools matching the specified coin type.
+   * @return {Promise<QueryAllLivePoolsResponse>} A Promise that resolves with the
+   * list of seed pools matching the specified coin type.
    */
   getLivePools(paginationToken?: string): Promise<QueryAllLivePoolsResponse> {
     return jsonFetch(`${this.url}/sol/live-pools${paginationToken ? "?paginationToken=" + paginationToken : ""}`, {
@@ -72,7 +74,8 @@ export class PoolAPI {
   /**
    * Retrieves seed pools filtered by coin type.
    * @param {string} [paginationToken] - A token for pagination, if more results are available beyond the first page.
-   * @return {Promise<QueryAllStakingPoolsResponse>} A Promise that resolves with the list of seed pools matching the specified coin type.
+   * @return {Promise<QueryAllStakingPoolsResponse>} A Promise that resolves with the
+   * list of seed pools matching the specified coin type.
    */
   getStakingPools(paginationToken?: string): Promise<QueryAllStakingPoolsResponse> {
     return jsonFetch(`${this.url}/sol/staking-pools${paginationToken ? "?paginationToken=" + paginationToken : ""}`, {

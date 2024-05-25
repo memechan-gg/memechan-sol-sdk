@@ -9,7 +9,7 @@ export type CreateMetadataInstructionParsed = {
   type: "create_metadata";
 };
 
-export async function ParseCreateMetadataInstruction(
+export async function parseCreateMetadataInstruction(
   tx: ParsedTransactionWithMeta,
   index: number,
   memechanProgram: MemechanClient,

@@ -12,7 +12,7 @@ export type InitStakingPoolInstructionParsed = {
   type: "init_staking";
 };
 
-export async function ParseInitStakingInstruction(
+export async function parseInitStakingInstruction(
   tx: ParsedTransactionWithMeta,
   index: number,
   client: MemechanClient,
