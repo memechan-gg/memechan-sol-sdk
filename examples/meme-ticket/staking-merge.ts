@@ -17,7 +17,8 @@ export const stakingMerge = async () => {
     await destinationMemeTicket.stakingMerge({
       staking: stakingPoolAddress,
       ticketsToMerge: sourceMemeTickets,
-      user: payer,
+      user: payer.publicKey,
+      signer: payer,
     });
 
     console.log("[stakingMerge] All the tickets are merged.");
