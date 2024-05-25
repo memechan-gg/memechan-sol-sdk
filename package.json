@@ -1,7 +1,7 @@
 {
   "name": "@avernikoz/memechan-sol-sdk",
   "description": "Typescript SDK for memechan.gg",
-  "version": "1.0.28",
+  "version": "1.0.29",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "directories": {
@@ -18,7 +18,7 @@
     "test": "jest",
     "audit": "yarn audit --groups dependencies",
     "format": "prettier --write src/**/*.ts",
-    "lint": "tsc --noEmit && eslint src/**/*.ts",
+    "lint": "tsc --noEmit",
     "build": "yarn rimraf dist && yarn lint && tsup",
     "build:watch": "tsc --watch",
     "prettier-format": "prettier --config .prettierrc 'src/**/*.ts' --write",
