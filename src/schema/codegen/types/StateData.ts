@@ -1,69 +1,69 @@
-import { PublicKey } from "@solana/web3.js" // eslint-disable-line @typescript-eslint/no-unused-vars
-import BN from "bn.js" // eslint-disable-line @typescript-eslint/no-unused-vars
-import * as types from "../types" // eslint-disable-line @typescript-eslint/no-unused-vars
-import * as borsh from "@project-serum/borsh"
+import { PublicKey } from "@solana/web3.js"; // eslint-disable-line @typescript-eslint/no-unused-vars
+import BN from "bn.js"; // eslint-disable-line @typescript-eslint/no-unused-vars
+import * as types from "../types"; // eslint-disable-line @typescript-eslint/no-unused-vars
+import * as borsh from "@project-serum/borsh";
 
 export interface StateDataFields {
-  needTakePnlCoin: BN
-  needTakePnlPc: BN
-  totalPnlPc: BN
-  totalPnlCoin: BN
-  poolOpenTime: BN
-  padding: Array<BN>
-  orderbookToInitTime: BN
-  swapCoinInAmount: BN
-  swapPcOutAmount: BN
-  swapAccPcFee: BN
-  swapPcInAmount: BN
-  swapCoinOutAmount: BN
-  swapAccCoinFee: BN
+  needTakePnlCoin: BN;
+  needTakePnlPc: BN;
+  totalPnlPc: BN;
+  totalPnlCoin: BN;
+  poolOpenTime: BN;
+  padding: Array<BN>;
+  orderbookToInitTime: BN;
+  swapCoinInAmount: BN;
+  swapPcOutAmount: BN;
+  swapAccPcFee: BN;
+  swapPcInAmount: BN;
+  swapCoinOutAmount: BN;
+  swapAccCoinFee: BN;
 }
 
 export interface StateDataJSON {
-  needTakePnlCoin: string
-  needTakePnlPc: string
-  totalPnlPc: string
-  totalPnlCoin: string
-  poolOpenTime: string
-  padding: Array<string>
-  orderbookToInitTime: string
-  swapCoinInAmount: string
-  swapPcOutAmount: string
-  swapAccPcFee: string
-  swapPcInAmount: string
-  swapCoinOutAmount: string
-  swapAccCoinFee: string
+  needTakePnlCoin: string;
+  needTakePnlPc: string;
+  totalPnlPc: string;
+  totalPnlCoin: string;
+  poolOpenTime: string;
+  padding: Array<string>;
+  orderbookToInitTime: string;
+  swapCoinInAmount: string;
+  swapPcOutAmount: string;
+  swapAccPcFee: string;
+  swapPcInAmount: string;
+  swapCoinOutAmount: string;
+  swapAccCoinFee: string;
 }
 
 export class StateData {
-  readonly needTakePnlCoin: BN
-  readonly needTakePnlPc: BN
-  readonly totalPnlPc: BN
-  readonly totalPnlCoin: BN
-  readonly poolOpenTime: BN
-  readonly padding: Array<BN>
-  readonly orderbookToInitTime: BN
-  readonly swapCoinInAmount: BN
-  readonly swapPcOutAmount: BN
-  readonly swapAccPcFee: BN
-  readonly swapPcInAmount: BN
-  readonly swapCoinOutAmount: BN
-  readonly swapAccCoinFee: BN
+  readonly needTakePnlCoin: BN;
+  readonly needTakePnlPc: BN;
+  readonly totalPnlPc: BN;
+  readonly totalPnlCoin: BN;
+  readonly poolOpenTime: BN;
+  readonly padding: Array<BN>;
+  readonly orderbookToInitTime: BN;
+  readonly swapCoinInAmount: BN;
+  readonly swapPcOutAmount: BN;
+  readonly swapAccPcFee: BN;
+  readonly swapPcInAmount: BN;
+  readonly swapCoinOutAmount: BN;
+  readonly swapAccCoinFee: BN;
 
   constructor(fields: StateDataFields) {
-    this.needTakePnlCoin = fields.needTakePnlCoin
-    this.needTakePnlPc = fields.needTakePnlPc
-    this.totalPnlPc = fields.totalPnlPc
-    this.totalPnlCoin = fields.totalPnlCoin
-    this.poolOpenTime = fields.poolOpenTime
-    this.padding = fields.padding
-    this.orderbookToInitTime = fields.orderbookToInitTime
-    this.swapCoinInAmount = fields.swapCoinInAmount
-    this.swapPcOutAmount = fields.swapPcOutAmount
-    this.swapAccPcFee = fields.swapAccPcFee
-    this.swapPcInAmount = fields.swapPcInAmount
-    this.swapCoinOutAmount = fields.swapCoinOutAmount
-    this.swapAccCoinFee = fields.swapAccCoinFee
+    this.needTakePnlCoin = fields.needTakePnlCoin;
+    this.needTakePnlPc = fields.needTakePnlPc;
+    this.totalPnlPc = fields.totalPnlPc;
+    this.totalPnlCoin = fields.totalPnlCoin;
+    this.poolOpenTime = fields.poolOpenTime;
+    this.padding = fields.padding;
+    this.orderbookToInitTime = fields.orderbookToInitTime;
+    this.swapCoinInAmount = fields.swapCoinInAmount;
+    this.swapPcOutAmount = fields.swapPcOutAmount;
+    this.swapAccPcFee = fields.swapAccPcFee;
+    this.swapPcInAmount = fields.swapPcInAmount;
+    this.swapCoinOutAmount = fields.swapCoinOutAmount;
+    this.swapAccCoinFee = fields.swapAccCoinFee;
   }
 
   static layout(property?: string) {
@@ -83,8 +83,8 @@ export class StateData {
         borsh.u128("swapCoinOutAmount"),
         borsh.u64("swapAccCoinFee"),
       ],
-      property
-    )
+      property,
+    );
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -103,7 +103,7 @@ export class StateData {
       swapPcInAmount: obj.swapPcInAmount,
       swapCoinOutAmount: obj.swapCoinOutAmount,
       swapAccCoinFee: obj.swapAccCoinFee,
-    })
+    });
   }
 
   static toEncodable(fields: StateDataFields) {
@@ -121,7 +121,7 @@ export class StateData {
       swapPcInAmount: fields.swapPcInAmount,
       swapCoinOutAmount: fields.swapCoinOutAmount,
       swapAccCoinFee: fields.swapAccCoinFee,
-    }
+    };
   }
 
   toJSON(): StateDataJSON {
@@ -139,7 +139,7 @@ export class StateData {
       swapPcInAmount: this.swapPcInAmount.toString(),
       swapCoinOutAmount: this.swapCoinOutAmount.toString(),
       swapAccCoinFee: this.swapAccCoinFee.toString(),
-    }
+    };
   }
 
   static fromJSON(obj: StateDataJSON): StateData {
@@ -157,10 +157,10 @@ export class StateData {
       swapPcInAmount: new BN(obj.swapPcInAmount),
       swapCoinOutAmount: new BN(obj.swapCoinOutAmount),
       swapAccCoinFee: new BN(obj.swapAccCoinFee),
-    })
+    });
   }
 
   toEncodable() {
-    return StateData.toEncodable(this)
+    return StateData.toEncodable(this);
   }
 }

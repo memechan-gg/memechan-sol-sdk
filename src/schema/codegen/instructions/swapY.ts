@@ -1,29 +1,26 @@
-import { TransactionInstruction, PublicKey } from "@solana/web3.js" // eslint-disable-line @typescript-eslint/no-unused-vars
-import BN from "bn.js" // eslint-disable-line @typescript-eslint/no-unused-vars
-import * as borsh from "@project-serum/borsh" // eslint-disable-line @typescript-eslint/no-unused-vars
-import * as types from "../types" // eslint-disable-line @typescript-eslint/no-unused-vars
-import { PROGRAM_ID } from "../programId"
+import { TransactionInstruction, PublicKey } from "@solana/web3.js"; // eslint-disable-line @typescript-eslint/no-unused-vars
+import BN from "bn.js"; // eslint-disable-line @typescript-eslint/no-unused-vars
+import * as borsh from "@project-serum/borsh"; // eslint-disable-line @typescript-eslint/no-unused-vars
+import * as types from "../types"; // eslint-disable-line @typescript-eslint/no-unused-vars
+import { PROGRAM_ID } from "../programId";
 
 export interface SwapYArgs {
-  coinInAmount: BN
-  coinXMinValue: BN
+  coinInAmount: BN;
+  coinXMinValue: BN;
 }
 
 export interface SwapYAccounts {
-  pool: PublicKey
-  quoteVault: PublicKey
-  userSol: PublicKey
-  memeTicket: PublicKey
-  owner: PublicKey
-  poolSignerPda: PublicKey
-  tokenProgram: PublicKey
-  systemProgram: PublicKey
+  pool: PublicKey;
+  quoteVault: PublicKey;
+  userSol: PublicKey;
+  memeTicket: PublicKey;
+  owner: PublicKey;
+  poolSignerPda: PublicKey;
+  tokenProgram: PublicKey;
+  systemProgram: PublicKey;
 }
 
-export const layout = borsh.struct([
-  borsh.u64("coinInAmount"),
-  borsh.u64("coinXMinValue"),
-])
+export const layout = borsh.struct([borsh.u64("coinInAmount"), borsh.u64("coinXMinValue")]);
 
 export function swapY(args: SwapYArgs, accounts: SwapYAccounts) {
   const keys = [
@@ -35,17 +32,17 @@ export function swapY(args: SwapYArgs, accounts: SwapYAccounts) {
     { pubkey: accounts.poolSignerPda, isSigner: false, isWritable: false },
     { pubkey: accounts.tokenProgram, isSigner: false, isWritable: false },
     { pubkey: accounts.systemProgram, isSigner: false, isWritable: false },
-  ]
-  const identifier = Buffer.from([126, 208, 104, 214, 101, 217, 59, 65])
-  const buffer = Buffer.alloc(1000)
+  ];
+  const identifier = Buffer.from([126, 208, 104, 214, 101, 217, 59, 65]);
+  const buffer = Buffer.alloc(1000);
   const len = layout.encode(
     {
       coinInAmount: args.coinInAmount,
       coinXMinValue: args.coinXMinValue,
     },
-    buffer
-  )
-  const data = Buffer.concat([identifier, buffer]).slice(0, 8 + len)
-  const ix = new TransactionInstruction({ keys, programId: PROGRAM_ID, data })
-  return ix
+    buffer,
+  );
+  const data = Buffer.concat([identifier, buffer]).slice(0, 8 + len);
+  const ix = new TransactionInstruction({ keys, programId: PROGRAM_ID, data });
+  return ix;
 }

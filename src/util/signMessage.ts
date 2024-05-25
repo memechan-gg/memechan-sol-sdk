@@ -16,11 +16,7 @@ export async function signMessage(message: string, keypair: Keypair) {
   const signature = nacl.sign.detached(messageBytes, keypair.secretKey);
 
   // Step 3: Verify the signature (optional)
-  const isValid = nacl.sign.detached.verify(
-    messageBytes,
-    signature,
-    keypair.publicKey.toBytes()
-  );
+  const isValid = nacl.sign.detached.verify(messageBytes, signature, keypair.publicKey.toBytes());
 
   if (!isValid) {
     throw new Error("Signature verification failed");

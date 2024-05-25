@@ -22,7 +22,12 @@ import {
   sendAndConfirmTransaction,
 } from "@solana/web3.js";
 import BigNumber from "bignumber.js";
-import { BoundPool, BoundPool as CodegenBoundPool, MemeTicketFields } from "../schema/codegen/accounts";
+import {
+  BoundPool,
+  BoundPoolFields,
+  BoundPool as CodegenBoundPool,
+  MemeTicketFields,
+} from "../schema/codegen/accounts";
 
 import { BN, Program, Provider } from "@coral-xyz/anchor";
 import { MemechanClient } from "../MemechanClient";
@@ -75,10 +80,10 @@ import { getCreateAccountInstructions } from "../util/getCreateAccountInstructio
 import { getSendAndConfirmTransactionMethod } from "../util/getSendAndConfirmTransactionMethod";
 import { retry } from "../util/retry";
 import { deductSlippage } from "../util/trading/deductSlippage";
-import { normalizeInputCoinAmount } from "../util/trading/normalizeInputCoinAmount";
 import { extractSwapDataFromSimulation } from "../util/trading/extractSwapDataFromSimulation";
 import { getOptimizedTransactions } from "../memeticket/utils";
 import { ParsedMemeTicket } from "../memeticket/types";
+import { normalizeInputCoinAmount } from "../util/trading/normalizeInputCoinAmount";
 
 export class BoundPoolClient {
   private constructor(
@@ -398,8 +403,13 @@ export class BoundPoolClient {
     });
   }
 
-  public static async all(program: Program<MemechanSol>) {
-    return program.account.boundPool.all();
+  public static async all(
+    program: Program<MemechanSol>,
+  ): Promise<{ account: BoundPoolFields; publicKey: PublicKey }[]> {
+    const rawPools = await program.account.boundPool.all();
+    const pools = rawPools.map((el) => el);
+
+    return pools;
   }
 
   public findSignerPda(): PublicKey {
@@ -424,8 +434,8 @@ export class BoundPoolClient {
 
     const pool = input.pool ?? this.id;
     const poolSignerPda = BoundPoolClient.findSignerPda(pool, this.client.memechanProgram.programId);
-    const sol_in = input.quoteAmountIn;
-    const meme_out = input.memeTokensOut;
+    const solIn = input.quoteAmountIn;
+    const memeOut = input.memeTokensOut;
 
     const userQuoteAcc =
       input.userSolAcc ??
@@ -442,7 +452,7 @@ export class BoundPoolClient {
       ).address;
 
     await this.client.memechanProgram.methods
-      .swapY(new BN(sol_in), new BN(meme_out))
+      .swapY(new BN(solIn), new BN(memeOut))
       .accounts({
         memeTicket: id.publicKey,
         owner: user.publicKey,
@@ -652,7 +662,8 @@ export class BoundPoolClient {
     const inputAmountBignumber = new BigNumber(inputAmountWithDecimals.toString());
 
     // output
-    // Note: Be aware, we relay on the fact that `MEMECHAN_QUOTE_TOKEN_DECIMALS` would be always set same for all memecoins
+    // Note: Be aware, we relay on the fact that `MEMECHAN_QUOTE_TOKEN_DECIMALS`
+    // would be always set same for all memecoins
     // As well as the fact that memecoins and tickets decimals are always the same
     const minOutputWithSlippage = deductSlippage(new BigNumber(minOutputAmount), slippagePercentage);
     const minOutputNormalized = normalizeInputCoinAmount(
@@ -797,14 +808,14 @@ export class BoundPoolClient {
 
     const pool = this.id;
     const poolSignerPda = this.findSignerPda();
-    const meme_in = input.memeAmountIn;
+    const memeIn = input.memeAmountIn;
     const minQuoteAmountOut = input.minQuoteAmountOut;
 
     const memeTicket = input.userMemeTicket;
     const userSolAcc = input.userQuoteAcc;
 
     const sellMemeTransactionInstruction = await this.client.memechanProgram.methods
-      .swapX(new BN(meme_in), new BN(minQuoteAmountOut))
+      .swapX(new BN(memeIn), new BN(minQuoteAmountOut))
       .accounts({
         memeTicket: memeTicket.id,
         owner: user.publicKey,

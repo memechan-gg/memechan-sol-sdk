@@ -135,9 +135,9 @@ export class StakingPoolClient {
     const memeAccountPublicKey = memeAccountKeypair.publicKey;
     const createMemeAccountInstructions = await getCreateAccountInstructions(
       this.client.connection,
-      args.user.publicKey,
+      args.user,
       stakingInfo.memeMint,
-      args.user.publicKey,
+      args.user,
       memeAccountKeypair,
     );
 
@@ -147,9 +147,9 @@ export class StakingPoolClient {
     const quoteAccountPublicKey = quoteAccountKeypair.publicKey;
     const createQuoteAccountInstructions = await getCreateAccountInstructions(
       this.client.connection,
-      args.user.publicKey,
+      args.user,
       MEMECHAN_QUOTE_MINT,
-      args.user.publicKey,
+      args.user,
       quoteAccountKeypair,
     );
 
@@ -159,7 +159,7 @@ export class StakingPoolClient {
       .unstake(args.amount)
       .accounts({
         memeTicket: args.ticket.id,
-        signer: args.user.publicKey,
+        signer: args.user,
         stakingSignerPda: this.findSignerPda(),
         memeVault: stakingInfo.memeVault,
         quoteVault: stakingInfo.quoteVault,
@@ -178,7 +178,7 @@ export class StakingPoolClient {
   public async unstake(
     args: UnstakeArgs,
   ): Promise<{ memeAccountPublicKey: PublicKey; quoteAccountPublicKey: PublicKey }> {
-    const { memeAccountKeypair, transaction, quoteAccountKeypair } = await this.getUnstakeTransaction(args);
+    const { memeAccountKeypair, transaction, quoteAccountKeypair } = await this.getUnstakeTransaction({...args, user: args.user.publicKey});
 
     const signature = await sendAndConfirmTransaction(
       this.client.connection,
@@ -253,9 +253,9 @@ export class StakingPoolClient {
     const memeAccountPublicKey = memeAccountKeypair.publicKey;
     const createMemeAccountInstructions = await getCreateAccountInstructions(
       this.client.connection,
-      args.user.publicKey,
+      args.user,
       stakingInfo.memeMint,
-      args.user.publicKey,
+      args.user,
       memeAccountKeypair,
     );
 
@@ -265,9 +265,9 @@ export class StakingPoolClient {
     const quoteAccountPublicKey = quoteAccountKeypair.publicKey;
     const createWSolAccountInstructions = await getCreateAccountInstructions(
       this.client.connection,
-      args.user.publicKey,
+      args.user,
       MEMECHAN_QUOTE_MINT,
-      args.user.publicKey,
+      args.user,
       quoteAccountKeypair,
     );
 
@@ -283,7 +283,7 @@ export class StakingPoolClient {
         staking: this.id,
         userMeme: memeAccountPublicKey,
         userQuote: quoteAccountPublicKey,
-        signer: args.user.publicKey,
+        signer: args.user,
         tokenProgram: TOKEN_PROGRAM_ID,
       })
       .instruction();
@@ -296,7 +296,7 @@ export class StakingPoolClient {
   public async withdrawFees(
     args: WithdrawFeesArgs,
   ): Promise<{ memeAccountPublicKey: PublicKey; quoteAccountPublicKey: PublicKey }> {
-    const { memeAccountKeypair, transaction, quoteAccountKeypair } = await this.getWithdrawFeesTransaction(args);
+    const { memeAccountKeypair, transaction, quoteAccountKeypair } = await this.getWithdrawFeesTransaction({...args, user: args.user.publicKey});
 
     const sendAndConfirmWithdrawFeesTransaction = getSendAndConfirmTransactionMethod({
       connection: this.client.connection,
@@ -315,7 +315,7 @@ export class StakingPoolClient {
   public async getAvailableWithdrawFeesAmount(
     args: WithdrawFeesArgs,
   ) /*: Promise<{ availableAmount: number; error?: TransactionError; logs?: string[] | null }>*/ {
-    const { memeAccountKeypair, transaction, quoteAccountKeypair } = await this.getWithdrawFeesTransaction(args);
+    const { memeAccountKeypair, transaction, quoteAccountKeypair } = await this.getWithdrawFeesTransaction({...args, user: args.user.publicKey});
 
     const result = await this.client.connection.simulateTransaction(
       transaction,
@@ -407,7 +407,7 @@ export class StakingPoolClient {
   }
 
   public static async all(program: Program<MemechanSol>) {
-    return program.account.stakingPool.all();
+    return await program.account.stakingPool.all();
   }
 
   public findSignerPda(): PublicKey {
