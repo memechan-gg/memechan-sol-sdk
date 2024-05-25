@@ -27,7 +27,8 @@ export class PoolAPI {
   /**
    * Retrieves seed pool filtered by coin type.
    * @param {string} tokenAddress - The type of coin for filtering seed pools.
-   * @return {Promise<SolanaSeedPool>} A Promise that resolves with the list of seed pools matching the specified coin type.
+   * @return {Promise<SolanaSeedPool>} A Promise that resolves with the list of
+   * seed pools matching the specified coin type.
    */
   getSeedPoolByTokenAddress(tokenAddress: string): Promise<SolanaSeedPool> {
     return jsonFetch(`${this.url}/sol/seed-pools?tokenAddress=${tokenAddress}`, {
