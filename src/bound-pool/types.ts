@@ -35,6 +35,27 @@ export type GetBuyMemeTransactionOutput = {
   inputTokenAccount: PublicKey;
 };
 
+export type GetSellMemeTransactionArgs = {
+  user: PublicKey;
+  outputTokenAccount?: PublicKey;
+  inputAmount: string;
+  minOutputAmount: string;
+  slippagePercentage: number;
+  transaction?: Transaction;
+};
+
+export type SellMemeArgs = GetSellMemeTransactionArgs & { signer: Keypair };
+
+export type GetOutputAmountForSellMemeArgs = Omit<
+  SellMemeArgs,
+  "minOutputAmount" | "inputTokenAccount" | "user" | "signer"
+>;
+
+export type GetSellMemeTransactionOutput = {
+  txs: Transaction[];
+  isMoreThanOneTransaction: boolean;
+};
+
 export interface SwapXArgs {
   user: Keypair;
   //pool: PublicKey;
@@ -46,7 +67,7 @@ export interface SwapXArgs {
   quoteMint: PublicKey;
 }
 
-export type GetSellMemeTransactionArgs = Omit<SwapXArgs, "user" | "pool" | "poolSignerPda"> & {
+export type GetSellMemeTransactionArgsLegacy = Omit<SwapXArgs, "user" | "pool" | "poolSignerPda"> & {
   user: { publicKey: PublicKey };
   transaction?: Transaction;
 };
