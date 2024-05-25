@@ -15,7 +15,11 @@ export type GetAvailableUnstakeAmountArgs = {
   stakingPoolVestingConfig: VestingConfig;
 };
 
-export type GetUnstakeTransactionArgs = UnstakeArgs & { transaction?: Transaction };
+export type GetUnstakeTransactionArgs = Omit<UnstakeArgs, "user"> & 
+{
+   transaction?: Transaction;
+   user: PublicKey
+};
 
 export type AddFeesArgs = GetAddFeesTransactionArgs;
 
@@ -26,7 +30,11 @@ export interface WithdrawFeesArgs {
   user: Keypair;
 }
 
-export type GetWithdrawFeesTransactionArgs = WithdrawFeesArgs & { transaction?: Transaction };
+export type GetWithdrawFeesTransactionArgs = Omit<WithdrawFeesArgs, "user"> & 
+{ 
+  transaction?: Transaction;
+  user: PublicKey;
+};
 
 export interface AccountMeta {
   isSigner: boolean;
