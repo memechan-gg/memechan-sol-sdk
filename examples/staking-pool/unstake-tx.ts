@@ -45,7 +45,8 @@ export const unstake = async () => {
       await destinationMemeTicket.stakingMerge({
         staking: stakingPoolAddress,
         ticketsToMerge: sourceMemeTickets,
-        user: payer,
+        user: payer.publicKey,
+        signer: payer,
       });
 
       console.log("[unstake] All the tickets are merged.");
@@ -56,7 +57,11 @@ export const unstake = async () => {
     console.log("[unstake] Unstaking...");
 
     // Unstake
-    const { transaction, memeAccountKeypair, quoteAccountKeypair } = await stakingPool.getUnstakeTransaction({ amount: new BN(amount), user: payer.publicKey, ticket: destinationMemeTicket });
+    const { transaction, memeAccountKeypair, quoteAccountKeypair } = await stakingPool.getUnstakeTransaction({
+      amount: new BN(amount),
+      user: payer.publicKey,
+      ticket: destinationMemeTicket,
+    });
 
     console.log("payer: " + payer.publicKey.toBase58());
     const signature = await sendAndConfirmTransaction(
@@ -66,7 +71,6 @@ export const unstake = async () => {
       { commitment: "confirmed", skipPreflight: true },
     );
     console.log("unstake signature:", signature);
-    
   } catch (e) {
     console.error("[unstake] Error:", e);
   }

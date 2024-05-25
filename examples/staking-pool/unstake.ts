@@ -45,7 +45,8 @@ export const unstake = async () => {
       await destinationMemeTicket.stakingMerge({
         staking: stakingPoolAddress,
         ticketsToMerge: sourceMemeTickets,
-        user: payer,
+        user: payer.publicKey,
+        signer: payer,
       });
 
       console.log("[unstake] All the tickets are merged.");
