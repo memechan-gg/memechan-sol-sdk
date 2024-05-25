@@ -14,6 +14,7 @@ import {
   StakingMerge,
 } from "./types";
 import { getOptimizedTransactions } from "./utils";
+import { MEMECHAN_MEME_TOKEN_DECIMALS } from "../config/config";
 
 export class MemeTicketClient {
   public constructor(
@@ -43,7 +44,7 @@ export class MemeTicketClient {
       const mergeInstruction = await this.client.memechanProgram.methods
         .boundMergeTickets()
         .accounts({
-          owner: user.publicKey,
+          owner: user,
           pool: pool,
           ticketFrom: ticket.id,
           ticketInto: this.id,
@@ -57,13 +58,10 @@ export class MemeTicketClient {
   }
 
   public async boundMerge(input: BoundMerge): Promise<MemeTicketClient> {
-    const mergeTransaction = await this.getBoundMergeTransaction(input);
+    const { transactions } = await this.getBoundMergeTransactions(input);
 
-    const optimizedTransactions = getOptimizedTransactions(mergeTransaction.instructions, input.user.publicKey);
-    console.log("optimizedTransactions length:", optimizedTransactions.length);
-
-    for (const tx of optimizedTransactions) {
-      const signature = await sendAndConfirmTransaction(this.client.connection, tx, [input.user], {
+    for (const tx of transactions) {
+      const signature = await sendAndConfirmTransaction(this.client.connection, tx, [input.signer], {
         commitment: "confirmed",
         skipPreflight: true,
       });
@@ -71,6 +69,16 @@ export class MemeTicketClient {
     }
 
     return this;
+  }
+
+  public async getBoundMergeTransactions(input: GetBoundMergeTransactionArgs): Promise<{
+    transactions: Transaction[];
+    isMoreThanOneTransaction: boolean;
+  }> {
+    const mergeTransaction = await this.getBoundMergeTransaction(input);
+    const optimizedTransactions = getOptimizedTransactions(mergeTransaction.instructions, input.user);
+
+    return { transactions: optimizedTransactions, isMoreThanOneTransaction: optimizedTransactions.length > 0 };
   }
 
   public async getStakingMergeTransaction({
@@ -85,7 +93,7 @@ export class MemeTicketClient {
       const mergeInstruction = await this.client.memechanProgram.methods
         .stakingMergeTickets()
         .accounts({
-          owner: user.publicKey,
+          owner: user,
           staking: staking,
           ticketFrom: ticket.id,
           ticketInto: this.id,
@@ -101,10 +109,10 @@ export class MemeTicketClient {
   public async stakingMerge(input: StakingMerge): Promise<MemeTicketClient> {
     const mergeTransaction = await this.getStakingMergeTransaction(input);
 
-    const optimizedTransactions = getOptimizedTransactions(mergeTransaction.instructions, input.user.publicKey);
+    const optimizedTransactions = getOptimizedTransactions(mergeTransaction.instructions, input.user);
 
     for (const tx of optimizedTransactions) {
-      const signature = await sendAndConfirmTransaction(this.client.connection, tx, [input.user], {
+      const signature = await sendAndConfirmTransaction(this.client.connection, tx, [input.signer], {
         commitment: "confirmed",
         skipPreflight: true,
       });
@@ -120,7 +128,7 @@ export class MemeTicketClient {
     const closeInstruction = await this.client.memechanProgram.methods
       .closeTicket()
       .accounts({
-        owner: user.publicKey,
+        owner: user,
         ticket: this.id,
       })
       .instruction();
@@ -133,7 +141,7 @@ export class MemeTicketClient {
   public async close(input: CloseArgs): Promise<MemeTicketClient> {
     const closeTransaction = await this.getCloseTransaction(input);
 
-    const signature = await sendAndConfirmTransaction(this.client.connection, closeTransaction, [input.user], {
+    const signature = await sendAndConfirmTransaction(this.client.connection, closeTransaction, [input.signer], {
       commitment: "confirmed",
       skipPreflight: true,
     });
@@ -191,6 +199,7 @@ export class MemeTicketClient {
         id: ticket.publicKey,
         jsonFields: jsonTicket,
         fields: ticket.account,
+        amountWithDecimals: new BigNumber(jsonTicket.amount).dividedBy(10 ** MEMECHAN_MEME_TOKEN_DECIMALS).toString(),
       };
     });
 
@@ -207,13 +216,83 @@ export class MemeTicketClient {
       return currentTimestamp >= unlockTicketTimestamp;
     });
 
-    const availableAmount = availableTickets
-      .reduce((amount: BigNumber, ticket) => {
-        amount = amount.plus(ticket.jsonFields.amount);
-        return amount;
-      }, new BigNumber(0))
-      .toString();
+    const availableAmount = availableTickets.reduce((amount: BigNumber, ticket) => {
+      amount = amount.plus(ticket.jsonFields.amount);
+      return amount;
+    }, new BigNumber(0));
 
-    return { tickets: availableTickets, availableAmount };
+    const availableAmountWithDecimals = availableAmount.div(10 ** MEMECHAN_MEME_TOKEN_DECIMALS);
+
+    return {
+      tickets: availableTickets,
+      availableAmount: availableAmount.toString(),
+      availableAmountWithDecimals: availableAmountWithDecimals.toString(),
+    };
+  }
+
+  /**
+   * Retrieves the required tickets to sell to meet or exceed a specified amount.
+   *
+   * @param {Object} params - The parameters object.
+   * @param {BigNumber} params.amount - The amount required to fulfill.
+   * @param {ParsedMemeTicket[]} params.availableTickets - The list of available tickets.
+   * @returns {Promise<{ticketsRequiredToSell: ParsedMemeTicket[]}>} The list of tickets required to sell.
+   *
+   * @throws {Error} If the available tickets list is empty.
+   * @throws {Error} If the required amount cannot be met with the available tickets.
+   * @throws {Error} If no tickets are required to sell.
+   *
+   * @note This method relies on the assumption that the total amount of available tickets will always be greater than or equal to the specified amount.
+   */
+  public static async getRequiredTicketsToSell({
+    amount,
+    availableTickets,
+  }: {
+    amount: BigNumber;
+    availableTickets: ParsedMemeTicket[];
+  }): Promise<{ ticketsRequiredToSell: ParsedMemeTicket[]; isMoreThanOneTicket: boolean }> {
+    // Check if the availableTickets array is empty
+    if (availableTickets.length === 0) {
+      throw new Error("[getRequiredTicketsToSell] No available tickets to sell.");
+    }
+
+    // Initialize an array to hold the required tickets
+    const ticketsRequiredToSell: ParsedMemeTicket[] = [];
+
+    // Initialize a BigNumber to keep track of the accumulated amount
+    let accumulatedAmount = new BigNumber(0);
+
+    // Iterate over the available tickets
+    for (const ticket of availableTickets) {
+      // Convert the ticket amount to BigNumber
+      const ticketAmount = new BigNumber(ticket.jsonFields.amount);
+
+      // Add the ticket to the list of required tickets
+      ticketsRequiredToSell.push(ticket);
+
+      // Accumulate the amount
+      accumulatedAmount = accumulatedAmount.plus(ticketAmount);
+
+      // Check if the accumulated amount meets or exceeds the required amount
+      if (accumulatedAmount.isGreaterThanOrEqualTo(amount)) {
+        break; // We have enough tickets, break out of the loop
+      }
+    }
+
+    // If we exit the loop without fulfilling the amount, throw an error
+    if (accumulatedAmount.isLessThan(amount)) {
+      throw new Error(
+        `[getRequiredTicketsToSell] Insufficient tickets to fulfill the required amount.
+      Amount to fulfil: ${amount.toString()}, accumulatedAmount: ${accumulatedAmount}`,
+      );
+    }
+
+    // If no tickets were added to ticketsRequiredToSell, throw an error
+    if (ticketsRequiredToSell.length === 0) {
+      throw new Error("[getRequiredTicketsToSell] No tickets required to sell.");
+    }
+
+    // Return the list of required tickets
+    return { ticketsRequiredToSell, isMoreThanOneTicket: ticketsRequiredToSell.length > 1 };
   }
 }

@@ -44,10 +44,14 @@ import {
   GetGoLiveTransactionArgs,
   GetInitStakingPoolTransactionArgs,
   GetOutputAmountForBuyMeme,
+  GetOutputAmountForSellMemeArgs,
   GetSellMemeTransactionArgs,
+  GetSellMemeTransactionArgsLegacy,
+  GetSellMemeTransactionOutput,
   GoLiveArgs,
   InitStakingPoolArgs,
   InitStakingPoolResult,
+  SellMemeArgs,
   SwapXArgs,
   SwapYArgs,
 } from "./types";
@@ -77,6 +81,8 @@ import { getSendAndConfirmTransactionMethod } from "../util/getSendAndConfirmTra
 import { retry } from "../util/retry";
 import { deductSlippage } from "../util/trading/deductSlippage";
 import { extractSwapDataFromSimulation } from "../util/trading/extractSwapDataFromSimulation";
+import { getOptimizedTransactions } from "../memeticket/utils";
+import { ParsedMemeTicket } from "../memeticket/types";
 import { normalizeInputCoinAmount } from "../util/trading/normalizeInputCoinAmount";
 
 export class BoundPoolClient {
@@ -284,6 +290,7 @@ export class BoundPoolClient {
         quoteMint: quoteToken.mint,
         tokenProgram: TOKEN_PROGRAM_ID,
         systemProgram: SystemProgram.programId,
+        // TODO: Replace it in a way, that it would respect any target config, not only a hardcoded one
         targetConfig: MEMECHAN_TARGET_CONFIG,
       })
       .instruction();
@@ -427,8 +434,8 @@ export class BoundPoolClient {
 
     const pool = input.pool ?? this.id;
     const poolSignerPda = BoundPoolClient.findSignerPda(pool, this.client.memechanProgram.programId);
-    const sol_in = input.quoteAmountIn;
-    const meme_out = input.memeTokensOut;
+    const solIn = input.quoteAmountIn;
+    const memeOut = input.memeTokensOut;
 
     const userQuoteAcc =
       input.userSolAcc ??
@@ -445,7 +452,7 @@ export class BoundPoolClient {
       ).address;
 
     await this.client.memechanProgram.methods
-      .swapY(new BN(sol_in), new BN(meme_out))
+      .swapY(new BN(solIn), new BN(memeOut))
       .accounts({
         memeTicket: id.publicKey,
         owner: user.publicKey,
@@ -561,9 +568,6 @@ export class BoundPoolClient {
 
     transaction.add(buyMemeInstruction);
 
-    console.debug("memeTicketPublicKey: ", memeTicketKeypair.publicKey.toString());
-    console.debug("inputTokenAccount: ", inputTokenAccount.toString());
-
     return { tx: transaction, memeTicketKeypair, inputTokenAccount };
   }
 
@@ -607,6 +611,179 @@ export class BoundPoolClient {
     return outputAmountRespectingSlippage.toString();
   }
 
+  public async sellMeme(input: SellMemeArgs): Promise<string[]> {
+    const { txs } = await this.getSellMemeTransaction(input);
+    const txIdList: string[] = [];
+
+    for (const tx of txs) {
+      const signature = await sendAndConfirmTransaction(this.client.connection, tx, [input.signer], {
+        commitment: "confirmed",
+        skipPreflight: true,
+      });
+
+      txIdList.push(signature);
+      console.log("tx signature:", signature);
+    }
+
+    return txIdList;
+  }
+
+  public async getSellMemeTransaction(input: GetSellMemeTransactionArgs): Promise<GetSellMemeTransactionOutput> {
+    const { inputAmount, minOutputAmount, slippagePercentage, user, transaction = new Transaction() } = input;
+    let { outputTokenAccount } = input;
+
+    const pool = this.id;
+    const poolSignerPda = this.findSignerPda();
+    const connection = this.client.connection;
+
+    // Check that user has enough available tickets
+    const { availableAmountWithDecimals, tickets } = await MemeTicketClient.fetchAvailableTicketsByUser(
+      pool,
+      this.client,
+      user,
+    );
+
+    // console.debug("availableAmountWithDecimals: ", availableAmountWithDecimals);
+    // console.debug("tickets: ", tickets);
+
+    const isInputTicketAmountIsLargerThanAvailable = new BigNumber(inputAmount).isGreaterThan(
+      new BigNumber(availableAmountWithDecimals),
+    );
+
+    if (isInputTicketAmountIsLargerThanAvailable) {
+      throw new Error(
+        "Provided inputTicketAmount is larger than available ticket amount for sell. " +
+          `Available ticket amount: ${availableAmountWithDecimals}`,
+      );
+    }
+    // input
+    const inputAmountWithDecimals = normalizeInputCoinAmount(inputAmount, MEMECHAN_MEME_TOKEN_DECIMALS);
+    const inputAmountBN = new BN(inputAmountWithDecimals.toString());
+    const inputAmountBignumber = new BigNumber(inputAmountWithDecimals.toString());
+
+    // output
+    // Note: Be aware, we relay on the fact that `MEMECHAN_QUOTE_TOKEN_DECIMALS`
+    // would be always set same for all memecoins
+    // As well as the fact that memecoins and tickets decimals are always the same
+    const minOutputWithSlippage = deductSlippage(new BigNumber(minOutputAmount), slippagePercentage);
+    const minOutputNormalized = normalizeInputCoinAmount(
+      minOutputWithSlippage.toString(),
+      MEMECHAN_QUOTE_TOKEN_DECIMALS,
+    );
+    const minOutputBN = new BN(minOutputNormalized.toString());
+
+    // If `outputTokenAccount` is not passed in args, we need to find out, whether a outputTokenAccount exists for user
+    if (!outputTokenAccount) {
+      const associatedToken = getAssociatedTokenAddressSync(
+        this.quoteTokenMint,
+        user,
+        true,
+        TOKEN_PROGRAM_ID,
+        ASSOCIATED_TOKEN_PROGRAM_ID,
+      );
+
+      const account = await getAccount(connection, associatedToken);
+      outputTokenAccount = account.address;
+
+      // If doesn't exist, add an instruction to create it
+      if (!outputTokenAccount) {
+        const associatedTransactionInstruction = createAssociatedTokenAccountInstruction(
+          user,
+          associatedToken,
+          user,
+          this.quoteTokenMint,
+          TOKEN_PROGRAM_ID,
+          ASSOCIATED_TOKEN_PROGRAM_ID,
+        );
+
+        transaction.add(associatedTransactionInstruction);
+
+        outputTokenAccount = associatedToken;
+      }
+    }
+
+    const { ticketsRequiredToSell, isMoreThanOneTicket } = await MemeTicketClient.getRequiredTicketsToSell({
+      amount: inputAmountBignumber,
+      availableTickets: tickets,
+    });
+
+    // TODO: We need to close tickets if there is no money left in the ticket
+    let destinationTicket: ParsedMemeTicket;
+    if (isMoreThanOneTicket) {
+      const [destinationTicketRaw, ...ticketsToMerge] = ticketsRequiredToSell;
+      destinationTicket = destinationTicketRaw;
+      const destinationMemeticketInstance = new MemeTicketClient(destinationTicketRaw.id, this.client);
+
+      const boundMergeTransaction = await destinationMemeticketInstance.getBoundMergeTransaction({
+        pool,
+        ticketsToMerge: ticketsToMerge,
+        user,
+      });
+      transaction.add(...boundMergeTransaction.instructions);
+    } else {
+      destinationTicket = ticketsRequiredToSell[0];
+    }
+
+    const sellMemeTransactionInstruction = await this.client.memechanProgram.methods
+      .swapX(new BN(inputAmountBN), new BN(minOutputBN))
+      .accounts({
+        memeTicket: destinationTicket.id,
+        owner: user,
+        pool: pool,
+        poolSigner: poolSignerPda,
+        quoteVault: this.quoteVault,
+        userSol: outputTokenAccount,
+        tokenProgram: TOKEN_PROGRAM_ID,
+      })
+      .instruction();
+
+    transaction.add(sellMemeTransactionInstruction);
+
+    const optimizedTransactions = getOptimizedTransactions(transaction.instructions, input.user);
+
+    return { txs: optimizedTransactions, isMoreThanOneTransaction: optimizedTransactions.length > 1 };
+  }
+
+  // TODO(?): Handle for 0 input
+  // TODO(?): Handle for very huge number
+  public async getOutputAmountForSellMeme(input: GetOutputAmountForSellMemeArgs) {
+    const { inputAmount, slippagePercentage, transaction = new Transaction() } = input;
+    const pool = this.id;
+
+    // input & output
+    const inputAmountWithDecimals = normalizeInputCoinAmount(inputAmount, MEMECHAN_MEME_TOKEN_DECIMALS);
+    const inputAmountBN = new BN(inputAmountWithDecimals.toString());
+    const minOutputBN = new BN(0);
+
+    const getOutputAmountBuyMemeInstruction = await this.client.memechanProgram.methods
+      .getSwapXAmt(inputAmountBN, minOutputBN)
+      .accounts({
+        pool: pool,
+        quoteVault: this.quoteVault,
+      })
+      .instruction();
+
+    transaction.add(getOutputAmountBuyMemeInstruction);
+
+    const result = await this.client.connection.simulateTransaction(transaction, [this.client.simulationKeypair], true);
+
+    // If error happened (e.g. pool is locked)
+    if (result.value.err) {
+      console.debug("[getOutputAmountForBuyMeme] error on simulation ", JSON.stringify(result.value));
+      throw new Error("Simulation results for getOutputAmountForBuyMeme returned error");
+    }
+
+    const { swapOutAmount } = extractSwapDataFromSimulation(result);
+
+    // output
+    // Note: Be aware, we relay on the fact that `MEMECOIN_DECIMALS` would be always set same for all memecoins
+    // As well as the fact that memecoins and tickets decimals are always the same
+    const outputAmount = new BigNumber(swapOutAmount).div(10 ** MEMECHAN_QUOTE_TOKEN_DECIMALS);
+    const outputAmountRespectingSlippage = deductSlippage(outputAmount, slippagePercentage);
+
+    return outputAmountRespectingSlippage.toString();
+  }
+
   public async isMemeCoinReadyToLivePhase() {
     const poolData = await BoundPoolClient.fetch2(this.client.connection, this.id);
     const isPoolLocked = poolData.locked;
@@ -614,10 +791,8 @@ export class BoundPoolClient {
     return isPoolLocked;
   }
 
-  // TODO: Add method for checking is pool locked or not
-
   public async swapX(input: SwapXArgs): Promise<string> {
-    const sellMemeCoinTransaction = await this.getSellMemeTransaction(input);
+    const sellMemeCoinTransaction = await this.getSellMemeTransactionLegacy(input);
 
     const txId = await sendAndConfirmTransaction(this.client.connection, sellMemeCoinTransaction, [input.user], {
       skipPreflight: true,
@@ -627,20 +802,20 @@ export class BoundPoolClient {
     return txId;
   }
 
-  public async getSellMemeTransaction(input: GetSellMemeTransactionArgs): Promise<Transaction> {
+  public async getSellMemeTransactionLegacy(input: GetSellMemeTransactionArgsLegacy): Promise<Transaction> {
     const tx = input.transaction ?? new Transaction();
     const user = input.user;
 
     const pool = this.id;
     const poolSignerPda = this.findSignerPda();
-    const meme_in = input.memeAmountIn;
+    const memeIn = input.memeAmountIn;
     const minQuoteAmountOut = input.minQuoteAmountOut;
 
     const memeTicket = input.userMemeTicket;
     const userSolAcc = input.userQuoteAcc;
 
     const sellMemeTransactionInstruction = await this.client.memechanProgram.methods
-      .swapX(new BN(meme_in), new BN(minQuoteAmountOut))
+      .swapX(new BN(memeIn), new BN(minQuoteAmountOut))
       .accounts({
         memeTicket: memeTicket.id,
         owner: user.publicKey,

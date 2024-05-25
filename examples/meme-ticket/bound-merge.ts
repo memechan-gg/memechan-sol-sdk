@@ -13,7 +13,12 @@ export const boundMerge = async () => {
     const destinationMemeTicket = new MemeTicketClient(destinationTicket.id, client);
     const sourceMemeTickets = sourceTickets.map((ticket) => new MemeTicketClient(ticket.id, client));
 
-    await destinationMemeTicket.boundMerge({ pool: poolAddress, ticketsToMerge: sourceMemeTickets, user: payer });
+    await destinationMemeTicket.boundMerge({
+      pool: poolAddress,
+      ticketsToMerge: sourceMemeTickets,
+      user: payer.publicKey,
+      signer: payer,
+    });
 
     console.log("[boundMerge] All the tickets are merged.");
   } else if (tickets.length === 1) {
