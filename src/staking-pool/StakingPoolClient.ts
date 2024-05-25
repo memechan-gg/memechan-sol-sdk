@@ -178,7 +178,10 @@ export class StakingPoolClient {
   public async unstake(
     args: UnstakeArgs,
   ): Promise<{ memeAccountPublicKey: PublicKey; quoteAccountPublicKey: PublicKey }> {
-    const { memeAccountKeypair, transaction, quoteAccountKeypair } = await this.getUnstakeTransaction({...args, user: args.user.publicKey});
+    const { memeAccountKeypair, transaction, quoteAccountKeypair } = await this.getUnstakeTransaction({
+      ...args,
+      user: args.user.publicKey,
+    });
 
     const signature = await sendAndConfirmTransaction(
       this.client.connection,
@@ -296,7 +299,10 @@ export class StakingPoolClient {
   public async withdrawFees(
     args: WithdrawFeesArgs,
   ): Promise<{ memeAccountPublicKey: PublicKey; quoteAccountPublicKey: PublicKey }> {
-    const { memeAccountKeypair, transaction, quoteAccountKeypair } = await this.getWithdrawFeesTransaction({...args, user: args.user.publicKey});
+    const { memeAccountKeypair, transaction, quoteAccountKeypair } = await this.getWithdrawFeesTransaction({
+      ...args,
+      user: args.user.publicKey,
+    });
 
     const sendAndConfirmWithdrawFeesTransaction = getSendAndConfirmTransactionMethod({
       connection: this.client.connection,
@@ -315,7 +321,10 @@ export class StakingPoolClient {
   public async getAvailableWithdrawFeesAmount(
     args: WithdrawFeesArgs,
   ) /*: Promise<{ availableAmount: number; error?: TransactionError; logs?: string[] | null }>*/ {
-    const { memeAccountKeypair, transaction, quoteAccountKeypair } = await this.getWithdrawFeesTransaction({...args, user: args.user.publicKey});
+    const { memeAccountKeypair, transaction, quoteAccountKeypair } = await this.getWithdrawFeesTransaction({
+      ...args,
+      user: args.user.publicKey,
+    });
 
     const result = await this.client.connection.simulateTransaction(
       transaction,
