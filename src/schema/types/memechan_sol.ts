@@ -85,6 +85,7 @@ export type MemechanSol = {
           name: "memeMplMetadata";
           isMut: true;
           isSigner: false;
+          docs: ["To store metaplex metadata. Created in the function scope"];
         },
         {
           name: "poolSigner";
@@ -105,6 +106,7 @@ export type MemechanSol = {
           name: "metadataProgram";
           isMut: false;
           isSigner: false;
+          docs: ["Program to create NFT metadata"];
         },
         {
           name: "rent";
@@ -289,11 +291,13 @@ export type MemechanSol = {
           name: "signer";
           isMut: true;
           isSigner: true;
+          docs: ["Signer"];
         },
         {
           name: "pool";
           isMut: true;
           isSigner: false;
+          docs: ["Bonding Pool account"];
         },
         {
           name: "boundPoolSignerPda";
@@ -304,36 +308,43 @@ export type MemechanSol = {
           name: "poolMemeVault";
           isMut: true;
           isSigner: false;
+          docs: ["Bonding Pool Meme vault"];
         },
         {
           name: "poolQuoteVault";
           isMut: true;
           isSigner: false;
+          docs: ["Bonding Pool WSOL vault"];
         },
         {
           name: "adminVaultQuote";
           isMut: true;
           isSigner: false;
+          docs: ["Bonding Pool Admin Vault"];
         },
         {
           name: "memeMint";
           isMut: false;
           isSigner: false;
+          docs: ["Mint Account for Meme"];
         },
         {
           name: "quoteMint";
           isMut: false;
           isSigner: false;
+          docs: ["Mint Account for WSOL"];
         },
         {
           name: "staking";
           isMut: true;
           isSigner: false;
+          docs: ["Staking Pool Account"];
         },
         {
           name: "stakingPoolSignerPda";
           isMut: true;
           isSigner: false;
+          docs: ["Staking Pool Signer"];
         },
         {
           name: "stakingMemeVault";
@@ -344,11 +355,13 @@ export type MemechanSol = {
           name: "stakingQuoteVault";
           isMut: true;
           isSigner: false;
+          docs: ["Bonding Pool WSOL vault"];
         },
         {
           name: "memeTicket";
           isMut: true;
           isSigner: false;
+          docs: ["Meme Ticket Account of Admin"];
         },
         {
           name: "rent";
@@ -442,76 +455,91 @@ export type MemechanSol = {
           name: "signer";
           isMut: true;
           isSigner: true;
+          docs: ["Signer"];
         },
         {
           name: "staking";
           isMut: true;
           isSigner: false;
+          docs: ["Staking Pool Account"];
         },
         {
           name: "stakingPoolSignerPda";
           isMut: true;
           isSigner: false;
+          docs: ["Staking Pool Signer"];
         },
         {
           name: "poolMemeVault";
           isMut: true;
           isSigner: false;
+          docs: ["Staking Pool Meme vault"];
         },
         {
           name: "poolQuoteVault";
           isMut: true;
           isSigner: false;
+          docs: ["Staking Pool WSOL vault"];
         },
         {
           name: "memeMint";
           isMut: false;
           isSigner: false;
+          docs: ["Mint Account for Meme"];
         },
         {
           name: "quoteMint";
           isMut: false;
           isSigner: false;
+          docs: ["Mint Account for WSOL"];
         },
         {
           name: "openOrders";
           isMut: true;
           isSigner: false;
+          docs: ["Open Orders Account"];
         },
         {
           name: "targetOrders";
           isMut: true;
           isSigner: false;
+          docs: ["Target Orders Account"];
         },
         {
           name: "marketAccount";
           isMut: true;
           isSigner: false;
+          docs: ["Market Orders Account"];
         },
         {
           name: "raydiumAmm";
           isMut: true;
           isSigner: false;
+          docs: ["Raydium AMM Account"];
         },
         {
           name: "raydiumAmmAuthority";
           isMut: true;
           isSigner: false;
+          docs: ["Raydium AMM Signer"];
         },
         {
           name: "raydiumLpMint";
           isMut: true;
           isSigner: false;
+          docs: ["Raydium LP MinT"];
         },
         {
           name: "raydiumMemeVault";
           isMut: true;
           isSigner: false;
+          docs: ["Raydium LP Token Account", "Raydium Meme Token Account"];
         },
         {
           name: "raydiumQuoteVault";
           isMut: true;
           isSigner: false;
+          docs: ["Raydium WSOL Token Account"];
         },
         {
           name: "ammConfig";
@@ -991,8 +1019,10 @@ export type MemechanSol = {
             };
           },
           {
-            name: "lpTokensWithdrawn";
-            type: "u64";
+            name: "raydiumFees";
+            type: {
+              defined: "RaydiumAmmFees";
+            };
           },
           {
             name: "stakesTotal";
@@ -1032,26 +1062,31 @@ export type MemechanSol = {
         fields: [
           {
             name: "pnlOwner";
+            docs: ["withdraw pnl owner"];
             type: "publicKey";
           },
           {
             name: "cancelOwner";
+            docs: ["admin amm order owner"];
             type: "publicKey";
           },
           {
             name: "pending1";
+            docs: ["pending"];
             type: {
               array: ["u64", 28];
             };
           },
           {
             name: "pending2";
+            docs: ["pending"];
             type: {
               array: ["u64", 31];
             };
           },
           {
             name: "createPoolFee";
+            docs: ["init amm pool fee amount"];
             type: "u64";
           },
         ];
@@ -1438,6 +1473,22 @@ export type MemechanSol = {
       };
     },
     {
+      name: "RaydiumAmmFees";
+      type: {
+        kind: "struct";
+        fields: [
+          {
+            name: "lastCumQuoteFees";
+            type: "u64";
+          },
+          {
+            name: "lastCumMemeFees";
+            type: "u64";
+          },
+        ];
+      };
+    },
+    {
       name: "TokenLimit";
       type: {
         kind: "struct";
@@ -1494,34 +1545,42 @@ export type MemechanSol = {
         fields: [
           {
             name: "minSeparateNumerator";
+            docs: ["numerator of the min_separate"];
             type: "u64";
           },
           {
             name: "minSeparateDenominator";
+            docs: ["denominator of the min_separate"];
             type: "u64";
           },
           {
             name: "tradeFeeNumerator";
+            docs: ["numerator of the fee"];
             type: "u64";
           },
           {
             name: "tradeFeeDenominator";
+            docs: ["denominator of the fee", "and 'trade_fee_denominator' must be equal to 'min_separate_denominator'"];
             type: "u64";
           },
           {
             name: "pnlNumerator";
+            docs: ["numerator of the pnl"];
             type: "u64";
           },
           {
             name: "pnlDenominator";
+            docs: ["denominator of the pnl"];
             type: "u64";
           },
           {
             name: "swapFeeNumerator";
+            docs: ["numerator of the swap_fee"];
             type: "u64";
           },
           {
             name: "swapFeeDenominator";
+            docs: ["denominator of the swap_fee"];
             type: "u64";
           },
         ];
@@ -1534,56 +1593,69 @@ export type MemechanSol = {
         fields: [
           {
             name: "needTakePnlCoin";
+            docs: ["delay to take pnl coin"];
             type: "u64";
           },
           {
             name: "needTakePnlPc";
+            docs: ["delay to take pnl pc"];
             type: "u64";
           },
           {
             name: "totalPnlPc";
+            docs: ["total pnl pc"];
             type: "u64";
           },
           {
             name: "totalPnlCoin";
+            docs: ["total pnl coin"];
             type: "u64";
           },
           {
             name: "poolOpenTime";
+            docs: ["ido pool open time"];
             type: "u64";
           },
           {
             name: "padding";
+            docs: ["padding for future updates"];
             type: {
               array: ["u64", 2];
             };
           },
           {
             name: "orderbookToInitTime";
+            docs: ["switch from orderbookonly to init"];
             type: "u64";
           },
           {
             name: "swapCoinInAmount";
+            docs: ["swap coin in amount"];
             type: "u128";
           },
           {
             name: "swapPcOutAmount";
+            docs: ["swap pc out amount"];
             type: "u128";
           },
           {
             name: "swapAccPcFee";
+            docs: ["charge pc as swap fee while swap pc to coin"];
             type: "u64";
           },
           {
             name: "swapPcInAmount";
+            docs: ["swap pc in amount"];
             type: "u128";
           },
           {
             name: "swapCoinOutAmount";
+            docs: ["swap coin out amount"];
             type: "u128";
           },
           {
             name: "swapAccCoinFee";
+            docs: ["charge coin as swap fee while swap coin to pc"];
             type: "u64";
           },
         ];
@@ -1667,7 +1739,7 @@ export type MemechanSol = {
     {
       code: 6002;
       name: "SlippageExceeded";
-      msg: "Given amount of tokens to swap would result in \\\n        less than minimum requested tokens to receive";
+      msg: "Given amount of tokens to swap would result in \\\r\n        less than minimum requested tokens to receive";
     },
     {
       code: 6003;
@@ -1769,6 +1841,10 @@ export type MemechanSol = {
       code: 6025;
       name: "CantUnstakeBeforeCliff";
     },
+    {
+      code: 6026;
+      name: "NoFeesToAdd";
+    },
   ];
 };
 
@@ -1859,6 +1935,7 @@ export const IDL: MemechanSol = {
           name: "memeMplMetadata",
           isMut: true,
           isSigner: false,
+          docs: ["To store metaplex metadata. Created in the function scope"],
         },
         {
           name: "poolSigner",
@@ -1879,6 +1956,7 @@ export const IDL: MemechanSol = {
           name: "metadataProgram",
           isMut: false,
           isSigner: false,
+          docs: ["Program to create NFT metadata"],
         },
         {
           name: "rent",
@@ -2063,11 +2141,13 @@ export const IDL: MemechanSol = {
           name: "signer",
           isMut: true,
           isSigner: true,
+          docs: ["Signer"],
         },
         {
           name: "pool",
           isMut: true,
           isSigner: false,
+          docs: ["Bonding Pool account"],
         },
         {
           name: "boundPoolSignerPda",
@@ -2078,36 +2158,43 @@ export const IDL: MemechanSol = {
           name: "poolMemeVault",
           isMut: true,
           isSigner: false,
+          docs: ["Bonding Pool Meme vault"],
         },
         {
           name: "poolQuoteVault",
           isMut: true,
           isSigner: false,
+          docs: ["Bonding Pool WSOL vault"],
         },
         {
           name: "adminVaultQuote",
           isMut: true,
           isSigner: false,
+          docs: ["Bonding Pool Admin Vault"],
         },
         {
           name: "memeMint",
           isMut: false,
           isSigner: false,
+          docs: ["Mint Account for Meme"],
         },
         {
           name: "quoteMint",
           isMut: false,
           isSigner: false,
+          docs: ["Mint Account for WSOL"],
         },
         {
           name: "staking",
           isMut: true,
           isSigner: false,
+          docs: ["Staking Pool Account"],
         },
         {
           name: "stakingPoolSignerPda",
           isMut: true,
           isSigner: false,
+          docs: ["Staking Pool Signer"],
         },
         {
           name: "stakingMemeVault",
@@ -2118,11 +2205,13 @@ export const IDL: MemechanSol = {
           name: "stakingQuoteVault",
           isMut: true,
           isSigner: false,
+          docs: ["Bonding Pool WSOL vault"],
         },
         {
           name: "memeTicket",
           isMut: true,
           isSigner: false,
+          docs: ["Meme Ticket Account of Admin"],
         },
         {
           name: "rent",
@@ -2216,76 +2305,91 @@ export const IDL: MemechanSol = {
           name: "signer",
           isMut: true,
           isSigner: true,
+          docs: ["Signer"],
         },
         {
           name: "staking",
           isMut: true,
           isSigner: false,
+          docs: ["Staking Pool Account"],
         },
         {
           name: "stakingPoolSignerPda",
           isMut: true,
           isSigner: false,
+          docs: ["Staking Pool Signer"],
         },
         {
           name: "poolMemeVault",
           isMut: true,
           isSigner: false,
+          docs: ["Staking Pool Meme vault"],
         },
         {
           name: "poolQuoteVault",
           isMut: true,
           isSigner: false,
+          docs: ["Staking Pool WSOL vault"],
         },
         {
           name: "memeMint",
           isMut: false,
           isSigner: false,
+          docs: ["Mint Account for Meme"],
         },
         {
           name: "quoteMint",
           isMut: false,
           isSigner: false,
+          docs: ["Mint Account for WSOL"],
         },
         {
           name: "openOrders",
           isMut: true,
           isSigner: false,
+          docs: ["Open Orders Account"],
         },
         {
           name: "targetOrders",
           isMut: true,
           isSigner: false,
+          docs: ["Target Orders Account"],
         },
         {
           name: "marketAccount",
           isMut: true,
           isSigner: false,
+          docs: ["Market Orders Account"],
         },
         {
           name: "raydiumAmm",
           isMut: true,
           isSigner: false,
+          docs: ["Raydium AMM Account"],
         },
         {
           name: "raydiumAmmAuthority",
           isMut: true,
           isSigner: false,
+          docs: ["Raydium AMM Signer"],
         },
         {
           name: "raydiumLpMint",
           isMut: true,
           isSigner: false,
+          docs: ["Raydium LP MinT"],
         },
         {
           name: "raydiumMemeVault",
           isMut: true,
           isSigner: false,
+          docs: ["Raydium LP Token Account", "Raydium Meme Token Account"],
         },
         {
           name: "raydiumQuoteVault",
           isMut: true,
           isSigner: false,
+          docs: ["Raydium WSOL Token Account"],
         },
         {
           name: "ammConfig",
@@ -2765,8 +2869,10 @@ export const IDL: MemechanSol = {
             },
           },
           {
-            name: "lpTokensWithdrawn",
-            type: "u64",
+            name: "raydiumFees",
+            type: {
+              defined: "RaydiumAmmFees",
+            },
           },
           {
             name: "stakesTotal",
@@ -2806,26 +2912,31 @@ export const IDL: MemechanSol = {
         fields: [
           {
             name: "pnlOwner",
+            docs: ["withdraw pnl owner"],
             type: "publicKey",
           },
           {
             name: "cancelOwner",
+            docs: ["admin amm order owner"],
             type: "publicKey",
           },
           {
             name: "pending1",
+            docs: ["pending"],
             type: {
               array: ["u64", 28],
             },
           },
           {
             name: "pending2",
+            docs: ["pending"],
             type: {
               array: ["u64", 31],
             },
           },
           {
             name: "createPoolFee",
+            docs: ["init amm pool fee amount"],
             type: "u64",
           },
         ],
@@ -3212,6 +3323,22 @@ export const IDL: MemechanSol = {
       },
     },
     {
+      name: "RaydiumAmmFees",
+      type: {
+        kind: "struct",
+        fields: [
+          {
+            name: "lastCumQuoteFees",
+            type: "u64",
+          },
+          {
+            name: "lastCumMemeFees",
+            type: "u64",
+          },
+        ],
+      },
+    },
+    {
       name: "TokenLimit",
       type: {
         kind: "struct",
@@ -3268,34 +3395,42 @@ export const IDL: MemechanSol = {
         fields: [
           {
             name: "minSeparateNumerator",
+            docs: ["numerator of the min_separate"],
             type: "u64",
           },
           {
             name: "minSeparateDenominator",
+            docs: ["denominator of the min_separate"],
             type: "u64",
           },
           {
             name: "tradeFeeNumerator",
+            docs: ["numerator of the fee"],
             type: "u64",
           },
           {
             name: "tradeFeeDenominator",
+            docs: ["denominator of the fee", "and 'trade_fee_denominator' must be equal to 'min_separate_denominator'"],
             type: "u64",
           },
           {
             name: "pnlNumerator",
+            docs: ["numerator of the pnl"],
             type: "u64",
           },
           {
             name: "pnlDenominator",
+            docs: ["denominator of the pnl"],
             type: "u64",
           },
           {
             name: "swapFeeNumerator",
+            docs: ["numerator of the swap_fee"],
             type: "u64",
           },
           {
             name: "swapFeeDenominator",
+            docs: ["denominator of the swap_fee"],
             type: "u64",
           },
         ],
@@ -3308,56 +3443,69 @@ export const IDL: MemechanSol = {
         fields: [
           {
             name: "needTakePnlCoin",
+            docs: ["delay to take pnl coin"],
             type: "u64",
           },
           {
             name: "needTakePnlPc",
+            docs: ["delay to take pnl pc"],
             type: "u64",
           },
           {
             name: "totalPnlPc",
+            docs: ["total pnl pc"],
             type: "u64",
           },
           {
             name: "totalPnlCoin",
+            docs: ["total pnl coin"],
             type: "u64",
           },
           {
             name: "poolOpenTime",
+            docs: ["ido pool open time"],
             type: "u64",
           },
           {
             name: "padding",
+            docs: ["padding for future updates"],
             type: {
               array: ["u64", 2],
             },
           },
           {
             name: "orderbookToInitTime",
+            docs: ["switch from orderbookonly to init"],
             type: "u64",
           },
           {
             name: "swapCoinInAmount",
+            docs: ["swap coin in amount"],
             type: "u128",
           },
           {
             name: "swapPcOutAmount",
+            docs: ["swap pc out amount"],
             type: "u128",
           },
           {
             name: "swapAccPcFee",
+            docs: ["charge pc as swap fee while swap pc to coin"],
             type: "u64",
           },
           {
             name: "swapPcInAmount",
+            docs: ["swap pc in amount"],
             type: "u128",
           },
           {
             name: "swapCoinOutAmount",
+            docs: ["swap coin out amount"],
             type: "u128",
           },
           {
             name: "swapAccCoinFee",
+            docs: ["charge coin as swap fee while swap coin to pc"],
             type: "u64",
           },
         ],
@@ -3441,7 +3589,7 @@ export const IDL: MemechanSol = {
     {
       code: 6002,
       name: "SlippageExceeded",
-      msg: "Given amount of tokens to swap would result in \\\n        less than minimum requested tokens to receive",
+      msg: "Given amount of tokens to swap would result in \\\r\n        less than minimum requested tokens to receive",
     },
     {
       code: 6003,
@@ -3542,6 +3690,10 @@ export const IDL: MemechanSol = {
     {
       code: 6025,
       name: "CantUnstakeBeforeCliff",
+    },
+    {
+      code: 6026,
+      name: "NoFeesToAdd",
     },
   ],
 };
