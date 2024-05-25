@@ -407,7 +407,7 @@ export class StakingPoolClient {
   }
 
   public static async all(program: Program<MemechanSol>) {
-    return program.account.stakingPool.all();
+    return await program.account.stakingPool.all();
   }
 
   public findSignerPda(): PublicKey {
