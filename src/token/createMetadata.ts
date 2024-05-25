@@ -4,7 +4,8 @@ import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import { CreateMetadataInfo } from "../api/types";
 import { uploadMetadataToIpfs } from "../api/uploadMetadataToIpfs";
 
-//  https://github.com/metaplex-foundation/metaplex-program-library/blob/caeab0f7/token-metadata/js/src/generated/index.ts#L13
+// eslint-disable-next-line max-len
+// https://github.com/metaplex-foundation/metaplex-program-library/blob/caeab0f7/token-metadata/js/src/generated/index.ts#L13
 const TOKEN_METADATA_PROGRAM_ID = new PublicKey("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s");
 
 export async function createMetadata(client: MemechanClient, input: CreateMetadataInfo): Promise<string> {

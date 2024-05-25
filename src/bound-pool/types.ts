@@ -58,8 +58,8 @@ export type GetSellMemeTransactionOutput = {
 
 export interface SwapXArgs {
   user: Keypair;
-  //pool: PublicKey;
-  //poolSignerPda: PublicKey;
+  // pool: PublicKey;
+  // poolSignerPda: PublicKey;
   memeAmountIn: BN;
   minQuoteAmountOut: BN;
   userMemeTicket: MemeTicketClient;

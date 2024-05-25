@@ -71,7 +71,7 @@ export async function ammCreatePool(input: TestTxInputInfo) {
     associatedOnly: false,
     checkCreateATAOwner: true,
     makeTxVersion,
-    //feeDestinationId: new PublicKey('7YttLkHDoNj9wyDur5pM1ejNaAvT9X4eqaYcHQqtj2G5'), // only mainnet use this
+    // feeDestinationId: new PublicKey('7YttLkHDoNj9wyDur5pM1ejNaAvT9X4eqaYcHQqtj2G5'), // only mainnet use this
     feeDestinationId: new PublicKey(input.feeDestinationWalletAddress),
   });
 

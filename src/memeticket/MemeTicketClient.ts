@@ -242,7 +242,8 @@ export class MemeTicketClient {
    * @throws {Error} If the required amount cannot be met with the available tickets.
    * @throws {Error} If no tickets are required to sell.
    *
-   * @note This method relies on the assumption that the total amount of available tickets will always be greater than or equal to the specified amount.
+   * @note This method relies on the assumption that the total amount
+   * of available tickets will always be greater than or equal to the specified amount.
    */
   public static async getRequiredTicketsToSell({
     amount,

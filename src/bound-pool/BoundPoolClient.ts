@@ -73,7 +73,7 @@ import { MemechanSol } from "../schema/types/memechan_sol";
 import { getCreateMetadataTransaction } from "../token/createMetadata";
 import { getCreateMintWithPriorityTransaction } from "../token/getCreateMintWithPriorityTransaction";
 import { NewBPInstructionParsed } from "../tx-parsing/parsers/bonding-pool-creation-parser";
-import { ParseTx } from "../tx-parsing/parsing";
+import { parseTx } from "../tx-parsing/parsing";
 import { sendTx } from "../util";
 import { getTxSize } from "../util/get-tx-size";
 import { getCreateAccountInstructions } from "../util/getCreateAccountInstruction";
@@ -127,7 +127,7 @@ export class BoundPoolClient {
     client: MemechanClient;
     poolCreationSignature: string;
   }) {
-    const parsedData = await ParseTx(poolCreationSignature, client);
+    const parsedData = await parseTx(poolCreationSignature, client);
     console.debug("parsedData: ", parsedData);
 
     if (!parsedData) {

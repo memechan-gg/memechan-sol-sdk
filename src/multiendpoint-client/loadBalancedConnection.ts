@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Connection } from "@solana/web3.js";
 
 type ConnectionMethod = {
