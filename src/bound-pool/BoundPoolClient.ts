@@ -392,7 +392,7 @@ export class BoundPoolClient {
   }
 
   public static async all(program: Program<MemechanSol>) {
-    return program.account.boundPool.all();
+    return await program.account.boundPool.all();
   }
 
   public findSignerPda(): PublicKey {
