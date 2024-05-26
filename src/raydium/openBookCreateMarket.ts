@@ -50,7 +50,11 @@ export async function getCreateMarketTransactions(
 
   console.log("createMarketInstruments:", createMarketInstruments);
 
-  const transactions = await buildTxs(input.connection, input.signer, createMarketInstruments.innerTransactions);
+  const transactions = await buildTxs(
+    input.connection,
+    input.signer.publicKey,
+    createMarketInstruments.innerTransactions,
+  );
 
   return { transactions, marketId: createMarketInstruments.address.marketId };
 }
