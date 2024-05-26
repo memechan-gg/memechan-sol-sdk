@@ -381,8 +381,6 @@ export class StakingPoolClient {
     );
 
     const aggregatedHolderAmounts: Map<string, BigNumber> = new Map();
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const aggregatedStaking = new BigNumber(0);
 
     ticketHolderList.forEach((ticketFields: MemeTicketFields[], holder: string) => {
       let accumulator = new BigNumber(0);
