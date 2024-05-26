@@ -1,12 +1,13 @@
-import { Program } from "@coral-xyz/anchor";
 import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import { AccountMeta, Keypair, PublicKey, Transaction, sendAndConfirmTransaction } from "@solana/web3.js";
 import BigNumber from "bignumber.js";
 import { MemechanClient } from "../MemechanClient";
 import { BoundPoolClient } from "../bound-pool/BoundPoolClient";
+import { MEMECHAN_QUOTE_MINT } from "../config/config";
+import { LivePoolClient } from "../live-pool/LivePoolClient";
 import { MemeTicketClient } from "../memeticket/MemeTicketClient";
+import { formatAmmKeysById } from "../raydium/formatAmmKeysById";
 import { MemeTicketFields, StakingPoolFields } from "../schema/codegen/accounts";
-import { MemechanSol } from "../schema/types/memechan_sol";
 import { getCreateAccountInstructions } from "../util/getCreateAccountInstruction";
 import { getSendAndConfirmTransactionMethod } from "../util/getSendAndConfirmTransactionMethod";
 import { retry } from "../util/retry";
@@ -19,9 +20,6 @@ import {
   UnstakeArgs,
   WithdrawFeesArgs,
 } from "./types";
-import { MEMECHAN_QUOTE_MINT } from "../config/config";
-import { formatAmmKeysById } from "../raydium/formatAmmKeysById";
-import { LivePoolClient } from "../live-pool/LivePoolClient";
 
 export class StakingPoolClient {
   constructor(
