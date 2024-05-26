@@ -1,8 +1,8 @@
 import { BN } from "@coral-xyz/anchor";
-import { MemeTicketClient } from "../memeticket/MemeTicketClient";
 import { Keypair, PublicKey, Transaction } from "@solana/web3.js";
-import { VestingConfig } from "../schema/codegen/types";
+import { MemeTicketClient } from "../memeticket/MemeTicketClient";
 import { MemeTicketFields } from "../schema/codegen/accounts";
+import { VestingConfig } from "../schema/codegen/types";
 
 export interface UnstakeArgs {
   ticket: MemeTicketClient;
@@ -20,6 +20,14 @@ export type GetUnstakeTransactionArgs = Omit<UnstakeArgs, "user"> & {
   user: PublicKey;
 };
 
+export type GetPreparedUnstakeTransactionsArgs = {
+  ticketIds: PublicKey[];
+  ammPoolId: PublicKey;
+  amount: BN;
+  user: PublicKey;
+  transaction?: Transaction;
+};
+
 export interface AddFeesArgs {
   ammPoolId: PublicKey;
   payer: Keypair;
@@ -35,9 +43,20 @@ export interface WithdrawFeesArgs {
   user: Keypair;
 }
 
+export type getAvailableWithdrawFeesAmountArgs = {
+  tickets: MemeTicketFields[];
+};
+
 export type GetWithdrawFeesTransactionArgs = Omit<WithdrawFeesArgs, "user"> & {
   transaction?: Transaction;
   user: PublicKey;
+};
+
+export type GetPreparedWithdrawFeesTransactionsArgs = {
+  ticketIds: PublicKey[];
+  ammPoolId: PublicKey;
+  user: PublicKey;
+  transaction?: Transaction;
 };
 
 export interface AccountMeta {
@@ -45,3 +64,9 @@ export interface AccountMeta {
   isWritable: boolean;
   pubkey: PublicKey;
 }
+
+export type PrepareTransactionWithStakingTicketsMergeArgs = {
+  transaction: Transaction;
+  user: PublicKey;
+  ticketIds: PublicKey[];
+};

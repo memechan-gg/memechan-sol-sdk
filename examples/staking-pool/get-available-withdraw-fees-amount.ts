@@ -5,6 +5,8 @@ import { MemeTicketClient, StakingPoolClient } from "../../src";
 
 // yarn tsx examples/staking-pool/get-available-withdraw-fees-amount.ts > withdraw-fees-amount.txt 2>&1
 export const getAvailableWithdrawFeesAmount = async () => {
+  const boundPoolId = new PublicKey("");
+
   // Get staking pool
   const stakingPoolAddress = new PublicKey("FMyKyPPmgRHdCVsfvdyuR6Y4BAgNvsQCPQtMAtEcysmm");
   const stakingPool = await StakingPoolClient.fromStakingPoolId({ client, poolAccountAddressId: stakingPoolAddress });
@@ -20,8 +22,11 @@ export const getAvailableWithdrawFeesAmount = async () => {
   // call addfees to accumulate fees
   //await stakingPool.addFees({payer, transaction: new Transaction(), ammPoolId: ammPoolAddress});
 
+  const tickets = await MemeTicketClient.fetchTicketsByUser(boundPoolId, client, payer.publicKey);
+  const ticketFields = tickets.map((ticket) => ticket.fields);
+
   // Get available withdraw fees amount
-  const res = await stakingPool.getAvailableWithdrawFeesAmount({ ticket: memeTicket, user: payer });
+  const res = await stakingPool.getAvailableWithdrawFeesAmount({ tickets: ticketFields });
   console.log("res:", res);
 };
 
