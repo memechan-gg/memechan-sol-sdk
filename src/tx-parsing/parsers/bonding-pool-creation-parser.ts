@@ -42,7 +42,8 @@ export async function parseNewBPInstruction(
     poolAddr,
     pool,
     newMint,
-    sender: tx.transaction.message.accountKeys[0].pubkey, // In the `Message` structure, the first account is always the fee-payer
+    // In the `Message` structure, the first account is always the fee-payer
+    sender: tx.transaction.message.accountKeys[0].pubkey,
     type: "new_pool",
   };
 
