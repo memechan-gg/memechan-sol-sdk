@@ -51,6 +51,7 @@ export * from "./schema/types/memechan_sol";
 export * from "./common/helpers";
 export * from "./util/wallet/NoWalletAdapter";
 export * from "./util/signMessage";
+export * from "./util/index";
 
 // Metadata
 export * from "./token/createMetadata";
