@@ -984,6 +984,10 @@
             "type": "publicKey"
           },
           {
+            "name": "creatorAddr",
+            "type": "publicKey"
+          },
+          {
             "name": "fees",
             "type": {
               "defined": "Fees"
@@ -1067,6 +1071,10 @@
           },
           {
             "name": "quoteVault",
+            "type": "publicKey"
+          },
+          {
+            "name": "raydiumAmm",
             "type": "publicKey"
           },
           {
@@ -2023,6 +2031,6 @@
     }
   ],
   "metadata": {
-    "address": "3ZSoMaLkD4QBVY94hiqRsi7wtxhXHn1cQxKzPnXyB2KP"
+    "address": "kKRWbmqpGqPzkAb9aLmhCFcJsr3oBkqCcZYK21dWYRz"
   }
 }
