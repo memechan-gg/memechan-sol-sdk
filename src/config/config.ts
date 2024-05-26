@@ -19,14 +19,14 @@ export const BE_REGION = "us-east-1";
  *
  * @constant {string}
  */
-export const MEMECHAN_PROGRAM_ID = "3ZSoMaLkD4QBVY94hiqRsi7wtxhXHn1cQxKzPnXyB2KP";
+export const MEMECHAN_PROGRAM_ID = "kKRWbmqpGqPzkAb9aLmhCFcJsr3oBkqCcZYK21dWYRz";
 export const RAYDIUM_PROTOCOL_FEE = 1_000_000_000; // 1 SOL on Devnet. TODO on Mainnet, it's only 0.4 SOL
 export const TRANSFER_FEE = 60_000_000;
 
 export const SLERF_MINT = new PublicKey("7BgBvyjrZX1YKz4oh9mjb8ZScatkkwb8DzFx7LoiVkM3");
 
 export const MEMECHAN_QUOTE_MINT = new PublicKey("HX2pp5za2aBkrA5X5iTioZXcrpWb2q9DiaeWPW3qKMaw");
-export const MEMECHAN_TARGET_CONFIG = new PublicKey("83VcLXAURSYBqVKAZpKTFuKomeSiQ6t7EZoA4LmUsedZ");
+export const MEMECHAN_TARGET_CONFIG = new PublicKey("H3vkkiCoXWESVK2FGUa561XtC41g73sRgx4h3tQJNAov");
 export const MEMECHAN_QUOTE_TOKEN_DECIMALS = 9; // current devnet quote token decimals
 export const MEMECHAN_QUOTE_TOKEN: Token = new Token(
   TOKEN_PROGRAM_ID,
