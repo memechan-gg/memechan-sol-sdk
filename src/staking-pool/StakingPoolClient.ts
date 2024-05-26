@@ -3,7 +3,7 @@ import { AccountMeta, Keypair, PublicKey, Transaction, sendAndConfirmTransaction
 import BigNumber from "bignumber.js";
 import { MemechanClient } from "../MemechanClient";
 import { BoundPoolClient } from "../bound-pool/BoundPoolClient";
-import { MEMECHAN_QUOTE_MINT } from "../config/config";
+import { MAX_MEME_TOKENS, MEMECHAN_QUOTE_MINT, MEME_TOKEN_DECIMALS } from "../config/config";
 import { LivePoolClient } from "../live-pool/LivePoolClient";
 import { MemeTicketClient } from "../memeticket/MemeTicketClient";
 import { formatAmmKeysById } from "../raydium/formatAmmKeysById";
@@ -360,20 +360,63 @@ export class StakingPoolClient {
   /**
    * Fetches all unique token holders and memetickets owners for pool; then returns thier addresses
    */
-  public static async getHoldersList(pool: PublicKey, mint: PublicKey, client: MemechanClient) {
-    const ticketHolderList = await BoundPoolClient.getHoldersList(pool, client);
-    const tokenHolderList = await StakingPoolClient.getTokenHolderListHelius(mint, client.heliusApiUrl);
+  public static async getHoldersList(
+    pool: PublicKey,
+    mint: PublicKey,
+    client: MemechanClient,
+  ): Promise<
+    [
+      { address: string; tokenAmount: BigNumber; tokenAmountInPercentage: BigNumber }[],
+      { address: string; amount: BigNumber },
+    ]
+  > {
+    const stakingId = BoundPoolClient.findStakingPda(mint, client.memechanProgram.programId);
+    const stakingPDA = StakingPoolClient.findSignerPda(stakingId, client.memechanProgram.programId).toBase58();
 
-    ticketHolderList.forEach((holder) => {
-      tokenHolderList.add(holder);
+    const ticketHolderList = await BoundPoolClient.getHoldersMap(pool, client);
+    const [tokenHolderList, stakingTokens] = await StakingPoolClient.getTokenHolderListHelius(
+      mint,
+      stakingPDA,
+      client.heliusApiUrl,
+    );
+
+    const aggregatedHolderAmounts: Map<string, BigNumber> = new Map();
+    var aggregatedStaking = BigNumber(0);
+
+    ticketHolderList.forEach((ticketFields: MemeTicketFields[], holder: string) => {
+      var accumulator = new BigNumber(0);
+      ticketFields.forEach((ticket) => {
+        accumulator = accumulator.plus(ticket.amount.toString());
+      });
+
+      aggregatedHolderAmounts.set(holder, accumulator);
     });
 
-    return Array.from(tokenHolderList);
+    tokenHolderList.forEach((amount: BigNumber, holder: string) => {
+      const current = aggregatedHolderAmounts.get(holder) ?? new BigNumber(0);
+      aggregatedHolderAmounts.set(holder, current.plus(amount));
+    });
+
+    const aggregatedHoldersList: { address: string; tokenAmount: BigNumber; tokenAmountInPercentage: BigNumber }[] = [];
+    aggregatedHolderAmounts.forEach((amount: BigNumber, holder: string) => {
+      aggregatedHoldersList.push({
+        address: holder,
+        tokenAmount: amount,
+        tokenAmountInPercentage: amount.div(new BigNumber(MAX_MEME_TOKENS * MEME_TOKEN_DECIMALS)),
+      });
+    });
+
+    return [aggregatedHoldersList, { address: stakingPDA, amount: stakingTokens }];
   }
 
-  public static async getTokenHolderListHelius(mint: PublicKey, url: string) {
+  public static async getTokenHolderListHelius(
+    mint: PublicKey,
+    stakingPDA: string,
+    url: string,
+  ): Promise<[Map<string, BigNumber>, BigNumber]> {
     let page = 1;
-    const allOwners: Set<string> = new Set();
+    const allOwners: Map<string, BigNumber> = new Map();
+    var stakingLockedTokens = new BigNumber(0);
 
     // eslint-disable-next-line no-constant-condition
     while (true) {
@@ -395,16 +438,22 @@ export class StakingPoolClient {
         }),
       });
       const data = await response.json();
-
       if (!data.result || data.result.token_accounts.length === 0) {
         break;
       }
 
-      data.result.token_accounts.forEach((account: { owner: string }) => allOwners.add(account.owner));
+      data.result.token_accounts.forEach((account: { owner: string; amount: BigNumber }) => {
+        if (account.owner === stakingPDA) {
+          stakingLockedTokens = account.amount;
+        } else {
+          const current = allOwners.get(account.owner) ?? new BigNumber(0);
+          allOwners.set(account.owner, current.plus(account.amount));
+        }
+      });
       page++;
     }
 
-    return allOwners;
+    return [allOwners, stakingLockedTokens];
   }
 
   private async fetch(program = this.client.memechanProgram) {
