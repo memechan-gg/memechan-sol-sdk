@@ -9,6 +9,7 @@ import {
 import { Connection, PublicKey } from "@solana/web3.js";
 
 export async function formatAmmKeysById(id: string, connection: Connection): Promise<ApiPoolInfoV4> {
+  // TODO: Combine getAccountInfo into getMultipleAccounts
   console.log("formatAmmKeysById id: " + id);
   const account = await connection.getAccountInfo(new PublicKey(id), { commitment: "confirmed" });
 
