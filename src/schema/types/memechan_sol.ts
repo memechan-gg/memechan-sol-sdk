@@ -927,6 +927,10 @@ export type MemechanSol = {
             type: "publicKey";
           },
           {
+            name: "creatorAddr";
+            type: "publicKey";
+          },
+          {
             name: "fees";
             type: {
               defined: "Fees";
@@ -1010,6 +1014,10 @@ export type MemechanSol = {
           },
           {
             name: "quoteVault";
+            type: "publicKey";
+          },
+          {
+            name: "raydiumAmm";
             type: "publicKey";
           },
           {
@@ -2777,6 +2785,10 @@ export const IDL: MemechanSol = {
             type: "publicKey",
           },
           {
+            name: "creatorAddr",
+            type: "publicKey",
+          },
+          {
             name: "fees",
             type: {
               defined: "Fees",
@@ -2860,6 +2872,10 @@ export const IDL: MemechanSol = {
           },
           {
             name: "quoteVault",
+            type: "publicKey",
+          },
+          {
+            name: "raydiumAmm",
             type: "publicKey",
           },
           {
