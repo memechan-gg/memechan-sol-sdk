@@ -4,7 +4,6 @@ import BigNumber from "bignumber.js";
 import { MemechanClient } from "../MemechanClient";
 import { BoundPoolClient } from "../bound-pool/BoundPoolClient";
 import { MAX_MEME_TOKENS, MEMECHAN_QUOTE_MINT, MEME_TOKEN_DECIMALS } from "../config/config";
-import { LivePoolClient } from "../live-pool/LivePoolClient";
 import { MemeTicketClient } from "../memeticket/MemeTicketClient";
 import { formatAmmKeysById } from "../raydium/formatAmmKeysById";
 import { MemeTicketFields, StakingPoolFields } from "../schema/codegen/accounts";
@@ -459,26 +458,9 @@ export class StakingPoolClient {
     return program.account.stakingPool.fetch(this.id);
   }
 
-  public static async all(
-    client: MemechanClient,
-  ): Promise<{ account: StakingPoolFields; publicKey: PublicKey; livePool: LivePoolClient | null }[]> {
+  public static async all(client: MemechanClient): Promise<{ account: StakingPoolFields; publicKey: PublicKey }[]> {
     const rawPools = await client.memechanProgram.account.stakingPool.all();
-    const pools = await Promise.all(
-      rawPools.map(async (el) => {
-        let livePool: LivePoolClient | null = null;
-        try {
-          livePool = await LivePoolClient.fromAmmId(el.account.raydiumAmm, client);
-        } catch (error) {
-          console.error(`Failed to create livePool for account ${el.account}:`, error);
-        }
-        return {
-          account: el.account,
-          publicKey: el.publicKey,
-          livePool,
-        };
-      }),
-    );
-
+    const pools = rawPools.map((el) => el);
     return pools;
   }
 
