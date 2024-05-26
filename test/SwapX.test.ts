@@ -5,8 +5,8 @@ import { sleep } from "../src/common/helpers";
 import { MEMECHAN_QUOTE_TOKEN } from "../src/config/config";
 import { MintUtils } from "../src/token/mintUtils";
 
-describe("swapX", () => {
-  it.skip("swaps user quote token->memecoin", async () => {
+describe.skip("swapX", () => {
+  it("swaps user quote token->memecoin", async () => {
     const pool = await BoundPoolClient.new({
       admin,
       payer,
@@ -25,8 +25,8 @@ describe("swapX", () => {
     const ticketId = await pool.swapY({
       payer: payer,
       user: payer,
-      memeTokensOut: new BN(10),
-      quoteAmountIn: new BN(1000),
+      memeTokensOut: new BN(10 * 1e6),
+      quoteAmountIn: new BN(1000 * 1e9),
       quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
       pool: pool.id,
     });

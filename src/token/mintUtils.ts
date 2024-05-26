@@ -1,6 +1,7 @@
 import * as splToken from "@solana/spl-token";
 import { PublicKey, Connection, Keypair } from "@solana/web3.js";
 import { MEMECHAN_MEME_TOKEN_DECIMALS } from "../config/config";
+import BN from "bn.js";
 
 export interface TokenData {
   mint: PublicKey;
@@ -60,7 +61,7 @@ export class MintUtils {
     return await splToken.getOrCreateAssociatedTokenAccount(this.conn, payer, mint, owner, false);
   }
 
-  public async mintTo(mint: PublicKey, tokenAccount: PublicKey, amount: number = 1000000000000) {
+  public async mintTo(mint: PublicKey, tokenAccount: PublicKey, amount: bigint = BigInt("0x2F00000000000000")) {
     await splToken.mintTo(this.conn, this.authority, mint, tokenAccount, this.authority, amount);
   }
 }

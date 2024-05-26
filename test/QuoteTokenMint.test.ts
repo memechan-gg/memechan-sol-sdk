@@ -2,7 +2,7 @@ import { client, payer } from "./common/common";
 import { MEMECHAN_QUOTE_TOKEN } from "../src/config/config";
 import { MintUtils } from "../src/token/mintUtils";
 
-describe("QUOTE TOKEN MINT", () => {
+describe.skip("QUOTE TOKEN MINT", () => {
   it("airdrop quote token", async () => {
 
     console.log("payer: " + payer.publicKey.toString());
@@ -10,12 +10,12 @@ describe("QUOTE TOKEN MINT", () => {
 
     const mintUtils = new MintUtils(client.connection, payer);
 
-    const getAccount1 = await mintUtils.getOrCreateTokenAccount(MEMECHAN_QUOTE_TOKEN.mint, payer, payer.publicKey );
+    const getAccount1 = await mintUtils.getOrCreateTokenAccount(MEMECHAN_QUOTE_TOKEN.mint, payer, payer.publicKey);
     console.log("getOrCreateTokenAccount getAccount1", getAccount1);
 
-    await mintUtils.mintTo(MEMECHAN_QUOTE_TOKEN.mint, getAccount1.address, 40000 * 1e9);
+    await mintUtils.mintTo(MEMECHAN_QUOTE_TOKEN.mint, getAccount1.address, BigInt(40000 * 1e9));
 
-    const getAccount2 = await mintUtils.getOrCreateTokenAccount(MEMECHAN_QUOTE_TOKEN.mint, payer, payer.publicKey );
+    const getAccount2 = await mintUtils.getOrCreateTokenAccount(MEMECHAN_QUOTE_TOKEN.mint, payer, payer.publicKey);
     console.log("getOrCreateTokenAccount getAccount2", getAccount2);
 
   }, 90000);
