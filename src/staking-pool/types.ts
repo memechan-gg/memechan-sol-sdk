@@ -1,9 +1,8 @@
 import { BN } from "@coral-xyz/anchor";
-import { MemeTicketClient } from "../memeticket/MemeTicketClient";
 import { Keypair, PublicKey, Transaction } from "@solana/web3.js";
-import { VestingConfig } from "../schema/codegen/types";
+import { MemeTicketClient } from "../memeticket/MemeTicketClient";
 import { MemeTicketFields } from "../schema/codegen/accounts";
-import { ParsedMemeTicket } from "../memeticket/types";
+import { VestingConfig } from "../schema/codegen/types";
 
 export interface UnstakeArgs {
   ticket: MemeTicketClient;

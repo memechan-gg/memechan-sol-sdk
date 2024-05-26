@@ -6,6 +6,7 @@ import { BoundPoolClient } from "../bound-pool/BoundPoolClient";
 import { MAX_MEME_TOKENS, MEMECHAN_QUOTE_MINT, MEME_TOKEN_DECIMALS } from "../config/config";
 import { LivePoolClient } from "../live-pool/LivePoolClient";
 import { MemeTicketClient } from "../memeticket/MemeTicketClient";
+import { getOptimizedTransactions } from "../memeticket/utils";
 import { formatAmmKeysById } from "../raydium/formatAmmKeysById";
 import { MemeTicketFields, StakingPool, StakingPoolFields } from "../schema/codegen/accounts";
 import { getCreateAccountInstructions } from "../util/getCreateAccountInstruction";
@@ -23,8 +24,6 @@ import {
   WithdrawFeesArgs,
   getAvailableWithdrawFeesAmountArgs,
 } from "./types";
-import { getOptimizedTransactions } from "../memeticket/utils";
-import BN from "bn.js";
 
 export class StakingPoolClient {
   constructor(
@@ -513,11 +512,11 @@ export class StakingPoolClient {
 
     const totalStaked = stakingPoolData.stakesTotal.toString();
     console.log("totalStaked:", totalStaked);
-    const userStakePart = BigNumber(stakedAmount).div(totalStaked);
+    const userStakePart = new BigNumber(stakedAmount).div(totalStaked);
     console.log("userStakePart:", userStakePart.toString());
-    const fullMemeFeesPart = BigNumber(stakingPoolData.feesXTotal.toString()).multipliedBy(userStakePart);
+    const fullMemeFeesPart = new BigNumber(stakingPoolData.feesXTotal.toString()).multipliedBy(userStakePart);
     console.log("fullMemeFeesPart:", fullMemeFeesPart.toString());
-    const fullSlerfFeesPart = BigNumber(stakingPoolData.feesYTotal.toString()).multipliedBy(userStakePart);
+    const fullSlerfFeesPart = new BigNumber(stakingPoolData.feesYTotal.toString()).multipliedBy(userStakePart);
     console.log("fullSlerfFeesPart:", fullSlerfFeesPart.toString());
 
     const { memeFees, slerfFees } = tickets.reduce(
