@@ -26,7 +26,7 @@ export async function getCreateMintWithPriorityTransaction(
   });
 
   const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
-    microLamports: 6000000,
+    microLamports: 5_000,
   });
 
   console.log("mintAuthority: " + mintAuthority.toBase58());

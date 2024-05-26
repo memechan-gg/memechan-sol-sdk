@@ -4,7 +4,7 @@ import { RpcResponseAndContext, SimulatedTransactionResponse } from "@solana/web
  * Extracts swap values (in and out) from the transaction simulation logs.
  *
  * @param {RpcResponseAndContext<SimulatedTransactionResponse>} txSimulationData - The transaction simulation output.
- * @returns {{ swapInAmount: string; swapOutAmount: string }} An object containing the swapInAmount and swapOutAmount values as strings.
+ * @returns {{ swapInAmount: string; swapOutAmount: string }}
  * @throws Will throw an error if no swap values are found in the logs.
  */
 export function extractSwapDataFromSimulation(txSimulationData: RpcResponseAndContext<SimulatedTransactionResponse>): {

@@ -49,7 +49,8 @@ export async function parseSwapXInstruction(
     quoteAmtReceived,
     poolQuoteVault,
     baseAmtSwapped,
-    sender: tx.transaction.message.accountKeys[0].pubkey, // In the `Message` structure, the first account is always the fee-payer
+    // In the `Message` structure, the first account is always the fee-payer
+    sender: tx.transaction.message.accountKeys[0].pubkey,
     type: "swap_x",
   };
 

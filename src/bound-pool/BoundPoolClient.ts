@@ -338,22 +338,35 @@ export class BoundPoolClient {
     const createTokenTransactionSize = getTxSize(createTokenTransaction, payer.publicKey);
     console.debug("createTokenTransaction size: ", createTokenTransactionSize);
 
-    const createPoolSignature = await sendAndConfirmTransaction(
-      client.connection,
-      createPoolTransaction,
-      [payer, memeMintKeypair, poolQuoteVaultId, launchVaultId],
-      {
+    const createPoolMethod = getSendAndConfirmTransactionMethod({
+      connection: client.connection,
+      transaction: createPoolTransaction,
+      signers: [payer, memeMintKeypair, poolQuoteVaultId, launchVaultId],
+      options: {
         commitment: "confirmed",
         skipPreflight: true,
       },
-    );
-    console.log("createPoolSignature:", createPoolSignature);
-
-    const createTokenSignature = await sendAndConfirmTransaction(client.connection, createTokenTransaction, [payer], {
-      commitment: "confirmed",
-      skipPreflight: true,
     });
-    console.log("createTokenSignature:", createTokenSignature);
+
+    await retry({
+      fn: createPoolMethod,
+      functionName: "createPoolMethod",
+    });
+
+    const createTokenMethod = getSendAndConfirmTransactionMethod({
+      connection: client.connection,
+      transaction: createTokenTransaction,
+      signers: [payer],
+      options: {
+        commitment: "confirmed",
+        skipPreflight: true,
+      },
+    });
+
+    await retry({
+      fn: createTokenMethod,
+      functionName: "createTokenMethod",
+    });
 
     const id = this.findBoundPoolPda(memeMint, quoteToken.mint, memechanProgram.programId);
 
@@ -991,7 +1004,7 @@ export class BoundPoolClient {
     transaction.add(modifyComputeUnits);
 
     const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
-      microLamports: 5000000,
+      microLamports: 5_000,
     });
 
     transaction.add(addPriorityFee);
