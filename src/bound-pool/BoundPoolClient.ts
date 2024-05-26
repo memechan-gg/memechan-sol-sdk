@@ -24,7 +24,7 @@ import {
 import BigNumber from "bignumber.js";
 import { BoundPool, BoundPool as CodegenBoundPool, MemeTicketFields } from "../schema/codegen/accounts";
 
-import { BN, Program, Provider } from "@coral-xyz/anchor";
+import { BN, Program, ProgramAccount, Provider } from "@coral-xyz/anchor";
 import { MemechanClient } from "../MemechanClient";
 import { MemeTicketClient } from "../memeticket/MemeTicketClient";
 import { ATA_PROGRAM_ID, PROGRAMIDS } from "../raydium/config";
@@ -391,8 +391,8 @@ export class BoundPoolClient {
     });
   }
 
-  public static async all(program: Program<MemechanSol>) {
-    return await program.account.boundPool.all();
+  public static async all(program: Program<MemechanSol>): Promise<ProgramAccount<MemechanSol>> {
+    return program.account.boundPool.all();
   }
 
   public findSignerPda(): PublicKey {
