@@ -5,7 +5,7 @@ import BigNumber from "bignumber.js";
 import { MemechanClient } from "../MemechanClient";
 import { BoundPoolClient } from "../bound-pool/BoundPoolClient";
 import { MemeTicketClient } from "../memeticket/MemeTicketClient";
-import { MemeTicketFields } from "../schema/codegen/accounts";
+import { MemeTicketFields, StakingPoolFields } from "../schema/codegen/accounts";
 import { MemechanSol } from "../schema/types/memechan_sol";
 import { getCreateAccountInstructions } from "../util/getCreateAccountInstruction";
 import { getSendAndConfirmTransactionMethod } from "../util/getSendAndConfirmTransactionMethod";
@@ -21,6 +21,7 @@ import {
 } from "./types";
 import { MEMECHAN_QUOTE_MINT } from "../config/config";
 import { formatAmmKeysById } from "../raydium/formatAmmKeysById";
+import { LivePoolClient } from "../live-pool/LivePoolClient";
 
 export class StakingPoolClient {
   constructor(
@@ -412,8 +413,27 @@ export class StakingPoolClient {
     return program.account.stakingPool.fetch(this.id);
   }
 
-  public static async all(program: Program<MemechanSol>) {
-    return await program.account.stakingPool.all();
+  public static async all(
+    client: MemechanClient,
+  ): Promise<{ account: StakingPoolFields; publicKey: PublicKey; livePool: LivePoolClient | null }[]> {
+    const rawPools = await client.memechanProgram.account.stakingPool.all();
+    const pools = await Promise.all(
+      rawPools.map(async (el) => {
+        let livePool: LivePoolClient | null = null;
+        try {
+          livePool = await LivePoolClient.fromAmmId(el.account.raydiumAmm, client);
+        } catch (error) {
+          console.error(`Failed to create livePool for account ${el.account}:`, error);
+        }
+        return {
+          account: el.account,
+          publicKey: el.publicKey,
+          livePool,
+        };
+      }),
+    );
+
+    return pools;
   }
 
   public findSignerPda(): PublicKey {
