@@ -15,8 +15,8 @@ import {
   Transaction,
   VersionedTransaction,
 } from "@solana/web3.js";
-import { ATA_PROGRAM_ID, addLookupTableInfo, makeTxVersion } from "../raydium/config";
 import { findProgramAddress } from "../common/helpers";
+import { addLookupTableInfo, ATA_PROGRAM_ID, makeTxVersion } from "../raydium/config";
 
 export async function buildAndSendTx(
   connection: Connection,
@@ -24,14 +24,14 @@ export async function buildAndSendTx(
   innerSimpleV0Transaction: InnerSimpleV0Transaction[],
   options?: SendOptions,
 ) {
-  const willSendTx = await buildTxs(connection, payer, innerSimpleV0Transaction);
+  const willSendTx = await buildTxs(connection, payer.publicKey, innerSimpleV0Transaction);
 
   return await sendTx(connection, payer, willSendTx, options);
 }
 
 export async function buildTxs(
   connection: Connection,
-  payer: Signer,
+  payer: PublicKey,
   innerSimpleV0Transaction: InnerSimpleV0Transaction[],
 ): Promise<(Transaction | VersionedTransaction)[]> {
   let responseBlock;
@@ -49,7 +49,7 @@ export async function buildTxs(
   const transactions = await buildSimpleTransaction({
     connection,
     makeTxVersion,
-    payer: payer.publicKey,
+    payer,
     innerTransactions: innerSimpleV0Transaction,
     recentBlockhash,
     addLookupTableInfo: addLookupTableInfo,
