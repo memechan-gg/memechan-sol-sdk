@@ -58,6 +58,7 @@ import {
 
 import { findProgramAddress } from "../common/helpers";
 import {
+  COMPUTE_UNIT_PRICE,
   DEFAULT_MAX_M,
   FULL_MEME_AMOUNT_CONVERTED,
   MEMECHAN_MEME_TOKEN_DECIMALS,
@@ -1004,7 +1005,7 @@ export class BoundPoolClient {
     transaction.add(modifyComputeUnits);
 
     const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
-      microLamports: 5_000,
+      microLamports: COMPUTE_UNIT_PRICE,
     });
 
     transaction.add(addPriorityFee);

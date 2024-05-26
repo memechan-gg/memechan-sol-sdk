@@ -6,6 +6,7 @@ import {
   Transaction,
   sendAndConfirmTransaction,
 } from "@solana/web3.js";
+import { COMPUTE_UNIT_PRICE } from "../config/config";
 
 export function getSendAndConfirmTransactionMethod({
   connection,
@@ -29,7 +30,7 @@ export function getSendAndConfirmTransactionMethod({
     transaction.lastValidBlockHeight = latestBlockhash.lastValidBlockHeight;
 
     const computeUnitPriceInstruction = ComputeBudgetProgram.setComputeUnitPrice({
-      microLamports: 5_000,
+      microLamports: COMPUTE_UNIT_PRICE,
     });
 
     // Retrieve existing instructions
