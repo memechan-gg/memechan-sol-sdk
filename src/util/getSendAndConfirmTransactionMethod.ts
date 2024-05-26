@@ -1,4 +1,11 @@
-import { ConfirmOptions, Connection, Signer, Transaction, sendAndConfirmTransaction } from "@solana/web3.js";
+import {
+  ComputeBudgetProgram,
+  ConfirmOptions,
+  Connection,
+  Signer,
+  Transaction,
+  sendAndConfirmTransaction,
+} from "@solana/web3.js";
 
 export function getSendAndConfirmTransactionMethod({
   connection,
@@ -16,7 +23,31 @@ export function getSendAndConfirmTransactionMethod({
   options?: ConfirmOptions;
 }): () => Promise<void> {
   return async () => {
-    const tx = await sendAndConfirmTransaction(connection, transaction, signers, options);
+    const latestBlockhash = await connection.getLatestBlockhash("confirmed");
+    console.log("Latest blockhash: ", latestBlockhash);
+    transaction.recentBlockhash = latestBlockhash.blockhash;
+    transaction.lastValidBlockHeight = latestBlockhash.lastValidBlockHeight;
+
+    const computeUnitPriceInstruction = ComputeBudgetProgram.setComputeUnitPrice({
+      microLamports: 5_000,
+    });
+
+    // Retrieve existing instructions
+    const existingInstructions = transaction.instructions;
+
+    const hasComputeUnitInstruction = existingInstructions.some((instr) =>
+      instr.programId.equals(ComputeBudgetProgram.programId),
+    );
+
+    // Prepend new instructions if not already present
+    const updatedInstructions = hasComputeUnitInstruction
+      ? existingInstructions
+      : [computeUnitPriceInstruction, ...existingInstructions];
+
+    // Create a new transaction with the updated instructions
+    const updatedTransaction = new Transaction().add(...updatedInstructions);
+
+    const tx = await sendAndConfirmTransaction(connection, updatedTransaction, signers, options);
     console.log("Transaction confirmed: ", tx);
   };
 }
