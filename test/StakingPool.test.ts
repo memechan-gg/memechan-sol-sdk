@@ -9,7 +9,7 @@ import { MemeTicketClient } from "../src/memeticket/MemeTicketClient";
 import { swapOnlyAmm } from "../src/raydium/swapOnlyAmm";
 import { Percent, TokenAmount, Token } from "@raydium-io/raydium-sdk";
 import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
-import { PublicKey, Transaction } from "@solana/web3.js";
+import { PublicKey } from "@solana/web3.js";
 import { getWalletTokenAccount } from "../src/util";
 
 describe("StakingPoolClient", () => {
@@ -176,7 +176,7 @@ describe("StakingPoolClient", () => {
     const ammPool = livePool.ammPoolInfo;
     console.log("ammPool: " + JSON.stringify(ammPool));
 
-    await stakingPool.addFees({ payer, transaction: new Transaction(), ammPoolId: new PublicKey(ammPool.id) });
+    await stakingPool.addFees({ payer, ammPoolId: new PublicKey(ammPool.id) });
 
     await expect(
       stakingPool.unstake({
@@ -257,7 +257,7 @@ describe("StakingPoolClient", () => {
 
     await sleep(180000); // sleep 3 min cliff
 
-    await stakingPool.addFees({ payer, transaction: new Transaction(), ammPoolId: new PublicKey(ammPool.id) });
+    await stakingPool.addFees({ payer, ammPoolId: new PublicKey(ammPool.id) });
 
     const unstakeResult0 = await stakingPool.unstake({
       amount: new BN(10 * 1e6),
@@ -346,8 +346,8 @@ describe("StakingPoolClient", () => {
 
     await sleep(180000); // sleep 3 min cliff
 
-    await stakingPool.addFees({ payer, transaction: new Transaction(), ammPoolId: new PublicKey(ammPool.id) });
-    await stakingPool.addFees({ payer, transaction: new Transaction(), ammPoolId: new PublicKey(ammPool.id) });
+    await stakingPool.addFees({ payer, ammPoolId: new PublicKey(ammPool.id) });
+    await stakingPool.addFees({ payer, ammPoolId: new PublicKey(ammPool.id) });
 
     const unstakeResult0 = await stakingPool.unstake({
       amount: new BN(10 * 1e6),
@@ -357,7 +357,7 @@ describe("StakingPoolClient", () => {
 
     console.log("unstakeResult0: ", unstakeResult0);
 
-    await stakingPool.addFees({ payer, transaction: new Transaction(), ammPoolId: new PublicKey(ammPool.id) });
+    await stakingPool.addFees({ payer, ammPoolId: new PublicKey(ammPool.id) });
 
     const unstakeResult1 = await stakingPool.unstake({
       amount: new BN(20 * 1e6),
@@ -458,7 +458,7 @@ describe("StakingPoolClient", () => {
 
     await sleep(180000); // sleep 3 min cliff
 
-    await stakingPool.addFees({ payer, transaction: new Transaction(), ammPoolId: new PublicKey(ammPool.id) });
+    await stakingPool.addFees({ payer, ammPoolId: new PublicKey(ammPool.id) });
 
     walletTokenAccounts = await getWalletTokenAccount(client.connection, payer.publicKey); // without this, swap fails
     const swapTxIds1 = await swapOnlyAmm({
@@ -473,7 +473,7 @@ describe("StakingPoolClient", () => {
 
     console.log("amm swapresult 1 txids: ", swapTxIds1 + " " + new Date().toUTCString());
 
-    await stakingPool.addFees({ payer, transaction: new Transaction(), ammPoolId: new PublicKey(ammPool.id) });
+    await stakingPool.addFees({ payer, ammPoolId: new PublicKey(ammPool.id) });
 
     const unstakeResult0 = await stakingPool.unstake({
       amount: new BN(10 * 1e6),
@@ -503,7 +503,7 @@ describe("StakingPoolClient", () => {
 
     console.log("amm swapresult 2 txids: ", swapTxIds2 + " " + new Date().toUTCString());
 
-    await stakingPool.addFees({ payer, transaction: new Transaction(), ammPoolId: new PublicKey(ammPool.id) });
+    await stakingPool.addFees({ payer, ammPoolId: new PublicKey(ammPool.id) });
 
     const unstakeResult1 = await stakingPool.unstake({
       amount: new BN(100 * 1e6),
@@ -592,7 +592,7 @@ describe("StakingPoolClient", () => {
 
     console.log("amm swapresult txids: ", swapTxIds);
 
-    await stakingPool.addFees({ payer, transaction: new Transaction(), ammPoolId: new PublicKey(ammPool.id) });
+    await stakingPool.addFees({ payer, ammPoolId: new PublicKey(ammPool.id) });
 
     StakingPoolClient.fromStakingPoolId({ client, poolAccountAddressId: stakingPool.id });
 
@@ -683,7 +683,7 @@ describe("StakingPoolClient", () => {
 
     StakingPoolClient.fromStakingPoolId({ client, poolAccountAddressId: stakingPool.id });
 
-    await stakingPool.addFees({ payer, transaction: new Transaction(), ammPoolId: new PublicKey(ammPool.id) });
+    await stakingPool.addFees({ payer, ammPoolId: new PublicKey(ammPool.id) });
 
     console.log("addFeesResult completed");
   }, 550000);

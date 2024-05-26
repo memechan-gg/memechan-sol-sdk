@@ -63,15 +63,12 @@ export class StakingPoolClient {
     return PublicKey.findProgramAddressSync([Buffer.from("staking"), publicKey.toBytes()], memechanProgramId)[0];
   }
 
-  public async getAddFeesTransaction({
-    transaction,
-    ammPoolId,
-    payer,
-  }: GetAddFeesTransactionArgs): Promise<Transaction> {
-    const tx = transaction ?? new Transaction();
+  public async getAddFeesTransaction(args: GetAddFeesTransactionArgs): Promise<Transaction> {
+    const tx = args.transaction ?? new Transaction();
+    const payer = args.payer;
     const stakingInfo = await this.fetch();
 
-    const ammPool = await formatAmmKeysById(ammPoolId.toBase58(), this.client.connection);
+    const ammPool = await formatAmmKeysById(args.ammPoolId.toBase58(), this.client.connection);
 
     const stakingSignerPda = this.findSignerPda();
 
@@ -97,7 +94,7 @@ export class StakingPoolClient {
         raydiumLpMint: ammPool.lpMint,
         raydiumMemeVault: ammPool.baseVault,
         raydiumQuoteVault: ammPool.quoteVault,
-        signer: payer.publicKey,
+        signer: payer,
         targetOrders: ammPool.targetOrders,
         stakingLpWallet: this.lpVault,
         raydiumProgram: ammPool.programId,
@@ -109,8 +106,8 @@ export class StakingPoolClient {
     return tx;
   }
 
-  public async addFees({ payer, transaction, ammPoolId }: AddFeesArgs): Promise<void> {
-    const addFeesTransaction = await this.getAddFeesTransaction({ transaction, ammPoolId, payer });
+  public async addFees({ payer, ammPoolId }: AddFeesArgs): Promise<void> {
+    const addFeesTransaction = await this.getAddFeesTransaction({ payer: payer.publicKey, ammPoolId });
 
     const sendAndConfirmAddFeesTransaction = getSendAndConfirmTransactionMethod({
       connection: this.client.connection,
