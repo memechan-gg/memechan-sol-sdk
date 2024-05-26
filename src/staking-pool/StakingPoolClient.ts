@@ -15,11 +15,13 @@ import {
   AddFeesArgs,
   GetAddFeesTransactionArgs,
   GetAvailableUnstakeAmountArgs,
+  GetPreparedUnstakeTransactionsArgs,
   GetUnstakeTransactionArgs,
   GetWithdrawFeesTransactionArgs,
   UnstakeArgs,
   WithdrawFeesArgs,
 } from "./types";
+import { getOptimizedTransactions } from "../memeticket/utils";
 
 export class StakingPoolClient {
   constructor(
@@ -169,6 +171,93 @@ export class StakingPoolClient {
     tx.add(unstakeInstruction);
 
     return { transaction: tx, memeAccountKeypair, quoteAccountKeypair };
+  }
+
+  public async getPreparedUnstakeTransactions({
+    ammPoolId,
+    amount,
+    ticketIds,
+    user,
+    transaction,
+  }: GetPreparedUnstakeTransactionsArgs): Promise<{
+    transactions: Transaction[];
+    memeAccountKeypair: Keypair;
+    quoteAccountKeypair: Keypair;
+  }> {
+    const tx = transaction ?? new Transaction();
+
+    /**
+     * Adding add fees instructions.
+     * WARNING: `tx` mutation below.
+     */
+    await this.getAddFeesTransaction({ ammPoolId, payer: user, transaction: tx });
+
+    // Merge all the tickets into one before unstaking
+    const [destinationTicketId, ...sourceTicketIds] = ticketIds;
+    const destinationMemeTicket = new MemeTicketClient(destinationTicketId, this.client);
+
+    if (sourceTicketIds.length > 0) {
+      const sourceMemeTickets = sourceTicketIds.map((ticketId) => ({ id: ticketId }));
+
+      // WARNING: `tx` mutation below
+      await destinationMemeTicket.getStakingMergeTransaction({
+        staking: this.id,
+        ticketsToMerge: sourceMemeTickets,
+        user,
+        transaction: tx,
+      });
+
+      console.log("[getUnstakeTransactions] All the tickets are merged.");
+    } else {
+      console.log("[getUnstakeTransactions] Nothing to merge, only one ticket available.");
+    }
+
+    const stakingInfo = await this.fetch();
+
+    const memeAccountKeypair = Keypair.generate();
+    const memeAccountPublicKey = memeAccountKeypair.publicKey;
+    const createMemeAccountInstructions = await getCreateAccountInstructions(
+      this.client.connection,
+      user,
+      stakingInfo.memeMint,
+      user,
+      memeAccountKeypair,
+    );
+
+    tx.add(...createMemeAccountInstructions);
+
+    const quoteAccountKeypair = Keypair.generate();
+    const quoteAccountPublicKey = quoteAccountKeypair.publicKey;
+    const createQuoteAccountInstructions = await getCreateAccountInstructions(
+      this.client.connection,
+      user,
+      MEMECHAN_QUOTE_MINT,
+      user,
+      quoteAccountKeypair,
+    );
+
+    tx.add(...createQuoteAccountInstructions);
+
+    const unstakeInstruction = await this.client.memechanProgram.methods
+      .unstake(amount)
+      .accounts({
+        memeTicket: destinationMemeTicket.id,
+        signer: user,
+        stakingSignerPda: this.findSignerPda(),
+        memeVault: stakingInfo.memeVault,
+        quoteVault: stakingInfo.quoteVault,
+        staking: this.id,
+        userMeme: memeAccountPublicKey,
+        userQuote: quoteAccountPublicKey,
+        tokenProgram: TOKEN_PROGRAM_ID,
+      })
+      .instruction();
+
+    tx.add(unstakeInstruction);
+
+    const optimizedTransactions = getOptimizedTransactions(tx.instructions, user);
+
+    return { transactions: optimizedTransactions, memeAccountKeypair, quoteAccountKeypair };
   }
 
   public async unstake(

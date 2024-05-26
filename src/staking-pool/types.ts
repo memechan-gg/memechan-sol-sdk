@@ -20,6 +20,14 @@ export type GetUnstakeTransactionArgs = Omit<UnstakeArgs, "user"> & {
   user: PublicKey;
 };
 
+export type GetPreparedUnstakeTransactionsArgs = {
+  ticketIds: PublicKey[];
+  ammPoolId: PublicKey;
+  amount: BN;
+  user: PublicKey;
+  transaction?: Transaction;
+};
+
 export interface AddFeesArgs {
   ammPoolId: PublicKey;
   payer: Keypair;
