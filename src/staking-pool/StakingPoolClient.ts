@@ -214,48 +214,13 @@ export class StakingPoolClient {
       console.log("[getUnstakeTransactions] Nothing to merge, only one ticket available.");
     }
 
-    const stakingInfo = await this.fetch();
-
-    const memeAccountKeypair = Keypair.generate();
-    const memeAccountPublicKey = memeAccountKeypair.publicKey;
-    const createMemeAccountInstructions = await getCreateAccountInstructions(
-      this.client.connection,
+    // WARNING: `tx` mutation below
+    const { memeAccountKeypair, quoteAccountKeypair } = await this.getUnstakeTransaction({
+      amount,
+      ticket: destinationMemeTicket,
       user,
-      stakingInfo.memeMint,
-      user,
-      memeAccountKeypair,
-    );
-
-    tx.add(...createMemeAccountInstructions);
-
-    const quoteAccountKeypair = Keypair.generate();
-    const quoteAccountPublicKey = quoteAccountKeypair.publicKey;
-    const createQuoteAccountInstructions = await getCreateAccountInstructions(
-      this.client.connection,
-      user,
-      MEMECHAN_QUOTE_MINT,
-      user,
-      quoteAccountKeypair,
-    );
-
-    tx.add(...createQuoteAccountInstructions);
-
-    const unstakeInstruction = await this.client.memechanProgram.methods
-      .unstake(amount)
-      .accounts({
-        memeTicket: destinationMemeTicket.id,
-        signer: user,
-        stakingSignerPda: this.findSignerPda(),
-        memeVault: stakingInfo.memeVault,
-        quoteVault: stakingInfo.quoteVault,
-        staking: this.id,
-        userMeme: memeAccountPublicKey,
-        userQuote: quoteAccountPublicKey,
-        tokenProgram: TOKEN_PROGRAM_ID,
-      })
-      .instruction();
-
-    tx.add(unstakeInstruction);
+      transaction: tx,
+    });
 
     const optimizedTransactions = getOptimizedTransactions(tx.instructions, user);
 
@@ -421,48 +386,12 @@ export class StakingPoolClient {
       console.log("[getUnstakeTransactions] Nothing to merge, only one ticket available.");
     }
 
-    const stakingInfo = await this.fetch();
-
-    const memeAccountKeypair = Keypair.generate();
-    const memeAccountPublicKey = memeAccountKeypair.publicKey;
-    const createMemeAccountInstructions = await getCreateAccountInstructions(
-      this.client.connection,
+    // WARNING: `tx` mutation below
+    const { memeAccountKeypair, quoteAccountKeypair } = await this.getWithdrawFeesTransaction({
+      ticket: destinationMemeTicket,
       user,
-      stakingInfo.memeMint,
-      user,
-      memeAccountKeypair,
-    );
-
-    tx.add(...createMemeAccountInstructions);
-
-    const quoteAccountKeypair = Keypair.generate();
-    const quoteAccountPublicKey = quoteAccountKeypair.publicKey;
-    const createWSolAccountInstructions = await getCreateAccountInstructions(
-      this.client.connection,
-      user,
-      MEMECHAN_QUOTE_MINT,
-      user,
-      quoteAccountKeypair,
-    );
-
-    tx.add(...createWSolAccountInstructions);
-
-    const withdrawFeesInstruction = await this.client.memechanProgram.methods
-      .withdrawFees()
-      .accounts({
-        memeTicket: destinationTicketId,
-        stakingSignerPda: this.findSignerPda(),
-        memeVault: stakingInfo.memeVault,
-        quoteVault: stakingInfo.quoteVault,
-        staking: this.id,
-        userMeme: memeAccountPublicKey,
-        userQuote: quoteAccountPublicKey,
-        signer: user,
-        tokenProgram: TOKEN_PROGRAM_ID,
-      })
-      .instruction();
-
-    tx.add(withdrawFeesInstruction);
+      transaction: tx,
+    });
 
     const optimizedTransactions = getOptimizedTransactions(tx.instructions, user);
 
