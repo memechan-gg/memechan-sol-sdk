@@ -31,6 +31,12 @@ module.exports = {
     "prettier/prettier": 2, // Means error
     "require-jsdoc": "off",
     "valid-jsdoc": "off",
+    "prettier/prettier": [
+      "error",
+      {
+        "endOfLine": "auto"
+      }
+    ]
   },
   overrides: [
     {
@@ -49,7 +55,7 @@ module.exports = {
         "valid-jsdoc": "off",
         "require-jsdoc": "off",
         "max-len": "off",
-        camelcase: "off",
+        camelcase: "off"
       },
     },
   ],
