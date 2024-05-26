@@ -6,7 +6,7 @@ import {
   InvalidCoinSymbolError,
   NameEqualsToDescriptionError,
   SymbolEqualsToDescriptionError,
-} from "./invalid-param-errors";
+} from "./invalidParamErrors";
 import { validateCoinDescription, validateCoinImage, validateCoinName, validateCoinSymbol } from "./validation";
 
 /**
