@@ -64,3 +64,9 @@ export interface AccountMeta {
   isWritable: boolean;
   pubkey: PublicKey;
 }
+
+export type PrepareTransactionWithStakingTicketsMergeArgs = {
+  transaction: Transaction;
+  user: PublicKey;
+  ticketIds: PublicKey[];
+};

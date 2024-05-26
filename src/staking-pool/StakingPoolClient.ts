@@ -20,6 +20,7 @@ import {
   GetPreparedWithdrawFeesTransactionsArgs,
   GetUnstakeTransactionArgs,
   GetWithdrawFeesTransactionArgs,
+  PrepareTransactionWithStakingTicketsMergeArgs,
   UnstakeArgs,
   WithdrawFeesArgs,
   getAvailableWithdrawFeesAmountArgs,
@@ -194,25 +195,12 @@ export class StakingPoolClient {
      */
     await this.getAddFeesTransaction({ ammPoolId, payer: user, transaction: tx });
 
-    // Merge all the tickets into one before unstaking
-    const [destinationTicketId, ...sourceTicketIds] = ticketIds;
-    const destinationMemeTicket = new MemeTicketClient(destinationTicketId, this.client);
-
-    if (sourceTicketIds.length > 0) {
-      const sourceMemeTickets = sourceTicketIds.map((ticketId) => ({ id: ticketId }));
-
-      // WARNING: `tx` mutation below
-      await destinationMemeTicket.getStakingMergeTransaction({
-        staking: this.id,
-        ticketsToMerge: sourceMemeTickets,
-        user,
-        transaction: tx,
-      });
-
-      console.log("[getUnstakeTransactions] All the tickets are merged.");
-    } else {
-      console.log("[getUnstakeTransactions] Nothing to merge, only one ticket available.");
-    }
+    // WARNING: `tx` mutation below
+    const destinationMemeTicket = await this.prepareTransactionWithStakingTicketsMerge({
+      ticketIds,
+      transaction: tx,
+      user,
+    });
 
     // WARNING: `tx` mutation below
     const { memeAccountKeypair, quoteAccountKeypair } = await this.getUnstakeTransaction({
@@ -366,25 +354,12 @@ export class StakingPoolClient {
      */
     await this.getAddFeesTransaction({ ammPoolId, payer: user, transaction: tx });
 
-    // Merge all the tickets into one before unstaking
-    const [destinationTicketId, ...sourceTicketIds] = ticketIds;
-    const destinationMemeTicket = new MemeTicketClient(destinationTicketId, this.client);
-
-    if (sourceTicketIds.length > 0) {
-      const sourceMemeTickets = sourceTicketIds.map((ticketId) => ({ id: ticketId }));
-
-      // WARNING: `tx` mutation below
-      await destinationMemeTicket.getStakingMergeTransaction({
-        staking: this.id,
-        ticketsToMerge: sourceMemeTickets,
-        user,
-        transaction: tx,
-      });
-
-      console.log("[getUnstakeTransactions] All the tickets are merged.");
-    } else {
-      console.log("[getUnstakeTransactions] Nothing to merge, only one ticket available.");
-    }
+    // WARNING: `tx` mutation below
+    const destinationMemeTicket = await this.prepareTransactionWithStakingTicketsMerge({
+      ticketIds,
+      transaction: tx,
+      user,
+    });
 
     // WARNING: `tx` mutation below
     const { memeAccountKeypair, quoteAccountKeypair } = await this.getWithdrawFeesTransaction({
@@ -461,6 +436,36 @@ export class StakingPoolClient {
     );
 
     return { memeFees: memeFees.toFixed(0), slerfFees: slerfFees.toFixed(0) };
+  }
+
+  /**
+   * @returns A destination meme ticket.
+   */
+  public async prepareTransactionWithStakingTicketsMerge({
+    transaction,
+    user,
+    ticketIds,
+  }: PrepareTransactionWithStakingTicketsMergeArgs): Promise<MemeTicketClient> {
+    const [destinationTicketId, ...sourceTicketIds] = ticketIds;
+    const destinationMemeTicket = new MemeTicketClient(destinationTicketId, this.client);
+
+    if (sourceTicketIds.length > 0) {
+      const sourceMemeTickets = sourceTicketIds.map((ticketId) => ({ id: ticketId }));
+
+      // WARNING: `transaction` mutation below
+      await destinationMemeTicket.getStakingMergeTransaction({
+        staking: this.id,
+        ticketsToMerge: sourceMemeTickets,
+        user,
+        transaction,
+      });
+
+      console.log("[prepareTransactionWithStakingTicketsMerge] All the tickets are merged.");
+    } else {
+      console.log("[prepareTransactionWithStakingTicketsMerge] Nothing to merge, only one ticket available.");
+    }
+
+    return destinationMemeTicket;
   }
 
   public async getHoldersCount() {
