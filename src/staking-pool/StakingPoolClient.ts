@@ -381,10 +381,11 @@ export class StakingPoolClient {
     );
 
     const aggregatedHolderAmounts: Map<string, BigNumber> = new Map();
-    var aggregatedStaking = BigNumber(0);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const aggregatedStaking = new BigNumber(0);
 
     ticketHolderList.forEach((ticketFields: MemeTicketFields[], holder: string) => {
-      var accumulator = new BigNumber(0);
+      let accumulator = new BigNumber(0);
       ticketFields.forEach((ticket) => {
         accumulator = accumulator.plus(ticket.amount.toString());
       });
@@ -416,7 +417,7 @@ export class StakingPoolClient {
   ): Promise<[Map<string, BigNumber>, BigNumber]> {
     let page = 1;
     const allOwners: Map<string, BigNumber> = new Map();
-    var stakingLockedTokens = new BigNumber(0);
+    let stakingLockedTokens = new BigNumber(0);
 
     // eslint-disable-next-line no-constant-condition
     while (true) {
