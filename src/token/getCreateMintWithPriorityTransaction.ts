@@ -1,5 +1,6 @@
 import { MINT_SIZE, TOKEN_PROGRAM_ID, createInitializeMintInstruction } from "@solana/spl-token";
 import { ComputeBudgetProgram, Connection, Keypair, PublicKey, SystemProgram, Transaction } from "@solana/web3.js";
+import { COMPUTE_UNIT_PRICE } from "../config/config";
 
 /**
  * Get a transaction for creating and initializing a new mint
@@ -26,7 +27,7 @@ export async function getCreateMintWithPriorityTransaction(
   });
 
   const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
-    microLamports: 5_000,
+    microLamports: COMPUTE_UNIT_PRICE,
   });
 
   console.log("mintAuthority: " + mintAuthority.toBase58());
