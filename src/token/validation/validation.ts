@@ -1,6 +1,8 @@
 // eslint-disable-next-line max-len
 // Byte limits from https://github.com/metaplex-foundation/metaplex-program-library/blob/9fc2a13b5a66d407f0b9ab31eb7b161b78f28ef0/token-metadata/program/src/state/metadata.rs#L63
 
+import { MAX_NAME_LENGTH, MAX_SYMBOL_LENGTH } from "./consts";
+
 /**
  * Validates the coin name to be a non-empty string and within the byte length limit.
  *
@@ -9,7 +11,7 @@
  */
 export function validateCoinName(coinName: string): boolean {
   const regex = /^[a-zA-Z0-9\s]+$/;
-  const maxByteLength = 32;
+  const maxByteLength = MAX_NAME_LENGTH;
 
   return (
     typeof coinName === "string" &&
@@ -27,7 +29,7 @@ export function validateCoinName(coinName: string): boolean {
  */
 export function validateCoinSymbol(coinSymbol: string): boolean {
   const regex = /^[a-zA-Z_]+$/;
-  const maxByteLength = 10;
+  const maxByteLength = MAX_SYMBOL_LENGTH;
 
   const isCoinSymbolValid =
     typeof coinSymbol === "string" && regex.test(coinSymbol) && getByteSize(coinSymbol) <= maxByteLength;

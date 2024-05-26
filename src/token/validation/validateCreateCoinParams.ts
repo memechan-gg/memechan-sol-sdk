@@ -15,7 +15,7 @@ import { validateCoinDescription, validateCoinImage, validateCoinName, validateC
  * @param {CreateCoinTransactionParams} params - Parameters for creating the coin.
  * @throws {Error} If the validation fails.
  */
-export function validateCreateCoinParams({ name, symbol, url, description }: CreateCoinTransactionParams): void {
+export function validateCreateCoinParams({ name, symbol, image, description }: CreateCoinTransactionParams): void {
   if (!validateCoinName(name)) {
     throw new InvalidCoinNameError(`[validateCreateCoinParams] Coin name ${name} is invalid`);
   }
@@ -28,8 +28,8 @@ export function validateCreateCoinParams({ name, symbol, url, description }: Cre
     throw new InvalidCoinDescriptionError(`[validateCreateCoinParams] Coin description ${description} is invalid`);
   }
 
-  if (!validateCoinImage(url)) {
-    throw new InvalidCoinImageError(`[validateCreateCoinParams] Coin image ${url} is invalid`);
+  if (!validateCoinImage(image)) {
+    throw new InvalidCoinImageError(`[validateCreateCoinParams] Coin image ${image} is invalid`);
   }
 
   if (name.trim() === description.trim()) {
