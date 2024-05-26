@@ -1,4 +1,4 @@
-import { ParseTx } from "../src/tx-parsing/parsing";
+import { parseTx } from "../src/tx-parsing/parsing";
 import { client } from "./common/common";
 
 describe("Tx Parsing", () => {
@@ -14,7 +14,7 @@ describe("Tx Parsing", () => {
     ];
 
     for (let i = 0; i < txSigs.length; i++) {
-      console.log(await ParseTx(txSigs[i], client));
+      console.log(await parseTx(txSigs[i], client));
     }
   });
 });

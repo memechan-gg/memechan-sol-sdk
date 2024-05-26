@@ -14,7 +14,7 @@ export type NewBPInstructionParsed = {
   type: "new_pool";
 };
 
-export async function ParseNewBPInstruction(
+export async function parseNewBPInstruction(
   tx: ParsedTransactionWithMeta,
   index: number,
   client: MemechanClient,
@@ -23,7 +23,7 @@ export async function ParseNewBPInstruction(
   const ix = tx.transaction.message.instructions[index];
 
   if ("accounts" in ix && ix.accounts.length > 2) {
-    //to ensure we also have a mint, which has index of 2
+    // to ensure we also have a mint, which has index of 2
     poolAddr = ix.accounts[1];
   } else {
     return undefined;
@@ -42,7 +42,8 @@ export async function ParseNewBPInstruction(
     poolAddr,
     pool,
     newMint,
-    sender: tx.transaction.message.accountKeys[0].pubkey, // In the `Message` structure, the first account is always the fee-payer
+    // In the `Message` structure, the first account is always the fee-payer
+    sender: tx.transaction.message.accountKeys[0].pubkey,
     type: "new_pool",
   };
 

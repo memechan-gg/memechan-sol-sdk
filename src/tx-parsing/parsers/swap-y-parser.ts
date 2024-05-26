@@ -15,7 +15,7 @@ export type SwapYInstructionParsed = {
   type: "swap_y";
 };
 
-export async function ParseSwapYInstruction(
+export async function parseSwapYInstruction(
   tx: ParsedTransactionWithMeta,
   index: number,
   client: MemechanClient,
@@ -39,7 +39,7 @@ export async function ParseSwapYInstruction(
   const ticket = await client.memechanProgram.account.memeTicket.fetchNullable(ticketAddr);
 
   if (!ticket) {
-    throw new Error(`[ParseSwapYInstruction] No ticket found with ticket address ${ticketAddr}`);
+    throw new Error(`[parseSwapYInstruction] No ticket found with ticket address ${ticketAddr}`);
   }
 
   const poolPrevPos = Number(preBalances[0].uiTokenAmount.amount);
@@ -53,6 +53,7 @@ export async function ParseSwapYInstruction(
     baseAmtReceived,
     poolQuoteVault,
     quoteAmtSwapped,
+    // eslint-disable-next-line max-len
     sender: tx.transaction.message.accountKeys[0].pubkey, // In the `Message` structure, the first account is always the fee-payer
     type: "swap_y",
   };

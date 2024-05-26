@@ -12,7 +12,7 @@ export interface StakingPoolFields {
   lpMint: PublicKey;
   quoteVault: PublicKey;
   vestingConfig: types.VestingConfigFields;
-  lpTokensWithdrawn: BN;
+  raydiumFees: types.RaydiumAmmFeesFields;
   stakesTotal: BN;
   feesXTotal: BN;
   feesYTotal: BN;
@@ -26,7 +26,7 @@ export interface StakingPoolJSON {
   lpMint: string;
   quoteVault: string;
   vestingConfig: types.VestingConfigJSON;
-  lpTokensWithdrawn: string;
+  raydiumFees: types.RaydiumAmmFeesJSON;
   stakesTotal: string;
   feesXTotal: string;
   feesYTotal: string;
@@ -40,7 +40,7 @@ export class StakingPool {
   readonly lpMint: PublicKey;
   readonly quoteVault: PublicKey;
   readonly vestingConfig: types.VestingConfig;
-  readonly lpTokensWithdrawn: BN;
+  readonly raydiumFees: types.RaydiumAmmFees;
   readonly stakesTotal: BN;
   readonly feesXTotal: BN;
   readonly feesYTotal: BN;
@@ -55,7 +55,7 @@ export class StakingPool {
     borsh.publicKey("lpMint"),
     borsh.publicKey("quoteVault"),
     types.VestingConfig.layout("vestingConfig"),
-    borsh.u64("lpTokensWithdrawn"),
+    types.RaydiumAmmFees.layout("raydiumFees"),
     borsh.u64("stakesTotal"),
     borsh.u64("feesXTotal"),
     borsh.u64("feesYTotal"),
@@ -69,7 +69,7 @@ export class StakingPool {
     this.lpMint = fields.lpMint;
     this.quoteVault = fields.quoteVault;
     this.vestingConfig = new types.VestingConfig({ ...fields.vestingConfig });
-    this.lpTokensWithdrawn = fields.lpTokensWithdrawn;
+    this.raydiumFees = new types.RaydiumAmmFees({ ...fields.raydiumFees });
     this.stakesTotal = fields.stakesTotal;
     this.feesXTotal = fields.feesXTotal;
     this.feesYTotal = fields.feesYTotal;
@@ -118,7 +118,7 @@ export class StakingPool {
       lpMint: dec.lpMint,
       quoteVault: dec.quoteVault,
       vestingConfig: types.VestingConfig.fromDecoded(dec.vestingConfig),
-      lpTokensWithdrawn: dec.lpTokensWithdrawn,
+      raydiumFees: types.RaydiumAmmFees.fromDecoded(dec.raydiumFees),
       stakesTotal: dec.stakesTotal,
       feesXTotal: dec.feesXTotal,
       feesYTotal: dec.feesYTotal,
@@ -134,7 +134,7 @@ export class StakingPool {
       lpMint: this.lpMint.toString(),
       quoteVault: this.quoteVault.toString(),
       vestingConfig: this.vestingConfig.toJSON(),
-      lpTokensWithdrawn: this.lpTokensWithdrawn.toString(),
+      raydiumFees: this.raydiumFees.toJSON(),
       stakesTotal: this.stakesTotal.toString(),
       feesXTotal: this.feesXTotal.toString(),
       feesYTotal: this.feesYTotal.toString(),
@@ -150,7 +150,7 @@ export class StakingPool {
       lpMint: new PublicKey(obj.lpMint),
       quoteVault: new PublicKey(obj.quoteVault),
       vestingConfig: types.VestingConfig.fromJSON(obj.vestingConfig),
-      lpTokensWithdrawn: new BN(obj.lpTokensWithdrawn),
+      raydiumFees: types.RaydiumAmmFees.fromJSON(obj.raydiumFees),
       stakesTotal: new BN(obj.stakesTotal),
       feesXTotal: new BN(obj.feesXTotal),
       feesYTotal: new BN(obj.feesYTotal),

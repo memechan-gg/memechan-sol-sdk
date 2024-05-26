@@ -3,14 +3,14 @@ import * as base58 from "bs58";
 
 import * as solana from "@solana/web3.js";
 import { MemechanClient } from "../MemechanClient";
-import { NewBPInstructionParsed, ParseNewBPInstruction } from "./parsers/bonding-pool-creation-parser";
-import { GoLiveInstructionParsed, ParseGoLiveInstruction } from "./parsers/go-live-parser";
-import { InitStakingPoolInstructionParsed, ParseInitStakingInstruction } from "./parsers/init-staking-parser";
-import { ParseSwapXInstruction, SwapXInstructionParsed } from "./parsers/swap-x-parser";
-import { ParseSwapYInstruction, SwapYInstructionParsed } from "./parsers/swap-y-parser";
-import { CreateMetadataInstructionParsed, ParseCreateMetadataInstruction } from "./parsers/create-metadata-parser";
+import { NewBPInstructionParsed, parseNewBPInstruction } from "./parsers/bonding-pool-creation-parser";
+import { GoLiveInstructionParsed, parseGoLiveInstruction } from "./parsers/go-live-parser";
+import { InitStakingPoolInstructionParsed, parseInitStakingInstruction } from "./parsers/init-staking-parser";
+import { parseSwapXInstruction, SwapXInstructionParsed } from "./parsers/swap-x-parser";
+import { parseSwapYInstruction, SwapYInstructionParsed } from "./parsers/swap-y-parser";
+import { CreateMetadataInstructionParsed, parseCreateMetadataInstruction } from "./parsers/create-metadata-parser";
 
-export async function ParseTx(
+export async function parseTx(
   txSig: TransactionSignature,
   client: MemechanClient,
 ): Promise<
@@ -25,7 +25,7 @@ export async function ParseTx(
   | undefined
 > {
   const pt = await client.connection.getParsedTransaction(txSig);
-  //console.log(pt);
+  // console.log(pt);
 
   const ixs = pt?.transaction?.message.instructions;
   if (!ixs) {
@@ -76,27 +76,27 @@ async function ptx(
 
   if (ixBytesSliced.equals(Buffer.from([0x26, 0x3f]))) {
     console.log("parsing ix: NewPool");
-    return await ParseNewBPInstruction(tx, index, memechanProgram);
+    return await parseNewBPInstruction(tx, index, memechanProgram);
   }
   if (ixBytesSliced.equals(Buffer.from([0x41, 0x3f]))) {
     console.log("parsing ix: SwapX");
-    return await ParseSwapXInstruction(tx, index, memechanProgram);
+    return await parseSwapXInstruction(tx, index, memechanProgram);
   }
   if (ixBytesSliced.equals(Buffer.from([0x7e, 0xd0]))) {
     console.log("parsing ix: SwapY");
-    return await ParseSwapYInstruction(tx, index, memechanProgram);
+    return await parseSwapYInstruction(tx, index, memechanProgram);
   }
   if (ixBytesSliced.equals(Buffer.from([0x68, 0xc1]))) {
     console.log("parsing ix: InitStaking");
-    return await ParseInitStakingInstruction(tx, index, memechanProgram);
+    return await parseInitStakingInstruction(tx, index, memechanProgram);
   }
   if (ixBytesSliced.equals(Buffer.from([0x7e, 0x62]))) {
     console.log("parsing ix: GoLive");
-    return await ParseGoLiveInstruction(tx, index);
+    return await parseGoLiveInstruction(tx, index);
   }
   if (ixBytesSliced.equals(Buffer.from([0x1e, 0x23]))) {
     console.log("parsing ix: CreateMetadata");
-    return await ParseCreateMetadataInstruction(tx, index, memechanProgram);
+    return await parseCreateMetadataInstruction(tx, index, memechanProgram);
   }
 
   return undefined;

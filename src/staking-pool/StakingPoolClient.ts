@@ -31,7 +31,7 @@ export class StakingPoolClient {
     public memeMint: PublicKey,
     public lpVault: PublicKey,
     public lpMint: PublicKey,
-    public quote_vault: PublicKey,
+    public quoteVault: PublicKey,
   ) {}
 
   public static async fromStakingPoolId({
@@ -63,15 +63,12 @@ export class StakingPoolClient {
     return PublicKey.findProgramAddressSync([Buffer.from("staking"), publicKey.toBytes()], memechanProgramId)[0];
   }
 
-  public async getAddFeesTransaction({
-    transaction,
-    ammPoolId,
-    payer,
-  }: GetAddFeesTransactionArgs): Promise<Transaction> {
-    const tx = transaction ?? new Transaction();
+  public async getAddFeesTransaction(args: GetAddFeesTransactionArgs): Promise<Transaction> {
+    const tx = args.transaction ?? new Transaction();
+    const payer = args.payer;
     const stakingInfo = await this.fetch();
 
-    const ammPool = await formatAmmKeysById(ammPoolId.toBase58(), this.client.connection);
+    const ammPool = await formatAmmKeysById(args.ammPoolId.toBase58(), this.client.connection);
 
     const stakingSignerPda = this.findSignerPda();
 
@@ -97,7 +94,7 @@ export class StakingPoolClient {
         raydiumLpMint: ammPool.lpMint,
         raydiumMemeVault: ammPool.baseVault,
         raydiumQuoteVault: ammPool.quoteVault,
-        signer: payer.publicKey,
+        signer: payer,
         targetOrders: ammPool.targetOrders,
         stakingLpWallet: this.lpVault,
         raydiumProgram: ammPool.programId,
@@ -109,8 +106,8 @@ export class StakingPoolClient {
     return tx;
   }
 
-  public async addFees({ payer, transaction, ammPoolId }: AddFeesArgs): Promise<void> {
-    const addFeesTransaction = await this.getAddFeesTransaction({ transaction, ammPoolId, payer });
+  public async addFees({ payer, ammPoolId }: AddFeesArgs): Promise<void> {
+    const addFeesTransaction = await this.getAddFeesTransaction({ payer: payer.publicKey, ammPoolId });
 
     const sendAndConfirmAddFeesTransaction = getSendAndConfirmTransactionMethod({
       connection: this.client.connection,
@@ -135,9 +132,9 @@ export class StakingPoolClient {
     const memeAccountPublicKey = memeAccountKeypair.publicKey;
     const createMemeAccountInstructions = await getCreateAccountInstructions(
       this.client.connection,
-      args.user.publicKey,
+      args.user,
       stakingInfo.memeMint,
-      args.user.publicKey,
+      args.user,
       memeAccountKeypair,
     );
 
@@ -147,9 +144,9 @@ export class StakingPoolClient {
     const quoteAccountPublicKey = quoteAccountKeypair.publicKey;
     const createQuoteAccountInstructions = await getCreateAccountInstructions(
       this.client.connection,
-      args.user.publicKey,
+      args.user,
       MEMECHAN_QUOTE_MINT,
-      args.user.publicKey,
+      args.user,
       quoteAccountKeypair,
     );
 
@@ -159,7 +156,7 @@ export class StakingPoolClient {
       .unstake(args.amount)
       .accounts({
         memeTicket: args.ticket.id,
-        signer: args.user.publicKey,
+        signer: args.user,
         stakingSignerPda: this.findSignerPda(),
         memeVault: stakingInfo.memeVault,
         quoteVault: stakingInfo.quoteVault,
@@ -178,7 +175,10 @@ export class StakingPoolClient {
   public async unstake(
     args: UnstakeArgs,
   ): Promise<{ memeAccountPublicKey: PublicKey; quoteAccountPublicKey: PublicKey }> {
-    const { memeAccountKeypair, transaction, quoteAccountKeypair } = await this.getUnstakeTransaction(args);
+    const { memeAccountKeypair, transaction, quoteAccountKeypair } = await this.getUnstakeTransaction({
+      ...args,
+      user: args.user.publicKey,
+    });
 
     const signature = await sendAndConfirmTransaction(
       this.client.connection,
@@ -253,9 +253,9 @@ export class StakingPoolClient {
     const memeAccountPublicKey = memeAccountKeypair.publicKey;
     const createMemeAccountInstructions = await getCreateAccountInstructions(
       this.client.connection,
-      args.user.publicKey,
+      args.user,
       stakingInfo.memeMint,
-      args.user.publicKey,
+      args.user,
       memeAccountKeypair,
     );
 
@@ -265,9 +265,9 @@ export class StakingPoolClient {
     const quoteAccountPublicKey = quoteAccountKeypair.publicKey;
     const createWSolAccountInstructions = await getCreateAccountInstructions(
       this.client.connection,
-      args.user.publicKey,
+      args.user,
       MEMECHAN_QUOTE_MINT,
-      args.user.publicKey,
+      args.user,
       quoteAccountKeypair,
     );
 
@@ -283,7 +283,7 @@ export class StakingPoolClient {
         staking: this.id,
         userMeme: memeAccountPublicKey,
         userQuote: quoteAccountPublicKey,
-        signer: args.user.publicKey,
+        signer: args.user,
         tokenProgram: TOKEN_PROGRAM_ID,
       })
       .instruction();
@@ -296,7 +296,10 @@ export class StakingPoolClient {
   public async withdrawFees(
     args: WithdrawFeesArgs,
   ): Promise<{ memeAccountPublicKey: PublicKey; quoteAccountPublicKey: PublicKey }> {
-    const { memeAccountKeypair, transaction, quoteAccountKeypair } = await this.getWithdrawFeesTransaction(args);
+    const { memeAccountKeypair, transaction, quoteAccountKeypair } = await this.getWithdrawFeesTransaction({
+      ...args,
+      user: args.user.publicKey,
+    });
 
     const sendAndConfirmWithdrawFeesTransaction = getSendAndConfirmTransactionMethod({
       connection: this.client.connection,
@@ -314,8 +317,11 @@ export class StakingPoolClient {
 
   public async getAvailableWithdrawFeesAmount(
     args: WithdrawFeesArgs,
-  ) /*: Promise<{ availableAmount: number; error?: TransactionError; logs?: string[] | null }>*/ {
-    const { memeAccountKeypair, transaction, quoteAccountKeypair } = await this.getWithdrawFeesTransaction(args);
+  ) /* : Promise<{ availableAmount: number; error?: TransactionError; logs?: string[] | null }>*/ {
+    const { memeAccountKeypair, transaction, quoteAccountKeypair } = await this.getWithdrawFeesTransaction({
+      ...args,
+      user: args.user.publicKey,
+    });
 
     const result = await this.client.connection.simulateTransaction(
       transaction,

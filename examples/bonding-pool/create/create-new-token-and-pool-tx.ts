@@ -6,7 +6,7 @@ import { getTxSize } from "../../../src/util/get-tx-size";
 
 // yarn tsx examples/bonding-pool/create/create-new-token-and-pool-tx.ts > log.txt 2>&1
 export const createNewTokenAndPoolTx = async () => {
-  const { transaction, memeMintKeypair, poolQuoteVaultId, launchVaultId } =
+  const { createPoolTransaction, createTokenTransaction, memeMintKeypair, poolQuoteVaultId, launchVaultId } =
     await BoundPoolClient.getCreateNewBondingPoolAndTokenTransaction({
       admin,
       payer: payer.publicKey,
@@ -18,19 +18,28 @@ export const createNewTokenAndPoolTx = async () => {
   const memeMint = memeMintKeypair.publicKey;
 
   try {
-    const size = getTxSize(transaction, payer.publicKey);
-    console.debug("createPoolAndTokenSignature size: ", size);
+    const createPoolTransactionSize = getTxSize(createPoolTransaction, payer.publicKey);
+    console.debug("createPoolTransaction size: ", createPoolTransactionSize);
 
-    const createPoolAndTokenSignature = await sendAndConfirmTransaction(
+    const createTokenTransactionSize = getTxSize(createTokenTransaction, payer.publicKey);
+    console.debug("createTokenTransaction size: ", createTokenTransactionSize);
+
+    const createPoolSignature = await sendAndConfirmTransaction(
       client.connection,
-      transaction,
+      createPoolTransaction,
       [payer, memeMintKeypair, poolQuoteVaultId, launchVaultId],
       {
         commitment: "confirmed",
         skipPreflight: true,
       },
     );
-    console.log("createPoolAndTokenSignature:", createPoolAndTokenSignature);
+    console.log("createPoolSignature:", createPoolSignature);
+
+    const createTokenSignature = await sendAndConfirmTransaction(client.connection, createTokenTransaction, [payer], {
+      commitment: "confirmed",
+      skipPreflight: true,
+    });
+    console.log("createTokenSignature:", createTokenSignature);
 
     const id = BoundPoolClient.findBoundPoolPda(memeMint, MEMECHAN_QUOTE_TOKEN.mint, client.memechanProgram.programId);
     console.debug("id: ", id);
