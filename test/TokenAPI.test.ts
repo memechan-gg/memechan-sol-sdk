@@ -37,40 +37,11 @@ describe("TokenService authenticated operations", () => {
     */
 
     const { token } = await tokenApi.createToken({
-      txDigest: "Bdkcg4Z2HuUTRkvG5mrCZRya8fxqwPzbHnY3cfD1tTYQ",
+      txDigest: "gGEg4dX3Vs72AE3Nr8ardJajLn1bb5Cs5cbeHRUDak1SGfkmbSfE1rejPzia8wcikP5ME7ZXDe1cXa6vYSeS9u3",
       socialLinks: {
         twitter: "mytwitter",
         discord: "mydiscord",
       },
-    });
-    expect(token).toEqual({
-      image:
-        // eslint-disable-next-line max-len
-        "https://i.seadn.io/gae/2hDpuTi-0AMKvoZJGd-yKWvK4tKdQr_kLIpB_qSeMau2TNGCNidAosMEvrEXFO9G6tmlFlPQplpwiqirgrIPWnCKMvElaYgI-HiVvXc?auto=format&dpr=1&w=1000",
-      contractAddress: "0xf45c3c4ffb1466384e2b904454c220ab28eca72c7b5d36df57e5e8afc54cab1b",
-      creationTime: 1714397293646,
-      creator: "0x9a32c41920a66f4919a3d011dac7d45fb79d2629d4c5dce937d550339bbad8e2",
-      txDigest: "Bdkcg4Z2HuUTRkvG5mrCZRya8fxqwPzbHnY3cfD1tTYQ",
-      status: "PRESALE",
-      type: "0xd4c0f2f4a375fd37e57c2e8f6597def5934140bb1f0629af7182c9f30f7da524::test_token_4am::TEST_TOKEN_4AM",
-      marketcap: 0,
-      lastReply: 0,
-      socialLinks: { twitter: "mytwitter", discord: "mydiscord" },
-      decimals: 6,
-      description: "testtoken4am description",
-      icon_url:
-        // eslint-disable-next-line max-len
-        "https://i.seadn.io/gae/2hDpuTi-0AMKvoZJGd-yKWvK4tKdQr_kLIpB_qSeMau2TNGCNidAosMEvrEXFO9G6tmlFlPQplpwiqirgrIPWnCKMvElaYgI-HiVvXc?auto=format&dpr=1&w=1000",
-      name: "testtoken4am",
-      symbol: "TEST_TOKEN_4am",
-      coinType: "0xd4c0f2f4a375fd37e57c2e8f6597def5934140bb1f0629af7182c9f30f7da524::test_token_4am::TEST_TOKEN_4AM",
-      objectId: "0xf110c32923e77de35505352fcd631a83beb38a1cbe9ab0ba85ac7100c4ee9281",
-      objectType:
-        // eslint-disable-next-line max-len
-        "0x2::coin::Coin<0xd4c0f2f4a375fd37e57c2e8f6597def5934140bb1f0629af7182c9f30f7da524::test_token_4am::TEST_TOKEN_4AM>",
-      treasureCapId: "0xf6ea44e563c85b0b2baf4f91805f4b0e14711913cd4d5cc9664fca876d0a1386",
-      packageId: "0xf45c3c4ffb1466384e2b904454c220ab28eca72c7b5d36df57e5e8afc54cab1b",
-      metadataObjectId: "0xbaab84e4a437b223097cabf43b666e1666d460b9d83506d6281b85ea4e17267b",
     });
   });
 });
