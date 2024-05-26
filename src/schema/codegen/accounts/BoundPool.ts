@@ -10,6 +10,7 @@ export interface BoundPoolFields {
   adminFeesMeme: BN;
   adminFeesQuote: BN;
   adminVaultQuote: PublicKey;
+  creatorAddr: PublicKey;
   fees: types.FeesFields;
   config: types.ConfigFields;
   locked: boolean;
@@ -21,6 +22,7 @@ export interface BoundPoolJSON {
   adminFeesMeme: string;
   adminFeesQuote: string;
   adminVaultQuote: string;
+  creatorAddr: string;
   fees: types.FeesJSON;
   config: types.ConfigJSON;
   locked: boolean;
@@ -32,6 +34,7 @@ export class BoundPool {
   readonly adminFeesMeme: BN;
   readonly adminFeesQuote: BN;
   readonly adminVaultQuote: PublicKey;
+  readonly creatorAddr: PublicKey;
   readonly fees: types.Fees;
   readonly config: types.Config;
   readonly locked: boolean;
@@ -44,6 +47,7 @@ export class BoundPool {
     borsh.u64("adminFeesMeme"),
     borsh.u64("adminFeesQuote"),
     borsh.publicKey("adminVaultQuote"),
+    borsh.publicKey("creatorAddr"),
     types.Fees.layout("fees"),
     types.Config.layout("config"),
     borsh.bool("locked"),
@@ -55,6 +59,7 @@ export class BoundPool {
     this.adminFeesMeme = fields.adminFeesMeme;
     this.adminFeesQuote = fields.adminFeesQuote;
     this.adminVaultQuote = fields.adminVaultQuote;
+    this.creatorAddr = fields.creatorAddr;
     this.fees = new types.Fees({ ...fields.fees });
     this.config = new types.Config({ ...fields.config });
     this.locked = fields.locked;
@@ -101,6 +106,7 @@ export class BoundPool {
       adminFeesMeme: dec.adminFeesMeme,
       adminFeesQuote: dec.adminFeesQuote,
       adminVaultQuote: dec.adminVaultQuote,
+      creatorAddr: dec.creatorAddr,
       fees: types.Fees.fromDecoded(dec.fees),
       config: types.Config.fromDecoded(dec.config),
       locked: dec.locked,
@@ -114,6 +120,7 @@ export class BoundPool {
       adminFeesMeme: this.adminFeesMeme.toString(),
       adminFeesQuote: this.adminFeesQuote.toString(),
       adminVaultQuote: this.adminVaultQuote.toString(),
+      creatorAddr: this.creatorAddr.toString(),
       fees: this.fees.toJSON(),
       config: this.config.toJSON(),
       locked: this.locked,
@@ -127,6 +134,7 @@ export class BoundPool {
       adminFeesMeme: new BN(obj.adminFeesMeme),
       adminFeesQuote: new BN(obj.adminFeesQuote),
       adminVaultQuote: new PublicKey(obj.adminVaultQuote),
+      creatorAddr: new PublicKey(obj.creatorAddr),
       fees: types.Fees.fromJSON(obj.fees),
       config: types.Config.fromJSON(obj.config),
       locked: obj.locked,
