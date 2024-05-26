@@ -7,7 +7,7 @@ import { MAX_MEME_TOKENS, MEMECHAN_QUOTE_MINT, MEME_TOKEN_DECIMALS } from "../co
 import { LivePoolClient } from "../live-pool/LivePoolClient";
 import { MemeTicketClient } from "../memeticket/MemeTicketClient";
 import { formatAmmKeysById } from "../raydium/formatAmmKeysById";
-import { MemeTicketFields, StakingPoolFields } from "../schema/codegen/accounts";
+import { MemeTicketFields, StakingPool, StakingPoolFields } from "../schema/codegen/accounts";
 import { getCreateAccountInstructions } from "../util/getCreateAccountInstruction";
 import { getSendAndConfirmTransactionMethod } from "../util/getSendAndConfirmTransactionMethod";
 import { retry } from "../util/retry";
@@ -16,12 +16,15 @@ import {
   GetAddFeesTransactionArgs,
   GetAvailableUnstakeAmountArgs,
   GetPreparedUnstakeTransactionsArgs,
+  GetPreparedWithdrawFeesTransactionsArgs,
   GetUnstakeTransactionArgs,
   GetWithdrawFeesTransactionArgs,
   UnstakeArgs,
   WithdrawFeesArgs,
+  getAvailableWithdrawFeesAmountArgs,
 } from "./types";
 import { getOptimizedTransactions } from "../memeticket/utils";
+import BN from "bn.js";
 
 export class StakingPoolClient {
   constructor(
@@ -381,6 +384,92 @@ export class StakingPoolClient {
     return { transaction: tx, memeAccountKeypair, quoteAccountKeypair };
   }
 
+  public async getPreparedWithdrawFeesTransactions({
+    ammPoolId,
+    ticketIds,
+    user,
+    transaction,
+  }: GetPreparedWithdrawFeesTransactionsArgs): Promise<{
+    transactions: Transaction[];
+    memeAccountKeypair: Keypair;
+    quoteAccountKeypair: Keypair;
+  }> {
+    const tx = transaction ?? new Transaction();
+
+    /**
+     * Adding add fees instructions.
+     * WARNING: `tx` mutation below.
+     */
+    await this.getAddFeesTransaction({ ammPoolId, payer: user, transaction: tx });
+
+    // Merge all the tickets into one before unstaking
+    const [destinationTicketId, ...sourceTicketIds] = ticketIds;
+    const destinationMemeTicket = new MemeTicketClient(destinationTicketId, this.client);
+
+    if (sourceTicketIds.length > 0) {
+      const sourceMemeTickets = sourceTicketIds.map((ticketId) => ({ id: ticketId }));
+
+      // WARNING: `tx` mutation below
+      await destinationMemeTicket.getStakingMergeTransaction({
+        staking: this.id,
+        ticketsToMerge: sourceMemeTickets,
+        user,
+        transaction: tx,
+      });
+
+      console.log("[getUnstakeTransactions] All the tickets are merged.");
+    } else {
+      console.log("[getUnstakeTransactions] Nothing to merge, only one ticket available.");
+    }
+
+    const stakingInfo = await this.fetch();
+
+    const memeAccountKeypair = Keypair.generate();
+    const memeAccountPublicKey = memeAccountKeypair.publicKey;
+    const createMemeAccountInstructions = await getCreateAccountInstructions(
+      this.client.connection,
+      user,
+      stakingInfo.memeMint,
+      user,
+      memeAccountKeypair,
+    );
+
+    tx.add(...createMemeAccountInstructions);
+
+    const quoteAccountKeypair = Keypair.generate();
+    const quoteAccountPublicKey = quoteAccountKeypair.publicKey;
+    const createWSolAccountInstructions = await getCreateAccountInstructions(
+      this.client.connection,
+      user,
+      MEMECHAN_QUOTE_MINT,
+      user,
+      quoteAccountKeypair,
+    );
+
+    tx.add(...createWSolAccountInstructions);
+
+    const withdrawFeesInstruction = await this.client.memechanProgram.methods
+      .withdrawFees()
+      .accounts({
+        memeTicket: destinationTicketId,
+        stakingSignerPda: this.findSignerPda(),
+        memeVault: stakingInfo.memeVault,
+        quoteVault: stakingInfo.quoteVault,
+        staking: this.id,
+        userMeme: memeAccountPublicKey,
+        userQuote: quoteAccountPublicKey,
+        signer: user,
+        tokenProgram: TOKEN_PROGRAM_ID,
+      })
+      .instruction();
+
+    tx.add(withdrawFeesInstruction);
+
+    const optimizedTransactions = getOptimizedTransactions(tx.instructions, user);
+
+    return { transactions: optimizedTransactions, memeAccountKeypair, quoteAccountKeypair };
+  }
+
   public async withdrawFees(
     args: WithdrawFeesArgs,
   ): Promise<{ memeAccountPublicKey: PublicKey; quoteAccountPublicKey: PublicKey }> {
@@ -403,25 +492,47 @@ export class StakingPoolClient {
     return { memeAccountPublicKey: memeAccountKeypair.publicKey, quoteAccountPublicKey: quoteAccountKeypair.publicKey };
   }
 
-  public async getAvailableWithdrawFeesAmount(
-    args: WithdrawFeesArgs,
-  ) /* : Promise<{ availableAmount: number; error?: TransactionError; logs?: string[] | null }>*/ {
-    const { memeAccountKeypair, transaction, quoteAccountKeypair } = await this.getWithdrawFeesTransaction({
-      ...args,
-      user: args.user.publicKey,
-    });
+  public async getAvailableWithdrawFeesAmount({
+    tickets,
+  }: getAvailableWithdrawFeesAmountArgs): Promise<{ memeFees: string; slerfFees: string }> {
+    const stakedAmount = tickets.reduce((staked, { vesting: { notional, released } }) => {
+      const notionalString = notional.toString();
+      const releasedString = released.toString();
+      const rest = new BigNumber(notionalString).minus(releasedString);
 
-    const result = await this.client.connection.simulateTransaction(
-      transaction,
-      [args.user, memeAccountKeypair, quoteAccountKeypair],
-      true,
-    );
+      return staked.plus(rest);
+    }, new BigNumber(0));
+    console.log("stakedAmount:", stakedAmount.toString());
 
-    if (result.value.err) {
-      return { availableAmount: 0, error: result.value.err, logs: result.value.logs };
+    const stakingPoolData = await StakingPool.fetch(this.client.connection, this.id);
+    console.log("stakingPoolData:", stakingPoolData);
+
+    if (!stakingPoolData) {
+      throw new Error(`[getAvailableWithdrawFeesAmount] Failed to fetch staking pool data for ${this.id.toString()}.`);
     }
 
-    return result;
+    const totalStaked = stakingPoolData.stakesTotal.toString();
+    console.log("totalStaked:", totalStaked);
+    const userStakePart = BigNumber(stakedAmount).div(totalStaked);
+    console.log("userStakePart:", userStakePart.toString());
+    const fullMemeFeesPart = BigNumber(stakingPoolData.feesXTotal.toString()).multipliedBy(userStakePart);
+    console.log("fullMemeFeesPart:", fullMemeFeesPart.toString());
+    const fullSlerfFeesPart = BigNumber(stakingPoolData.feesYTotal.toString()).multipliedBy(userStakePart);
+    console.log("fullSlerfFeesPart:", fullSlerfFeesPart.toString());
+
+    const { memeFees, slerfFees } = tickets.reduce(
+      ({ memeFees, slerfFees }, ticket) => {
+        const { withdrawsMeme, withdrawsQuote } = ticket;
+
+        memeFees = memeFees.minus(withdrawsMeme.toString());
+        slerfFees = slerfFees.minus(withdrawsQuote.toString());
+
+        return { memeFees, slerfFees };
+      },
+      { memeFees: fullMemeFeesPart, slerfFees: fullSlerfFeesPart },
+    );
+
+    return { memeFees: memeFees.toFixed(0), slerfFees: slerfFees.toFixed(0) };
   }
 
   public async getHoldersCount() {
