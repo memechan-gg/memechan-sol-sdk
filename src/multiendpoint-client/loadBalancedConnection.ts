@@ -29,14 +29,18 @@ export class LoadBalancedConnection extends Connection {
   private endpoints: string[];
   private currentIndex: number;
   private failingEndpoints: Map<string, number>;
+  private usageCount: Map<string, number>;
   private cooldownPeriod: number;
+  private maxUsageCount: number;
 
   constructor(endpoints: string[]) {
     super(endpoints[0]);
     this.endpoints = endpoints;
     this.currentIndex = 0;
     this.failingEndpoints = new Map();
+    this.usageCount = new Map();
     this.cooldownPeriod = 5 * 60 * 1000; // 5 mins
+    this.maxUsageCount = 10; // Max usage count before pushing to the end
     return new Proxy(this, {
       get: (target, prop, receiver) => {
         if (isConnectionMethod(prop)) {
@@ -55,11 +59,20 @@ export class LoadBalancedConnection extends Connection {
     for (let i = 0; i < this.endpoints.length; i++) {
       const endpoint = this.endpoints[this.currentIndex];
       this.currentIndex = (this.currentIndex + 1) % this.endpoints.length;
-      if (!this.failingEndpoints.has(endpoint) || now - this.failingEndpoints.get(endpoint)! > this.cooldownPeriod) {
+      const usageCount = this.usageCount.get(endpoint) || 0;
+      if (
+        (!this.failingEndpoints.has(endpoint) || now - this.failingEndpoints.get(endpoint)! > this.cooldownPeriod) &&
+        usageCount < this.maxUsageCount
+      ) {
+        this.usageCount.set(endpoint, usageCount + 1);
         return endpoint;
+      } else if (usageCount >= this.maxUsageCount) {
+        this.endpoints.push(this.endpoints.splice(this.currentIndex - 1, 1)[0]);
+        this.usageCount.set(endpoint, 0);
+        this.currentIndex--;
       }
     }
-    throw new Error("All endpoints are in cooldown period.");
+    throw new Error("All endpoints are in cooldown period or have reached max usage count.");
   }
 
   private async retryWithNextEndpoint<T extends ConnectionMethod>(
@@ -82,6 +95,12 @@ export class LoadBalancedConnection extends Connection {
         lastError = error;
         console.error(`Failed with endpoint ${endpoint}:`, error);
         this.failingEndpoints.set(endpoint, Date.now());
+
+        // Push failing endpoint to the end of the list
+        const index = this.endpoints.indexOf(endpoint);
+        if (index > -1) {
+          this.endpoints.push(this.endpoints.splice(index, 1)[0]);
+        }
       }
     }
     throw lastError;
