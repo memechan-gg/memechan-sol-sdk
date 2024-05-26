@@ -3,7 +3,7 @@ import { endpoints } from "./endpoints";
 import { PublicKey } from "@solana/web3.js";
 
 // Example
-//yarn tsx examples/load-balanced-connection/example.ts
+// yarn tsx examples/load-balanced-connection/example.ts
 (async () => {
   const publicKey = new PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA");
   const loadBalancedConnection = new LoadBalancedConnection(endpoints);
