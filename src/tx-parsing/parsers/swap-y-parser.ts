@@ -53,6 +53,7 @@ export async function parseSwapYInstruction(
     baseAmtReceived,
     poolQuoteVault,
     quoteAmtSwapped,
+    // eslint-disable-next-line max-len
     sender: tx.transaction.message.accountKeys[0].pubkey, // In the `Message` structure, the first account is always the fee-payer
     type: "swap_y",
   };

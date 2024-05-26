@@ -368,23 +368,6 @@ export class BoundPoolClient {
       functionName: "createTokenMethod",
     });
 
-    // const createPoolSignature = await sendAndConfirmTransaction(
-    //   client.connection,
-    //   createPoolTransaction,
-    //   [payer, memeMintKeypair, poolQuoteVaultId, launchVaultId],
-    //   {
-    //     commitment: "confirmed",
-    //     skipPreflight: true,
-    //   },
-    // );
-    // console.log("createPoolSignature:", createPoolSignature);
-
-    // const createTokenSignature = await sendAndConfirmTransaction(client.connection, createTokenTransaction, [payer], {
-    //   commitment: "confirmed",
-    //   skipPreflight: true,
-    // });
-    // console.log("createTokenSignature:", createTokenSignature);
-
     const id = this.findBoundPoolPda(memeMint, quoteToken.mint, memechanProgram.programId);
 
     return new BoundPoolClient(
