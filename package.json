@@ -15,7 +15,7 @@
     "node": "20"
   },
   "scripts": {
-    "test": "jest,
+    "test": "jest",
     "audit": "yarn audit --groups dependencies",
     "format": "prettier --write src/**/*.ts",
     "lint": "tsc --noEmit && eslint src/**/*.ts",
