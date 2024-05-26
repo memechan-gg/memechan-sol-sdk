@@ -1,14 +1,14 @@
-import { PublicKey } from "@solana/web3.js";
+import { PublicKey, sendAndConfirmTransaction } from "@solana/web3.js";
 import { StakingPool as CodegenStakingPool } from "../../src/schema/codegen/accounts";
 import { client, connection, payer } from "../common";
 import { BN } from "bn.js";
 import { MemeTicketClient, StakingPoolClient } from "../../src";
 
-// yarn tsx examples/staking-pool/unstake.ts > unstake.txt 2>&1
+// yarn tsx examples/staking-pool/unstake-tx.ts > unstake-tx.txt 2>&1
 export const unstake = async () => {
   try {
-    const boundPoolAddress = new PublicKey("B36EwUzBiZqLeKTwJrwPNbwfJaPRwfKcbCyHPLix3xF9");
-    const stakingPoolAddress = new PublicKey("EeckpiLcg6FZLkjSR31wf9Z8VZUhyWncB5x4Hks5A8ve");
+    const boundPoolAddress = new PublicKey("4FjqPg6rcp9W5nfNh5SiCaSv9mqbnn3h7AJ4y6TFPMnf");
+    const stakingPoolAddress = new PublicKey("EWuDJ1xifbipiDRm5mwgoGEwY4qFH6ApFT6PMet98Qfc");
 
     // Get staking pool
     const stakingPool = await StakingPoolClient.fromStakingPoolId({ client, poolAccountAddressId: stakingPoolAddress });
@@ -54,8 +54,23 @@ export const unstake = async () => {
       console.log("[unstake] Nothing to merge, only one ticket available.");
     }
 
+    console.log("[unstake] Unstaking...");
+
     // Unstake
-    await stakingPool.unstake({ amount: new BN(amount), user: payer, ticket: destinationMemeTicket });
+    const { transaction, memeAccountKeypair, quoteAccountKeypair } = await stakingPool.getUnstakeTransaction({
+      amount: new BN(amount),
+      user: payer.publicKey,
+      ticket: destinationMemeTicket,
+    });
+
+    console.log("payer: " + payer.publicKey.toBase58());
+    const signature = await sendAndConfirmTransaction(
+      client.connection,
+      transaction,
+      [payer, memeAccountKeypair, quoteAccountKeypair],
+      { commitment: "confirmed", skipPreflight: true },
+    );
+    console.log("unstake signature:", signature);
   } catch (e) {
     console.error("[unstake] Error:", e);
   }

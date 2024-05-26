@@ -6,7 +6,7 @@ import { client, payer } from "../common";
 export const getAvailableStakedLpByOwner = async () => {
   const poolAddress = new PublicKey("9Qy1JawWD9Ue7rWfCJUwcTDWqSSbS48e8MhqgGsprrcV");
 
-  const { availableAmount, tickets } = await MemeTicketClient.fetchAvailableTicketsByUser(
+  const { availableAmount, availableAmountWithDecimals, tickets } = await MemeTicketClient.fetchAvailableTicketsByUser(
     poolAddress,
     client,
     payer.publicKey,
@@ -14,6 +14,7 @@ export const getAvailableStakedLpByOwner = async () => {
 
   console.log("\ntickets:", tickets);
   console.log("\navailableAmount:", availableAmount);
+  console.log("\navailableAmountWithDecimals:", availableAmountWithDecimals);
 };
 
 getAvailableStakedLpByOwner();

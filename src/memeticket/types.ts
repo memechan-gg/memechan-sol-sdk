@@ -1,27 +1,31 @@
 import { Keypair, PublicKey, Transaction } from "@solana/web3.js";
 import { MemeTicketFields, MemeTicketJSON } from "../schema/codegen/accounts";
-import { MemeTicketClient } from "./MemeTicketClient";
 
-export interface BoundMerge {
+export type GetBoundMergeTransactionArgs = {
   pool: PublicKey;
-  user: Keypair;
-  ticketsToMerge: MemeTicketClient[];
-}
+  user: PublicKey;
+  ticketsToMerge: { id: PublicKey }[];
+  transaction?: Transaction;
+};
 
-export type GetBoundMergeTransactionArgs = BoundMerge & { transaction?: Transaction };
+export type BoundMerge = GetBoundMergeTransactionArgs & { signer: Keypair };
 
-export interface StakingMerge {
+export type GetStakingMergeTransactionArgs = {
   staking: PublicKey;
-  user: Keypair;
-  ticketsToMerge: MemeTicketClient[];
-}
+  user: PublicKey;
+  ticketsToMerge: { id: PublicKey }[];
+  transaction?: Transaction;
+};
 
-export type GetStakingMergeTransactionArgs = StakingMerge & { transaction?: Transaction };
+export type StakingMerge = GetStakingMergeTransactionArgs & { signer: Keypair };
 
-export interface CloseArgs {
-  user: Keypair;
-}
+export type GetCloseTransactionArgs = { user: PublicKey; transaction?: Transaction };
 
-export type GetCloseTransactionArgs = CloseArgs & { transaction?: Transaction };
+export type CloseArgs = GetCloseTransactionArgs & { signer: Keypair };
 
-export type ParsedMemeTicket = { id: PublicKey; fields: MemeTicketFields; jsonFields: MemeTicketJSON };
+export type ParsedMemeTicket = {
+  id: PublicKey;
+  fields: MemeTicketFields;
+  jsonFields: MemeTicketJSON;
+  amountWithDecimals: string;
+};

@@ -11,7 +11,7 @@ export type SwapXInstructionParsed = {
   type: "swap_x";
 };
 
-export async function ParseSwapXInstruction(
+export async function parseSwapXInstruction(
   tx: ParsedTransactionWithMeta,
   index: number,
   client: MemechanClient,
@@ -35,7 +35,7 @@ export async function ParseSwapXInstruction(
   const ticket = await client.memechanProgram.account.memeTicket.fetchNullable(ticketAddr);
 
   if (!ticket) {
-    throw new Error(`[ParseSwapXInstruction] No ticket found with ticket address ${ticketAddr}`);
+    throw new Error(`[parseSwapXInstruction] No ticket found with ticket address ${ticketAddr}`);
   }
 
   const poolPrevPos = Number(preBalances[0].uiTokenAmount.amount);

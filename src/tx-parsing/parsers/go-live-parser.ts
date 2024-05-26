@@ -5,7 +5,7 @@ export type GoLiveInstructionParsed = {
   type: "go_live";
 };
 
-export async function ParseGoLiveInstruction(tx: ParsedTransactionWithMeta, index: number) {
+export async function parseGoLiveInstruction(tx: ParsedTransactionWithMeta, index: number) {
   const ix = tx.transaction.message.instructions[index];
 
   if (!("accounts" in ix)) {

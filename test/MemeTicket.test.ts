@@ -65,7 +65,8 @@ describe("MemeTicketClient", () => {
     const mergedTicket = await tickets[0].boundMerge({
       pool: pool.id,
       ticketsToMerge: [tickets[1], tickets[2]],
-      user: payer,
+      user: payer.publicKey,
+      signer: payer,
     });
 
     console.log("mergedTicket: " + mergedTicket.id.toBase58());
@@ -148,7 +149,8 @@ describe("MemeTicketClient", () => {
     const mergedTicket = await tickets[0].stakingMerge({
       staking: stakingPool.id,
       ticketsToMerge: [tickets[1], tickets[2]],
-      user: payer,
+      user: payer.publicKey,
+      signer: payer,
     });
 
     console.log("mergedTicket: " + mergedTicket.id.toBase58());
@@ -189,7 +191,8 @@ describe("MemeTicketClient", () => {
     console.log("swapXTxResult: " + swapXTxResult);
 
     const closedTicket = await ticket.close({
-      user: payer,
+      user: payer.publicKey,
+      signer: payer,
     });
 
     console.log("closedTicket: " + closedTicket.id.toBase58());

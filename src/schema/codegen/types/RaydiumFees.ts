@@ -1,49 +1,49 @@
-import { PublicKey } from "@solana/web3.js" // eslint-disable-line @typescript-eslint/no-unused-vars
-import BN from "bn.js" // eslint-disable-line @typescript-eslint/no-unused-vars
-import * as types from "../types" // eslint-disable-line @typescript-eslint/no-unused-vars
-import * as borsh from "@project-serum/borsh"
+import { PublicKey } from "@solana/web3.js"; // eslint-disable-line @typescript-eslint/no-unused-vars
+import BN from "bn.js"; // eslint-disable-line @typescript-eslint/no-unused-vars
+import * as types from "../types"; // eslint-disable-line @typescript-eslint/no-unused-vars
+import * as borsh from "@project-serum/borsh";
 
 export interface RaydiumFeesFields {
-  minSeparateNumerator: BN
-  minSeparateDenominator: BN
-  tradeFeeNumerator: BN
-  tradeFeeDenominator: BN
-  pnlNumerator: BN
-  pnlDenominator: BN
-  swapFeeNumerator: BN
-  swapFeeDenominator: BN
+  minSeparateNumerator: BN;
+  minSeparateDenominator: BN;
+  tradeFeeNumerator: BN;
+  tradeFeeDenominator: BN;
+  pnlNumerator: BN;
+  pnlDenominator: BN;
+  swapFeeNumerator: BN;
+  swapFeeDenominator: BN;
 }
 
 export interface RaydiumFeesJSON {
-  minSeparateNumerator: string
-  minSeparateDenominator: string
-  tradeFeeNumerator: string
-  tradeFeeDenominator: string
-  pnlNumerator: string
-  pnlDenominator: string
-  swapFeeNumerator: string
-  swapFeeDenominator: string
+  minSeparateNumerator: string;
+  minSeparateDenominator: string;
+  tradeFeeNumerator: string;
+  tradeFeeDenominator: string;
+  pnlNumerator: string;
+  pnlDenominator: string;
+  swapFeeNumerator: string;
+  swapFeeDenominator: string;
 }
 
 export class RaydiumFees {
-  readonly minSeparateNumerator: BN
-  readonly minSeparateDenominator: BN
-  readonly tradeFeeNumerator: BN
-  readonly tradeFeeDenominator: BN
-  readonly pnlNumerator: BN
-  readonly pnlDenominator: BN
-  readonly swapFeeNumerator: BN
-  readonly swapFeeDenominator: BN
+  readonly minSeparateNumerator: BN;
+  readonly minSeparateDenominator: BN;
+  readonly tradeFeeNumerator: BN;
+  readonly tradeFeeDenominator: BN;
+  readonly pnlNumerator: BN;
+  readonly pnlDenominator: BN;
+  readonly swapFeeNumerator: BN;
+  readonly swapFeeDenominator: BN;
 
   constructor(fields: RaydiumFeesFields) {
-    this.minSeparateNumerator = fields.minSeparateNumerator
-    this.minSeparateDenominator = fields.minSeparateDenominator
-    this.tradeFeeNumerator = fields.tradeFeeNumerator
-    this.tradeFeeDenominator = fields.tradeFeeDenominator
-    this.pnlNumerator = fields.pnlNumerator
-    this.pnlDenominator = fields.pnlDenominator
-    this.swapFeeNumerator = fields.swapFeeNumerator
-    this.swapFeeDenominator = fields.swapFeeDenominator
+    this.minSeparateNumerator = fields.minSeparateNumerator;
+    this.minSeparateDenominator = fields.minSeparateDenominator;
+    this.tradeFeeNumerator = fields.tradeFeeNumerator;
+    this.tradeFeeDenominator = fields.tradeFeeDenominator;
+    this.pnlNumerator = fields.pnlNumerator;
+    this.pnlDenominator = fields.pnlDenominator;
+    this.swapFeeNumerator = fields.swapFeeNumerator;
+    this.swapFeeDenominator = fields.swapFeeDenominator;
   }
 
   static layout(property?: string) {
@@ -58,8 +58,8 @@ export class RaydiumFees {
         borsh.u64("swapFeeNumerator"),
         borsh.u64("swapFeeDenominator"),
       ],
-      property
-    )
+      property,
+    );
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -73,7 +73,7 @@ export class RaydiumFees {
       pnlDenominator: obj.pnlDenominator,
       swapFeeNumerator: obj.swapFeeNumerator,
       swapFeeDenominator: obj.swapFeeDenominator,
-    })
+    });
   }
 
   static toEncodable(fields: RaydiumFeesFields) {
@@ -86,7 +86,7 @@ export class RaydiumFees {
       pnlDenominator: fields.pnlDenominator,
       swapFeeNumerator: fields.swapFeeNumerator,
       swapFeeDenominator: fields.swapFeeDenominator,
-    }
+    };
   }
 
   toJSON(): RaydiumFeesJSON {
@@ -99,7 +99,7 @@ export class RaydiumFees {
       pnlDenominator: this.pnlDenominator.toString(),
       swapFeeNumerator: this.swapFeeNumerator.toString(),
       swapFeeDenominator: this.swapFeeDenominator.toString(),
-    }
+    };
   }
 
   static fromJSON(obj: RaydiumFeesJSON): RaydiumFees {
@@ -112,10 +112,10 @@ export class RaydiumFees {
       pnlDenominator: new BN(obj.pnlDenominator),
       swapFeeNumerator: new BN(obj.swapFeeNumerator),
       swapFeeDenominator: new BN(obj.swapFeeDenominator),
-    })
+    });
   }
 
   toEncodable() {
-    return RaydiumFees.toEncodable(this)
+    return RaydiumFees.toEncodable(this);
   }
 }

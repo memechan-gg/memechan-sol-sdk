@@ -1,29 +1,29 @@
-import { TransactionInstruction, PublicKey } from "@solana/web3.js" // eslint-disable-line @typescript-eslint/no-unused-vars
-import BN from "bn.js" // eslint-disable-line @typescript-eslint/no-unused-vars
-import * as borsh from "@project-serum/borsh" // eslint-disable-line @typescript-eslint/no-unused-vars
-import * as types from "../types" // eslint-disable-line @typescript-eslint/no-unused-vars
-import { PROGRAM_ID } from "../programId"
+import { TransactionInstruction, PublicKey } from "@solana/web3.js"; // eslint-disable-line @typescript-eslint/no-unused-vars
+import BN from "bn.js"; // eslint-disable-line @typescript-eslint/no-unused-vars
+import * as borsh from "@project-serum/borsh"; // eslint-disable-line @typescript-eslint/no-unused-vars
+import * as types from "../types"; // eslint-disable-line @typescript-eslint/no-unused-vars
+import { PROGRAM_ID } from "../programId";
 
 export interface InitStakingPoolAccounts {
-  signer: PublicKey
-  pool: PublicKey
-  boundPoolSignerPda: PublicKey
-  poolMemeVault: PublicKey
-  poolQuoteVault: PublicKey
-  adminVaultQuote: PublicKey
-  memeMint: PublicKey
-  quoteMint: PublicKey
-  staking: PublicKey
-  stakingPoolSignerPda: PublicKey
-  stakingMemeVault: PublicKey
-  stakingQuoteVault: PublicKey
-  memeTicket: PublicKey
-  rent: PublicKey
-  clock: PublicKey
-  ataProgram: PublicKey
-  marketProgramId: PublicKey
-  tokenProgram: PublicKey
-  systemProgram: PublicKey
+  signer: PublicKey;
+  pool: PublicKey;
+  boundPoolSignerPda: PublicKey;
+  poolMemeVault: PublicKey;
+  poolQuoteVault: PublicKey;
+  adminVaultQuote: PublicKey;
+  memeMint: PublicKey;
+  quoteMint: PublicKey;
+  staking: PublicKey;
+  stakingPoolSignerPda: PublicKey;
+  stakingMemeVault: PublicKey;
+  stakingQuoteVault: PublicKey;
+  memeTicket: PublicKey;
+  rent: PublicKey;
+  clock: PublicKey;
+  ataProgram: PublicKey;
+  marketProgramId: PublicKey;
+  tokenProgram: PublicKey;
+  systemProgram: PublicKey;
 }
 
 export function initStakingPool(accounts: InitStakingPoolAccounts) {
@@ -51,9 +51,9 @@ export function initStakingPool(accounts: InitStakingPoolAccounts) {
     { pubkey: accounts.marketProgramId, isSigner: false, isWritable: false },
     { pubkey: accounts.tokenProgram, isSigner: false, isWritable: false },
     { pubkey: accounts.systemProgram, isSigner: false, isWritable: false },
-  ]
-  const identifier = Buffer.from([104, 193, 216, 189, 77, 85, 90, 51])
-  const data = identifier
-  const ix = new TransactionInstruction({ keys, programId: PROGRAM_ID, data })
-  return ix
+  ];
+  const identifier = Buffer.from([104, 193, 216, 189, 77, 85, 90, 51]);
+  const data = identifier;
+  const ix = new TransactionInstruction({ keys, programId: PROGRAM_ID, data });
+  return ix;
 }
