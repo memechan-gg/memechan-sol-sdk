@@ -24,7 +24,7 @@ export const MEMECHAN_PROGRAM_ID = "kKRWbmqpGqPzkAb9aLmhCFcJsr3oBkqCcZYK21dWYRz"
 export const RAYDIUM_PROTOCOL_FEE = 1_000_000_000; // 1 SOL on Devnet. TODO on Mainnet, it's only 0.4 SOL
 export const TRANSFER_FEE = 60_000_000;
 export const COMPUTE_UNIT_PRICE = 100_000; // priority fee
-export const FEE_DESTINATION_ID = "3XMrhbv989VxAMi3DErLV9eJht1pHppW5LbKxe9fkEFR"
+export const FEE_DESTINATION_ID = "3XMrhbv989VxAMi3DErLV9eJht1pHppW5LbKxe9fkEFR";
 
 export const SLERF_MINT = new PublicKey("7BgBvyjrZX1YKz4oh9mjb8ZScatkkwb8DzFx7LoiVkM3");
 
