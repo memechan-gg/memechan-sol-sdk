@@ -23,6 +23,11 @@ export const requestPriceSchema = z.object({
   type: z.literal("seedPool"),
 });
 
+export const updatePriceSchema = z.object({
+  address: z.string(),
+  type: z.literal("seedPool"),
+});
+
 export const ohlvcSchema = z.object({
   time: z.number(),
   open: z.string(),
@@ -50,4 +55,5 @@ export type PriceSnapshot = z.infer<typeof priceSnapshot>;
 export type ChartsResolution = z.infer<typeof chartsResolutions>;
 export type Symbols = z.infer<typeof symbols>;
 export type RequestPrice = z.infer<typeof requestPriceSchema>;
+export type RequestUpdatePrice = z.infer<typeof updatePriceSchema>;
 export type PriceResponse = { price: string };

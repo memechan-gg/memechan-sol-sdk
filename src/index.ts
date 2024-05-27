@@ -22,6 +22,7 @@ export * from "./api/PoolApi";
 export * from "./api/TokenAPI";
 export * from "./api/social/SocialAPI";
 export * from "./api/social/schemas";
+export * from "./api/ChartApi";
 
 // API schemas
 export * from "./api/schemas/pools-schema";
