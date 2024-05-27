@@ -2,8 +2,7 @@ import { BN } from "@coral-xyz/anchor";
 import { BoundPoolClient } from "../src/bound-pool/BoundPoolClient";
 import { sleep } from "../src/common/helpers";
 import { DUMMY_TOKEN_METADATA, admin, client, payer } from "./common/common";
-import { FEE_DESTINATION_ID } from "./common/env";
-import { MEMECHAN_QUOTE_TOKEN } from "../src/config/config";
+import { FEE_DESTINATION_ID, MEMECHAN_QUOTE_TOKEN } from "../src/config/config";
 import { MemeTicketClient } from "../src/memeticket/MemeTicketClient";
 
 describe("BoundPool", () => {
