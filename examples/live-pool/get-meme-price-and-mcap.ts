@@ -4,7 +4,7 @@ import { connection } from "../common";
 
 // yarn tsx examples/live-pool/get-meme-price-and-mcap.ts > log.txt 2>&1
 export const getMemePriceAndMarketCap = async () => {
-  const poolAddress = "BY6xstuufxC7sii4iqYXToSzYrT8wBcLkrwrVatHXkQs";
+  const poolAddress = "GvRAuPrbff7Pa95DqNMKnuGybMjt43nBJE4gMSKqtiiT";
   const memePrice = await LivePoolClient.getMemePrice({ poolAddress, connection, quotePriceInUsd: 0.31 });
   console.log("memePrice:", memePrice);
 
