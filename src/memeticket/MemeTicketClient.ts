@@ -25,11 +25,11 @@ export class MemeTicketClient {
   }
 
   public async fetch(program = this.client.memechanProgram) {
-    return program.account.memeTicket.fetch(this.id);
+    return await program.account.memeTicket.fetch(this.id);
   }
 
   public static async all(program: Program<MemechanSol>) {
-    return program.account.memeTicket.all();
+    return await program.account.memeTicket.all();
   }
 
   public async getBoundMergeTransaction({
