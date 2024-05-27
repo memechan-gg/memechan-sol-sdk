@@ -1,6 +1,6 @@
 import { BE_URL } from "../config/config";
 import { jsonFetch } from "../util/fetch";
-import { SolanaLivePool, SolanaSeedPool } from "./schemas/pools-schema";
+import { SolanaLivePool, SolanaSeedPool, SolanaStakingPoolData } from "./schemas/pools-schema";
 import { QueryAllLivePoolsResponse, QueryAllSeedPoolsResponse, QueryAllStakingPoolsResponse } from "./types";
 
 /**
@@ -50,10 +50,10 @@ export class PoolAPI {
   /**
    * Retrieves staking pool by coin type.
    * @param {string} tokenAddress - The type of coin for filtering seed pools.
-   * @return {Promise<QueryAllStakingPoolsResponse>} A Promise that resolves with the
+   * @return {Promise<SolanaStakingPoolData>} A Promise that resolves with the
    * live pool matching the specified coin type.
    */
-  getStakingPoolByCoinType(tokenAddress: string): Promise<QueryAllStakingPoolsResponse> {
+  getStakingPoolByCoinType(tokenAddress: string): Promise<SolanaStakingPoolData> {
     return jsonFetch(`${this.url}/sol/staking-pools?tokenAddress=${tokenAddress}`, {
       method: "GET",
     });
