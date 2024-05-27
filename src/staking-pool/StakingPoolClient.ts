@@ -46,8 +46,6 @@ export class StakingPoolClient {
   }) {
     const stakingPoolObjectData = await client.memechanProgram.account.stakingPool.fetch(poolAccountAddressId);
 
-    console.log("stakingPoolObjectData:", stakingPoolObjectData);
-
     const boundClientInstance = new StakingPoolClient(
       poolAccountAddressId,
       client,
