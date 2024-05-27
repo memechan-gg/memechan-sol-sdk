@@ -20,7 +20,7 @@ export class ChartApi {
   }
   updatePrice(params: RequestUpdatePrice): Promise<PriceResponse> {
     return jsonFetch(`${this.url}/input/chart/swap`, {
-      method: "GET",
+      method: "PUT",
       body: {
         ...params,
       },
