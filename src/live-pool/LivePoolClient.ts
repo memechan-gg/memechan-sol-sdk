@@ -220,7 +220,7 @@ export class LivePoolClient {
       slippage: slippage,
     });
 
-    const memePriceInQuote = new BigNumber(10).div(amountOut.toExact()).toString();
+    const memePriceInQuote = new BigNumber(quoteAmountIn.toExact()).div(amountOut.toExact()).toString();
     const memePriceInUsd = new BigNumber(memePriceInQuote).multipliedBy(quotePriceInUsd).toString();
 
     return { priceInQuote: memePriceInQuote, priceInUsd: memePriceInUsd };
