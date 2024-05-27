@@ -441,7 +441,9 @@ export class BoundPoolClient {
     return pools;
   }
 
-  public static async allLocked(program: Program<MemechanSol>) {
+  public static async allLocked(
+    program: Program<MemechanSol>,
+  ): Promise<{ account: BoundPoolFields; publicKey: PublicKey }[]> {
     const filters: GetProgramAccountsFilter[] = [
       {
         memcmp: {
