@@ -22,7 +22,7 @@ export async function retry<T>({ fn, retries = 3, delay = 1000, functionName }: 
     try {
       return await fn();
     } catch (error) {
-      console.warn(`Retry attempt ${i + 1} for function ${functionName}`);
+      console.warn(`Retry attempt ${i + 1} for function ${functionName}. Error: ${error}`);
       if (i === retries - 1) {
         console.warn(`All retries failed for function ${functionName}`);
         throw error;
