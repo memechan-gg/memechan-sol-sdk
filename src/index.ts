@@ -55,3 +55,10 @@ export * from "./util/index";
 export * from "./memeticket/utils";
 // Metadata
 export * from "./token/createMetadata";
+
+// Token Utils (validation)
+export * from "./token/validation/CreateCoinTransactionParams";
+export * from "./token/validation/consts";
+export * from "./token/validation/invalidParamErrors";
+export * from "./token/validation/validateCreateCoinParams";
+export * from "./token/validation/validation";
