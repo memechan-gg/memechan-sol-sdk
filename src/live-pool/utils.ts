@@ -20,7 +20,7 @@
  * getNumeratorAndDenominator(1.4);
  *
  * @example
- * // Returns { numerator: 28, denominator: 1 }
+ * // Returns { numerator: 28, denominator: 100 }
  * getNumeratorAndDenominator(28);
  *
  * @example
@@ -44,7 +44,7 @@ export function getNumeratorAndDenominator(num: number): { numerator: number; de
 
     return { numerator, denominator };
   } else {
-    // If there's no fractional part, the denominator is 1
-    return { numerator: num, denominator: 1 };
+    // If there's no fractional part, the denominator is 100
+    return { numerator: num, denominator: 100 };
   }
 }
