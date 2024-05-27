@@ -495,6 +495,9 @@ export class BoundPoolClient {
         )
       ).address;
 
+    console.log("solIn: ", solIn);
+    console.log("memeOut: ", memeOut);
+
     await this.client.memechanProgram.methods
       .swapY(new BN(solIn), new BN(memeOut))
       .accounts({
@@ -508,8 +511,7 @@ export class BoundPoolClient {
         tokenProgram: TOKEN_PROGRAM_ID,
       })
       .signers([user, id])
-      .rpc({ skipPreflight: true, commitment: "confirmed" })
-      .catch((e) => console.error(e));
+      .rpc({ skipPreflight: true, commitment: "confirmed" });
 
     return new MemeTicketClient(id.publicKey, this.client);
   }
@@ -1080,7 +1082,7 @@ export class BoundPoolClient {
   }
 
   public async goLive(args: GoLiveArgs): Promise<[StakingPoolClient, LivePoolClient]> {
-    return await retry({ fn: () => this.goLiveInternal(args), functionName: "goLive", retries: 10 });
+    return await retry({ fn: () => this.goLiveInternal(args), functionName: "goLive", retries: 3 });
   }
 
   private async goLiveInternal(args: GoLiveArgs): Promise<[StakingPoolClient, LivePoolClient]> {
