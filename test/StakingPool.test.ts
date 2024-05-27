@@ -1,10 +1,9 @@
 import BN from "bn.js";
 import { BoundPoolClient } from "../src/bound-pool/BoundPoolClient";
 import { sleep } from "../src/common/helpers";
-import { MEMECHAN_MEME_TOKEN_DECIMALS, MEMECHAN_QUOTE_TOKEN } from "../src/config/config";
+import { FEE_DESTINATION_ID, MEMECHAN_MEME_TOKEN_DECIMALS, MEMECHAN_QUOTE_TOKEN } from "../src/config/config";
 import { StakingPoolClient } from "../src/staking-pool/StakingPoolClient";
 import { DUMMY_TOKEN_METADATA, admin, client, payer } from "./common/common";
-import { FEE_DESTINATION_ID } from "./common/env";
 import { MemeTicketClient } from "../src/memeticket/MemeTicketClient";
 import { swapOnlyAmm } from "../src/raydium/swapOnlyAmm";
 import { Percent, TokenAmount, Token } from "@raydium-io/raydium-sdk";
