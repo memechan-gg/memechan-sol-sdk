@@ -9,7 +9,6 @@ import {
 import { Connection, PublicKey } from "@solana/web3.js";
 
 export async function formatAmmKeysById(id: string, connection: Connection): Promise<ApiPoolInfoV4> {
-  console.log("formatAmmKeysById id: " + id);
   const account = await connection.getAccountInfo(new PublicKey(id), { commitment: "confirmed" });
 
   if (account === null) throw Error(" get id info error ");
