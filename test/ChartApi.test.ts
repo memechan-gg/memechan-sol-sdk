@@ -35,7 +35,6 @@ describe("Charts API", () => {
       "GET PRICE",
       await api.updatePrice({
         address: "78nBXvVnHeKvFu4oWdcZwcWgtuXEzcmv8scrweiNjALd",
-        symbol: "SLERF",
         type: "seedPool",
       }),
     );
@@ -74,7 +73,6 @@ describe("Charts API", () => {
       "GET PRICE",
       await api.updatePrice({
         address: "5gTdveThDJG93wQp2oiTSMoDLR87mMvAGRzEkQ3S8Aa1",
-        symbol: "SLERF",
         type: "seedPool",
       }),
     );
