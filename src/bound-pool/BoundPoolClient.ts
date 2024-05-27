@@ -11,6 +11,7 @@ import {
 import {
   ComputeBudgetProgram,
   Connection,
+  GetProgramAccountsFilter,
   Keypair,
   PublicKey,
   SYSVAR_CLOCK_PUBKEY,
@@ -85,6 +86,7 @@ import { extractSwapDataFromSimulation } from "../util/trading/extractSwapDataFr
 import { getOptimizedTransactions } from "../memeticket/utils";
 import { ParsedMemeTicket } from "../memeticket/types";
 import { normalizeInputCoinAmount } from "../util/trading/normalizeInputCoinAmount";
+import base58 from "bs58";
 
 export class BoundPoolClient {
   private constructor(
@@ -436,6 +438,19 @@ export class BoundPoolClient {
     const rawPools = await program.account.boundPool.all();
     const pools = rawPools.map((el) => el);
 
+    return pools;
+  }
+
+  public static async allLocked(program: Program<MemechanSol>) {
+    const filters: GetProgramAccountsFilter[] = [
+      {
+        memcmp: {
+          bytes: base58.encode(Buffer.from([0x1])),
+          offset: 352,
+        },
+      },
+    ];
+    const pools = await program.account.boundPool.all(filters);
     return pools;
   }
 
