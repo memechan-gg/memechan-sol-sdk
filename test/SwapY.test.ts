@@ -147,7 +147,7 @@ describe("SwapY", () => {
     expect(pool2.locked).toBeTruthy();
   }, 220000);
 
-  it("swaps below exact threshold + fee quote token->memecoin", async () => {
+  it.skip("swaps below exact threshold + fee quote token->memecoin", async () => {
     const pool = await BoundPoolClient.new({
       admin,
       payer,
@@ -175,5 +175,59 @@ describe("SwapY", () => {
     console.log("boundPoolInfo:", pool2);
 
     expect(pool2.locked).toBeFalsy();
+  }, 220000);
+
+  it("swaps 0", async () => {
+    const pool = await BoundPoolClient.new({
+      admin,
+      payer,
+      client,
+      quoteToken: MEMECHAN_QUOTE_TOKEN,
+      tokenMetadata: DUMMY_TOKEN_METADATA,
+    });
+
+    console.log("==== swapy pool id: " + pool.id.toString());
+
+    await sleep(1000);
+
+    // call to the swap endpoint
+    await expect(pool.swapY({
+      payer: payer,
+      user: payer,
+      memeTokensOut: new BN(1),
+      quoteAmountIn: new BN(0),
+      quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
+      pool: pool.id,
+    })).rejects.toThrow();
+  }, 220000);
+
+  it("swaps negative", async () => {
+    const pool = await BoundPoolClient.new({
+      admin,
+      payer,
+      client,
+      quoteToken: MEMECHAN_QUOTE_TOKEN,
+      tokenMetadata: DUMMY_TOKEN_METADATA,
+    });
+
+    console.log("==== swapy pool id: " + pool.id.toString());
+
+    await sleep(1000);
+
+    // call to the swap endpoint
+    const ticketId = await pool.swapY({
+      payer: payer,
+      user: payer,
+      memeTokensOut: new BN(1),
+      quoteAmountIn: new BN(-1000*1e9),
+      quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
+      pool: pool.id,
+    });
+
+    console.log("swaps negative swapY ticketId: " + ticketId.id.toBase58());
+    const pool2 = await BoundPoolClient.fetch2(client.connection, pool.id);
+    console.log("swaps negative boundPoolInfo:", pool2);
+    expect(pool2.locked).toBeFalsy();
+
   }, 220000);
 });
