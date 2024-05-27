@@ -50,4 +50,5 @@ export type PriceSnapshot = z.infer<typeof priceSnapshot>;
 export type ChartsResolution = z.infer<typeof chartsResolutions>;
 export type Symbols = z.infer<typeof symbols>;
 export type RequestPrice = z.infer<typeof requestPriceSchema>;
+export type RequestUpdatePrice = z.infer<typeof requestPriceSchema>;
 export type PriceResponse = { price: string };
