@@ -237,15 +237,10 @@ export class StakingPoolClient {
     tickets,
     stakingPoolVestingConfig,
   }: GetAvailableUnstakeAmountArgs): Promise<string> {
-    const { cliffTs, endTs, startTs } = stakingPoolVestingConfig;
+    const { cliffTs, endTs } = stakingPoolVestingConfig;
     const currentTimeInMs = Date.now();
-    const startTsInMs = new BigNumber(startTs.toString()).multipliedBy(1_000);
     const cliffTsInMs = new BigNumber(cliffTs.toString()).multipliedBy(1_000);
     const endTsInMs = new BigNumber(endTs.toString()).multipliedBy(1_000);
-    console.log("currentTimeInMs:", currentTimeInMs.toString());
-    console.log("startTsInMs:", startTsInMs.toString());
-    console.log("cliffTsInMs:", cliffTsInMs.toString());
-    console.log("endTsInMs:", endTsInMs.toString());
 
     // If linear unlock didn't start yet, return 0
     if (cliffTsInMs.gt(currentTimeInMs)) {
@@ -259,26 +254,19 @@ export class StakingPoolClient {
 
       return staked.plus(rest);
     }, new BigNumber(0));
-    console.log("stakedAmount:", stakedAmount.toString());
 
     const unlockDurationInMs = endTsInMs.minus(cliffTsInMs);
-    console.log("unlockDurationInMs:", unlockDurationInMs.toString());
     const unlockProgressInMs = new BigNumber(currentTimeInMs).minus(cliffTsInMs);
-    console.log("unlockProgressInMs:", unlockProgressInMs.toString());
     const unlockProgressInAbsolutePercent = new BigNumber(unlockProgressInMs).div(unlockDurationInMs).toNumber();
-    console.log("unlockProgressInAbsolutePercent:", unlockProgressInAbsolutePercent);
 
     // Extra safety net in case unlock progress is less than zero
     const unlockProgressWithLowerBound = Math.max(unlockProgressInAbsolutePercent, 0);
-    console.log("unlockProgressWithLowerBound:", unlockProgressWithLowerBound);
 
     // Calculated unlock progress can be greater than 1, when it is already over
     const unlockProgressWithUpperBound = Math.min(unlockProgressWithLowerBound, 1);
-    console.log("unlockProgressWithUpperBound:", unlockProgressWithUpperBound);
 
     // Unstake amount must be bignumerish, so `toFixed(0)`
     const availableUnstakeAmount = stakedAmount.multipliedBy(unlockProgressWithUpperBound).toFixed(0);
-    console.log("availableUnstakeAmount:", availableUnstakeAmount.toString());
 
     return availableUnstakeAmount;
   }
@@ -404,23 +392,17 @@ export class StakingPoolClient {
 
       return staked.plus(rest);
     }, new BigNumber(0));
-    console.log("stakedAmount:", stakedAmount.toString());
 
     const stakingPoolData = await StakingPool.fetch(this.client.connection, this.id);
-    console.log("stakingPoolData:", stakingPoolData);
 
     if (!stakingPoolData) {
       throw new Error(`[getAvailableWithdrawFeesAmount] Failed to fetch staking pool data for ${this.id.toString()}.`);
     }
 
     const totalStaked = stakingPoolData.stakesTotal.toString();
-    console.log("totalStaked:", totalStaked);
     const userStakePart = new BigNumber(stakedAmount).div(totalStaked);
-    console.log("userStakePart:", userStakePart.toString());
     const fullMemeFeesPart = new BigNumber(stakingPoolData.feesXTotal.toString()).multipliedBy(userStakePart);
-    console.log("fullMemeFeesPart:", fullMemeFeesPart.toString());
     const fullSlerfFeesPart = new BigNumber(stakingPoolData.feesYTotal.toString()).multipliedBy(userStakePart);
-    console.log("fullSlerfFeesPart:", fullSlerfFeesPart.toString());
 
     const { memeFees, slerfFees } = tickets.reduce(
       ({ memeFees, slerfFees }, ticket) => {
