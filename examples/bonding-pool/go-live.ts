@@ -1,8 +1,7 @@
 import { BN } from "bn.js";
 import { BoundPoolClient } from "../../src/bound-pool/BoundPoolClient";
-import { MEMECHAN_QUOTE_TOKEN } from "../../src/config/config";
+import { FEE_DESTINATION_ID, MEMECHAN_QUOTE_TOKEN } from "../../src/config/config";
 import { DUMMY_TOKEN_METADATA, admin, client, payer } from "../common";
-import { FEE_DESTINATION_ID } from "../env";
 
 // yarn tsx examples/bonding-pool/go-live.ts > go-live.txt 2>&1
 export const goLive = async () => {

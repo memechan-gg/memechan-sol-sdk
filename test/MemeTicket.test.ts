@@ -1,11 +1,10 @@
 import BN from "bn.js";
 import { BoundPoolClient } from "../src/bound-pool/BoundPoolClient";
 import { sleep } from "../src/common/helpers";
-import { MEMECHAN_QUOTE_TOKEN } from "../src/config/config";
+import { FEE_DESTINATION_ID, MEMECHAN_QUOTE_TOKEN } from "../src/config/config";
 import { MemeTicketClient } from "../src/memeticket/MemeTicketClient";
 import { MintUtils } from "../src/token/mintUtils";
 import { DUMMY_TOKEN_METADATA, LIVE_BOUND_POOL_ID, admin, client, payer } from "./common/common";
-import { FEE_DESTINATION_ID } from "./common/env";
 
 describe("MemeTicketClient", () => {
   it.skip("all", async () => {
