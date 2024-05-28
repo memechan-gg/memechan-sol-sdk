@@ -389,19 +389,6 @@ export class BoundPoolClient {
   /**
    * Fetches the bound pool account information.
    *
-   * @deprecated Please use `fetch2` method
-   * @param {Object} [program=this.client.memechanProgram] - The program to use for fetching the account.
-   * @param {string} [accountId=this.id] - The ID of the account to fetch.
-   * @returns {Promise<T>} - The account information.
-   */
-  async fetch(program = this.client.memechanProgram, accountId = this.id) {
-    const accountInfo = await program.account.boundPool.fetch(accountId, "confirmed");
-    return accountInfo;
-  }
-
-  /**
-   * Fetches the bound pool account information.
-   *
    * @param {Connection} connection - The Solana RPC connection.
    * @param {PublicKey} accountId - The ID of the account to fetch.
    * @returns {Promise<T>} - The account information.
@@ -414,24 +401,6 @@ export class BoundPoolClient {
     }
 
     return accountInfo;
-  }
-
-  /**
-   * Fetches the account information with retry logic.
-   *
-   * @param {Object} [program=this.client.memechanProgram] - The program to use for fetching the account.
-   * @param {string} [accountId=this.id] - The ID of the account to fetch.
-   * @param {number} [retries=3] - The number of retry attempts.
-   * @param {number} [delay=1000] - The delay between retry attempts in milliseconds.
-   * @returns {Promise<T>} - The account information.
-   */
-  async fetchWithRetry(program = this.client.memechanProgram, accountId = this.id, retries = 3, delay = 1000) {
-    return retry({
-      fn: () => this.fetch(program, accountId),
-      retries,
-      delay,
-      functionName: "fetch",
-    });
   }
 
   public static async all(
