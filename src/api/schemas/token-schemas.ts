@@ -20,7 +20,7 @@ export const solanaSocialLinks = z.object({
 });
 
 export const createSolanaTokenRequestBodySchema = z.object({
-  txDigest: z.string(),
+  txDigests: z.array(z.string()),
   socialLinks: solanaSocialLinks,
 });
 
@@ -67,12 +67,12 @@ export const solanaTokenRecordSchema = solanaTokenSchema.extend({
 });
 
 export const createCoinRequestBodySchema = z.object({
-  txDigest: z.string(),
+  txDigests: z.array(z.string()),
   socialLinks: solanaSocialLinks.nullish(),
 });
 
 export const createTokenRequestBodySchema = z.object({
-  txDigest: z.string(),
+  txDigests: z.array(z.string()),
   socialLinks: solanaSocialLinks.nullish(),
 });
 
