@@ -24,6 +24,7 @@ import {
   getAvailableWithdrawFeesAmountArgs,
 } from "./types";
 import { ensureAssociatedTokenAccountWithIX } from "../util/ensureAssociatedTokenAccountWithIX";
+import BN from "bn.js";
 
 export class StakingPoolClient {
   constructor(
@@ -231,13 +232,11 @@ export class StakingPoolClient {
       return "0";
     }
 
-    const stakedAmount = tickets.reduce((staked, { vesting: { notional, released } }) => {
-      const notionalString = notional.toString();
-      const releasedString = released.toString();
-      const rest = new BigNumber(notionalString).minus(releasedString);
+    const notionalTotalBN = tickets.reduce((acc: BN, curr) => acc.add(curr.vesting.notional), new BN(0));
+    const releasedTotalBN = tickets.reduce((acc: BN, curr) => acc.add(curr.vesting.released), new BN(0));
 
-      return staked.plus(rest);
-    }, new BigNumber(0));
+    const notionalTotal = new BigNumber(notionalTotalBN.toString());
+    const releasedTotal = new BigNumber(releasedTotalBN.toString());
 
     const unlockDurationInMs = endTsInMs.minus(cliffTsInMs);
     const unlockProgressInMs = new BigNumber(currentTimeInMs).minus(cliffTsInMs);
@@ -250,7 +249,10 @@ export class StakingPoolClient {
     const unlockProgressWithUpperBound = Math.min(unlockProgressWithLowerBound, 1);
 
     // Unstake amount must be bignumerish, so `toFixed(0)`
-    const availableUnstakeAmount = stakedAmount.multipliedBy(unlockProgressWithUpperBound).toFixed(0);
+    const availableUnstakeAmount = notionalTotal
+      .multipliedBy(unlockProgressWithUpperBound)
+      .minus(releasedTotal)
+      .toFixed(0);
 
     return availableUnstakeAmount;
   }
