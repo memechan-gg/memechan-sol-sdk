@@ -11,6 +11,7 @@ export const connection = new Connection(RPC_API_CLUSTER, {
   httpAgent: IS_TEST_ENV ? false : undefined,
   commitment: "confirmed",
   wsEndpoint: WSS_API_CLUSTER,
+  confirmTransactionInitialTimeout: 90000,
 });
 
 export const client = new MemechanClient({
