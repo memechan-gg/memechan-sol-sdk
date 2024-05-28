@@ -31,6 +31,7 @@ export const createNewTokenAndPoolTx = async () => {
       {
         commitment: "confirmed",
         skipPreflight: true,
+        preflightCommitment: "confirmed",
       },
     );
     console.log("createPoolSignature:", createPoolSignature);
@@ -38,6 +39,7 @@ export const createNewTokenAndPoolTx = async () => {
     const createTokenSignature = await sendAndConfirmTransaction(client.connection, createTokenTransaction, [payer], {
       commitment: "confirmed",
       skipPreflight: true,
+      preflightCommitment: "confirmed",
     });
     console.log("createTokenSignature:", createTokenSignature);
 

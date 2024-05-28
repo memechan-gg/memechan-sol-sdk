@@ -68,7 +68,7 @@ export const unstake = async () => {
       client.connection,
       transaction,
       [payer, memeAccountKeypair, quoteAccountKeypair],
-      { commitment: "confirmed", skipPreflight: true },
+      { commitment: "confirmed", skipPreflight: true, preflightCommitment: "confirmed" },
     );
     console.log("unstake signature:", signature);
   } catch (e) {

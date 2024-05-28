@@ -87,7 +87,7 @@ export class TargetConfigClient {
         targetConfig: this.id,
       })
       .signers([payer])
-      .rpc({ commitment: "confirmed" });
+      .rpc({ commitment: "confirmed", skipPreflight: true, preflightCommitment: "confirmed" });
 
     console.log("changeTargetConfig result", result);
     return result;
