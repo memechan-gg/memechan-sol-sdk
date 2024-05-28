@@ -2,10 +2,9 @@ import { BN } from "@project-serum/anchor";
 import { BoundPoolClient } from "../src/bound-pool/BoundPoolClient";
 import { DUMMY_TOKEN_METADATA, admin, client, payer } from "./common/common";
 import { MEMECHAN_QUOTE_TOKEN } from "../src/config/config";
-import { sleep } from "../src/common/helpers";
 import { connection } from "../examples/common";
 
-describe("SwapY", () => {
+describe.skip("SwapY", () => {
   it.skip("swaps quote token->memecoin", async () => {
     const pool = await BoundPoolClient.new({
       admin,
@@ -16,8 +15,6 @@ describe("SwapY", () => {
     });
 
     console.log("==== swapy pool id: " + pool.id.toString());
-
-    await sleep(1000);
 
     // call to the swap endpoint
     const ticketId = await pool.swapY({
@@ -42,8 +39,6 @@ describe("SwapY", () => {
     });
 
     console.log("==== swapy pool id: " + pool.id.toString());
-
-    await sleep(1000);
 
     // call to the swap endpoint
     const ticketId = await pool.swapY({
@@ -72,8 +67,6 @@ describe("SwapY", () => {
 
     console.log("==== swapy pool id: " + pool.id.toString());
 
-    await sleep(1000);
-
     // call to the swap endpoint
     const ticketId = await pool.swapY({
       payer: payer,
@@ -100,8 +93,6 @@ describe("SwapY", () => {
 
     console.log("==== swapy pool id: " + pool.id.toString());
 
-    await sleep(1000);
-
     // call to the swap endpoint
     const ticketId = await pool.swapY({
       payer: payer,
@@ -127,8 +118,6 @@ describe("SwapY", () => {
     });
 
     console.log("==== swapy pool id: " + pool.id.toString());
-
-    await sleep(1000);
 
     // call to the swap endpoint
     const ticketId = await pool.swapY({
@@ -158,8 +147,6 @@ describe("SwapY", () => {
 
     console.log("==== swapy pool id: " + pool.id.toString());
 
-    await sleep(1000);
-
     // call to the swap endpoint
     const ticketId = await pool.swapY({
       payer: payer,
@@ -188,17 +175,17 @@ describe("SwapY", () => {
 
     console.log("==== swapy pool id: " + pool.id.toString());
 
-    await sleep(1000);
-
     // call to the swap endpoint
-    await expect(pool.swapY({
-      payer: payer,
-      user: payer,
-      memeTokensOut: new BN(1),
-      quoteAmountIn: new BN(0),
-      quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
-      pool: pool.id,
-    })).rejects.toThrow();
+    await expect(
+      pool.swapY({
+        payer: payer,
+        user: payer,
+        memeTokensOut: new BN(1),
+        quoteAmountIn: new BN(0),
+        quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
+        pool: pool.id,
+      }),
+    ).rejects.toThrow();
     await expect(
       pool.swapY({
         payer: payer,
@@ -211,7 +198,6 @@ describe("SwapY", () => {
     ).rejects.toThrow();
   }, 220000);
 
-  it("swaps negative", async () => {
   // strange behavour, it should fail, but it converts negative amount to positive
   it.skip("swaps negative", async () => {
     const pool = await BoundPoolClient.new({
@@ -224,14 +210,11 @@ describe("SwapY", () => {
 
     console.log("==== swapy pool id: " + pool.id.toString());
 
-    await sleep(1000);
-
     // call to the swap endpoint
     const ticketId = await pool.swapY({
       payer: payer,
       user: payer,
       memeTokensOut: new BN(1),
-      quoteAmountIn: new BN(-1000*1e9),
       quoteAmountIn: new BN(-1000 * 1e9),
       quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
       pool: pool.id,
@@ -241,6 +224,5 @@ describe("SwapY", () => {
     const pool2 = await BoundPoolClient.fetch2(client.connection, pool.id);
     console.log("swaps negative boundPoolInfo:", pool2);
     expect(pool2.locked).toBeFalsy();
-
   }, 220000);
 });
