@@ -64,6 +64,7 @@ export class MemeTicketClient {
       const signature = await sendAndConfirmTransaction(this.client.connection, tx, [input.signer], {
         commitment: "confirmed",
         skipPreflight: true,
+        preflightCommitment: "confirmed",
       });
       console.log("bound merge signature:", signature);
     }

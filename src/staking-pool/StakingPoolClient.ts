@@ -226,7 +226,7 @@ export class StakingPoolClient {
       this.client.connection,
       transaction,
       [args.user, memeAccountKeypair, quoteAccountKeypair],
-      { commitment: "confirmed", skipPreflight: true },
+      { commitment: "confirmed", skipPreflight: true, preflightCommitment: "confirmed" },
     );
     console.log("unstake signature:", signature);
 

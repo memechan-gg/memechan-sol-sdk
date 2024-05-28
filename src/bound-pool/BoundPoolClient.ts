@@ -348,6 +348,7 @@ export class BoundPoolClient {
       options: {
         commitment: "confirmed",
         skipPreflight: true,
+        preflightCommitment: "confirmed",
       },
     });
 
@@ -363,6 +364,7 @@ export class BoundPoolClient {
       options: {
         commitment: "confirmed",
         skipPreflight: true,
+        preflightCommitment: "confirmed",
       },
     });
 
@@ -511,7 +513,7 @@ export class BoundPoolClient {
         tokenProgram: TOKEN_PROGRAM_ID,
       })
       .signers([user, id])
-      .rpc({ skipPreflight: true, commitment: "confirmed" });
+      .rpc({ skipPreflight: true, commitment: "confirmed", preflightCommitment: "confirmed" });
 
     return new MemeTicketClient(id.publicKey, this.client);
   }
@@ -530,6 +532,7 @@ export class BoundPoolClient {
     const txId = await sendAndConfirmTransaction(this.client.connection, tx, [input.signer, memeTicketKeypair], {
       skipPreflight: true,
       commitment: "confirmed",
+      preflightCommitment: "confirmed",
     });
 
     return txId;
@@ -665,6 +668,7 @@ export class BoundPoolClient {
       const signature = await sendAndConfirmTransaction(this.client.connection, tx, [input.signer], {
         commitment: "confirmed",
         skipPreflight: true,
+        preflightCommitment: "confirmed",
       });
 
       txIdList.push(signature);
@@ -843,6 +847,7 @@ export class BoundPoolClient {
     const txId = await sendAndConfirmTransaction(this.client.connection, sellMemeCoinTransaction, [input.user], {
       skipPreflight: true,
       commitment: "confirmed",
+      preflightCommitment: "confirmed",
     });
 
     return txId;
