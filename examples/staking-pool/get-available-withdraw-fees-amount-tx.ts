@@ -18,25 +18,21 @@ export const getAvailableWithdrawFeesAmount = async () => {
   const memeTicket = new MemeTicketClient(memeTicketId, client);
 
   // call addfees to accumulate fees
-  //await stakingPool.addFees({payer, transaction: new Transaction(), ammPoolId: ammPoolAddress});
+  // await stakingPool.addFees({payer, transaction: new Transaction(), ammPoolId: ammPoolAddress});
 
-  //getAddFeesTransaction
+  // getAddFeesTransaction
 
   // Get available withdraw fees amount
-  const { transaction, memeAccountKeypair, quoteAccountKeypair } = await stakingPool.getWithdrawFeesTransaction({ ticket: memeTicket, user: payer.publicKey });
+  const transaction = await stakingPool.getWithdrawFeesTransaction({ ticket: memeTicket, user: payer.publicKey });
 
-  console.log("simulating transaction...")
+  console.log("simulating transaction...");
 
-  const getWithdrawFeesResult = await client.connection.simulateTransaction(
-      transaction,
-      [payer, memeAccountKeypair, quoteAccountKeypair],
-      true,
-    );
+  const getWithdrawFeesResult = await client.connection.simulateTransaction(transaction, [payer], true);
 
   console.log("getWithdrawFeesResult:", getWithdrawFeesResult);
 
   const feesRegex = /fees_meme: (\d+) fees_quote: (\d+)/;
-  getWithdrawFeesResult.value.logs?.forEach(log => {
+  getWithdrawFeesResult.value.logs?.forEach((log) => {
     const match = log.match(feesRegex);
     if (match) {
       const feesMeme = parseInt(match[1], 10) / 1e6; // Convert to decimal with 6 places

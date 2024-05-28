@@ -791,12 +791,12 @@ export type MemechanSol = {
         },
         {
           name: "userMeme";
-          isMut: false;
+          isMut: true;
           isSigner: false;
         },
         {
           name: "userQuote";
-          isMut: false;
+          isMut: true;
           isSigner: false;
         },
         {
@@ -2649,12 +2649,12 @@ export const IDL: MemechanSol = {
         },
         {
           name: "userMeme",
-          isMut: false,
+          isMut: true,
           isSigner: false,
         },
         {
           name: "userQuote",
-          isMut: false,
+          isMut: true,
           isSigner: false,
         },
         {

@@ -31,8 +31,6 @@ describe("StakingPoolClient", () => {
     });
 
     console.log("==== pool id: " + boundPool.id.toString());
-    await sleep(2000);
-
     const tickets: MemeTicketClient[] = [];
 
     const ticketId = await boundPool.swapY({
@@ -138,7 +136,6 @@ describe("StakingPoolClient", () => {
     });
 
     console.log("==== pool id: " + boundPool.id.toString());
-    await sleep(2000);
 
     const tickets: MemeTicketClient[] = [];
 
@@ -196,7 +193,6 @@ describe("StakingPoolClient", () => {
     });
 
     console.log("==== pool id: " + boundPool.id.toString());
-    await sleep(2000);
 
     const tickets: MemeTicketClient[] = [];
 
@@ -285,7 +281,6 @@ describe("StakingPoolClient", () => {
     });
 
     console.log("==== pool id: " + boundPool.id.toString());
-    await sleep(2000);
 
     const tickets: MemeTicketClient[] = [];
 
@@ -377,7 +372,6 @@ describe("StakingPoolClient", () => {
     });
 
     console.log("==== pool id: " + boundPool.id.toString());
-    await sleep(2000);
 
     const tickets: MemeTicketClient[] = [];
 
@@ -523,7 +517,6 @@ describe("StakingPoolClient", () => {
     });
 
     console.log("==== pool id: " + boundPool.id.toString());
-    await sleep(2000);
 
     const tickets: MemeTicketClient[] = [];
 
@@ -613,7 +606,6 @@ describe("StakingPoolClient", () => {
     });
 
     console.log("==== pool id: " + boundPool.id.toString());
-    await sleep(2000);
     const tickets: MemeTicketClient[] = [];
 
     const ticketId = await boundPool.swapY({

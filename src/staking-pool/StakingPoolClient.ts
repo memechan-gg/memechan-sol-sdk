@@ -1,5 +1,5 @@
 import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
-import { AccountMeta, Keypair, PublicKey, Transaction, sendAndConfirmTransaction } from "@solana/web3.js";
+import { AccountMeta, PublicKey, Transaction, sendAndConfirmTransaction } from "@solana/web3.js";
 import BigNumber from "bignumber.js";
 import { MemechanClient } from "../MemechanClient";
 import { BoundPoolClient } from "../bound-pool/BoundPoolClient";
@@ -8,7 +8,6 @@ import { MemeTicketClient } from "../memeticket/MemeTicketClient";
 import { getOptimizedTransactions } from "../memeticket/utils";
 import { formatAmmKeysById } from "../raydium/formatAmmKeysById";
 import { MemeTicketFields, StakingPool, StakingPoolFields } from "../schema/codegen/accounts";
-import { getCreateAccountInstructions } from "../util/getCreateAccountInstruction";
 import { getSendAndConfirmTransactionMethod } from "../util/getSendAndConfirmTransactionMethod";
 import { retry } from "../util/retry";
 import {
@@ -24,6 +23,8 @@ import {
   WithdrawFeesArgs,
   getAvailableWithdrawFeesAmountArgs,
 } from "./types";
+import { ensureAssociatedTokenAccountWithIX } from "../util/ensureAssociatedTokenAccountWithIX";
+import BN from "bn.js";
 
 export class StakingPoolClient {
   constructor(
@@ -44,7 +45,10 @@ export class StakingPoolClient {
     client: MemechanClient;
     poolAccountAddressId: PublicKey;
   }) {
-    const stakingPoolObjectData = await client.memechanProgram.account.stakingPool.fetch(poolAccountAddressId);
+    const stakingPoolObjectData = await client.memechanProgram.account.stakingPool.fetch(
+      poolAccountAddressId,
+      "confirmed",
+    );
 
     const boundClientInstance = new StakingPoolClient(
       poolAccountAddressId,
@@ -123,35 +127,25 @@ export class StakingPoolClient {
     });
   }
 
-  public async getUnstakeTransaction(
-    args: GetUnstakeTransactionArgs,
-  ): Promise<{ transaction: Transaction; memeAccountKeypair: Keypair; quoteAccountKeypair: Keypair }> {
+  public async getUnstakeTransaction(args: GetUnstakeTransactionArgs): Promise<Transaction> {
     const tx = args.transaction ?? new Transaction();
     const stakingInfo = await this.fetch();
+    const user = args.user;
 
-    const memeAccountKeypair = Keypair.generate();
-    const memeAccountPublicKey = memeAccountKeypair.publicKey;
-    const createMemeAccountInstructions = await getCreateAccountInstructions(
-      this.client.connection,
-      args.user,
-      stakingInfo.memeMint,
-      args.user,
-      memeAccountKeypair,
-    );
-
-    tx.add(...createMemeAccountInstructions);
-
-    const quoteAccountKeypair = Keypair.generate();
-    const quoteAccountPublicKey = quoteAccountKeypair.publicKey;
-    const createQuoteAccountInstructions = await getCreateAccountInstructions(
-      this.client.connection,
-      args.user,
-      MEMECHAN_QUOTE_MINT,
-      args.user,
-      quoteAccountKeypair,
-    );
-
-    tx.add(...createQuoteAccountInstructions);
+    const associatedMemeTokenAddress = await ensureAssociatedTokenAccountWithIX({
+      connection: this.client.connection,
+      payer: user,
+      mint: stakingInfo.memeMint,
+      owner: user,
+      transaction: tx,
+    });
+    const associatedQuoteTokenAddress = await ensureAssociatedTokenAccountWithIX({
+      connection: this.client.connection,
+      payer: user,
+      mint: MEMECHAN_QUOTE_MINT,
+      owner: user,
+      transaction: tx,
+    });
 
     const unstakeInstruction = await this.client.memechanProgram.methods
       .unstake(args.amount)
@@ -162,15 +156,15 @@ export class StakingPoolClient {
         memeVault: stakingInfo.memeVault,
         quoteVault: stakingInfo.quoteVault,
         staking: this.id,
-        userMeme: memeAccountPublicKey,
-        userQuote: quoteAccountPublicKey,
+        userMeme: associatedMemeTokenAddress,
+        userQuote: associatedQuoteTokenAddress,
         tokenProgram: TOKEN_PROGRAM_ID,
       })
       .instruction();
 
     tx.add(unstakeInstruction);
 
-    return { transaction: tx, memeAccountKeypair, quoteAccountKeypair };
+    return tx;
   }
 
   public async getPreparedUnstakeTransactions({
@@ -179,11 +173,7 @@ export class StakingPoolClient {
     ticketIds,
     user,
     transaction,
-  }: GetPreparedUnstakeTransactionsArgs): Promise<{
-    transactions: Transaction[];
-    memeAccountKeypair: Keypair;
-    quoteAccountKeypair: Keypair;
-  }> {
+  }: GetPreparedUnstakeTransactionsArgs): Promise<Transaction[]> {
     const tx = transaction ?? new Transaction();
 
     /**
@@ -200,7 +190,7 @@ export class StakingPoolClient {
     });
 
     // WARNING: `tx` mutation below
-    const { memeAccountKeypair, quoteAccountKeypair } = await this.getUnstakeTransaction({
+    await this.getUnstakeTransaction({
       amount,
       ticket: destinationMemeTicket,
       user,
@@ -209,26 +199,23 @@ export class StakingPoolClient {
 
     const optimizedTransactions = getOptimizedTransactions(tx.instructions, user);
 
-    return { transactions: optimizedTransactions, memeAccountKeypair, quoteAccountKeypair };
+    return optimizedTransactions;
   }
 
-  public async unstake(
-    args: UnstakeArgs,
-  ): Promise<{ memeAccountPublicKey: PublicKey; quoteAccountPublicKey: PublicKey }> {
-    const { memeAccountKeypair, transaction, quoteAccountKeypair } = await this.getUnstakeTransaction({
+  public async unstake(args: UnstakeArgs): Promise<string> {
+    const transaction = await this.getUnstakeTransaction({
       ...args,
       user: args.user.publicKey,
     });
 
-    const signature = await sendAndConfirmTransaction(
-      this.client.connection,
-      transaction,
-      [args.user, memeAccountKeypair, quoteAccountKeypair],
-      { commitment: "confirmed", skipPreflight: true },
-    );
+    const signature = await sendAndConfirmTransaction(this.client.connection, transaction, [args.user], {
+      commitment: "confirmed",
+      skipPreflight: true,
+      preflightCommitment: "confirmed",
+    });
     console.log("unstake signature:", signature);
 
-    return { memeAccountPublicKey: memeAccountKeypair.publicKey, quoteAccountPublicKey: quoteAccountKeypair.publicKey };
+    return signature;
   }
 
   public async getAvailableUnstakeAmount({
@@ -245,13 +232,11 @@ export class StakingPoolClient {
       return "0";
     }
 
-    const stakedAmount = tickets.reduce((staked, { vesting: { notional, released } }) => {
-      const notionalString = notional.toString();
-      const releasedString = released.toString();
-      const rest = new BigNumber(notionalString).minus(releasedString);
+    const notionalTotalBN = tickets.reduce((acc: BN, curr) => acc.add(curr.vesting.notional), new BN(0));
+    const releasedTotalBN = tickets.reduce((acc: BN, curr) => acc.add(curr.vesting.released), new BN(0));
 
-      return staked.plus(rest);
-    }, new BigNumber(0));
+    const notionalTotal = new BigNumber(notionalTotalBN.toString());
+    const releasedTotal = new BigNumber(releasedTotalBN.toString());
 
     const unlockDurationInMs = endTsInMs.minus(cliffTsInMs);
     const unlockProgressInMs = new BigNumber(currentTimeInMs).minus(cliffTsInMs);
@@ -264,42 +249,33 @@ export class StakingPoolClient {
     const unlockProgressWithUpperBound = Math.min(unlockProgressWithLowerBound, 1);
 
     // Unstake amount must be bignumerish, so `toFixed(0)`
-    const availableUnstakeAmount = stakedAmount.multipliedBy(unlockProgressWithUpperBound).toFixed(0);
+    const availableUnstakeAmount = notionalTotal
+      .multipliedBy(unlockProgressWithUpperBound)
+      .minus(releasedTotal)
+      .toFixed(0);
 
     return availableUnstakeAmount;
   }
 
-  public async getWithdrawFeesTransaction(args: GetWithdrawFeesTransactionArgs): Promise<{
-    transaction: Transaction;
-    memeAccountKeypair: Keypair;
-    quoteAccountKeypair: Keypair;
-  }> {
+  public async getWithdrawFeesTransaction(args: GetWithdrawFeesTransactionArgs): Promise<Transaction> {
     const tx = args.transaction ?? new Transaction();
     const stakingInfo = await this.fetch();
 
-    const memeAccountKeypair = Keypair.generate();
-    const memeAccountPublicKey = memeAccountKeypair.publicKey;
-    const createMemeAccountInstructions = await getCreateAccountInstructions(
-      this.client.connection,
-      args.user,
-      stakingInfo.memeMint,
-      args.user,
-      memeAccountKeypair,
-    );
+    const memeAccountPublicKey = await ensureAssociatedTokenAccountWithIX({
+      connection: this.client.connection,
+      payer: args.user,
+      mint: stakingInfo.memeMint,
+      owner: args.user,
+      transaction: tx,
+    });
 
-    tx.add(...createMemeAccountInstructions);
-
-    const quoteAccountKeypair = Keypair.generate();
-    const quoteAccountPublicKey = quoteAccountKeypair.publicKey;
-    const createWSolAccountInstructions = await getCreateAccountInstructions(
-      this.client.connection,
-      args.user,
-      MEMECHAN_QUOTE_MINT,
-      args.user,
-      quoteAccountKeypair,
-    );
-
-    tx.add(...createWSolAccountInstructions);
+    const quoteAccountPublicKey = await ensureAssociatedTokenAccountWithIX({
+      connection: this.client.connection,
+      payer: args.user,
+      mint: MEMECHAN_QUOTE_MINT,
+      owner: args.user,
+      transaction: tx,
+    });
 
     const withdrawFeesInstruction = await this.client.memechanProgram.methods
       .withdrawFees()
@@ -318,7 +294,7 @@ export class StakingPoolClient {
 
     tx.add(withdrawFeesInstruction);
 
-    return { transaction: tx, memeAccountKeypair, quoteAccountKeypair };
+    return tx;
   }
 
   public async getPreparedWithdrawFeesTransactions({
@@ -326,11 +302,7 @@ export class StakingPoolClient {
     ticketIds,
     user,
     transaction,
-  }: GetPreparedWithdrawFeesTransactionsArgs): Promise<{
-    transactions: Transaction[];
-    memeAccountKeypair: Keypair;
-    quoteAccountKeypair: Keypair;
-  }> {
+  }: GetPreparedWithdrawFeesTransactionsArgs): Promise<Transaction[]> {
     const tx = transaction ?? new Transaction();
 
     /**
@@ -347,7 +319,7 @@ export class StakingPoolClient {
     });
 
     // WARNING: `tx` mutation below
-    const { memeAccountKeypair, quoteAccountKeypair } = await this.getWithdrawFeesTransaction({
+    await this.getWithdrawFeesTransaction({
       ticket: destinationMemeTicket,
       user,
       transaction: tx,
@@ -355,20 +327,18 @@ export class StakingPoolClient {
 
     const optimizedTransactions = getOptimizedTransactions(tx.instructions, user);
 
-    return { transactions: optimizedTransactions, memeAccountKeypair, quoteAccountKeypair };
+    return optimizedTransactions;
   }
 
-  public async withdrawFees(
-    args: WithdrawFeesArgs,
-  ): Promise<{ memeAccountPublicKey: PublicKey; quoteAccountPublicKey: PublicKey }> {
-    const { memeAccountKeypair, transaction, quoteAccountKeypair } = await this.getWithdrawFeesTransaction({
+  public async withdrawFees(args: WithdrawFeesArgs) {
+    const transaction = await this.getWithdrawFeesTransaction({
       ...args,
       user: args.user.publicKey,
     });
 
     const sendAndConfirmWithdrawFeesTransaction = getSendAndConfirmTransactionMethod({
       connection: this.client.connection,
-      signers: [args.user, memeAccountKeypair, quoteAccountKeypair],
+      signers: [args.user],
       transaction,
     });
 
@@ -376,8 +346,6 @@ export class StakingPoolClient {
       fn: sendAndConfirmWithdrawFeesTransaction,
       functionName: "withdrawFees",
     });
-
-    return { memeAccountPublicKey: memeAccountKeypair.publicKey, quoteAccountPublicKey: quoteAccountKeypair.publicKey };
   }
 
   public async getAvailableWithdrawFeesAmount({
@@ -568,7 +536,7 @@ export class StakingPoolClient {
   }
 
   private async fetch(program = this.client.memechanProgram) {
-    return program.account.stakingPool.fetch(this.id);
+    return program.account.stakingPool.fetch(this.id, "confirmed");
   }
 
   public static async all(client: MemechanClient): Promise<{ account: StakingPoolFields; publicKey: PublicKey }[]> {

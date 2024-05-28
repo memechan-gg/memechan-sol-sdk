@@ -28,7 +28,7 @@ export class TargetConfig {
   }
 
   static async fetch(c: Connection, address: PublicKey): Promise<TargetConfig | null> {
-    const info = await c.getAccountInfo(address);
+    const info = await c.getAccountInfo(address, { commitment: "confirmed" });
 
     if (info === null) {
       return null;
@@ -41,7 +41,7 @@ export class TargetConfig {
   }
 
   static async fetchMultiple(c: Connection, addresses: PublicKey[]): Promise<Array<TargetConfig | null>> {
-    const infos = await c.getMultipleAccountsInfo(addresses);
+    const infos = await c.getMultipleAccountsInfo(addresses, { commitment: "confirmed" });
 
     return infos.map((info) => {
       if (info === null) {

@@ -25,7 +25,7 @@ export async function parseInitStakingInstruction(
 
   const poolAddr = ix.accounts[1];
   const stakingAddr = ix.accounts[8];
-  const staking = await client.memechanProgram.account.stakingPool.fetch(stakingAddr);
+  const staking = await client.memechanProgram.account.stakingPool.fetch(stakingAddr, "confirmed");
 
   const ispParsed: InitStakingPoolInstructionParsed = {
     poolAddr,

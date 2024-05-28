@@ -17,6 +17,7 @@ export async function createMetadata(client: MemechanClient, input: CreateMetada
   const signature = await sendAndConfirmTransaction(client.connection, createMetadataTransaction, [input.payer], {
     skipPreflight: true,
     commitment: "confirmed",
+    preflightCommitment: "confirmed",
   });
 
   console.log("Transaction signature", signature);

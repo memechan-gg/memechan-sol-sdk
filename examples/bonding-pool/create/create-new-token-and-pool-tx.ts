@@ -6,7 +6,7 @@ import { getTxSize } from "../../../src/util/get-tx-size";
 
 // yarn tsx examples/bonding-pool/create/create-new-token-and-pool-tx.ts > log.txt 2>&1
 export const createNewTokenAndPoolTx = async () => {
-  const { createPoolTransaction, createTokenTransaction, memeMintKeypair, poolQuoteVaultId, launchVaultId } =
+  const { createPoolTransaction, createTokenTransaction, memeMintKeypair } =
     await BoundPoolClient.getCreateNewBondingPoolAndTokenTransaction({
       admin,
       payer: payer.publicKey,
@@ -27,10 +27,11 @@ export const createNewTokenAndPoolTx = async () => {
     const createPoolSignature = await sendAndConfirmTransaction(
       client.connection,
       createPoolTransaction,
-      [payer, memeMintKeypair, poolQuoteVaultId, launchVaultId],
+      [payer, memeMintKeypair],
       {
         commitment: "confirmed",
         skipPreflight: true,
+        preflightCommitment: "confirmed",
       },
     );
     console.log("createPoolSignature:", createPoolSignature);
@@ -38,6 +39,7 @@ export const createNewTokenAndPoolTx = async () => {
     const createTokenSignature = await sendAndConfirmTransaction(client.connection, createTokenTransaction, [payer], {
       commitment: "confirmed",
       skipPreflight: true,
+      preflightCommitment: "confirmed",
     });
     console.log("createTokenSignature:", createTokenSignature);
 

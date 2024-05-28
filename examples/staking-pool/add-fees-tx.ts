@@ -22,6 +22,7 @@ export const addFeesTx = async () => {
   const signature = await sendAndConfirmTransaction(client.connection, transaction, [payer], {
     commitment: "confirmed",
     skipPreflight: true,
+    preflightCommitment: "confirmed",
   });
   console.log("addfees signature:", signature);
 };
