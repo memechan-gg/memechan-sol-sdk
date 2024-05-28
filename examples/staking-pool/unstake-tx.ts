@@ -57,19 +57,18 @@ export const unstake = async () => {
     console.log("[unstake] Unstaking...");
 
     // Unstake
-    const { transaction, memeAccountKeypair, quoteAccountKeypair } = await stakingPool.getUnstakeTransaction({
+    const transaction = await stakingPool.getUnstakeTransaction({
       amount: new BN(amount),
       user: payer.publicKey,
       ticket: destinationMemeTicket,
     });
 
     console.log("payer: " + payer.publicKey.toBase58());
-    const signature = await sendAndConfirmTransaction(
-      client.connection,
-      transaction,
-      [payer, memeAccountKeypair, quoteAccountKeypair],
-      { commitment: "confirmed", skipPreflight: true },
-    );
+    const signature = await sendAndConfirmTransaction(client.connection, transaction, [payer], {
+      commitment: "confirmed",
+      skipPreflight: true,
+      preflightCommitment: "confirmed",
+    });
     console.log("unstake signature:", signature);
   } catch (e) {
     console.error("[unstake] Error:", e);

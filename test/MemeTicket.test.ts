@@ -134,8 +134,6 @@ describe("MemeTicketClient", () => {
     console.log("stakingMemeVault: " + stakingMemeVault.toString());
     console.log("stakingQuoteVault: " + stakingQuoteVault.toString());
 
-    await sleep(2000);
-
     const [stakingPool] = await pool.goLive({
       payer: payer,
       user: payer,
@@ -175,8 +173,6 @@ describe("MemeTicketClient", () => {
 
     const mintUtils = new MintUtils(client.connection, payer);
     const quoteAccount = await mintUtils.getOrCreateTokenAccount(MEMECHAN_QUOTE_TOKEN.mint, payer, payer.publicKey);
-
-    await sleep(5000);
 
     const swapXTxResult = await pool.swapX({
       user: payer,

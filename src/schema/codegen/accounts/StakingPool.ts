@@ -81,7 +81,7 @@ export class StakingPool {
   }
 
   static async fetch(c: Connection, address: PublicKey): Promise<StakingPool | null> {
-    const info = await c.getAccountInfo(address);
+    const info = await c.getAccountInfo(address, { commitment: "confirmed" });
 
     if (info === null) {
       return null;
@@ -94,7 +94,7 @@ export class StakingPool {
   }
 
   static async fetchMultiple(c: Connection, addresses: PublicKey[]): Promise<Array<StakingPool | null>> {
-    const infos = await c.getMultipleAccountsInfo(addresses);
+    const infos = await c.getMultipleAccountsInfo(addresses, { commitment: "confirmed" });
 
     return infos.map((info) => {
       if (info === null) {

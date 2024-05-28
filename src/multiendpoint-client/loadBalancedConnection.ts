@@ -39,7 +39,7 @@ export class LoadBalancedConnection extends Connection {
     this.currentIndex = 0;
     this.failingEndpoints = new Map();
     this.usageCount = new Map();
-    this.cooldownPeriod = 5 * 60 * 1000; // 5 mins
+    this.cooldownPeriod = 10 * 1000; // 10 seconds
     this.maxUsageCount = 10; // Max usage count before pushing to the end
     return new Proxy(this, {
       get: (target, prop, receiver) => {
