@@ -24,7 +24,7 @@ describe("Threads fetching", () => {
     });
     const tokenApi = new TokenAPI();
     const { token: tokenFetched } = await tokenApi.createToken({
-      txDigest: "HFKiTCkDmw1ZRuhSSBmRde7Lt6GnqwbcE3wqgQ2tVf55",
+      txDigests: ["HFKiTCkDmw1ZRuhSSBmRde7Lt6GnqwbcE3wqgQ2tVf55"],
       socialLinks: {
         twitter: "mytwitter",
         discord: "mydiscord",

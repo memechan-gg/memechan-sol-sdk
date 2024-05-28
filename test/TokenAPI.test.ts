@@ -37,7 +37,7 @@ describe("TokenService authenticated operations", () => {
     */
 
     const { token } = await tokenApi.createToken({
-      txDigest: "37QSkf6zxCASvBqTLso1n67Asx3o6hTcJxaAprvPDhvgfLXZn8qBCGAPtG4fmLfPx7yuha5UPcSiTGKvbEQvy9Q8",
+      txDigests: ["37QSkf6zxCASvBqTLso1n67Asx3o6hTcJxaAprvPDhvgfLXZn8qBCGAPtG4fmLfPx7yuha5UPcSiTGKvbEQvy9Q8"],
       socialLinks: {
         twitter: "mytwitter",
         discord: "mydiscord",
