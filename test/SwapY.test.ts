@@ -199,6 +199,16 @@ describe("SwapY", () => {
       quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
       pool: pool.id,
     })).rejects.toThrow();
+    await expect(
+      pool.swapY({
+        payer: payer,
+        user: payer,
+        memeTokensOut: new BN(1),
+        quoteAmountIn: new BN(0),
+        quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
+        pool: pool.id,
+      }),
+    ).rejects.toThrow();
   }, 220000);
 
   it("swaps negative", async () => {
