@@ -44,7 +44,10 @@ export class StakingPoolClient {
     client: MemechanClient;
     poolAccountAddressId: PublicKey;
   }) {
-    const stakingPoolObjectData = await client.memechanProgram.account.stakingPool.fetch(poolAccountAddressId);
+    const stakingPoolObjectData = await client.memechanProgram.account.stakingPool.fetch(
+      poolAccountAddressId,
+      "confirmed",
+    );
 
     const boundClientInstance = new StakingPoolClient(
       poolAccountAddressId,
@@ -568,7 +571,7 @@ export class StakingPoolClient {
   }
 
   private async fetch(program = this.client.memechanProgram) {
-    return program.account.stakingPool.fetch(this.id);
+    return program.account.stakingPool.fetch(this.id, "confirmed");
   }
 
   public static async all(client: MemechanClient): Promise<{ account: StakingPoolFields; publicKey: PublicKey }[]> {

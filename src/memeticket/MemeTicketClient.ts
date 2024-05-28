@@ -25,7 +25,7 @@ export class MemeTicketClient {
   }
 
   public async fetch(program = this.client.memechanProgram) {
-    return await program.account.memeTicket.fetch(this.id);
+    return await program.account.memeTicket.fetch(this.id, "confirmed");
   }
 
   public static async all(program: Program<MemechanSol>) {
