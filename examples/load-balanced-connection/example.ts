@@ -9,7 +9,7 @@ import { PublicKey } from "@solana/web3.js";
   const loadBalancedConnection = new LoadBalancedConnection(endpoints);
 
   try {
-    const accountInfo = await loadBalancedConnection.getAccountInfo(publicKey);
+    const accountInfo = await loadBalancedConnection.getAccountInfo(publicKey, { commitment: "confirmed" });
     console.log("Account Info:", accountInfo);
   } catch (error) {
     console.error("Failed to fetch account info:", error);
