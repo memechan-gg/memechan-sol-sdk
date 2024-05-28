@@ -56,7 +56,7 @@ describe("SwapY", () => {
     });
 
     console.log("swapY ticketId: " + ticketId.id.toBase58());
-    const ticket = await connection.getAccountInfo(ticketId.id);
+    const ticket = await connection.getAccountInfo(ticketId.id, { commitment: "confirmed" });
     console.log("fetched ticket", ticket);
     expect(ticket).toBeNull();
   }, 220000);
@@ -85,7 +85,7 @@ describe("SwapY", () => {
     });
 
     console.log("swapY ticketId: " + ticketId.id.toBase58());
-    const ticket = await connection.getAccountInfo(ticketId.id);
+    const ticket = await connection.getAccountInfo(ticketId.id, { commitment: "confirmed" });
     console.log("fetched ticket", ticket);
   }, 220000);
 
@@ -113,7 +113,7 @@ describe("SwapY", () => {
     });
 
     console.log("swapY ticketId: " + ticketId.id.toBase58());
-    const ticket = await connection.getAccountInfo(ticketId.id);
+    const ticket = await connection.getAccountInfo(ticketId.id, { commitment: "confirmed" });
     console.log("fetched ticket", ticket);
   }, 220000);
 

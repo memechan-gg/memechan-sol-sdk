@@ -23,7 +23,7 @@ export async function parseCreateMetadataInstruction(
   const mintAddr = ix.accounts[2];
   const metadataAddr = ix.accounts[3];
 
-  const metaAccountInfo = await memechanProgram.connection.getAccountInfo(metadataAddr);
+  const metaAccountInfo = await memechanProgram.connection.getAccountInfo(metadataAddr, { commitment: "confirmed" });
 
   if (!metaAccountInfo) {
     return undefined;
