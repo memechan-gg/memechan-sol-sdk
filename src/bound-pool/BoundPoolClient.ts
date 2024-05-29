@@ -90,7 +90,6 @@ import { ParsedMemeTicket } from "../memeticket/types";
 import { normalizeInputCoinAmount } from "../util/trading/normalizeInputCoinAmount";
 import base58 from "bs58";
 import { ensureAssociatedTokenAccountWithIX } from "../util/ensureAssociatedTokenAccountWithIX";
-import { connection } from "../../examples/common";
 
 export class BoundPoolClient {
   private constructor(
