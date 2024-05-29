@@ -2,7 +2,7 @@ import { BoundPoolClient } from "../src/bound-pool/BoundPoolClient";
 import { DUMMY_TOKEN_METADATA, admin, client, payer } from "./common/common";
 import { MEMECHAN_QUOTE_TOKEN } from "../src/config/config";
 
-describe.skip("BoundPoolClient Creation Tests", () => {
+describe("BoundPoolClient Creation Tests", () => {
   it("creates dummy bound pool", async () => {
     const boundPool = await BoundPoolClient.new({
       admin,
@@ -10,6 +10,25 @@ describe.skip("BoundPoolClient Creation Tests", () => {
       client,
       quoteToken: MEMECHAN_QUOTE_TOKEN,
       tokenMetadata: DUMMY_TOKEN_METADATA,
+    });
+    console.log("==== pool id: " + boundPool.id.toString());
+    const info = await BoundPoolClient.fetch2(client.connection, boundPool.id);
+    console.log(info);
+  }, 150000);
+
+  it("creates bound pool with buy tx", async () => {
+    const boundPool = await BoundPoolClient.newWithBuyTx({
+      admin,
+      payer,
+      client,
+      quoteToken: MEMECHAN_QUOTE_TOKEN,
+      tokenMetadata: DUMMY_TOKEN_METADATA,
+      buyMemeTransactionArgs: {
+        inputAmount: "10",
+        minOutputAmount: "1",
+        slippagePercentage: 0,
+        user: payer.publicKey,
+      },
     });
     console.log("==== pool id: " + boundPool.id.toString());
     const info = await BoundPoolClient.fetch2(client.connection, boundPool.id);
@@ -82,7 +101,7 @@ describe.skip("BoundPoolClient Creation Tests", () => {
         tokenMetadata: metadata,
       });
 
-      console.log("result: " + result);
+      console.log("result: " + result.id.toString());
       expect(result).not.toBeNull();
     }
 
@@ -101,7 +120,7 @@ describe.skip("BoundPoolClient Creation Tests", () => {
         tokenMetadata: metadata,
       });
 
-      console.log("result: " + result);
+      console.log("result: " + result.id.toString());
       expect(result).not.toBeNull();
     }
   }, 250000);
