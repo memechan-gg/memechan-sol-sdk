@@ -61,37 +61,3 @@ export class InvalidCoinImageError extends Error {
     super(msg);
   }
 }
-
-/**
- * Custom error class representing an error when a coin name and a coin description provided for the coin creation
- * are equal.
- * @class
- * @extends Error
- */
-export class NameEqualsToDescriptionError extends Error {
-  /**
-   * Creates an instance of NameEqualsToDescriptionError.
-   * @constructor
-   * @param {string} msg - The error message.
-   */
-  constructor(msg: string) {
-    super(msg);
-  }
-}
-
-/**
- * Custom error class representing an error when a coin symbol and a coin description provided for the coin creation
- * are equal.
- * @class
- * @extends Error
- */
-export class SymbolEqualsToDescriptionError extends Error {
-  /**
-   * Creates an instance of SymbolEqualsToDescriptionError.
-   * @constructor
-   * @param {string} msg - The error message.
-   */
-  constructor(msg: string) {
-    super(msg);
-  }
-}
