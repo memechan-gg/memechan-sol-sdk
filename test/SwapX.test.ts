@@ -15,9 +15,7 @@ describe.skip("swapX", () => {
     });
 
     const mintUtils = new MintUtils(client.connection, payer);
-
     const getAccount1 = await mintUtils.getOrCreateTokenAccount(MEMECHAN_QUOTE_TOKEN.mint, payer, payer.publicKey);
-    await mintUtils.mintTo(MEMECHAN_QUOTE_TOKEN.mint, getAccount1.address);
 
     const ticketId = await pool.swapY({
       payer: payer,
@@ -32,8 +30,8 @@ describe.skip("swapX", () => {
 
     const txResult = await pool.swapX({
       user: payer,
-      memeAmountIn: new BN(10000),
-      minQuoteAmountOut: new BN(1),
+      memeAmountIn: new BN(10 * 1e6),
+      minQuoteAmountOut: new BN(1 * 1e6),
       quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
       userMemeTicket: ticketId,
       userQuoteAcc: getAccount1.address,

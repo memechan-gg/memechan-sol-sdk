@@ -11,7 +11,7 @@ import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import { PublicKey } from "@solana/web3.js";
 import { getWalletTokenAccount } from "../src/util";
 
-describe("StakingPoolClient", () => {
+describe.skip("StakingPoolClient", () => {
   it.skip("all", async () => {
     /* const all = await StakingPoolClient.all(client.memechanProgram);
 

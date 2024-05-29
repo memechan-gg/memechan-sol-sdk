@@ -4,8 +4,8 @@ import { DUMMY_TOKEN_METADATA, admin, client, payer } from "./common/common";
 import { MEMECHAN_QUOTE_TOKEN } from "../src/config/config";
 import { connection } from "../examples/common";
 
-describe.skip("SwapY", () => {
-  it.skip("swaps quote token->memecoin", async () => {
+describe("SwapY", () => {
+  it("swaps quote token->memecoin", async () => {
     const pool = await BoundPoolClient.new({
       admin,
       payer,
@@ -29,7 +29,7 @@ describe.skip("SwapY", () => {
     console.log("swapY ticketId: " + ticketId.id.toBase58());
   }, 220000);
 
-  it.skip("swaps 1 quote token->memecoin should fail", async () => {
+  it("swaps 1 quote token->memecoin should fail", async () => {
     const pool = await BoundPoolClient.new({
       admin,
       payer,
@@ -56,7 +56,7 @@ describe.skip("SwapY", () => {
     expect(ticket).toBeNull();
   }, 220000);
 
-  it.skip("swaps minimum quote token->memecoin", async () => {
+  it("swaps minimum quote token->memecoin", async () => {
     const pool = await BoundPoolClient.new({
       admin,
       payer,
@@ -82,7 +82,7 @@ describe.skip("SwapY", () => {
     console.log("fetched ticket", ticket);
   }, 220000);
 
-  it.skip("swaps maximum quote token->memecoin", async () => {
+  it("swaps maximum quote token->memecoin", async () => {
     const pool = await BoundPoolClient.new({
       admin,
       payer,
@@ -108,7 +108,7 @@ describe.skip("SwapY", () => {
     console.log("fetched ticket", ticket);
   }, 220000);
 
-  it.skip("swaps exact threshold + fee token->memecoin", async () => {
+  it("swaps exact threshold + fee token->memecoin", async () => {
     const pool = await BoundPoolClient.new({
       admin,
       payer,
@@ -199,7 +199,7 @@ describe.skip("SwapY", () => {
   }, 220000);
 
   // strange behavour, it should fail, but it converts negative amount to positive
-  it.skip("swaps negative", async () => {
+  it("swaps negative", async () => {
     const pool = await BoundPoolClient.new({
       admin,
       payer,

@@ -1,16 +1,16 @@
 import { Connection, Keypair, PublicKey } from "@solana/web3.js";
-import { HELIUS_API_URL, IS_TEST_ENV, RPC_API_CLUSTER, TEST_USER_SECRET_KEY, WSS_API_CLUSTER } from "./env";
+import { HELIUS_API_URL, IS_TEST_ENV, TEST_USER_SECRET_KEY } from "./env";
 import { Wallet } from "@coral-xyz/anchor";
 import { MemechanClient } from "../../src/MemechanClient";
 import { ADMIN_PUB_KEY } from "../../src/config/config";
+import { getRandomRpcEndpoint } from "../../src/util/getRandomRpcEndpoint";
 
 export const admin = ADMIN_PUB_KEY;
 export const payer = Keypair.fromSecretKey(Buffer.from(JSON.parse(TEST_USER_SECRET_KEY)));
 export const wallet = new Wallet(payer);
-export const connection = new Connection(RPC_API_CLUSTER, {
+export const connection = new Connection(getRandomRpcEndpoint(), {
   httpAgent: IS_TEST_ENV ? false : undefined,
   commitment: "confirmed",
-  wsEndpoint: WSS_API_CLUSTER,
   confirmTransactionInitialTimeout: 90000,
 });
 
@@ -37,3 +37,17 @@ export const LIVE_BOUND_POOL_ID = new PublicKey("9pEBW3vNF7uxaPyJbATK1AdCLSxAzJy
 export const STAKING_POOL_ID = new PublicKey("AAJypjQCKkjkoTjSrM1rd2EEQNhbF27ZSseGJaiiVsRY");
 export const MARKET_ID = new PublicKey("3jSj3riY7c5HBCLAyZGRBPjk2Gq5weEMkx1sBYLwRtTf");
 export const MEME_MINT = new PublicKey("HjB3RLZYCKSW5mTfxLPtoWERA7GpQg9AZ4ozKshXHrYg");
+
+export function createMemechanClient(): MemechanClient {
+  const connection = new Connection(getRandomRpcEndpoint(), {
+    httpAgent: IS_TEST_ENV ? false : undefined,
+    commitment: "confirmed",
+    confirmTransactionInitialTimeout: 90000,
+  });
+  return new MemechanClient({
+    wallet,
+    connection,
+    heliusApiUrl: HELIUS_API_URL,
+    simulationKeypair: payer,
+  });
+}
