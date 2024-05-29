@@ -1,11 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { CreateCoinTransactionParams } from "../src/token/validation/CreateCoinTransactionParams";
 import {
   InvalidCoinNameError,
   InvalidCoinSymbolError,
   InvalidCoinDescriptionError,
   InvalidCoinImageError,
-  NameEqualsToDescriptionError,
-  SymbolEqualsToDescriptionError,
 } from "../src/token/validation/invalidParamErrors";
 import { validateCreateCoinParams } from "../src/token/validation/validateCreateCoinParams";
 import {
@@ -21,12 +20,16 @@ describe("Validation Tests", () => {
       expect(validateCoinName("ValidName")).toBe(true);
     });
 
+    it("should return true for a valid coin name with spaces", () => {
+      expect(validateCoinName("Name With Spaces")).toBe(true);
+    });
+
     it("should return false for an empty coin name", () => {
       expect(validateCoinName("")).toBe(false);
     });
 
-    it("should return false for a coin name with special characters", () => {
-      expect(validateCoinName("Invalid@Name!")).toBe(false);
+    it("should return true for a coin name with special characters", () => {
+      expect(validateCoinName("Valid@Name!")).toBe(true);
     });
 
     it("should return false for a coin name exceeding 32 bytes", () => {
@@ -35,26 +38,42 @@ describe("Validation Tests", () => {
   });
 
   describe("validateCoinSymbol", () => {
-    it("should return true for a valid coin symbol", () => {
+    it("should return true for a valid coin symbol with letters", () => {
       expect(validateCoinSymbol("VALID")).toBe(true);
     });
 
-    it("should return false for an empty coin symbol", () => {
-      expect(validateCoinSymbol("")).toBe(false);
+    it("should return true for a valid coin symbol with letters and numbers", () => {
+      expect(validateCoinSymbol("VALID123")).toBe(true);
     });
 
-    it("should return false for a coin symbol with special characters", () => {
-      expect(validateCoinSymbol("INVALID@SYM!")).toBe(false);
+    it("should return true for an empty coin symbol", () => {
+      expect(validateCoinSymbol("")).toBe(true);
+    });
+
+    it("should return true for a coin symbol with special characters", () => {
+      expect(validateCoinSymbol("INVID@SYM!")).toBe(true);
     });
 
     it("should return false for a coin symbol exceeding 10 bytes", () => {
       expect(validateCoinSymbol("TOOLONGSYMBOL")).toBe(false);
+    });
+
+    it("should return true for a valid coin symbol with only numbers", () => {
+      expect(validateCoinSymbol("123456")).toBe(true);
+    });
+
+    it("should return true for a coin symbol with spaces", () => {
+      expect(validateCoinSymbol("VALID SMBL")).toBe(true);
     });
   });
 
   describe("validateCoinDescription", () => {
     it("should return true for a valid coin description", () => {
       expect(validateCoinDescription("This is a valid description.")).toBe(true);
+    });
+
+    it("should return true for an empty coin description", () => {
+      expect(validateCoinDescription("")).toBe(true);
     });
 
     it("should return false for a non-string coin description", () => {
@@ -97,12 +116,12 @@ describe("Validation Tests", () => {
     });
 
     it("should throw InvalidCoinNameError for an invalid coin name", () => {
-      const params = { ...validParams, name: "Invalid@Name!" };
+      const params = { ...validParams, name: "ThisNameIsWayTooLongToBeValidAndShouldFail" };
       expect(() => validateCreateCoinParams(params)).toThrow(InvalidCoinNameError);
     });
 
     it("should throw InvalidCoinSymbolError for an invalid coin symbol", () => {
-      const params = { ...validParams, symbol: "INVALID@SYM!" };
+      const params = { ...validParams, symbol: "INVALID@TOOLONGSYMBL!" };
       expect(() => validateCreateCoinParams(params)).toThrow(InvalidCoinSymbolError);
     });
 
@@ -114,16 +133,6 @@ describe("Validation Tests", () => {
     it("should throw InvalidCoinImageError for an invalid coin image", () => {
       const params = { ...validParams, image: "invalid-url" };
       expect(() => validateCreateCoinParams(params)).toThrow(InvalidCoinImageError);
-    });
-
-    it("should throw NameEqualsToDescriptionError if name equals description", () => {
-      const params = { ...validParams, name: "SameText", description: "SameText" };
-      expect(() => validateCreateCoinParams(params)).toThrow(NameEqualsToDescriptionError);
-    });
-
-    it("should throw SymbolEqualsToDescriptionError if symbol equals description", () => {
-      const params = { ...validParams, symbol: "SameText", description: "SameText" };
-      expect(() => validateCreateCoinParams(params)).toThrow(SymbolEqualsToDescriptionError);
     });
   });
 });

@@ -1,7 +1,7 @@
 // eslint-disable-next-line max-len
 // Byte limits from https://github.com/metaplex-foundation/metaplex-program-library/blob/9fc2a13b5a66d407f0b9ab31eb7b161b78f28ef0/token-metadata/program/src/state/metadata.rs#L63
 
-import { MAX_NAME_LENGTH, MAX_SYMBOL_LENGTH } from "./consts";
+import { MAX_DESCRIPTION_LENGTH, MAX_NAME_LENGTH, MAX_SYMBOL_LENGTH } from "./consts";
 
 /**
  * Validates the coin name to be a non-empty string and within the byte length limit.
@@ -10,31 +10,21 @@ import { MAX_NAME_LENGTH, MAX_SYMBOL_LENGTH } from "./consts";
  * @return {boolean} - Returns true if the coin name is valid, otherwise false.
  */
 export function validateCoinName(coinName: string): boolean {
-  const regex = /^[a-zA-Z0-9\s]+$/;
   const maxByteLength = MAX_NAME_LENGTH;
 
-  return (
-    typeof coinName === "string" &&
-    coinName.trim() !== "" &&
-    regex.test(coinName) &&
-    getByteSize(coinName) <= maxByteLength
-  );
+  return typeof coinName === "string" && coinName.trim() !== "" && getByteSize(coinName) <= maxByteLength;
 }
 
 /**
- * Validates the coin symbol based on the specified pattern and byte length.
+ * Validates the coin symbol to be within the byte length limit.
  *
  * @param {string} coinSymbol - The coin symbol to validate.
  * @return {boolean} - Returns true if the coin symbol is valid, otherwise false.
  */
 export function validateCoinSymbol(coinSymbol: string): boolean {
-  const regex = /^[a-zA-Z_]+$/;
   const maxByteLength = MAX_SYMBOL_LENGTH;
 
-  const isCoinSymbolValid =
-    typeof coinSymbol === "string" && regex.test(coinSymbol) && getByteSize(coinSymbol) <= maxByteLength;
-
-  return isCoinSymbolValid;
+  return typeof coinSymbol === "string" && getByteSize(coinSymbol) <= maxByteLength;
 }
 
 /**
@@ -44,7 +34,7 @@ export function validateCoinSymbol(coinSymbol: string): boolean {
  * @return {boolean} - Returns true if the coin description is a string, otherwise false.
  */
 export function validateCoinDescription(coinDescription: string): boolean {
-  return typeof coinDescription === "string";
+  return typeof coinDescription === "string" && coinDescription.length <= MAX_DESCRIPTION_LENGTH;
 }
 
 /**

@@ -1,11 +1,10 @@
 import { CreateCoinTransactionParams } from "./CreateCoinTransactionParams";
 import {
+  CoinDescriptionTooLargeError,
   InvalidCoinDescriptionError,
   InvalidCoinImageError,
   InvalidCoinNameError,
   InvalidCoinSymbolError,
-  NameEqualsToDescriptionError,
-  SymbolEqualsToDescriptionError,
 } from "./invalidParamErrors";
 import { validateCoinDescription, validateCoinImage, validateCoinName, validateCoinSymbol } from "./validation";
 
@@ -25,22 +24,14 @@ export function validateCreateCoinParams({ name, symbol, image, description }: C
   }
 
   if (!validateCoinDescription(description)) {
+    if (description.length > 300) {
+      throw new CoinDescriptionTooLargeError(`[validateCreateCoinParams] Coin description ${description} is too large`);
+    }
+
     throw new InvalidCoinDescriptionError(`[validateCreateCoinParams] Coin description ${description} is invalid`);
   }
 
   if (!validateCoinImage(image)) {
     throw new InvalidCoinImageError(`[validateCreateCoinParams] Coin image ${image} is invalid`);
-  }
-
-  if (name.trim() === description.trim()) {
-    throw new NameEqualsToDescriptionError(
-      `[validateCreateCoinParams] Coin name ${name} and coin description ${description} are equal`,
-    );
-  }
-
-  if (symbol.trim() === description.trim()) {
-    throw new SymbolEqualsToDescriptionError(
-      `[validateCreateCoinParams] Coin symbol ${symbol} and coin description ${description} are equal`,
-    );
   }
 }

@@ -42,7 +42,7 @@ export class PoolAPI {
    * @return {Promise<SolanaLivePool>} A Promise that resolves with the live pool matching the specified coin type.
    */
   getLivePoolByTokenAddress(tokenAddress: string): Promise<SolanaLivePool> {
-    return jsonFetch(`${this.url}/sol/live-pools?coinType=${tokenAddress}`, {
+    return jsonFetch(`${this.url}/sol/live-pools?tokenAddress=${tokenAddress}`, {
       method: "GET",
     });
   }
