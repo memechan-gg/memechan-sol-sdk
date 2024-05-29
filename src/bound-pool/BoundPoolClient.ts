@@ -305,7 +305,6 @@ export class BoundPoolClient {
     args: GetCreateNewBondingPoolAndTokenWithBuyMemeTransactionArgs,
   ): Promise<{
     createPoolTransaction: Transaction;
-    createTokenTransaction: Transaction;
     memeMintKeypair: Keypair;
     poolQuoteVault: PublicKey;
     launchVault: PublicKey;
@@ -420,7 +419,6 @@ export class BoundPoolClient {
 
     return {
       createPoolTransaction,
-      createTokenTransaction: new Transaction(),
       memeMintKeypair,
       poolQuoteVault,
       launchVault,
@@ -494,25 +492,16 @@ export class BoundPoolClient {
     const { payer, client, quoteToken } = args;
     const { memechanProgram } = client;
 
-    const {
-      createPoolTransaction,
-      createTokenTransaction,
-      memeMintKeypair,
-      poolQuoteVault,
-      launchVault,
-      memeTicketKeypair,
-    } = await this.getCreateNewBondingPoolAndBuyAndTokenWithBuyMemeTransaction({
-      ...args,
-      payer: payer.publicKey,
-    });
+    const { createPoolTransaction, memeMintKeypair, poolQuoteVault, launchVault, memeTicketKeypair } =
+      await this.getCreateNewBondingPoolAndBuyAndTokenWithBuyMemeTransaction({
+        ...args,
+        payer: payer.publicKey,
+      });
 
     const memeMint = memeMintKeypair.publicKey;
 
     const createPoolTransactionSize = getTxSize(createPoolTransaction, payer.publicKey);
     console.debug("createPoolTransaction size: ", createPoolTransactionSize);
-
-    const createTokenTransactionSize = getTxSize(createTokenTransaction, payer.publicKey);
-    console.debug("createTokenTransaction size: ", createTokenTransactionSize);
 
     const signers = [payer, memeMintKeypair];
     if (memeTicketKeypair) {
@@ -535,23 +524,6 @@ export class BoundPoolClient {
       functionName: "createPoolMethod",
       retries: 1,
     });
-
-    // const createTokenMethod = getSendAndConfirmTransactionMethod({
-    //   connection: client.connection,
-    //   transaction: createTokenTransaction,
-    //   signers: [payer],
-    //   options: {
-    //     commitment: "confirmed",
-    //     skipPreflight: true,
-    //     preflightCommitment: "confirmed",
-    //   },
-    // });
-
-    // await retry({
-    //   fn: createTokenMethod,
-    //   functionName: "createTokenMethod",
-    //   retries: 1,
-    // });
 
     const id = this.findBoundPoolPda(memeMint, quoteToken.mint, memechanProgram.programId);
 
