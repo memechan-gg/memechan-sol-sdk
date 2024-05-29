@@ -24,12 +24,15 @@ export class MemechanClient {
     this.wallet = wallet;
     this.connection = connection;
     this.heliusApiUrl = heliusApiUrl;
-    const provider = new AnchorProvider(this.connection, wallet, { commitment: "confirmed" });
+    const provider = new AnchorProvider(this.connection, wallet, {
+      commitment: "confirmed",
+      preflightCommitment: "confirmed",
+      skipPreflight: true,
+    });
     setProvider(provider);
     this.anchorProvider = provider;
 
     console.log("MemechanClient init. Program id: " + MEMECHAN_PROGRAM_ID + " Rpc: " + connection.rpcEndpoint);
-    console.log("connection rpc: " + this.connection.rpcEndpoint);
 
     this.memechanProgram = new Program<MemechanSol>(IDL, new PublicKey(MEMECHAN_PROGRAM_ID), provider);
     this.simulationKeypair = config.simulationKeypair;
