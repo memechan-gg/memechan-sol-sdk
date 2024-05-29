@@ -1,24 +1,16 @@
 import { BN } from "@coral-xyz/anchor";
 import { BoundPoolClient } from "../src/bound-pool/BoundPoolClient";
-import { DUMMY_TOKEN_METADATA, admin, client, payer } from "./common/common";
+import { DUMMY_TOKEN_METADATA, admin, createMemechanClient, payer } from "./common/common";
 import { FEE_DESTINATION_ID, MEMECHAN_QUOTE_TOKEN } from "../src/config/config";
 import { MemeTicketClient } from "../src/memeticket/MemeTicketClient";
+import { BoundPoolWithBuyMemeArgs, MemechanClient } from "../src";
 
 describe("BoundPool", () => {
-  it.skip("all", async () => {
-    const all = await BoundPoolClient.all(client.memechanProgram);
-
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    for (const pool of all) {
-      // console.log(pool.account);
-      // console.log("==================================================");
-    }
-
-    console.log(all);
-  }, 30000);
-
-  it.skip("swapy, golive, should fail below tresholds", async () => {
-    const args = {
+  let client: MemechanClient;
+  let boundPoolWithBuyMemeArgs: BoundPoolWithBuyMemeArgs;
+  beforeAll(() => {
+    client = createMemechanClient();
+    boundPoolWithBuyMemeArgs = {
       admin,
       payer,
       client,
@@ -31,9 +23,15 @@ describe("BoundPool", () => {
         user: payer.publicKey,
       },
     };
+  });
 
-    const boundPool = await BoundPoolClient.newWithBuyTx(args);
+  it.skip("all", async () => {
+    const all = await BoundPoolClient.all(client.memechanProgram);
+    console.log("all BoundPool length: " + all.length);
+  }, 30000);
 
+  it.skip("swapy, golive, should fail below tresholds", async () => {
+    const boundPool = await BoundPoolClient.newWithBuyTx(boundPoolWithBuyMemeArgs);
     console.log("==== pool id: " + boundPool.id.toString() + ", " + new Date().toUTCString());
 
     const tickets: MemeTicketClient[] = [];
@@ -79,22 +77,8 @@ describe("BoundPool", () => {
 
   it("init staking pool then go live", async () => {
     console.log(" init staking pool then go live. " + new Date().toUTCString());
-    console.log("payer: " + payer.publicKey.toString());
-    const args = {
-      admin,
-      payer,
-      client,
-      quoteToken: MEMECHAN_QUOTE_TOKEN,
-      tokenMetadata: DUMMY_TOKEN_METADATA,
-      buyMemeTransactionArgs: {
-        inputAmount: "10",
-        minOutputAmount: "1",
-        slippagePercentage: 0,
-        user: payer.publicKey,
-      },
-    };
 
-    const pool = await BoundPoolClient.newWithBuyTx(args);
+    const pool = await BoundPoolClient.newWithBuyTx(boundPoolWithBuyMemeArgs);
 
     console.log("==== pool id: " + pool.id.toString());
 
@@ -143,21 +127,8 @@ describe("BoundPool", () => {
   it("init staking pool, many swapy, then go live", async () => {
     console.log(" init staking pool, many swapy then go live. " + new Date().toUTCString());
     console.log("payer: " + payer.publicKey.toString());
-    const args = {
-      admin,
-      payer,
-      client,
-      quoteToken: MEMECHAN_QUOTE_TOKEN,
-      tokenMetadata: DUMMY_TOKEN_METADATA,
-      buyMemeTransactionArgs: {
-        inputAmount: "10",
-        minOutputAmount: "1",
-        slippagePercentage: 0,
-        user: payer.publicKey,
-      },
-    };
-
-    const pool = await BoundPoolClient.newWithBuyTx(args);
+ 
+    const pool = await BoundPoolClient.newWithBuyTx(boundPoolWithBuyMemeArgs);
 
     console.log("==== pool id: " + pool.id.toString());
 

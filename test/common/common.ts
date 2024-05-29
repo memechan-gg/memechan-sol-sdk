@@ -37,3 +37,17 @@ export const LIVE_BOUND_POOL_ID = new PublicKey("9pEBW3vNF7uxaPyJbATK1AdCLSxAzJy
 export const STAKING_POOL_ID = new PublicKey("AAJypjQCKkjkoTjSrM1rd2EEQNhbF27ZSseGJaiiVsRY");
 export const MARKET_ID = new PublicKey("3jSj3riY7c5HBCLAyZGRBPjk2Gq5weEMkx1sBYLwRtTf");
 export const MEME_MINT = new PublicKey("HjB3RLZYCKSW5mTfxLPtoWERA7GpQg9AZ4ozKshXHrYg");
+
+export function createMemechanClient(): MemechanClient {
+  const connection = new Connection(getRandomRpcEndpoint(), {
+    httpAgent: IS_TEST_ENV ? false : undefined,
+    commitment: "confirmed",
+    confirmTransactionInitialTimeout: 90000,
+  });
+  return new MemechanClient({
+    wallet,
+    connection,
+    heliusApiUrl: HELIUS_API_URL,
+    simulationKeypair: payer,
+  });
+}

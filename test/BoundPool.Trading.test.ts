@@ -1,7 +1,7 @@
 import { BN } from "@coral-xyz/anchor";
 import { BoundPoolClient } from "../src/bound-pool/BoundPoolClient";
 import { sleep } from "../src/common/helpers";
-import { DUMMY_TOKEN_METADATA, admin, client, payer } from "./common/common";
+import { DUMMY_TOKEN_METADATA, admin, client, createMemechanClient, payer } from "./common/common";
 import {
   MEMECHAN_MEME_TOKEN_DECIMALS,
   MEMECHAN_QUOTE_TOKEN,
@@ -12,19 +12,32 @@ import { PublicKey, sendAndConfirmTransaction } from "@solana/web3.js";
 import { getTokenBalanceForWallet } from "../src/util/getTokenAccountBalance";
 import { normalizeInputCoinAmount } from "../src/util/trading/normalizeInputCoinAmount";
 import { connection } from "../examples/common";
+import { BoundPoolWithBuyMemeArgs, MemechanClient } from "../src";
 
 const BUY_SELL_BOUND_POOL_ID = new PublicKey("HCRVDUJgvLGiRh9oDpW63a3dyPAM8rJoxQXrfVbZSABv");
 const SLEEP_TIME = 60000;
 
 describe("BoundPoolClient Trading", () => {
-  it("buy meme tokens tx", async () => {
-    const boundPoolInstance = await BoundPoolClient.new({
+  let client: MemechanClient;
+  let boundPoolWithBuyMemeArgs: BoundPoolWithBuyMemeArgs;
+  beforeAll(() => {
+    client = createMemechanClient();
+    boundPoolWithBuyMemeArgs = {
       admin,
       payer,
       client,
       quoteToken: MEMECHAN_QUOTE_TOKEN,
       tokenMetadata: DUMMY_TOKEN_METADATA,
-    });
+      buyMemeTransactionArgs: {
+        inputAmount: "10",
+        minOutputAmount: "1",
+        slippagePercentage: 0,
+        user: payer.publicKey,
+      },
+    };
+  });
+  it("buy meme tokens tx", async () => {
+    const boundPoolInstance = await BoundPoolClient.newWithBuyTx(boundPoolWithBuyMemeArgs);
     const poolAccountAddressId = boundPoolInstance.id;
     const inputQuoteAmount = "1";
     const minMemeOutputAmount = await boundPoolInstance.getOutputAmountForBuyMeme({
@@ -109,13 +122,7 @@ describe("BoundPoolClient Trading", () => {
   }, 150000);
 
   it.skip("buy and sell meme tokens tx", async () => {
-    const boundPoolInstance = await BoundPoolClient.new({
-      admin,
-      payer,
-      client,
-      quoteToken: MEMECHAN_QUOTE_TOKEN,
-      tokenMetadata: DUMMY_TOKEN_METADATA,
-    });
+    const boundPoolInstance = await BoundPoolClient.newWithBuyTx(boundPoolWithBuyMemeArgs);
     console.log("==== pool id: " + boundPoolInstance.id.toString());
 
     // Step 1: Buy meme tokens

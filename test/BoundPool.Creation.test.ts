@@ -1,10 +1,14 @@
 import { BoundPoolClient } from "../src/bound-pool/BoundPoolClient";
-import { DUMMY_TOKEN_METADATA, admin, client, payer } from "./common/common";
+import { DUMMY_TOKEN_METADATA, admin, createMemechanClient, payer } from "./common/common";
 import { MEMECHAN_QUOTE_TOKEN } from "../src/config/config";
+import { BoundPoolWithBuyMemeArgs, MemechanClient } from "../src";
 
 describe("BoundPoolClient Creation Tests", () => {
-  it("creates bound pool with buy tx", async () => {
-    const args = {
+  let client: MemechanClient;
+  let boundPoolWithBuyMemeArgs: BoundPoolWithBuyMemeArgs;
+  beforeAll(() => {
+    client = createMemechanClient();
+    boundPoolWithBuyMemeArgs = {
       admin,
       payer,
       client,
@@ -17,11 +21,13 @@ describe("BoundPoolClient Creation Tests", () => {
         user: payer.publicKey,
       },
     };
+  });
 
-    const outputAmount = await BoundPoolClient.getOutputAmountForNewPoolWithBuyMemeTx(args);
+  it("creates bound pool with buy tx", async () => {
+    const outputAmount = await BoundPoolClient.getOutputAmountForNewPoolWithBuyMemeTx(boundPoolWithBuyMemeArgs);
     console.log("==== meme outputAmount: " + outputAmount.toString());
 
-    const boundPool = await BoundPoolClient.newWithBuyTx(args);
+    const boundPool = await BoundPoolClient.newWithBuyTx(boundPoolWithBuyMemeArgs);
     console.log("==== pool id: " + boundPool.id.toString());
     const info = await BoundPoolClient.fetch2(client.connection, boundPool.id);
     console.log(info);
@@ -40,17 +46,8 @@ describe("BoundPoolClient Creation Tests", () => {
       };
 
       const args = {
-        admin,
-        payer,
-        client,
-        quoteToken: MEMECHAN_QUOTE_TOKEN,
+        ...boundPoolWithBuyMemeArgs,
         tokenMetadata: metadata,
-        buyMemeTransactionArgs: {
-          inputAmount: "10",
-          minOutputAmount: "1",
-          slippagePercentage: 0,
-          user: payer.publicKey,
-        },
       };
 
       await expect(BoundPoolClient.newWithBuyTx(args)).rejects.toThrow();
@@ -69,17 +66,8 @@ describe("BoundPoolClient Creation Tests", () => {
       };
 
       const args = {
-        admin,
-        payer,
-        client,
-        quoteToken: MEMECHAN_QUOTE_TOKEN,
+        ...boundPoolWithBuyMemeArgs,
         tokenMetadata: metadata,
-        buyMemeTransactionArgs: {
-          inputAmount: "10",
-          minOutputAmount: "1",
-          slippagePercentage: 0,
-          user: payer.publicKey,
-        },
       };
 
       await expect(BoundPoolClient.newWithBuyTx(args)).rejects.toThrow();
@@ -97,17 +85,8 @@ describe("BoundPoolClient Creation Tests", () => {
         symbol: validSymbols[0],
       };
       const args = {
-        admin,
-        payer,
-        client,
-        quoteToken: MEMECHAN_QUOTE_TOKEN,
+        ...boundPoolWithBuyMemeArgs,
         tokenMetadata: metadata,
-        buyMemeTransactionArgs: {
-          inputAmount: "10",
-          minOutputAmount: "1",
-          slippagePercentage: 0,
-          user: payer.publicKey,
-        },
       };
 
       const result = await BoundPoolClient.newWithBuyTx(args);
