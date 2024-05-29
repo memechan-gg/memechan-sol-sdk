@@ -3,19 +3,6 @@ import { DUMMY_TOKEN_METADATA, admin, client, payer } from "./common/common";
 import { MEMECHAN_QUOTE_TOKEN } from "../src/config/config";
 
 describe("BoundPoolClient Creation Tests", () => {
-  it.skip("creates dummy bound pool", async () => {
-    const boundPool = await BoundPoolClient.new({
-      admin,
-      payer,
-      client,
-      quoteToken: MEMECHAN_QUOTE_TOKEN,
-      tokenMetadata: DUMMY_TOKEN_METADATA,
-    });
-    console.log("==== pool id: " + boundPool.id.toString());
-    const info = await BoundPoolClient.fetch2(client.connection, boundPool.id);
-    console.log(info);
-  }, 150000);
-
   it("creates bound pool with buy tx", async () => {
     const args = {
       admin,
@@ -40,7 +27,7 @@ describe("BoundPoolClient Creation Tests", () => {
     console.log(info);
   }, 150000);
 
-  it.skip("fails to create bound pool with invalid names", async () => {
+  it("fails to create bound pool with invalid names", async () => {
     const invalidNames = [
       "ThisNameIsWayTooLongToBeValidAndShouldFail", // Exceeds 32 characters
     ];
@@ -52,19 +39,25 @@ describe("BoundPoolClient Creation Tests", () => {
         name: invalidName,
       };
 
-      await expect(
-        BoundPoolClient.new({
-          admin,
-          payer,
-          client,
-          quoteToken: MEMECHAN_QUOTE_TOKEN,
-          tokenMetadata: metadata,
-        }),
-      ).rejects.toThrow();
+      const args = {
+        admin,
+        payer,
+        client,
+        quoteToken: MEMECHAN_QUOTE_TOKEN,
+        tokenMetadata: metadata,
+        buyMemeTransactionArgs: {
+          inputAmount: "10",
+          minOutputAmount: "1",
+          slippagePercentage: 0,
+          user: payer.publicKey,
+        },
+      };
+
+      await expect(BoundPoolClient.newWithBuyTx(args)).rejects.toThrow();
     }
   }, 150000);
 
-  it.skip("fails to create bound pool with invalid symbols", async () => {
+  it("fails to create bound pool with invalid symbols", async () => {
     const invalidSymbols = [
       "TOOLONGSYMBOL", // Exceeds 10 characters
     ];
@@ -75,19 +68,25 @@ describe("BoundPoolClient Creation Tests", () => {
         symbol: invalidSymbol,
       };
 
-      await expect(
-        BoundPoolClient.new({
-          admin,
-          payer,
-          client,
-          quoteToken: MEMECHAN_QUOTE_TOKEN,
-          tokenMetadata: metadata,
-        }),
-      ).rejects.toThrow();
+      const args = {
+        admin,
+        payer,
+        client,
+        quoteToken: MEMECHAN_QUOTE_TOKEN,
+        tokenMetadata: metadata,
+        buyMemeTransactionArgs: {
+          inputAmount: "10",
+          minOutputAmount: "1",
+          slippagePercentage: 0,
+          user: payer.publicKey,
+        },
+      };
+
+      await expect(BoundPoolClient.newWithBuyTx(args)).rejects.toThrow();
     }
   }, 150000);
 
-  it.skip("creates bound pool with valid names and symbols", async () => {
+  it("creates bound pool with valid names and symbols", async () => {
     const validNames = ["Valid@Name !123 őá", ""];
     const validSymbols = ["V4L! dS%M", ""];
 
@@ -97,16 +96,23 @@ describe("BoundPoolClient Creation Tests", () => {
         name: name,
         symbol: validSymbols[0],
       };
-
-      const result = await BoundPoolClient.new({
+      const args = {
         admin,
         payer,
         client,
         quoteToken: MEMECHAN_QUOTE_TOKEN,
         tokenMetadata: metadata,
-      });
+        buyMemeTransactionArgs: {
+          inputAmount: "10",
+          minOutputAmount: "1",
+          slippagePercentage: 0,
+          user: payer.publicKey,
+        },
+      };
 
-      console.log("result: " + result.id.toString());
+      const result = await BoundPoolClient.newWithBuyTx(args);
+
+      console.log("result: " + result.toString());
       expect(result).not.toBeNull();
     }
 
