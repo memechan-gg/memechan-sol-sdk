@@ -1,12 +1,13 @@
 import { Wallet } from "@coral-xyz/anchor";
 import { Connection, Keypair } from "@solana/web3.js";
 import { ADMIN_PUB_KEY, MemechanClient } from "../src";
-import { HELIUS_API_URL, IS_TEST_ENV, RPC_API_CLUSTER, TEST_USER_SECRET_KEY, WSS_API_CLUSTER } from "./env";
+import { HELIUS_API_URL, IS_TEST_ENV, TEST_USER_SECRET_KEY } from "./env";
+import { getRandomRpcEndpoint } from "../src/util/getRandomRpcEndpoint";
 
-export const connection = new Connection(RPC_API_CLUSTER, {
+export const connection = new Connection(getRandomRpcEndpoint(), {
   httpAgent: IS_TEST_ENV ? false : undefined,
   commitment: "confirmed",
-  wsEndpoint: WSS_API_CLUSTER,
+  confirmTransactionInitialTimeout: 90000,
 });
 
 export const admin = ADMIN_PUB_KEY;
