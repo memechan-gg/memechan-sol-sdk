@@ -103,11 +103,32 @@ export interface BoundPoolArgs {
   tokenMetadata: TokenMetadata;
 }
 
+export interface BoundPoolWithBuyMemeArgs {
+  admin: PublicKey;
+  payer: Signer;
+  client: MemechanClient;
+  quoteToken: Token;
+  tokenMetadata: TokenMetadata;
+  buyMemeTransactionArgs: GetBuyMemeTransactionArgs;
+}
+
 export type GetCreateNewBondingPoolAndTokenTransactionArgs = Omit<BoundPoolArgs, "payer"> & {
   payer: PublicKey;
   transaction?: Transaction;
   adminSolPublicKey?: PublicKey;
 };
+
+export type GetBuyMemeTransactionStaticArgs = GetBuyMemeTransactionArgs & {
+  boundPoolId: PublicKey;
+  poolSignerPda: PublicKey;
+  client: MemechanClient;
+  quoteVault: PublicKey;
+};
+
+export type GetCreateNewBondingPoolAndTokenWithBuyMemeTransactionArgs =
+  GetCreateNewBondingPoolAndTokenTransactionArgs & {
+    buyMemeTransactionArgs?: GetBuyMemeTransactionArgs;
+  };
 
 export interface InitStakingPoolResult {
   stakingMemeVault: PublicKey;

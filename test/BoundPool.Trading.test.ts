@@ -1,7 +1,7 @@
 import { BN } from "@coral-xyz/anchor";
 import { BoundPoolClient } from "../src/bound-pool/BoundPoolClient";
 import { sleep } from "../src/common/helpers";
-import { client, payer } from "./common/common";
+import { DUMMY_TOKEN_METADATA, admin, client, payer } from "./common/common";
 import {
   MEMECHAN_MEME_TOKEN_DECIMALS,
   MEMECHAN_QUOTE_TOKEN,
@@ -103,11 +103,104 @@ describe("BoundPoolClient Trading", () => {
     expect(afterBN.sub(beforeBN).gte(minMemeOutputAmountBN)).toBeTruthy();
   }, 150000);
 
-  it.skip("sell meme tokens tx", async () => {
-    const poolAccountAddressId = BUY_SELL_BOUND_POOL_ID;
-    const boundPoolInstance = await BoundPoolClient.fromBoundPoolId({ client, poolAccountAddressId });
+  it.skip("buy and sell meme tokens tx", async () => {
+    const boundPoolInstance = await BoundPoolClient.new({
+      admin,
+      payer,
+      client,
+      quoteToken: MEMECHAN_QUOTE_TOKEN,
+      tokenMetadata: DUMMY_TOKEN_METADATA,
+    });
+    console.log("==== pool id: " + boundPoolInstance.id.toString());
 
-    const inputMemeAmount = "20000000";
+    // Step 1: Buy meme tokens
+    const inputQuoteAmount = "2";
+    const minMemeOutputAmount = await boundPoolInstance.getOutputAmountForBuyMeme({
+      inputAmount: inputQuoteAmount,
+      slippagePercentage: 0,
+    });
+
+    console.log("minMemeOutputAmount: ", minMemeOutputAmount);
+    const { availableAmountWithDecimals: availableAmountWithDecimalsBeforeBuy } =
+      await MemeTicketClient.fetchAvailableTicketsByUser(boundPoolInstance.id, client, payer.publicKey);
+
+    console.log("availableAmountWithDecimalsBeforeBuy: ", availableAmountWithDecimalsBeforeBuy);
+
+    const quoteTokenBalanceBeforeBuy = await getTokenBalanceForWallet(
+      connection,
+      payer.publicKey,
+      MEMECHAN_QUOTE_TOKEN.mint,
+    );
+    console.log("quoteTokenBalanceBeforeBuy: ", quoteTokenBalanceBeforeBuy);
+
+    const { tx: buyTx, memeTicketKeypair } = await boundPoolInstance.getBuyMemeTransaction({
+      inputAmount: inputQuoteAmount,
+      minOutputAmount: minMemeOutputAmount,
+      slippagePercentage: 0,
+      user: payer.publicKey,
+    });
+
+    const latestBlockhashBuy = await client.connection.getLatestBlockhash("confirmed");
+    buyTx.recentBlockhash = latestBlockhashBuy.blockhash;
+    buyTx.lastValidBlockHeight = latestBlockhashBuy.lastValidBlockHeight;
+
+    const buySignature = await sendAndConfirmTransaction(client.connection, buyTx, [payer, memeTicketKeypair], {
+      commitment: "confirmed",
+      skipPreflight: true,
+      preflightCommitment: "confirmed",
+    });
+
+    console.log("buySignature: " + buySignature);
+
+    let retriesBuy = 5;
+    let availableAmountWithDecimalsAfterBuy = "0";
+    while (retriesBuy > 0) {
+      const { availableAmountWithDecimals } = await MemeTicketClient.fetchAvailableTicketsByUser(
+        boundPoolInstance.id,
+        client,
+        payer.publicKey,
+      );
+      if (availableAmountWithDecimals !== availableAmountWithDecimalsBeforeBuy) {
+        availableAmountWithDecimalsAfterBuy = availableAmountWithDecimals;
+        break;
+      }
+      console.log("Retrying to fetch updated state after buy...");
+      await sleep(15000);
+      retriesBuy--;
+    }
+
+    console.log("availableAmountWithDecimalsAfterBuy: ", availableAmountWithDecimalsAfterBuy);
+
+    const quoteTokenBalanceAfterBuy = await getTokenBalanceForWallet(
+      connection,
+      payer.publicKey,
+      MEMECHAN_QUOTE_TOKEN.mint,
+    );
+    console.log("quoteTokenBalanceAfterBuy: ", quoteTokenBalanceAfterBuy);
+
+    const beforeBuyBN = new BN(
+      normalizeInputCoinAmount(availableAmountWithDecimalsBeforeBuy, MEMECHAN_MEME_TOKEN_DECIMALS).toString(),
+    );
+    const afterBuyBN = new BN(
+      normalizeInputCoinAmount(availableAmountWithDecimalsAfterBuy, MEMECHAN_MEME_TOKEN_DECIMALS).toString(),
+    );
+    const minMemeOutputAmountBuyBN = new BN(
+      normalizeInputCoinAmount(minMemeOutputAmount, MEMECHAN_MEME_TOKEN_DECIMALS).toString(),
+    );
+
+    console.log("beforeBuyBN: ", beforeBuyBN.toString());
+    console.log("afterBuyBN: ", afterBuyBN.toString());
+    console.log("minMemeOutputAmountBuyBN: ", minMemeOutputAmountBuyBN.toString());
+    console.log("afterBuyBN.sub(beforeBuyBN): ", afterBuyBN.sub(beforeBuyBN).toString());
+
+    expect(afterBuyBN.sub(beforeBuyBN).gte(minMemeOutputAmountBuyBN)).toBeTruthy();
+
+    // Step 2: Sell meme tokens
+
+    // wait until ticket unlock
+    await sleep(60000);
+
+    const inputMemeAmount = availableAmountWithDecimalsAfterBuy;
     const minQuoteOutputAmount = await boundPoolInstance.getOutputAmountForSellMeme({
       inputAmount: inputMemeAmount,
       slippagePercentage: 0,
@@ -115,51 +208,64 @@ describe("BoundPoolClient Trading", () => {
 
     console.log("minQuoteOutputAmount: ", minQuoteOutputAmount);
 
-    const quoteTokenBalanceBefore = await getTokenBalanceForWallet(
+    const quoteTokenBalanceBeforeSell = await getTokenBalanceForWallet(
       connection,
       payer.publicKey,
       MEMECHAN_QUOTE_TOKEN.mint,
     );
-    console.log("quoteTokenBalanceBefore: ", quoteTokenBalanceBefore);
+    console.log("quoteTokenBalanceBeforeSell: ", quoteTokenBalanceBeforeSell);
 
-    const txResult = await boundPoolInstance.getSellMemeTransaction({
+    const { txs: sellTxs } = await boundPoolInstance.getSellMemeTransaction({
       inputAmount: inputMemeAmount,
       minOutputAmount: minQuoteOutputAmount,
       slippagePercentage: 0,
       user: payer.publicKey,
     });
 
-    for (const tx of txResult.txs) {
-      const latestBlockhash = await client.connection.getLatestBlockhash("confirmed");
-      tx.recentBlockhash = latestBlockhash.blockhash;
-      tx.lastValidBlockHeight = latestBlockhash.lastValidBlockHeight;
+    for (const tx of sellTxs) {
+      const latestBlockhashSell = await client.connection.getLatestBlockhash("confirmed");
+      tx.recentBlockhash = latestBlockhashSell.blockhash;
+      tx.lastValidBlockHeight = latestBlockhashSell.lastValidBlockHeight;
 
-      const signature = await sendAndConfirmTransaction(client.connection, tx, [payer], {
+      const sellSignature = await sendAndConfirmTransaction(client.connection, tx, [payer], {
         commitment: "confirmed",
         skipPreflight: true,
         preflightCommitment: "confirmed",
       });
 
-      console.log("signature: " + signature);
+      console.log("sellSignature: " + sellSignature);
     }
-    await sleep(SLEEP_TIME);
 
-    const quoteTokenBalanceAfter = await getTokenBalanceForWallet(
-      connection,
-      payer.publicKey,
-      MEMECHAN_QUOTE_TOKEN.mint,
-    );
-    console.log("quoteTokenBalanceAfter: ", quoteTokenBalanceAfter);
+    let retriesSell = 5;
+    let quoteTokenBalanceAfterSell = "0";
+    while (retriesSell > 0) {
+      const balance = await getTokenBalanceForWallet(connection, payer.publicKey, MEMECHAN_QUOTE_TOKEN.mint);
+      if (balance !== quoteTokenBalanceBeforeSell) {
+        quoteTokenBalanceAfterSell = balance;
+        break;
+      }
+      console.log("Retrying to fetch updated state after sell...");
+      await sleep(15000);
+      retriesSell--;
+    }
 
-    const beforeBN = new BN(
-      normalizeInputCoinAmount(quoteTokenBalanceBefore, MEMECHAN_QUOTE_TOKEN_DECIMALS).toString(),
+    console.log("quoteTokenBalanceAfterSell: ", quoteTokenBalanceAfterSell);
+
+    const beforeSellBN = new BN(
+      normalizeInputCoinAmount(quoteTokenBalanceBeforeSell, MEMECHAN_QUOTE_TOKEN_DECIMALS).toString(),
     );
-    const afterBN = new BN(normalizeInputCoinAmount(quoteTokenBalanceAfter, MEMECHAN_QUOTE_TOKEN_DECIMALS).toString());
+    const afterSellBN = new BN(
+      normalizeInputCoinAmount(quoteTokenBalanceAfterSell, MEMECHAN_QUOTE_TOKEN_DECIMALS).toString(),
+    );
     const minQuoteOutputAmountBN = new BN(
       normalizeInputCoinAmount(minQuoteOutputAmount, MEMECHAN_QUOTE_TOKEN_DECIMALS).toString(),
     );
 
-    expect(afterBN.sub(beforeBN).gt(minQuoteOutputAmountBN)).toBeTruthy();
+    console.log("beforeSellBN: ", beforeSellBN.toString());
+    console.log("afterSellBN: ", afterSellBN.toString());
+    console.log("minQuoteOutputAmountBN: ", minQuoteOutputAmountBN.toString());
+
+    expect(afterSellBN.sub(beforeSellBN).gte(minQuoteOutputAmountBN)).toBeTruthy();
   }, 150000);
 
   describe.skip("Edge Cases", () => {
