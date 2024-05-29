@@ -309,6 +309,7 @@ export class BoundPoolClient {
     memeMintKeypair: Keypair;
     poolQuoteVault: PublicKey;
     launchVault: PublicKey;
+    memeTicketKeypair?: Keypair;
   }> {
     const {
       admin,
@@ -389,17 +390,19 @@ export class BoundPoolClient {
 
     createPoolTransaction.add(createPoolInstruction);
 
+    let memeTicketKeypair: Keypair | undefined = undefined;
     if (args.buyMemeTransactionArgs) {
       const inputAmount = new BN(args.buyMemeTransactionArgs.inputAmount);
       if (!inputAmount.isZero()) {
-        const buyMemeTransaction = await this.getBuyMemeTransaction({
+        const { tx, memeTicketKeypair: newMemeTicketKeypair } = await this.getBuyMemeTransaction({
           ...args.buyMemeTransactionArgs,
           boundPoolId: id,
           poolSignerPda: poolSigner,
           client,
-          quoteVault: adminQuoteVault,
+          quoteVault: poolQuoteVault,
         });
-        createPoolTransaction.add(buyMemeTransaction.tx);
+        memeTicketKeypair = newMemeTicketKeypair;
+        createPoolTransaction.add(tx);
       }
     }
 
@@ -423,6 +426,7 @@ export class BoundPoolClient {
       memeMintKeypair,
       poolQuoteVault,
       launchVault,
+      memeTicketKeypair,
     };
   }
 
@@ -492,11 +496,17 @@ export class BoundPoolClient {
     const { payer, client, quoteToken } = args;
     const { memechanProgram } = client;
 
-    const { createPoolTransaction, createTokenTransaction, memeMintKeypair, poolQuoteVault, launchVault } =
-      await this.getCreateNewBondingPoolAndBuyAndTokenWithBuyMemeTransaction({
-        ...args,
-        payer: payer.publicKey,
-      });
+    const {
+      createPoolTransaction,
+      createTokenTransaction,
+      memeMintKeypair,
+      poolQuoteVault,
+      launchVault,
+      memeTicketKeypair,
+    } = await this.getCreateNewBondingPoolAndBuyAndTokenWithBuyMemeTransaction({
+      ...args,
+      payer: payer.publicKey,
+    });
 
     const memeMint = memeMintKeypair.publicKey;
 
@@ -506,10 +516,15 @@ export class BoundPoolClient {
     const createTokenTransactionSize = getTxSize(createTokenTransaction, payer.publicKey);
     console.debug("createTokenTransaction size: ", createTokenTransactionSize);
 
+    const signers = [payer, memeMintKeypair];
+    if (memeTicketKeypair) {
+      signers.push(memeTicketKeypair);
+    }
+
     const createPoolMethod = getSendAndConfirmTransactionMethod({
       connection: client.connection,
       transaction: createPoolTransaction,
-      signers: [payer, memeMintKeypair],
+      signers,
       options: {
         commitment: "confirmed",
         skipPreflight: true,
