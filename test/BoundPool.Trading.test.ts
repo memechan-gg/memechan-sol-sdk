@@ -18,9 +18,14 @@ const SLEEP_TIME = 60000;
 
 describe("BoundPoolClient Trading", () => {
   it("buy meme tokens tx", async () => {
-    const poolAccountAddressId = BUY_SELL_BOUND_POOL_ID;
-    const boundPoolInstance = await BoundPoolClient.fromBoundPoolId({ client, poolAccountAddressId });
-
+    const boundPoolInstance = await BoundPoolClient.new({
+      admin,
+      payer,
+      client,
+      quoteToken: MEMECHAN_QUOTE_TOKEN,
+      tokenMetadata: DUMMY_TOKEN_METADATA,
+    });
+    const poolAccountAddressId = boundPoolInstance.id;
     const inputQuoteAmount = "1";
     const minMemeOutputAmount = await boundPoolInstance.getOutputAmountForBuyMeme({
       inputAmount: inputQuoteAmount,

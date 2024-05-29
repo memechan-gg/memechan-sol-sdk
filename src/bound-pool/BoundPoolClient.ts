@@ -90,6 +90,7 @@ import { ParsedMemeTicket } from "../memeticket/types";
 import { normalizeInputCoinAmount } from "../util/trading/normalizeInputCoinAmount";
 import base58 from "bs58";
 import { ensureAssociatedTokenAccountWithIX } from "../util/ensureAssociatedTokenAccountWithIX";
+import { connection } from "../../examples/common";
 
 export class BoundPoolClient {
   private constructor(
@@ -194,7 +195,6 @@ export class BoundPoolClient {
     args: GetCreateNewBondingPoolAndTokenTransactionArgs,
   ): Promise<{
     createPoolTransaction: Transaction;
-    createTokenTransaction: Transaction;
     memeMintKeypair: Keypair;
     poolQuoteVault: PublicKey;
     launchVault: PublicKey;
@@ -294,7 +294,6 @@ export class BoundPoolClient {
 
     return {
       createPoolTransaction,
-      createTokenTransaction,
       memeMintKeypair,
       poolQuoteVault,
       launchVault,
@@ -430,7 +429,7 @@ export class BoundPoolClient {
     const { payer, client, quoteToken } = args;
     const { memechanProgram } = client;
 
-    const { createPoolTransaction, createTokenTransaction, memeMintKeypair, poolQuoteVault, launchVault } =
+    const { createPoolTransaction, memeMintKeypair, poolQuoteVault, launchVault } =
       await this.getCreateNewBondingPoolAndTokenTransaction({ ...args, payer: payer.publicKey });
 
     const memeMint = memeMintKeypair.publicKey;
@@ -438,8 +437,8 @@ export class BoundPoolClient {
     const createPoolTransactionSize = getTxSize(createPoolTransaction, payer.publicKey);
     console.debug("createPoolTransaction size: ", createPoolTransactionSize);
 
-    const createTokenTransactionSize = getTxSize(createTokenTransaction, payer.publicKey);
-    console.debug("createTokenTransaction size: ", createTokenTransactionSize);
+    // const createTokenTransactionSize = getTxSize(createTokenTransaction, payer.publicKey);
+    // console.debug("createTokenTransaction size: ", createTokenTransactionSize);
 
     const createPoolMethod = getSendAndConfirmTransactionMethod({
       connection: client.connection,
@@ -458,22 +457,22 @@ export class BoundPoolClient {
       retries: 1,
     });
 
-    const createTokenMethod = getSendAndConfirmTransactionMethod({
-      connection: client.connection,
-      transaction: createTokenTransaction,
-      signers: [payer],
-      options: {
-        commitment: "confirmed",
-        skipPreflight: true,
-        preflightCommitment: "confirmed",
-      },
-    });
+    // const createTokenMethod = getSendAndConfirmTransactionMethod({
+    //   connection: client.connection,
+    //   transaction: createTokenTransaction,
+    //   signers: [payer],
+    //   options: {
+    //     commitment: "confirmed",
+    //     skipPreflight: true,
+    //     preflightCommitment: "confirmed",
+    //   },
+    // });
 
-    await retry({
-      fn: createTokenMethod,
-      functionName: "createTokenMethod",
-      retries: 1,
-    });
+    // await retry({
+    //   fn: createTokenMethod,
+    //   functionName: "createTokenMethod",
+    //   retries: 1,
+    // });
 
     const id = this.findBoundPoolPda(memeMint, quoteToken.mint, memechanProgram.programId);
 
@@ -536,6 +535,39 @@ export class BoundPoolClient {
       quoteToken.mint,
       new Token(TOKEN_PROGRAM_ID, memeMint, MEMECHAN_MEME_TOKEN_DECIMALS),
     );
+  }
+
+  public static async getOutputAmountForNewPoolWithBuyMemeTx(args: BoundPoolWithBuyMemeArgs): Promise<string> {
+    const { payer, client } = args;
+
+    const { createPoolTransaction, memeMintKeypair, memeTicketKeypair } =
+      await this.getCreateNewBondingPoolAndBuyAndTokenWithBuyMemeTransaction({
+        ...args,
+        payer: payer.publicKey,
+      });
+
+    const signers = [payer, memeMintKeypair, client.simulationKeypair];
+    if (memeTicketKeypair) {
+      signers.push(memeTicketKeypair);
+    }
+
+    const result = await client.connection.simulateTransaction(createPoolTransaction, signers, true);
+
+    // If error happened (e.g. pool is locked)
+    if (result.value.err) {
+      console.debug("[getOutputAmountForBuyMeme] error on simulation ", JSON.stringify(result.value));
+      throw new Error("Simulation results for getOutputAmountForBuyMeme returned error");
+    }
+
+    const { swapOutAmount } = extractSwapDataFromSimulation(result);
+
+    // output
+    // Note: Be aware, we relay on the fact that `MEMECOIN_DECIMALS` would be always set same for all memecoins
+    // As well as the fact that memecoins and tickets decimals are always the same
+    const outputAmount = new BigNumber(swapOutAmount).div(10 ** MEMECHAN_MEME_TOKEN_DECIMALS);
+    const outputAmountRespectingSlippage = deductSlippage(outputAmount, args.buyMemeTransactionArgs.slippagePercentage);
+
+    return outputAmountRespectingSlippage.toString();
   }
 
   /**
