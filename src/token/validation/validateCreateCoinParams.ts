@@ -4,8 +4,6 @@ import {
   InvalidCoinImageError,
   InvalidCoinNameError,
   InvalidCoinSymbolError,
-  NameEqualsToDescriptionError,
-  SymbolEqualsToDescriptionError,
 } from "./invalidParamErrors";
 import { validateCoinDescription, validateCoinImage, validateCoinName, validateCoinSymbol } from "./validation";
 
@@ -30,17 +28,5 @@ export function validateCreateCoinParams({ name, symbol, image, description }: C
 
   if (!validateCoinImage(image)) {
     throw new InvalidCoinImageError(`[validateCreateCoinParams] Coin image ${image} is invalid`);
-  }
-
-  if (name.trim() === description.trim()) {
-    throw new NameEqualsToDescriptionError(
-      `[validateCreateCoinParams] Coin name ${name} and coin description ${description} are equal`,
-    );
-  }
-
-  if (symbol.trim() === description.trim()) {
-    throw new SymbolEqualsToDescriptionError(
-      `[validateCreateCoinParams] Coin symbol ${symbol} and coin description ${description} are equal`,
-    );
   }
 }
