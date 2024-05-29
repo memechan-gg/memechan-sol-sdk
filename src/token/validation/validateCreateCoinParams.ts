@@ -1,5 +1,6 @@
 import { CreateCoinTransactionParams } from "./CreateCoinTransactionParams";
 import {
+  CoinDescriptionTooLargeError,
   InvalidCoinDescriptionError,
   InvalidCoinImageError,
   InvalidCoinNameError,
@@ -23,6 +24,10 @@ export function validateCreateCoinParams({ name, symbol, image, description }: C
   }
 
   if (!validateCoinDescription(description)) {
+    if (description.length > 300) {
+      throw new CoinDescriptionTooLargeError(`[validateCreateCoinParams] Coin description ${description} is too large`);
+    }
+
     throw new InvalidCoinDescriptionError(`[validateCreateCoinParams] Coin description ${description} is invalid`);
   }
 
