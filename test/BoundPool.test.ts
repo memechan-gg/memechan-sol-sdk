@@ -18,13 +18,21 @@ describe("BoundPool", () => {
   }, 30000);
 
   it.skip("swapy, golive, should fail below tresholds", async () => {
-    const boundPool = await BoundPoolClient.new({
+    const args = {
       admin,
       payer,
       client,
       quoteToken: MEMECHAN_QUOTE_TOKEN,
       tokenMetadata: DUMMY_TOKEN_METADATA,
-    });
+      buyMemeTransactionArgs: {
+        inputAmount: "10",
+        minOutputAmount: "1",
+        slippagePercentage: 0,
+        user: payer.publicKey,
+      },
+    };
+
+    const boundPool = await BoundPoolClient.newWithBuyTx(args);
 
     console.log("==== pool id: " + boundPool.id.toString() + ", " + new Date().toUTCString());
 
@@ -69,16 +77,24 @@ describe("BoundPool", () => {
     console.log("initStakingPool result: " + result + ", " + new Date().toUTCString());
   }, 550000);
 
-  it.skip("init staking pool then go live", async () => {
+  it("init staking pool then go live", async () => {
     console.log(" init staking pool then go live. " + new Date().toUTCString());
     console.log("payer: " + payer.publicKey.toString());
-    const pool = await BoundPoolClient.new({
+    const args = {
       admin,
       payer,
       client,
       quoteToken: MEMECHAN_QUOTE_TOKEN,
       tokenMetadata: DUMMY_TOKEN_METADATA,
-    });
+      buyMemeTransactionArgs: {
+        inputAmount: "10",
+        minOutputAmount: "1",
+        slippagePercentage: 0,
+        user: payer.publicKey,
+      },
+    };
+
+    const pool = await BoundPoolClient.newWithBuyTx(args);
 
     console.log("==== pool id: " + pool.id.toString());
 
@@ -124,16 +140,24 @@ describe("BoundPool", () => {
     console.log("golive finished. stakingPool: " + stakingPool.id.toString() + " ammPool: " + ammPool.id.toString());
   }, 500000);
 
-  it.skip("init staking pool, many swapy, then go live", async () => {
+  it("init staking pool, many swapy, then go live", async () => {
     console.log(" init staking pool, many swapy then go live. " + new Date().toUTCString());
     console.log("payer: " + payer.publicKey.toString());
-    const pool = await BoundPoolClient.new({
+    const args = {
       admin,
       payer,
       client,
       quoteToken: MEMECHAN_QUOTE_TOKEN,
       tokenMetadata: DUMMY_TOKEN_METADATA,
-    });
+      buyMemeTransactionArgs: {
+        inputAmount: "10",
+        minOutputAmount: "1",
+        slippagePercentage: 0,
+        user: payer.publicKey,
+      },
+    };
+
+    const pool = await BoundPoolClient.newWithBuyTx(args);
 
     console.log("==== pool id: " + pool.id.toString());
 
