@@ -406,8 +406,6 @@ export class BoundPoolClient {
       }
     }
 
-    const createTokenTransaction = new Transaction();
-
     const createTokenInstructions = (
       await getCreateMetadataTransaction(client, {
         payer,
@@ -418,11 +416,11 @@ export class BoundPoolClient {
       })
     ).instructions;
 
-    createTokenTransaction.add(...createTokenInstructions);
+    createPoolTransaction.add(...createTokenInstructions);
 
     return {
       createPoolTransaction,
-      createTokenTransaction,
+      createTokenTransaction: new Transaction(),
       memeMintKeypair,
       poolQuoteVault,
       launchVault,
@@ -538,22 +536,22 @@ export class BoundPoolClient {
       retries: 1,
     });
 
-    const createTokenMethod = getSendAndConfirmTransactionMethod({
-      connection: client.connection,
-      transaction: createTokenTransaction,
-      signers: [payer],
-      options: {
-        commitment: "confirmed",
-        skipPreflight: true,
-        preflightCommitment: "confirmed",
-      },
-    });
+    // const createTokenMethod = getSendAndConfirmTransactionMethod({
+    //   connection: client.connection,
+    //   transaction: createTokenTransaction,
+    //   signers: [payer],
+    //   options: {
+    //     commitment: "confirmed",
+    //     skipPreflight: true,
+    //     preflightCommitment: "confirmed",
+    //   },
+    // });
 
-    await retry({
-      fn: createTokenMethod,
-      functionName: "createTokenMethod",
-      retries: 1,
-    });
+    // await retry({
+    //   fn: createTokenMethod,
+    //   functionName: "createTokenMethod",
+    //   retries: 1,
+    // });
 
     const id = this.findBoundPoolPda(memeMint, quoteToken.mint, memechanProgram.programId);
 
