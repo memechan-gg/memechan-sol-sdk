@@ -382,7 +382,7 @@ export class StakingPoolClient {
       { memeFees: fullMemeFeesPart, slerfFees: fullSlerfFeesPart },
     );
 
-    return { memeFees: memeFees.toFixed(0), slerfFees: slerfFees.toFixed(0) };
+    return { memeFees: memeFees.multipliedBy(0.9999).toFixed(0), slerfFees: slerfFees.multipliedBy(0.9999).toFixed(0) };
   }
 
   /**
@@ -465,7 +465,7 @@ export class StakingPoolClient {
     ticketHolderList.forEach((ticketFields: MemeTicketFields[], holder: string) => {
       let accumulator = new BigNumber(0);
       ticketFields.forEach((ticket) => {
-        accumulator = accumulator.plus(ticket.amount.toString());
+        accumulator = accumulator.plus(ticket.vesting.notional.sub(ticket.vesting.released).toString());
       });
 
       aggregatedHolderAmounts.set(holder, accumulator);
@@ -481,7 +481,7 @@ export class StakingPoolClient {
       aggregatedHoldersList.push({
         address: holder,
         tokenAmount: amount,
-        tokenAmountInPercentage: amount.div(new BigNumber(MAX_MEME_TOKENS * MEME_TOKEN_DECIMALS)),
+        tokenAmountInPercentage: amount.div(new BigNumber(MAX_MEME_TOKENS * MEME_TOKEN_DECIMALS)).multipliedBy(100),
       });
     });
 
