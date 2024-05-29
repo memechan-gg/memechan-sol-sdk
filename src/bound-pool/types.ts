@@ -109,7 +109,7 @@ export interface BoundPoolWithBuyMemeArgs {
   client: MemechanClient;
   quoteToken: Token;
   tokenMetadata: TokenMetadata;
-  buyMemeTransactionArgs: GetBuyMemeTransactionStaticArgs;
+  buyMemeTransactionArgs: GetBuyMemeTransactionArgs;
 }
 
 export type GetCreateNewBondingPoolAndTokenTransactionArgs = Omit<BoundPoolArgs, "payer"> & {
@@ -127,7 +127,7 @@ export type GetBuyMemeTransactionStaticArgs = GetBuyMemeTransactionArgs & {
 
 export type GetCreateNewBondingPoolAndTokenWithBuyMemeTransactionArgs =
   GetCreateNewBondingPoolAndTokenTransactionArgs & {
-    buyMemeTransactionArgs?: GetBuyMemeTransactionStaticArgs;
+    buyMemeTransactionArgs?: GetBuyMemeTransactionArgs;
   };
 
 export interface InitStakingPoolResult {

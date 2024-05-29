@@ -392,7 +392,13 @@ export class BoundPoolClient {
     if (args.buyMemeTransactionArgs) {
       const inputAmount = new BN(args.buyMemeTransactionArgs.inputAmount);
       if (!inputAmount.isZero()) {
-        const buyMemeTransaction = await this.getBuyMemeTransaction(args.buyMemeTransactionArgs);
+        const buyMemeTransaction = await this.getBuyMemeTransaction({
+          ...args.buyMemeTransactionArgs,
+          boundPoolId: id,
+          poolSignerPda: poolSigner,
+          client,
+          quoteVault: adminQuoteVault,
+        });
         createPoolTransaction.add(buyMemeTransaction.tx);
       }
     }
