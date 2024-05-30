@@ -4,39 +4,41 @@ import BN from "bn.js";
 import { MEMECHAN_QUOTE_TOKEN } from "../src/config/config";
 import { MintUtils } from "../src/token/mintUtils";
 
-describe.skip("swapX", () => {
-  it("swaps user quote token->memecoin", async () => {
-    const pool = await BoundPoolClient.new({
-      admin,
-      payer,
-      client,
-      quoteToken: MEMECHAN_QUOTE_TOKEN,
-      tokenMetadata: DUMMY_TOKEN_METADATA,
-    });
+export function test() {
+  describe("swapX", () => {
+    it("swaps user quote token->memecoin", async () => {
+      const pool = await BoundPoolClient.new({
+        admin,
+        payer,
+        client,
+        quoteToken: MEMECHAN_QUOTE_TOKEN,
+        tokenMetadata: DUMMY_TOKEN_METADATA,
+      });
 
-    const mintUtils = new MintUtils(client.connection, payer);
-    const getAccount1 = await mintUtils.getOrCreateTokenAccount(MEMECHAN_QUOTE_TOKEN.mint, payer, payer.publicKey);
+      const mintUtils = new MintUtils(client.connection, payer);
+      const getAccount1 = await mintUtils.getOrCreateTokenAccount(MEMECHAN_QUOTE_TOKEN.mint, payer, payer.publicKey);
 
-    const ticketId = await pool.swapY({
-      payer: payer,
-      user: payer,
-      memeTokensOut: new BN(10 * 1e6),
-      quoteAmountIn: new BN(1000 * 1e9),
-      quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
-      pool: pool.id,
-    });
+      const ticketId = await pool.swapY({
+        payer: payer,
+        user: payer,
+        memeTokensOut: new BN(10 * 1e6),
+        quoteAmountIn: new BN(1000 * 1e9),
+        quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
+        pool: pool.id,
+      });
 
-    console.log("swapx test - swapY ticketId: " + ticketId.id.toBase58());
+      console.log("swapx test - swapY ticketId: " + ticketId.id.toBase58());
 
-    const txResult = await pool.swapX({
-      user: payer,
-      memeAmountIn: new BN(10 * 1e6),
-      minQuoteAmountOut: new BN(1 * 1e6),
-      quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
-      userMemeTicket: ticketId,
-      userQuoteAcc: getAccount1.address,
-    });
+      const txResult = await pool.swapX({
+        user: payer,
+        memeAmountIn: new BN(10 * 1e6),
+        minQuoteAmountOut: new BN(1 * 1e6),
+        quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
+        userMemeTicket: ticketId,
+        userQuoteAcc: getAccount1.address,
+      });
 
-    console.log("swapX txResult: " + txResult);
-  }, 420000);
-});
+      console.log("swapX txResult: " + txResult);
+    }, 420000);
+  });
+}
