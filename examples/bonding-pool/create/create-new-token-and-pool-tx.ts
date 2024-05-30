@@ -6,7 +6,7 @@ import { getTxSize } from "../../../src/util/get-tx-size";
 
 // yarn tsx examples/bonding-pool/create/create-new-token-and-pool-tx.ts > log.txt 2>&1
 export const createNewTokenAndPoolTx = async () => {
-  const { createPoolTransaction, createTokenTransaction, memeMintKeypair } =
+  const { createPoolTransaction, memeMintKeypair } =
     await BoundPoolClient.getCreateNewBondingPoolAndTokenTransaction({
       admin,
       payer: payer.publicKey,
@@ -21,8 +21,8 @@ export const createNewTokenAndPoolTx = async () => {
     const createPoolTransactionSize = getTxSize(createPoolTransaction, payer.publicKey);
     console.debug("createPoolTransaction size: ", createPoolTransactionSize);
 
-    const createTokenTransactionSize = getTxSize(createTokenTransaction, payer.publicKey);
-    console.debug("createTokenTransaction size: ", createTokenTransactionSize);
+    // const createTokenTransactionSize = getTxSize(createTokenTransaction, payer.publicKey);
+    // console.debug("createTokenTransaction size: ", createTokenTransactionSize);
 
     const createPoolSignature = await sendAndConfirmTransaction(
       client.connection,
@@ -36,12 +36,12 @@ export const createNewTokenAndPoolTx = async () => {
     );
     console.log("createPoolSignature:", createPoolSignature);
 
-    const createTokenSignature = await sendAndConfirmTransaction(client.connection, createTokenTransaction, [payer], {
-      commitment: "confirmed",
-      skipPreflight: true,
-      preflightCommitment: "confirmed",
-    });
-    console.log("createTokenSignature:", createTokenSignature);
+    // const createTokenSignature = await sendAndConfirmTransaction(client.connection, createTokenTransaction, [payer], {
+    //   commitment: "confirmed",
+    //   skipPreflight: true,
+    //   preflightCommitment: "confirmed",
+    // });
+    // console.log("createTokenSignature:", createTokenSignature);
 
     const id = BoundPoolClient.findBoundPoolPda(memeMint, MEMECHAN_QUOTE_TOKEN.mint, client.memechanProgram.programId);
     console.debug("id: ", id);
