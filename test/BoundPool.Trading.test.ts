@@ -1,21 +1,18 @@
 import { BN } from "@coral-xyz/anchor";
 import { BoundPoolClient } from "../src/bound-pool/BoundPoolClient";
 import { sleep } from "../src/common/helpers";
-import { DUMMY_TOKEN_METADATA, admin, client, createMemechanClient, payer } from "./common/common";
+import { DUMMY_TOKEN_METADATA, admin, createMemechanClient, payer } from "./common/common";
 import {
   MEMECHAN_MEME_TOKEN_DECIMALS,
   MEMECHAN_QUOTE_TOKEN,
   MEMECHAN_QUOTE_TOKEN_DECIMALS,
 } from "../src/config/config";
 import { MemeTicketClient } from "../src/memeticket/MemeTicketClient";
-import { PublicKey, sendAndConfirmTransaction } from "@solana/web3.js";
+import { sendAndConfirmTransaction } from "@solana/web3.js";
 import { getTokenBalanceForWallet } from "../src/util/getTokenAccountBalance";
 import { normalizeInputCoinAmount } from "../src/util/trading/normalizeInputCoinAmount";
 import { connection } from "../examples/common";
 import { BoundPoolWithBuyMemeArgs, MemechanClient } from "../src";
-
-const BUY_SELL_BOUND_POOL_ID = new PublicKey("HCRVDUJgvLGiRh9oDpW63a3dyPAM8rJoxQXrfVbZSABv");
-const SLEEP_TIME = 60000;
 
 describe("BoundPoolClient Trading", () => {
   let client: MemechanClient;
@@ -280,10 +277,9 @@ describe("BoundPoolClient Trading", () => {
     expect(afterSellBN.sub(beforeSellBN).gte(minQuoteOutputAmountBN)).toBeTruthy();
   }, 150000);
 
-  describe.skip("Edge Cases", () => {
+  describe("Edge Cases", () => {
     it("handles zero input amount for sellMeme", async () => {
-      const poolAccountAddressId = new PublicKey("FrZBDKqxoNeyLYjLn2KM2nnVRWwpzZvM2i9kUx61xDVA");
-      const boundPoolInstance = await BoundPoolClient.fromBoundPoolId({ client, poolAccountAddressId });
+      const boundPoolInstance = await BoundPoolClient.newWithBuyTx(boundPoolWithBuyMemeArgs);
 
       const inputAmount = "0";
       const minOutputAmount = await boundPoolInstance.getOutputAmountForSellMeme({
@@ -305,8 +301,7 @@ describe("BoundPoolClient Trading", () => {
     }, 150000);
 
     it("handles negative input amount for buyMeme", async () => {
-      const poolAccountAddressId = new PublicKey("FrZBDKqxoNeyLYjLn2KM2nnVRWwpzZvM2i9kUx61xDVA");
-      const boundPoolInstance = await BoundPoolClient.fromBoundPoolId({ client, poolAccountAddressId });
+      const boundPoolInstance = await BoundPoolClient.newWithBuyTx(boundPoolWithBuyMemeArgs);
 
       const inputAmount = "-500608";
       //  await expect(
@@ -319,8 +314,7 @@ describe("BoundPoolClient Trading", () => {
     }, 150000);
 
     it("handles high slippage percentage for sellMeme", async () => {
-      const poolAccountAddressId = new PublicKey("FrZBDKqxoNeyLYjLn2KM2nnVRWwpzZvM2i9kUx61xDVA");
-      const boundPoolInstance = await BoundPoolClient.fromBoundPoolId({ client, poolAccountAddressId });
+      const boundPoolInstance = await BoundPoolClient.newWithBuyTx(boundPoolWithBuyMemeArgs);
 
       const inputAmount = "567.023231";
       await expect(
@@ -342,8 +336,7 @@ describe("BoundPoolClient Trading", () => {
     }, 150000);
 
     it("too high slippage percentage for sellMeme", async () => {
-      const poolAccountAddressId = new PublicKey("FrZBDKqxoNeyLYjLn2KM2nnVRWwpzZvM2i9kUx61xDVA");
-      const boundPoolInstance = await BoundPoolClient.fromBoundPoolId({ client, poolAccountAddressId });
+      const boundPoolInstance = await BoundPoolClient.newWithBuyTx(boundPoolWithBuyMemeArgs);
 
       const inputAmount = "567.023231";
       await expect(
@@ -365,9 +358,7 @@ describe("BoundPoolClient Trading", () => {
     }, 150000);
 
     it("handles high slippage percentage for sellMeme", async () => {
-      const poolAccountAddressId = new PublicKey("FrZBDKqxoNeyLYjLn2KM2nnVRWwpzZvM2i9kUx61xDVA");
-      const boundPoolInstance = await BoundPoolClient.fromBoundPoolId({ client, poolAccountAddressId });
-
+      const boundPoolInstance = await BoundPoolClient.newWithBuyTx(boundPoolWithBuyMemeArgs);
       const inputAmount = "567.023231";
       const minOutputAmount = await boundPoolInstance.getOutputAmountForSellMeme({
         inputAmount: inputAmount,

@@ -25,12 +25,12 @@ describe("BoundPool", () => {
     };
   });
 
-  it.skip("all", async () => {
+  it("all", async () => {
     const all = await BoundPoolClient.all(client.memechanProgram);
     console.log("all BoundPool length: " + all.length);
   }, 30000);
 
-  it.skip("swapy, golive, should fail below tresholds", async () => {
+  it("swapy, golive, should fail below tresholds", async () => {
     const boundPool = await BoundPoolClient.newWithBuyTx(boundPoolWithBuyMemeArgs);
     console.log("==== pool id: " + boundPool.id.toString() + ", " + new Date().toUTCString());
 
@@ -127,17 +127,17 @@ describe("BoundPool", () => {
   it("init staking pool, many swapy, then go live", async () => {
     console.log(" init staking pool, many swapy then go live. " + new Date().toUTCString());
     console.log("payer: " + payer.publicKey.toString());
- 
+
     const pool = await BoundPoolClient.newWithBuyTx(boundPoolWithBuyMemeArgs);
 
     console.log("==== pool id: " + pool.id.toString());
 
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 11; i++) {
       const ticketId = await pool.swapY({
         payer: payer,
         user: payer,
         memeTokensOut: new BN(100 * 1e6),
-        quoteAmountIn: new BN(41000 * 1e9),
+        quoteAmountIn: new BN(4000 * 1e9),
         quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
         pool: pool.id,
       });
