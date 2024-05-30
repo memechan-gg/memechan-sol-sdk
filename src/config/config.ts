@@ -28,7 +28,9 @@ export const FEE_DESTINATION_ID = "3XMrhbv989VxAMi3DErLV9eJht1pHppW5LbKxe9fkEFR"
 
 export const SLERF_MINT = new PublicKey("7BgBvyjrZX1YKz4oh9mjb8ZScatkkwb8DzFx7LoiVkM3");
 
+// TODO: Replace it with SLERF Mint when prod
 export const MEMECHAN_QUOTE_MINT = new PublicKey("HX2pp5za2aBkrA5X5iTioZXcrpWb2q9DiaeWPW3qKMaw");
+// TODO: Replace it with the actual value
 export const MEMECHAN_TARGET_CONFIG = new PublicKey("H3vkkiCoXWESVK2FGUa561XtC41g73sRgx4h3tQJNAov");
 export const MEMECHAN_QUOTE_TOKEN_DECIMALS = 9; // current devnet quote token decimals
 export const MEMECHAN_QUOTE_TOKEN: Token = new Token(
