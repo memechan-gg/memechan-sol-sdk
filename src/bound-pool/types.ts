@@ -81,7 +81,14 @@ export interface GoLiveArgs {
   quoteVault: PublicKey;
 }
 
+export type GoLiveStaticArgs = Omit<GoLiveArgs, "boundPoolInfo"> & {
+  memeMint: PublicKey;
+  client: MemechanClient;
+};
+
 export type GetGoLiveTransactionArgs = GoLiveArgs & { transaction?: Transaction };
+
+export type GetGoLiveTransactionStaticArgs = GoLiveStaticArgs & { transaction?: Transaction };
 
 export interface InitStakingPoolArgs {
   pool?: PublicKey;
