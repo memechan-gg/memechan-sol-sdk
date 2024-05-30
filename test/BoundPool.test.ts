@@ -1,38 +1,18 @@
 import { BN } from "@coral-xyz/anchor";
 import { BoundPoolClient } from "../src/bound-pool/BoundPoolClient";
-import { DUMMY_TOKEN_METADATA, admin, createMemechanClient, payer } from "./common/common";
+import { DEFAULT_BOUND_POOL_WITH_BUY_MEME_ARGS, client, payer } from "./common/common";
 import { FEE_DESTINATION_ID, MEMECHAN_QUOTE_TOKEN } from "../src/config/config";
 import { MemeTicketClient } from "../src/memeticket/MemeTicketClient";
-import { BoundPoolWithBuyMemeArgs, MemechanClient } from "../src";
 
 export function test() {
   describe("BoundPool", () => {
-    let client: MemechanClient;
-    let boundPoolWithBuyMemeArgs: BoundPoolWithBuyMemeArgs;
-    beforeAll(() => {
-      client = createMemechanClient();
-      boundPoolWithBuyMemeArgs = {
-        admin,
-        payer,
-        client,
-        quoteToken: MEMECHAN_QUOTE_TOKEN,
-        tokenMetadata: DUMMY_TOKEN_METADATA,
-        buyMemeTransactionArgs: {
-          inputAmount: "10",
-          minOutputAmount: "1",
-          slippagePercentage: 0,
-          user: payer.publicKey,
-        },
-      };
-    });
-
     it("all", async () => {
       const all = await BoundPoolClient.all(client.memechanProgram);
       console.log("all BoundPool length: " + all.length);
     }, 30000);
 
     it("swapy, golive, should fail below tresholds", async () => {
-      const boundPool = await BoundPoolClient.newWithBuyTx(boundPoolWithBuyMemeArgs);
+      const boundPool = await BoundPoolClient.newWithBuyTx(DEFAULT_BOUND_POOL_WITH_BUY_MEME_ARGS);
       console.log("==== pool id: " + boundPool.id.toString() + ", " + new Date().toUTCString());
 
       const tickets: MemeTicketClient[] = [];
@@ -79,7 +59,7 @@ export function test() {
     it("init staking pool then go live", async () => {
       console.log(" init staking pool then go live. " + new Date().toUTCString());
 
-      const pool = await BoundPoolClient.newWithBuyTx(boundPoolWithBuyMemeArgs);
+      const pool = await BoundPoolClient.newWithBuyTx(DEFAULT_BOUND_POOL_WITH_BUY_MEME_ARGS);
 
       console.log("==== pool id: " + pool.id.toString());
 
@@ -129,7 +109,7 @@ export function test() {
       console.log(" init staking pool, many swapy then go live. " + new Date().toUTCString());
       console.log("payer: " + payer.publicKey.toString());
 
-      const pool = await BoundPoolClient.newWithBuyTx(boundPoolWithBuyMemeArgs);
+      const pool = await BoundPoolClient.newWithBuyTx(DEFAULT_BOUND_POOL_WITH_BUY_MEME_ARGS);
 
       console.log("==== pool id: " + pool.id.toString());
 

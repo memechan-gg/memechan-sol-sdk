@@ -1,7 +1,7 @@
 import { BN } from "@coral-xyz/anchor";
 import { BoundPoolClient } from "../src/bound-pool/BoundPoolClient";
 import { sleep } from "../src/common/helpers";
-import { DUMMY_TOKEN_METADATA, admin, createMemechanClient, payer } from "./common/common";
+import { DEFAULT_BOUND_POOL_WITH_BUY_MEME_ARGS, client, payer } from "./common/common";
 import {
   MEMECHAN_MEME_TOKEN_DECIMALS,
   MEMECHAN_QUOTE_TOKEN,
@@ -12,30 +12,11 @@ import { sendAndConfirmTransaction } from "@solana/web3.js";
 import { getTokenBalanceForWallet } from "../src/util/getTokenAccountBalance";
 import { normalizeInputCoinAmount } from "../src/util/trading/normalizeInputCoinAmount";
 import { connection } from "../examples/common";
-import { BoundPoolWithBuyMemeArgs, MemechanClient } from "../src";
 
 export function test() {
   describe("BoundPoolClient Trading", () => {
-    let client: MemechanClient;
-    let boundPoolWithBuyMemeArgs: BoundPoolWithBuyMemeArgs;
-    beforeAll(() => {
-      client = createMemechanClient();
-      boundPoolWithBuyMemeArgs = {
-        admin,
-        payer,
-        client,
-        quoteToken: MEMECHAN_QUOTE_TOKEN,
-        tokenMetadata: DUMMY_TOKEN_METADATA,
-        buyMemeTransactionArgs: {
-          inputAmount: "10",
-          minOutputAmount: "1",
-          slippagePercentage: 0,
-          user: payer.publicKey,
-        },
-      };
-    });
     it("buy meme tokens tx", async () => {
-      const boundPoolInstance = await BoundPoolClient.newWithBuyTx(boundPoolWithBuyMemeArgs);
+      const boundPoolInstance = await BoundPoolClient.newWithBuyTx(DEFAULT_BOUND_POOL_WITH_BUY_MEME_ARGS);
       const poolAccountAddressId = boundPoolInstance.id;
       const inputQuoteAmount = "1";
       const minMemeOutputAmount = await boundPoolInstance.getOutputAmountForBuyMeme({
@@ -120,7 +101,7 @@ export function test() {
     }, 150000);
 
     it.skip("buy and sell meme tokens tx", async () => {
-      const boundPoolInstance = await BoundPoolClient.newWithBuyTx(boundPoolWithBuyMemeArgs);
+      const boundPoolInstance = await BoundPoolClient.newWithBuyTx(DEFAULT_BOUND_POOL_WITH_BUY_MEME_ARGS);
       console.log("==== pool id: " + boundPoolInstance.id.toString());
 
       // Step 1: Buy meme tokens
@@ -280,7 +261,7 @@ export function test() {
 
     describe("Edge Cases", () => {
       it("handles zero input amount for sellMeme", async () => {
-        const boundPoolInstance = await BoundPoolClient.newWithBuyTx(boundPoolWithBuyMemeArgs);
+        const boundPoolInstance = await BoundPoolClient.newWithBuyTx(DEFAULT_BOUND_POOL_WITH_BUY_MEME_ARGS);
 
         const inputAmount = "0";
         const minOutputAmount = await boundPoolInstance.getOutputAmountForSellMeme({
@@ -302,7 +283,7 @@ export function test() {
       }, 150000);
 
       it("handles negative input amount for buyMeme", async () => {
-        const boundPoolInstance = await BoundPoolClient.newWithBuyTx(boundPoolWithBuyMemeArgs);
+        const boundPoolInstance = await BoundPoolClient.newWithBuyTx(DEFAULT_BOUND_POOL_WITH_BUY_MEME_ARGS);
 
         const inputAmount = "-500608";
         //  await expect(
@@ -315,7 +296,7 @@ export function test() {
       }, 150000);
 
       it("handles high slippage percentage for sellMeme", async () => {
-        const boundPoolInstance = await BoundPoolClient.newWithBuyTx(boundPoolWithBuyMemeArgs);
+        const boundPoolInstance = await BoundPoolClient.newWithBuyTx(DEFAULT_BOUND_POOL_WITH_BUY_MEME_ARGS);
 
         const inputAmount = "567.023231";
         await expect(
@@ -337,7 +318,7 @@ export function test() {
       }, 150000);
 
       it("too high slippage percentage for sellMeme", async () => {
-        const boundPoolInstance = await BoundPoolClient.newWithBuyTx(boundPoolWithBuyMemeArgs);
+        const boundPoolInstance = await BoundPoolClient.newWithBuyTx(DEFAULT_BOUND_POOL_WITH_BUY_MEME_ARGS);
 
         const inputAmount = "567.023231";
         await expect(
@@ -359,7 +340,7 @@ export function test() {
       }, 150000);
 
       it("handles high slippage percentage for sellMeme", async () => {
-        const boundPoolInstance = await BoundPoolClient.newWithBuyTx(boundPoolWithBuyMemeArgs);
+        const boundPoolInstance = await BoundPoolClient.newWithBuyTx(DEFAULT_BOUND_POOL_WITH_BUY_MEME_ARGS);
         const inputAmount = "567.023231";
         const minOutputAmount = await boundPoolInstance.getOutputAmountForSellMeme({
           inputAmount: inputAmount,

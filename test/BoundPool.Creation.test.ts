@@ -1,34 +1,16 @@
 import { BoundPoolClient } from "../src/bound-pool/BoundPoolClient";
-import { DUMMY_TOKEN_METADATA, admin, createMemechanClient, payer } from "./common/common";
+import { DEFAULT_BOUND_POOL_WITH_BUY_MEME_ARGS, DUMMY_TOKEN_METADATA, admin, client, payer } from "./common/common";
 import { MEMECHAN_QUOTE_TOKEN } from "../src/config/config";
-import { BoundPoolWithBuyMemeArgs, MemechanClient } from "../src";
 
 export function test() {
   describe("BoundPoolClient Creation Tests", () => {
-    let client: MemechanClient;
-    let boundPoolWithBuyMemeArgs: BoundPoolWithBuyMemeArgs;
-    beforeAll(() => {
-      client = createMemechanClient();
-      boundPoolWithBuyMemeArgs = {
-        admin,
-        payer,
-        client,
-        quoteToken: MEMECHAN_QUOTE_TOKEN,
-        tokenMetadata: DUMMY_TOKEN_METADATA,
-        buyMemeTransactionArgs: {
-          inputAmount: "10",
-          minOutputAmount: "1",
-          slippagePercentage: 0,
-          user: payer.publicKey,
-        },
-      };
-    });
-
     it("creates bound pool with buy tx", async () => {
-      const outputAmount = await BoundPoolClient.getOutputAmountForNewPoolWithBuyMemeTx(boundPoolWithBuyMemeArgs);
+      const outputAmount = await BoundPoolClient.getOutputAmountForNewPoolWithBuyMemeTx(
+        DEFAULT_BOUND_POOL_WITH_BUY_MEME_ARGS,
+      );
       console.log("==== meme outputAmount: " + outputAmount.toString());
 
-      const boundPool = await BoundPoolClient.newWithBuyTx(boundPoolWithBuyMemeArgs);
+      const boundPool = await BoundPoolClient.newWithBuyTx(DEFAULT_BOUND_POOL_WITH_BUY_MEME_ARGS);
       console.log("==== pool id: " + boundPool.id.toString());
       const info = await BoundPoolClient.fetch2(client.connection, boundPool.id);
       console.log(info);
@@ -47,7 +29,7 @@ export function test() {
         };
 
         const args = {
-          ...boundPoolWithBuyMemeArgs,
+          ...DEFAULT_BOUND_POOL_WITH_BUY_MEME_ARGS,
           tokenMetadata: metadata,
         };
 
@@ -67,7 +49,7 @@ export function test() {
         };
 
         const args = {
-          ...boundPoolWithBuyMemeArgs,
+          ...DEFAULT_BOUND_POOL_WITH_BUY_MEME_ARGS,
           tokenMetadata: metadata,
         };
 
@@ -86,7 +68,7 @@ export function test() {
           symbol: validSymbols[0],
         };
         const args = {
-          ...boundPoolWithBuyMemeArgs,
+          ...DEFAULT_BOUND_POOL_WITH_BUY_MEME_ARGS,
           tokenMetadata: metadata,
         };
 

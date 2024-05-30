@@ -17,21 +17,26 @@ import * as validation from "./Validation.test";
 import * as poolService from "./PoolService.test";
 
 describe("sdk tests", () => {
-  authService.test();
-  boundPoolCreation.test();
-  boundPool.test();
-  boundPoolTrading.test();
-  chartApi.test();
-  holders.test();
-  memeTicket.test();
-  poolService.test();
-  quoteTokenMint.test();
-  socialAPI.test();
-  stakingPool.test();
-  swapX.test();
-  swapY.test();
-  targetConfig.test();
-  tokenApi.test();
-  txParsing.test();
-  validation.test();
+  describe("BE", () => {
+    authService.test();
+    chartApi.test();
+    holders.test();
+    poolService.test();
+    socialAPI.test();
+    tokenApi.test();
+    txParsing.test();
+  });
+
+  describe("contract", () => {
+    boundPoolCreation.test();
+    boundPool.test();
+    boundPoolTrading.test();
+    memeTicket.test();
+    quoteTokenMint.test();
+    stakingPool.test();
+    swapX.test();
+    swapY.test();
+    targetConfig.test();
+    validation.test();
+  });
 });
