@@ -50,10 +50,12 @@ export * from "./schema/types/memechan_sol";
 
 // Utils
 export * from "./common/helpers";
+export * from "./util/getRandomRpcEndpoint";
 export * from "./util/wallet/NoWalletAdapter";
 export * from "./util/signMessage";
 export * from "./util/index";
 export * from "./memeticket/utils";
+
 // Metadata
 export * from "./token/createMetadata";
 
