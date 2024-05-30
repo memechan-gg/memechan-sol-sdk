@@ -277,8 +277,6 @@ export class BoundPoolClient {
 
     createPoolTransaction.add(createPoolInstruction);
 
-    const createTokenTransaction = new Transaction();
-
     const createTokenInstructions = (
       await getCreateMetadataTransaction(client, {
         payer,
@@ -289,7 +287,7 @@ export class BoundPoolClient {
       })
     ).instructions;
 
-    createTokenTransaction.add(...createTokenInstructions);
+    createPoolTransaction.add(...createTokenInstructions);
 
     return {
       createPoolTransaction,
