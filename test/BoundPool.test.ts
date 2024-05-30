@@ -45,15 +45,14 @@ export function test() {
 
       console.log("boundPoolInfo:", boundPoolInfo);
 
-      // await expect(
-      const result = await boundPool.initStakingPool({
-        payer: payer,
-        user: payer,
-        boundPoolInfo,
-      });
-      // ).rejects.toThrow();
+      await expect(
+        boundPool.initStakingPool({
+          payer: payer,
+          user: payer,
+          boundPoolInfo,
+        }),
+      ).rejects.toThrow();
 
-      console.log("initStakingPool result: " + result + ", " + new Date().toUTCString());
     }, 550000);
 
     it("init staking pool then go live", async () => {
