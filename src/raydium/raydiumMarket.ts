@@ -16,8 +16,9 @@ import {
   u16,
 } from "@raydium-io/raydium-sdk";
 import { TOKEN_PROGRAM_ID, createInitializeAccountInstruction } from "@solana/spl-token";
-import { Connection, PublicKey, SYSVAR_RENT_PUBKEY, SystemProgram, TransactionInstruction } from "@solana/web3.js";
+import { ComputeBudgetProgram, Connection, PublicKey, SYSVAR_RENT_PUBKEY, SystemProgram, TransactionInstruction } from "@solana/web3.js";
 import BN from "bn.js";
+import { COMPUTE_UNIT_PRICE } from "../config/config";
 
 function accountFlagsLayout(property = "accountFlags") {
   const ACCOUNT_FLAGS_LAYOUT = new WideBits(property);
@@ -187,6 +188,19 @@ export class MarketV2 extends Base {
     const ins1: TransactionInstruction[] = [];
     const accountLamports = await connection.getMinimumBalanceForRentExemption(165);
     console.log("accountLamports: ", accountLamports);
+
+    const modifyComputeUnits = ComputeBudgetProgram.setComputeUnitLimit({
+      units: 250000,
+    });
+
+    //ins1.push(modifyComputeUnits);
+
+    const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
+      microLamports: COMPUTE_UNIT_PRICE,
+    });
+
+    ins1.push(addPriorityFee);
+
     ins1.push(
       SystemProgram.createAccountWithSeed({
         fromPubkey: wallet,
@@ -232,6 +246,9 @@ export class MarketV2 extends Base {
     console.log("eventQueueLamports: ", eventQueueLamports);
     console.log("bidsLamports: ", bidsLamports);
     console.log("asksLamports: ", asksLamports);
+
+    //ins2.push(modifyComputeUnits);
+    ins2.push(addPriorityFee);
     ins2.push(
       SystemProgram.createAccountWithSeed({
         fromPubkey: wallet,
