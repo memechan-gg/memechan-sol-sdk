@@ -20,8 +20,8 @@ export function withdrawFees(accounts: WithdrawFeesAccounts) {
   const keys = [
     { pubkey: accounts.staking, isSigner: false, isWritable: false },
     { pubkey: accounts.memeTicket, isSigner: false, isWritable: true },
-    { pubkey: accounts.userMeme, isSigner: false, isWritable: false },
-    { pubkey: accounts.userQuote, isSigner: false, isWritable: false },
+    { pubkey: accounts.userMeme, isSigner: false, isWritable: true },
+    { pubkey: accounts.userQuote, isSigner: false, isWritable: true },
     { pubkey: accounts.memeVault, isSigner: false, isWritable: true },
     { pubkey: accounts.quoteVault, isSigner: false, isWritable: true },
     { pubkey: accounts.stakingSignerPda, isSigner: false, isWritable: false },

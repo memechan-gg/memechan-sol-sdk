@@ -121,7 +121,7 @@ export class MarketState {
   }
 
   static async fetch(c: Connection, address: PublicKey): Promise<MarketState | null> {
-    const info = await c.getAccountInfo(address, { commitment: "confirmed" });
+    const info = await c.getAccountInfo(address);
 
     if (info === null) {
       return null;
@@ -134,7 +134,7 @@ export class MarketState {
   }
 
   static async fetchMultiple(c: Connection, addresses: PublicKey[]): Promise<Array<MarketState | null>> {
-    const infos = await c.getMultipleAccountsInfo(addresses, { commitment: "confirmed" });
+    const infos = await c.getMultipleAccountsInfo(addresses);
 
     return infos.map((info) => {
       if (info === null) {

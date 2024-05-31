@@ -46,7 +46,7 @@ export class BoundPool {
     types.Reserve.layout("quoteReserve"),
     borsh.u64("adminFeesMeme"),
     borsh.u64("adminFeesQuote"),
-    borsh.publicKey("adminVaultQuote"),
+    borsh.publicKey("feeVaultQuote"),
     borsh.publicKey("creatorAddr"),
     types.Fees.layout("fees"),
     types.Config.layout("config"),
@@ -66,7 +66,7 @@ export class BoundPool {
   }
 
   static async fetch(c: Connection, address: PublicKey): Promise<BoundPool | null> {
-    const info = await c.getAccountInfo(address, { commitment: "confirmed" });
+    const info = await c.getAccountInfo(address);
 
     if (info === null) {
       return null;
@@ -79,7 +79,7 @@ export class BoundPool {
   }
 
   static async fetchMultiple(c: Connection, addresses: PublicKey[]): Promise<Array<BoundPool | null>> {
-    const infos = await c.getMultipleAccountsInfo(addresses, { commitment: "confirmed" });
+    const infos = await c.getMultipleAccountsInfo(addresses);
 
     return infos.map((info) => {
       if (info === null) {
