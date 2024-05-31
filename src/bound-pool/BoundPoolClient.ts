@@ -1623,7 +1623,7 @@ export class BoundPoolClient {
     // In case no meme coins were sold, return 0-prices
     if (soldMemeConverted.eq(0)) {
       // TODO: ASAP IMPORTANT: DON'T GO WITH IT IN PROD
-      const memePriceInQuote = new BigNumber(0.000037410203820143);
+      const memePriceInQuote = new BigNumber(0.0000329053);
       const memePriceInUsd = memePriceInQuote.multipliedBy(quotePriceInUsd).toString();
 
       return { priceInQuote: memePriceInQuote.toString(), priceInUsd: memePriceInUsd };
@@ -1650,7 +1650,7 @@ export class BoundPoolClient {
     quotePriceInUsd: number;
   }): Promise<{ priceInQuote: string; priceInUsd: string }> {
     // TODO: ASAP IMPORTANT: DON'T GO WITH IT IN PROD
-    const memePriceInQuote = new BigNumber(0.000037410203820143);
+    const memePriceInQuote = new BigNumber(0.0000329053);
     const memePriceInUsd = memePriceInQuote.multipliedBy(quotePriceInUsd).toString();
 
     return { priceInQuote: memePriceInQuote.toString(), priceInUsd: memePriceInUsd };
