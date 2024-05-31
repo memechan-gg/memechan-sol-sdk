@@ -34,7 +34,6 @@ import { ensureAssociatedTokenAccountWithIX } from "../util/ensureAssociatedToke
 import BN from "bn.js";
 import { MemechanSol } from "..";
 import { Program } from "@coral-xyz/anchor";
-import base58 from "bs58";
 
 export class StakingPoolClient {
   constructor(
