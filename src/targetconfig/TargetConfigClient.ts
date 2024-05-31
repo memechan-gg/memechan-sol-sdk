@@ -1,8 +1,9 @@
-import { Connection, Keypair, PublicKey, SystemProgram } from "@solana/web3.js";
+import { Connection, Keypair, PublicKey, SystemProgram, Transaction } from "@solana/web3.js";
 import { MemechanClient } from "../MemechanClient";
 import { CreateTargetConfigArgs } from "./types";
 import BN from "bn.js";
 import { TargetConfig as CodegenTargetConfig } from "../schema/codegen/accounts";
+import { getSendAndConfirmTransactionMethod } from "../util/getSendAndConfirmTransactionMethod";
 
 export class TargetConfigClient {
   public constructor(
@@ -59,7 +60,7 @@ export class TargetConfigClient {
   public static async new(input: CreateTargetConfigArgs) {
     const pda = this.findTargetConfigPda(input.mint, input.client.memechanProgram.programId);
 
-    const result = await input.client.memechanProgram.methods
+    const targetConfigInstruction = await input.client.memechanProgram.methods
       .newTargetConfig(input.targetAmount)
       .accounts({
         mint: input.mint,
@@ -67,10 +68,18 @@ export class TargetConfigClient {
         targetConfig: pda,
         systemProgram: SystemProgram.programId,
       })
-      .signers([input.payer])
-      .rpc({ skipPreflight: true });
+      .instruction();
 
-    console.log("newTargetConfig result", result);
+    const transaction = new Transaction();
+    transaction.add(targetConfigInstruction);
+
+    const createTargetConfigMethod = getSendAndConfirmTransactionMethod({
+      connection: input.client.connection,
+      signers: [input.payer],
+      transaction,
+    });
+
+    await createTargetConfigMethod();
 
     return new TargetConfigClient(pda, input.client, input.mint, input.targetAmount);
   }
