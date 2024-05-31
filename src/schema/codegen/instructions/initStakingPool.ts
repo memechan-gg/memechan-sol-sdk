@@ -10,7 +10,7 @@ export interface InitStakingPoolAccounts {
   boundPoolSignerPda: PublicKey;
   poolMemeVault: PublicKey;
   poolQuoteVault: PublicKey;
-  adminVaultQuote: PublicKey;
+  feeVaultQuote: PublicKey;
   memeMint: PublicKey;
   quoteMint: PublicKey;
   staking: PublicKey;
@@ -33,7 +33,7 @@ export function initStakingPool(accounts: InitStakingPoolAccounts) {
     { pubkey: accounts.boundPoolSignerPda, isSigner: false, isWritable: false },
     { pubkey: accounts.poolMemeVault, isSigner: false, isWritable: true },
     { pubkey: accounts.poolQuoteVault, isSigner: false, isWritable: true },
-    { pubkey: accounts.adminVaultQuote, isSigner: false, isWritable: true },
+    { pubkey: accounts.feeVaultQuote, isSigner: false, isWritable: true },
     { pubkey: accounts.memeMint, isSigner: false, isWritable: false },
     { pubkey: accounts.quoteMint, isSigner: false, isWritable: false },
     { pubkey: accounts.staking, isSigner: false, isWritable: true },

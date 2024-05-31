@@ -10,7 +10,7 @@ export interface NewPoolAccounts {
   memeMint: PublicKey;
   quoteVault: PublicKey;
   quoteMint: PublicKey;
-  adminQuoteVault: PublicKey;
+  feeQuoteVault: PublicKey;
   memeVault: PublicKey;
   targetConfig: PublicKey;
   poolSigner: PublicKey;
@@ -25,7 +25,7 @@ export function newPool(accounts: NewPoolAccounts) {
     { pubkey: accounts.memeMint, isSigner: false, isWritable: true },
     { pubkey: accounts.quoteVault, isSigner: false, isWritable: false },
     { pubkey: accounts.quoteMint, isSigner: false, isWritable: false },
-    { pubkey: accounts.adminQuoteVault, isSigner: false, isWritable: false },
+    { pubkey: accounts.feeQuoteVault, isSigner: false, isWritable: false },
     { pubkey: accounts.memeVault, isSigner: false, isWritable: true },
     { pubkey: accounts.targetConfig, isSigner: false, isWritable: false },
     { pubkey: accounts.poolSigner, isSigner: false, isWritable: false },

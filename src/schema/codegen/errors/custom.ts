@@ -50,10 +50,17 @@ export class InvalidArg extends Error {
 export class SlippageExceeded extends Error {
   readonly code = 6002;
   readonly name = "SlippageExceeded";
-  readonly msg = "Given amount of tokens to swap would result in less than minimum requested tokens to receive";
+  readonly msg =
+    // eslint-disable-next-line no-multi-str
+    "Given amount of tokens to swap would result in \
+        less than minimum requested tokens to receive";
 
   constructor() {
-    super("6002: Given amount of tokens to swap would result in less than minimum requested tokens to receive");
+    super(
+      // eslint-disable-next-line no-multi-str
+      "6002: Given amount of tokens to swap would result in \
+        less than minimum requested tokens to receive",
+    );
   }
 }
 

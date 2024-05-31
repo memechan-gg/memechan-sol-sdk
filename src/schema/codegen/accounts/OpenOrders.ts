@@ -81,7 +81,7 @@ export class OpenOrders {
   }
 
   static async fetch(c: Connection, address: PublicKey): Promise<OpenOrders | null> {
-    const info = await c.getAccountInfo(address, { commitment: "confirmed" });
+    const info = await c.getAccountInfo(address);
 
     if (info === null) {
       return null;
@@ -94,7 +94,7 @@ export class OpenOrders {
   }
 
   static async fetchMultiple(c: Connection, addresses: PublicKey[]): Promise<Array<OpenOrders | null>> {
-    const infos = await c.getMultipleAccountsInfo(addresses, { commitment: "confirmed" });
+    const infos = await c.getMultipleAccountsInfo(addresses);
 
     return infos.map((info) => {
       if (info === null) {
