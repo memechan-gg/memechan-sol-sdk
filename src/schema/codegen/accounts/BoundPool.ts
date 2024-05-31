@@ -9,7 +9,7 @@ export interface BoundPoolFields {
   quoteReserve: types.ReserveFields;
   adminFeesMeme: BN;
   adminFeesQuote: BN;
-  adminVaultQuote: PublicKey;
+  feeVaultQuote: PublicKey;
   creatorAddr: PublicKey;
   fees: types.FeesFields;
   config: types.ConfigFields;
@@ -21,7 +21,7 @@ export interface BoundPoolJSON {
   quoteReserve: types.ReserveJSON;
   adminFeesMeme: string;
   adminFeesQuote: string;
-  adminVaultQuote: string;
+  feeVaultQuote: string;
   creatorAddr: string;
   fees: types.FeesJSON;
   config: types.ConfigJSON;
@@ -33,7 +33,7 @@ export class BoundPool {
   readonly quoteReserve: types.Reserve;
   readonly adminFeesMeme: BN;
   readonly adminFeesQuote: BN;
-  readonly adminVaultQuote: PublicKey;
+  readonly feeVaultQuote: PublicKey;
   readonly creatorAddr: PublicKey;
   readonly fees: types.Fees;
   readonly config: types.Config;
@@ -58,7 +58,7 @@ export class BoundPool {
     this.quoteReserve = new types.Reserve({ ...fields.quoteReserve });
     this.adminFeesMeme = fields.adminFeesMeme;
     this.adminFeesQuote = fields.adminFeesQuote;
-    this.adminVaultQuote = fields.adminVaultQuote;
+    this.feeVaultQuote = fields.feeVaultQuote;
     this.creatorAddr = fields.creatorAddr;
     this.fees = new types.Fees({ ...fields.fees });
     this.config = new types.Config({ ...fields.config });
@@ -105,7 +105,7 @@ export class BoundPool {
       quoteReserve: types.Reserve.fromDecoded(dec.quoteReserve),
       adminFeesMeme: dec.adminFeesMeme,
       adminFeesQuote: dec.adminFeesQuote,
-      adminVaultQuote: dec.adminVaultQuote,
+      feeVaultQuote: dec.feeVaultQuote,
       creatorAddr: dec.creatorAddr,
       fees: types.Fees.fromDecoded(dec.fees),
       config: types.Config.fromDecoded(dec.config),
@@ -119,7 +119,7 @@ export class BoundPool {
       quoteReserve: this.quoteReserve.toJSON(),
       adminFeesMeme: this.adminFeesMeme.toString(),
       adminFeesQuote: this.adminFeesQuote.toString(),
-      adminVaultQuote: this.adminVaultQuote.toString(),
+      feeVaultQuote: this.feeVaultQuote.toString(),
       creatorAddr: this.creatorAddr.toString(),
       fees: this.fees.toJSON(),
       config: this.config.toJSON(),
@@ -133,7 +133,7 @@ export class BoundPool {
       quoteReserve: types.Reserve.fromJSON(obj.quoteReserve),
       adminFeesMeme: new BN(obj.adminFeesMeme),
       adminFeesQuote: new BN(obj.adminFeesQuote),
-      adminVaultQuote: new PublicKey(obj.adminVaultQuote),
+      feeVaultQuote: new PublicKey(obj.feeVaultQuote),
       creatorAddr: new PublicKey(obj.creatorAddr),
       fees: types.Fees.fromJSON(obj.fees),
       config: types.Config.fromJSON(obj.config),

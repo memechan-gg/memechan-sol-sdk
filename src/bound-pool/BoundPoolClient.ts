@@ -262,7 +262,7 @@ export class BoundPoolClient {
     const createPoolInstruction = await memechanProgram.methods
       .newPool()
       .accounts({
-        adminQuoteVault: adminQuoteVault,
+        feeQuoteVault: adminQuoteVault,
         memeVault: launchVault,
         quoteVault: poolQuoteVault,
         memeMint: memeMint,
@@ -370,7 +370,7 @@ export class BoundPoolClient {
     const createPoolInstruction = await memechanProgram.methods
       .newPool()
       .accounts({
-        adminQuoteVault: adminQuoteVault,
+        feeQuoteVault: adminQuoteVault,
         memeVault: launchVault,
         quoteVault: poolQuoteVault,
         memeMint: memeMint,
@@ -1173,7 +1173,7 @@ export class BoundPoolClient {
       quoteMint: this.quoteTokenMint,
       staking: stakingId,
       stakingPoolSignerPda: stakingSigner,
-      adminVaultQuote: boundPoolInfo.adminVaultQuote,
+      feeVaultQuote: boundPoolInfo.feeVaultQuote,
       marketProgramId: PROGRAMIDS.OPENBOOK_MARKET,
       systemProgram: SystemProgram.programId,
       tokenProgram: TOKEN_PROGRAM_ID,
