@@ -9,7 +9,9 @@ import BigNumber from "bignumber.js";
  * @constant {string}
  */
 export const PROD_BE_URL = "https://h9crl8krnj.execute-api.us-east-1.amazonaws.com/prod";
-export const BE_URL = "https://waqxcrbt93.execute-api.us-east-1.amazonaws.com/prod";
+export const BE_URL = "https://h9crl8krnj.execute-api.us-east-1.amazonaws.com/prod";
+
+// export const BE_URL = "https://waqxcrbt93.execute-api.us-east-1.amazonaws.com/prod"; // dev
 export const BE_REGION = "us-east-1";
 
 /**
@@ -20,16 +22,21 @@ export const BE_REGION = "us-east-1";
  *
  * @constant {string}
  */
-export const MEMECHAN_PROGRAM_ID = "kKRWbmqpGqPzkAb9aLmhCFcJsr3oBkqCcZYK21dWYRz";
-export const RAYDIUM_PROTOCOL_FEE = 1_000_000_000; // 1 SOL on Devnet. TODO on Mainnet, it's only 0.4 SOL
+export const MEMECHAN_PROGRAM_ID = "cYsHcSU42XESLPquuN1ga94jm1wVMg11wVcxqvofA3k";
+// export const RAYDIUM_PROTOCOL_FEE = 1_000_000_000; // 1 SOL on Devnet. TODO on Mainnet, it's only 0.4 SOL
+
+export const RAYDIUM_PROTOCOL_FEE = 400_000_000; // 0.4 SOL on Mainnet.
+
 export const TRANSFER_FEE = 60_000_000;
 export const COMPUTE_UNIT_PRICE = 100_000; // priority fee
-export const FEE_DESTINATION_ID = "3XMrhbv989VxAMi3DErLV9eJht1pHppW5LbKxe9fkEFR";
+// export const FEE_DESTINATION_ID = "3XMrhbv989VxAMi3DErLV9eJht1pHppW5LbKxe9fkEFR"; // devnet
+
+export const FEE_DESTINATION_ID = "7YttLkHDoNj9wyDur5pM1ejNaAvT9X4eqaYcHQqtj2G5";
 
 export const SLERF_MINT = new PublicKey("7BgBvyjrZX1YKz4oh9mjb8ZScatkkwb8DzFx7LoiVkM3");
 
 // TODO: Replace it with SLERF Mint when prod
-export const MEMECHAN_QUOTE_MINT = new PublicKey("HX2pp5za2aBkrA5X5iTioZXcrpWb2q9DiaeWPW3qKMaw");
+export const MEMECHAN_QUOTE_MINT = new PublicKey("9pECN2xxLQo22bFYpsNr3T3eW1UdEDtSqPQopFrGv7n4");
 // TODO: Replace it with the actual value
 export const MEMECHAN_TARGET_CONFIG = new PublicKey("H3vkkiCoXWESVK2FGUa561XtC41g73sRgx4h3tQJNAov");
 export const MEMECHAN_QUOTE_TOKEN_DECIMALS = 9; // current devnet quote token decimals
@@ -55,7 +62,7 @@ export const DEFAULT_MAX_M = 800_000_000_000_000;
 export const DECIMALS_S = 1_000_000_000;
 
 export const MAX_TRANSACTION_SIZE = 1232;
-export const ADMIN_PUB_KEY = new PublicKey("8SvkUtJZCyJwSQGkiszwcRcPv7c8pPSr8GVEppGNN7DV");
+export const ADMIN_PUB_KEY = new PublicKey("KZbAoMgCcb2gDEn2Ucea86ux84y25y3ybbWQGQpd9D6");
 export const FULL_MEME_AMOUNT_CONVERTED = new BigNumber(DEFAULT_MAX_M_LP)
   .plus(DEFAULT_MAX_M)
   .div(10 ** MEMECHAN_MEME_TOKEN_DECIMALS)
