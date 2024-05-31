@@ -389,7 +389,7 @@ export class BoundPoolClient {
 
     let memeTicketKeypair: Keypair | undefined = undefined;
     if (args.buyMemeTransactionArgs) {
-      const inputAmount = new BN(args.buyMemeTransactionArgs.inputAmount);
+      const inputAmount = new BigNumber(args.buyMemeTransactionArgs.inputAmount);
       if (!inputAmount.isZero()) {
         const { tx, memeTicketKeypair: newMemeTicketKeypair } = await this.getBuyMemeTransaction({
           ...args.buyMemeTransactionArgs,
