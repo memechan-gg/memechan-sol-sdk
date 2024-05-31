@@ -21,7 +21,7 @@ export const createTargetConfig = async () => {
     payer: payer,
     client,
     mint: mint,
-    targetAmount: new BN(40_000 * MEMECHAN_QUOTE_TOKEN_DECIMALS),
+    targetAmount: new BN(40_000 * 10 ** MEMECHAN_QUOTE_TOKEN_DECIMALS),
   });
   await sleep(1000);
   console.log("targetconfig id: " + targetConfig.id);
