@@ -1,5 +1,12 @@
 import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
-import { AccountMeta, PublicKey, Transaction, sendAndConfirmTransaction } from "@solana/web3.js";
+import {
+  AccountMeta,
+  GetProgramAccountsFilter,
+  PublicKey,
+  SystemProgram,
+  Transaction,
+  sendAndConfirmTransaction,
+} from "@solana/web3.js";
 import BigNumber from "bignumber.js";
 import { MemechanClient } from "../MemechanClient";
 import { BoundPoolClient } from "../bound-pool/BoundPoolClient";
@@ -25,6 +32,9 @@ import {
 } from "./types";
 import { ensureAssociatedTokenAccountWithIX } from "../util/ensureAssociatedTokenAccountWithIX";
 import BN from "bn.js";
+import { MemechanSol } from "..";
+import { Program } from "@coral-xyz/anchor";
+import base58 from "bs58";
 
 export class StakingPoolClient {
   constructor(
@@ -542,6 +552,21 @@ export class StakingPoolClient {
   public static async all(client: MemechanClient): Promise<{ account: StakingPoolFields; publicKey: PublicKey }[]> {
     const rawPools = await client.memechanProgram.account.stakingPool.all();
     const pools = rawPools.map((el) => el);
+    return pools;
+  }
+
+  public static async allGoLiveCandidates(
+    program: Program<MemechanSol>,
+  ): Promise<{ account: StakingPoolFields; publicKey: PublicKey }[]> {
+    const filters: GetProgramAccountsFilter[] = [
+      {
+        memcmp: {
+          bytes: SystemProgram.programId.toBase58(),
+          offset: 200,
+        },
+      },
+    ];
+    const pools = await program.account.stakingPool.all(filters);
     return pools;
   }
 
