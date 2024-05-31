@@ -23,8 +23,16 @@ export const BE_REGION = "us-east-1";
  * @constant {string}
  */
 export const MEMECHAN_PROGRAM_ID = "cYsHcSU42XESLPquuN1ga94jm1wVMg11wVcxqvofA3k";
-// export const RAYDIUM_PROTOCOL_FEE = 1_000_000_000; // 1 SOL on Devnet. TODO on Mainnet, it's only 0.4 SOL
 
+/**
+ * The Memechan fee wallet id.
+ * This address collects fee from memechan protocol
+ *
+ * @constant {string}
+ */
+export const MEMECHAN_FEE_WALLET_ID = "feeLPZEfzJFwDR11cdMWE3nSa4nr7sPPM4u6tmDTw3Y";
+
+// export const RAYDIUM_PROTOCOL_FEE = 1_000_000_000; // 1 SOL on Devnet. TODO on Mainnet, it's only 0.4 SOL
 export const RAYDIUM_PROTOCOL_FEE = 400_000_000; // 0.4 SOL on Mainnet.
 
 export const TRANSFER_FEE = 60_000_000;
