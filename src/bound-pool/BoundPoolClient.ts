@@ -67,6 +67,7 @@ import {
   COMPUTE_UNIT_PRICE,
   DEFAULT_MAX_M,
   FULL_MEME_AMOUNT_CONVERTED,
+  MEMECHAN_FEE_WALLET_ID,
   MEMECHAN_MEME_TOKEN_DECIMALS,
   MEMECHAN_QUOTE_MINT,
   MEMECHAN_QUOTE_TOKEN,
@@ -309,7 +310,6 @@ export class BoundPoolClient {
     memeTicketKeypair?: Keypair;
   }> {
     const {
-      admin,
       payer,
       client,
       quoteToken,
@@ -346,7 +346,7 @@ export class BoundPoolClient {
         connection,
         payer,
         mint: quoteToken.mint,
-        owner: admin,
+        owner: new PublicKey(MEMECHAN_FEE_WALLET_ID),
         transaction: createPoolTransaction,
       });
     }
