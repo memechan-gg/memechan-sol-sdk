@@ -1622,7 +1622,11 @@ export class BoundPoolClient {
 
     // In case no meme coins were sold, return 0-prices
     if (soldMemeConverted.eq(0)) {
-      return { priceInQuote: "0", priceInUsd: "0" };
+      // TODO: ASAP IMPORTANT: DON'T GO WITH IT IN PROD
+      const memePriceInQuote = new BigNumber(0.00001);
+      const memePriceInUsd = memePriceInQuote.multipliedBy(quotePriceInUsd).toString();
+
+      return { priceInQuote: memePriceInQuote.toString(), priceInUsd: memePriceInUsd };
     }
 
     const memePriceInQuote = quoteBalanceConverted.div(soldMemeConverted);
