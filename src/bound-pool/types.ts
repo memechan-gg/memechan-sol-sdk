@@ -122,7 +122,7 @@ export interface BoundPoolWithBuyMemeArgs {
 export type GetCreateNewBondingPoolAndTokenTransactionArgs = Omit<BoundPoolArgs, "payer"> & {
   payer: PublicKey;
   transaction?: Transaction;
-  adminSolPublicKey?: PublicKey;
+  feeQuoteVaultPk?: PublicKey;
 };
 
 export type GetBuyMemeTransactionStaticArgs = GetBuyMemeTransactionArgs & {

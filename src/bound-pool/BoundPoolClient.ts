@@ -206,7 +206,7 @@ export class BoundPoolClient {
       client,
       quoteToken,
       transaction: createPoolTransaction = new Transaction(),
-      adminSolPublicKey,
+      feeQuoteVaultPk,
       tokenMetadata,
     } = args;
     const { connection, memechanProgram } = client;
@@ -229,12 +229,12 @@ export class BoundPoolClient {
 
     createPoolTransaction.add(...createMemeMintWithPriorityInstructions);
 
-    let adminQuoteVault: PublicKey | undefined = adminSolPublicKey;
+    let feeQuoteVault: PublicKey | undefined = feeQuoteVaultPk;
 
-    // If `adminSolPublicKey` is not passed in args, we need to find out, whether a quote account for an admin
+    // If `feeQuoteVaultPk` is not passed in args, we need to find out, whether a quote account for an admin
     // already exists
-    if (!adminQuoteVault) {
-      adminQuoteVault = await ensureAssociatedTokenAccountWithIX({
+    if (!feeQuoteVault) {
+      feeQuoteVault = await ensureAssociatedTokenAccountWithIX({
         connection,
         payer,
         mint: quoteToken.mint,
@@ -262,7 +262,7 @@ export class BoundPoolClient {
     const createPoolInstruction = await memechanProgram.methods
       .newPool()
       .accounts({
-        adminQuoteVault: adminQuoteVault,
+        feeQuoteVault: feeQuoteVault,
         memeVault: launchVault,
         quoteVault: poolQuoteVault,
         memeMint: memeMint,
@@ -314,7 +314,7 @@ export class BoundPoolClient {
       client,
       quoteToken,
       transaction: createPoolTransaction = new Transaction(),
-      adminSolPublicKey,
+      feeQuoteVaultPk,
       tokenMetadata,
     } = args;
     const { connection, memechanProgram } = client;
@@ -337,12 +337,12 @@ export class BoundPoolClient {
 
     createPoolTransaction.add(...createMemeMintWithPriorityInstructions);
 
-    let adminQuoteVault: PublicKey | undefined = adminSolPublicKey;
+    let feeQuoteVault: PublicKey | undefined = feeQuoteVaultPk;
 
-    // If `adminSolPublicKey` is not passed in args, we need to find out, whether a quote account for an admin
+    // If `feeQuoteVaultPk` is not passed in args, we need to find out, whether a quote account for an admin
     // already exists
-    if (!adminQuoteVault) {
-      adminQuoteVault = await ensureAssociatedTokenAccountWithIX({
+    if (!feeQuoteVault) {
+      feeQuoteVault = await ensureAssociatedTokenAccountWithIX({
         connection,
         payer,
         mint: quoteToken.mint,
@@ -370,7 +370,7 @@ export class BoundPoolClient {
     const createPoolInstruction = await memechanProgram.methods
       .newPool()
       .accounts({
-        adminQuoteVault: adminQuoteVault,
+        feeQuoteVault: feeQuoteVault,
         memeVault: launchVault,
         quoteVault: poolQuoteVault,
         memeMint: memeMint,
@@ -1173,7 +1173,7 @@ export class BoundPoolClient {
       quoteMint: this.quoteTokenMint,
       staking: stakingId,
       stakingPoolSignerPda: stakingSigner,
-      adminVaultQuote: boundPoolInfo.adminVaultQuote,
+      feeVaultQuote: boundPoolInfo.feeVaultQuote,
       marketProgramId: PROGRAMIDS.OPENBOOK_MARKET,
       systemProgram: SystemProgram.programId,
       tokenProgram: TOKEN_PROGRAM_ID,

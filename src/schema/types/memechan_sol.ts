@@ -31,7 +31,7 @@ export type MemechanSol = {
           isSigner: false;
         },
         {
-          name: "adminQuoteVault";
+          name: "feeQuoteVault";
           isMut: false;
           isSigner: false;
         },
@@ -317,7 +317,7 @@ export type MemechanSol = {
           docs: ["Bonding Pool WSOL vault"];
         },
         {
-          name: "adminVaultQuote";
+          name: "feeVaultQuote";
           isMut: true;
           isSigner: false;
           docs: ["Bonding Pool Admin Vault"];
@@ -923,7 +923,7 @@ export type MemechanSol = {
             type: "u64";
           },
           {
-            name: "adminVaultQuote";
+            name: "feeVaultQuote";
             type: "publicKey";
           },
           {
@@ -1889,7 +1889,7 @@ export const IDL: MemechanSol = {
           isSigner: false,
         },
         {
-          name: "adminQuoteVault",
+          name: "feeQuoteVault",
           isMut: false,
           isSigner: false,
         },
@@ -2175,7 +2175,7 @@ export const IDL: MemechanSol = {
           docs: ["Bonding Pool WSOL vault"],
         },
         {
-          name: "adminVaultQuote",
+          name: "feeVaultQuote",
           isMut: true,
           isSigner: false,
           docs: ["Bonding Pool Admin Vault"],
@@ -2781,7 +2781,7 @@ export const IDL: MemechanSol = {
             type: "u64",
           },
           {
-            name: "adminVaultQuote",
+            name: "feeVaultQuote",
             type: "publicKey",
           },
           {

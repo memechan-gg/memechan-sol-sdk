@@ -31,7 +31,7 @@
           "isSigner": false
         },
         {
-          "name": "adminQuoteVault",
+          "name": "feeQuoteVault",
           "isMut": false,
           "isSigner": false
         },
@@ -85,9 +85,7 @@
           "name": "memeMplMetadata",
           "isMut": true,
           "isSigner": false,
-          "docs": [
-            "To store metaplex metadata. Created in the function scope"
-          ]
+          "docs": ["To store metaplex metadata. Created in the function scope"]
         },
         {
           "name": "poolSigner",
@@ -108,9 +106,7 @@
           "name": "metadataProgram",
           "isMut": false,
           "isSigner": false,
-          "docs": [
-            "Program to create NFT metadata"
-          ]
+          "docs": ["Program to create NFT metadata"]
         },
         {
           "name": "rent",
@@ -295,17 +291,13 @@
           "name": "signer",
           "isMut": true,
           "isSigner": true,
-          "docs": [
-            "Signer"
-          ]
+          "docs": ["Signer"]
         },
         {
           "name": "pool",
           "isMut": true,
           "isSigner": false,
-          "docs": [
-            "Bonding Pool account"
-          ]
+          "docs": ["Bonding Pool account"]
         },
         {
           "name": "boundPoolSignerPda",
@@ -316,57 +308,43 @@
           "name": "poolMemeVault",
           "isMut": true,
           "isSigner": false,
-          "docs": [
-            "Bonding Pool Meme vault"
-          ]
+          "docs": ["Bonding Pool Meme vault"]
         },
         {
           "name": "poolQuoteVault",
           "isMut": true,
           "isSigner": false,
-          "docs": [
-            "Bonding Pool WSOL vault"
-          ]
+          "docs": ["Bonding Pool WSOL vault"]
         },
         {
-          "name": "adminVaultQuote",
+          "name": "feeVaultQuote",
           "isMut": true,
           "isSigner": false,
-          "docs": [
-            "Bonding Pool Admin Vault"
-          ]
+          "docs": ["Bonding Pool Admin Vault"]
         },
         {
           "name": "memeMint",
           "isMut": false,
           "isSigner": false,
-          "docs": [
-            "Mint Account for Meme"
-          ]
+          "docs": ["Mint Account for Meme"]
         },
         {
           "name": "quoteMint",
           "isMut": false,
           "isSigner": false,
-          "docs": [
-            "Mint Account for WSOL"
-          ]
+          "docs": ["Mint Account for WSOL"]
         },
         {
           "name": "staking",
           "isMut": true,
           "isSigner": false,
-          "docs": [
-            "Staking Pool Account"
-          ]
+          "docs": ["Staking Pool Account"]
         },
         {
           "name": "stakingPoolSignerPda",
           "isMut": true,
           "isSigner": false,
-          "docs": [
-            "Staking Pool Signer"
-          ]
+          "docs": ["Staking Pool Signer"]
         },
         {
           "name": "stakingMemeVault",
@@ -377,17 +355,13 @@
           "name": "stakingQuoteVault",
           "isMut": true,
           "isSigner": false,
-          "docs": [
-            "Bonding Pool WSOL vault"
-          ]
+          "docs": ["Bonding Pool WSOL vault"]
         },
         {
           "name": "memeTicket",
           "isMut": true,
           "isSigner": false,
-          "docs": [
-            "Meme Ticket Account of Admin"
-          ]
+          "docs": ["Meme Ticket Account of Admin"]
         },
         {
           "name": "rent",
@@ -481,122 +455,91 @@
           "name": "signer",
           "isMut": true,
           "isSigner": true,
-          "docs": [
-            "Signer"
-          ]
+          "docs": ["Signer"]
         },
         {
           "name": "staking",
           "isMut": true,
           "isSigner": false,
-          "docs": [
-            "Staking Pool Account"
-          ]
+          "docs": ["Staking Pool Account"]
         },
         {
           "name": "stakingPoolSignerPda",
           "isMut": true,
           "isSigner": false,
-          "docs": [
-            "Staking Pool Signer"
-          ]
+          "docs": ["Staking Pool Signer"]
         },
         {
           "name": "poolMemeVault",
           "isMut": true,
           "isSigner": false,
-          "docs": [
-            "Staking Pool Meme vault"
-          ]
+          "docs": ["Staking Pool Meme vault"]
         },
         {
           "name": "poolQuoteVault",
           "isMut": true,
           "isSigner": false,
-          "docs": [
-            "Staking Pool WSOL vault"
-          ]
+          "docs": ["Staking Pool WSOL vault"]
         },
         {
           "name": "memeMint",
           "isMut": false,
           "isSigner": false,
-          "docs": [
-            "Mint Account for Meme"
-          ]
+          "docs": ["Mint Account for Meme"]
         },
         {
           "name": "quoteMint",
           "isMut": false,
           "isSigner": false,
-          "docs": [
-            "Mint Account for WSOL"
-          ]
+          "docs": ["Mint Account for WSOL"]
         },
         {
           "name": "openOrders",
           "isMut": true,
           "isSigner": false,
-          "docs": [
-            "Open Orders Account"
-          ]
+          "docs": ["Open Orders Account"]
         },
         {
           "name": "targetOrders",
           "isMut": true,
           "isSigner": false,
-          "docs": [
-            "Target Orders Account"
-          ]
+          "docs": ["Target Orders Account"]
         },
         {
           "name": "marketAccount",
           "isMut": true,
           "isSigner": false,
-          "docs": [
-            "Market Orders Account"
-          ]
+          "docs": ["Market Orders Account"]
         },
         {
           "name": "raydiumAmm",
           "isMut": true,
           "isSigner": false,
-          "docs": [
-            "Raydium AMM Account"
-          ]
+          "docs": ["Raydium AMM Account"]
         },
         {
           "name": "raydiumAmmAuthority",
           "isMut": true,
           "isSigner": false,
-          "docs": [
-            "Raydium AMM Signer"
-          ]
+          "docs": ["Raydium AMM Signer"]
         },
         {
           "name": "raydiumLpMint",
           "isMut": true,
           "isSigner": false,
-          "docs": [
-            "Raydium LP MinT"
-          ]
+          "docs": ["Raydium LP MinT"]
         },
         {
           "name": "raydiumMemeVault",
           "isMut": true,
           "isSigner": false,
-          "docs": [
-            "Raydium LP Token Account",
-            "Raydium Meme Token Account"
-          ]
+          "docs": ["Raydium LP Token Account", "Raydium Meme Token Account"]
         },
         {
           "name": "raydiumQuoteVault",
           "isMut": true,
           "isSigner": false,
-          "docs": [
-            "Raydium WSOL Token Account"
-          ]
+          "docs": ["Raydium WSOL Token Account"]
         },
         {
           "name": "ammConfig",
@@ -980,7 +923,7 @@
             "type": "u64"
           },
           {
-            "name": "adminVaultQuote",
+            "name": "feeVaultQuote",
             "type": "publicKey"
           },
           {
@@ -1127,47 +1070,31 @@
         "fields": [
           {
             "name": "pnlOwner",
-            "docs": [
-              "withdraw pnl owner"
-            ],
+            "docs": ["withdraw pnl owner"],
             "type": "publicKey"
           },
           {
             "name": "cancelOwner",
-            "docs": [
-              "admin amm order owner"
-            ],
+            "docs": ["admin amm order owner"],
             "type": "publicKey"
           },
           {
             "name": "pending1",
-            "docs": [
-              "pending"
-            ],
+            "docs": ["pending"],
             "type": {
-              "array": [
-                "u64",
-                28
-              ]
+              "array": ["u64", 28]
             }
           },
           {
             "name": "pending2",
-            "docs": [
-              "pending"
-            ],
+            "docs": ["pending"],
             "type": {
-              "array": [
-                "u64",
-                31
-              ]
+              "array": ["u64", 31]
             }
           },
           {
             "name": "createPoolFee",
-            "docs": [
-              "init amm pool fee amount"
-            ],
+            "docs": ["init amm pool fee amount"],
             "type": "u64"
           }
         ]
@@ -1181,10 +1108,7 @@
           {
             "name": "owner",
             "type": {
-              "array": [
-                "u64",
-                4
-              ]
+              "array": ["u64", 4]
             }
           },
           {
@@ -1201,10 +1125,7 @@
           {
             "name": "padding1",
             "type": {
-              "array": [
-                "u64",
-                8
-              ]
+              "array": ["u64", 8]
             }
           },
           {
@@ -1261,28 +1182,19 @@
           {
             "name": "padding2",
             "type": {
-              "array": [
-                "u64",
-                6
-              ]
+              "array": ["u64", 6]
             }
           },
           {
             "name": "replaceBuyClientId",
             "type": {
-              "array": [
-                "u64",
-                10
-              ]
+              "array": ["u64", 10]
             }
           },
           {
             "name": "replaceSellClientId",
             "type": {
-              "array": [
-                "u64",
-                10
-              ]
+              "array": ["u64", 10]
             }
           },
           {
@@ -1312,10 +1224,7 @@
           {
             "name": "padding3",
             "type": {
-              "array": [
-                "u64",
-                10
-              ]
+              "array": ["u64", 10]
             }
           },
           {
@@ -1337,19 +1246,13 @@
           {
             "name": "market",
             "type": {
-              "array": [
-                "u64",
-                4
-              ]
+              "array": ["u64", 4]
             }
           },
           {
             "name": "owner",
             "type": {
-              "array": [
-                "u64",
-                4
-              ]
+              "array": ["u64", 4]
             }
           },
           {
@@ -1379,19 +1282,13 @@
           {
             "name": "orders",
             "type": {
-              "array": [
-                "u128",
-                128
-              ]
+              "array": ["u128", 128]
             }
           },
           {
             "name": "clientOrderIds",
             "type": {
-              "array": [
-                "u64",
-                128
-              ]
+              "array": ["u64", 128]
             }
           },
           {
@@ -1413,10 +1310,7 @@
           {
             "name": "ownAddress",
             "type": {
-              "array": [
-                "u64",
-                4
-              ]
+              "array": ["u64", 4]
             }
           },
           {
@@ -1426,28 +1320,19 @@
           {
             "name": "coinMint",
             "type": {
-              "array": [
-                "u64",
-                4
-              ]
+              "array": ["u64", 4]
             }
           },
           {
             "name": "pcMint",
             "type": {
-              "array": [
-                "u64",
-                4
-              ]
+              "array": ["u64", 4]
             }
           },
           {
             "name": "coinVault",
             "type": {
-              "array": [
-                "u64",
-                4
-              ]
+              "array": ["u64", 4]
             }
           },
           {
@@ -1461,10 +1346,7 @@
           {
             "name": "pcVault",
             "type": {
-              "array": [
-                "u64",
-                4
-              ]
+              "array": ["u64", 4]
             }
           },
           {
@@ -1482,37 +1364,25 @@
           {
             "name": "reqQ",
             "type": {
-              "array": [
-                "u64",
-                4
-              ]
+              "array": ["u64", 4]
             }
           },
           {
             "name": "eventQ",
             "type": {
-              "array": [
-                "u64",
-                4
-              ]
+              "array": ["u64", 4]
             }
           },
           {
             "name": "bids",
             "type": {
-              "array": [
-                "u64",
-                4
-              ]
+              "array": ["u64", 4]
             }
           },
           {
             "name": "asks",
             "type": {
-              "array": [
-                "u64",
-                4
-              ]
+              "array": ["u64", 4]
             }
           },
           {
@@ -1683,23 +1553,17 @@
         "fields": [
           {
             "name": "minSeparateNumerator",
-            "docs": [
-              "numerator of the min_separate"
-            ],
+            "docs": ["numerator of the min_separate"],
             "type": "u64"
           },
           {
             "name": "minSeparateDenominator",
-            "docs": [
-              "denominator of the min_separate"
-            ],
+            "docs": ["denominator of the min_separate"],
             "type": "u64"
           },
           {
             "name": "tradeFeeNumerator",
-            "docs": [
-              "numerator of the fee"
-            ],
+            "docs": ["numerator of the fee"],
             "type": "u64"
           },
           {
@@ -1712,30 +1576,22 @@
           },
           {
             "name": "pnlNumerator",
-            "docs": [
-              "numerator of the pnl"
-            ],
+            "docs": ["numerator of the pnl"],
             "type": "u64"
           },
           {
             "name": "pnlDenominator",
-            "docs": [
-              "denominator of the pnl"
-            ],
+            "docs": ["denominator of the pnl"],
             "type": "u64"
           },
           {
             "name": "swapFeeNumerator",
-            "docs": [
-              "numerator of the swap_fee"
-            ],
+            "docs": ["numerator of the swap_fee"],
             "type": "u64"
           },
           {
             "name": "swapFeeDenominator",
-            "docs": [
-              "denominator of the swap_fee"
-            ],
+            "docs": ["denominator of the swap_fee"],
             "type": "u64"
           }
         ]
@@ -1748,98 +1604,69 @@
         "fields": [
           {
             "name": "needTakePnlCoin",
-            "docs": [
-              "delay to take pnl coin"
-            ],
+            "docs": ["delay to take pnl coin"],
             "type": "u64"
           },
           {
             "name": "needTakePnlPc",
-            "docs": [
-              "delay to take pnl pc"
-            ],
+            "docs": ["delay to take pnl pc"],
             "type": "u64"
           },
           {
             "name": "totalPnlPc",
-            "docs": [
-              "total pnl pc"
-            ],
+            "docs": ["total pnl pc"],
             "type": "u64"
           },
           {
             "name": "totalPnlCoin",
-            "docs": [
-              "total pnl coin"
-            ],
+            "docs": ["total pnl coin"],
             "type": "u64"
           },
           {
             "name": "poolOpenTime",
-            "docs": [
-              "ido pool open time"
-            ],
+            "docs": ["ido pool open time"],
             "type": "u64"
           },
           {
             "name": "padding",
-            "docs": [
-              "padding for future updates"
-            ],
+            "docs": ["padding for future updates"],
             "type": {
-              "array": [
-                "u64",
-                2
-              ]
+              "array": ["u64", 2]
             }
           },
           {
             "name": "orderbookToInitTime",
-            "docs": [
-              "switch from orderbookonly to init"
-            ],
+            "docs": ["switch from orderbookonly to init"],
             "type": "u64"
           },
           {
             "name": "swapCoinInAmount",
-            "docs": [
-              "swap coin in amount"
-            ],
+            "docs": ["swap coin in amount"],
             "type": "u128"
           },
           {
             "name": "swapPcOutAmount",
-            "docs": [
-              "swap pc out amount"
-            ],
+            "docs": ["swap pc out amount"],
             "type": "u128"
           },
           {
             "name": "swapAccPcFee",
-            "docs": [
-              "charge pc as swap fee while swap pc to coin"
-            ],
+            "docs": ["charge pc as swap fee while swap pc to coin"],
             "type": "u64"
           },
           {
             "name": "swapPcInAmount",
-            "docs": [
-              "swap pc in amount"
-            ],
+            "docs": ["swap pc in amount"],
             "type": "u128"
           },
           {
             "name": "swapCoinOutAmount",
-            "docs": [
-              "swap coin out amount"
-            ],
+            "docs": ["swap coin out amount"],
             "type": "u128"
           },
           {
             "name": "swapAccCoinFee",
-            "docs": [
-              "charge coin as swap fee while swap coin to pc"
-            ],
+            "docs": ["charge coin as swap fee while swap coin to pc"],
             "type": "u64"
           }
         ]
@@ -1923,7 +1750,7 @@
     {
       "code": 6002,
       "name": "SlippageExceeded",
-      "msg": "Given amount of tokens to swap would result in \\\r\n        less than minimum requested tokens to receive"
+      "msg": "Given amount of tokens to swap would result in \\\n        less than minimum requested tokens to receive"
     },
     {
       "code": 6003,
@@ -2031,6 +1858,6 @@
     }
   ],
   "metadata": {
-    "address": "kKRWbmqpGqPzkAb9aLmhCFcJsr3oBkqCcZYK21dWYRz"
+    "address": "cYsHcSU42XESLPquuN1ga94jm1wVMg11wVcxqvofA3k"
   }
 }
