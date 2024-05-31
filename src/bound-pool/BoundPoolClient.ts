@@ -1631,6 +1631,27 @@ export class BoundPoolClient {
     return { priceInQuote: memePriceInQuote.toString(), priceInUsd: memePriceInUsd };
   }
 
+  /**
+   * Get an initial meme price of a coin
+   *   *
+   * @work-in-progress This method is a work in progress and not yet ready for production use.
+   * @untested This method is untested and may contain bugs.
+   */
+  public static async getInitialMemePrice({
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    boundPoolInfo,
+    quotePriceInUsd,
+  }: {
+    boundPoolInfo: BoundPool;
+    quotePriceInUsd: number;
+  }): Promise<{ priceInQuote: string; priceInUsd: string }> {
+    // TODO: ASAP IMPORTANT: DON'T GO WITH IT IN PROD
+    const memePriceInQuote = new BigNumber(0.00001);
+    const memePriceInUsd = memePriceInQuote.multipliedBy(quotePriceInUsd).toString();
+
+    return { priceInQuote: memePriceInQuote.toString(), priceInUsd: memePriceInUsd };
+  }
+
   public static getMemeMarketCap({ memePriceInUsd }: { memePriceInUsd: string }): string {
     const marketCap = new BigNumber(FULL_MEME_AMOUNT_CONVERTED).multipliedBy(memePriceInUsd).toString();
 
