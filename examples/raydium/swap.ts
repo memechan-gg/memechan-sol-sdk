@@ -4,18 +4,29 @@ import { MEMECHAN_MEME_TOKEN_DECIMALS, MEMECHAN_QUOTE_TOKEN } from "../../src/co
 import { swapOnlyAmm } from "../../src/raydium/swapOnlyAmm";
 import { client, connection, payer } from "../common";
 import { getWalletTokenAccount } from "../../src/util";
+import { LivePoolClient } from "../../src";
 
 // yarn tsx examples/raydium/swap.ts > swap.txt 2>&1
 export const swap = async () => {
-  const poolAddress = "BY6xstuufxC7sii4iqYXToSzYrT8wBcLkrwrVatHXkQs";
+  const poolAddress = "BevUTtVUZQ4LdwWfcq4Uom88yuj1WE2EUiZBgESUsFQT";
+  const memeMint = "2Y3jTuAc778X9Fgh9iejxpK6zBYDSwpUdr1Kz5SdGh5x";
+
   const quoteAmountIn = new TokenAmount(MEMECHAN_QUOTE_TOKEN, 10000000);
-  const tokenOut = new Token(
-    TOKEN_PROGRAM_ID,
-    "FhCre5WhZY9478pYVwZfiKSztugBKg8ezonGQUBC8Tne",
-    MEMECHAN_MEME_TOKEN_DECIMALS,
-  );
+  const tokenOut = new Token(TOKEN_PROGRAM_ID, memeMint, MEMECHAN_MEME_TOKEN_DECIMALS);
   const slippage = new Percent(1, 10000);
   const walletTokenAccounts = await getWalletTokenAccount(client.connection, payer.publicKey);
+
+  const amountIn = "100"; // That's a formatted amount
+
+  const { minAmountOut, wrappedAmountIn } = await LivePoolClient.getBuyMemeOutput({
+    poolAddress,
+    memeCoinMint: memeMint,
+    amountIn,
+    connection,
+    slippagePercentage: 0.1,
+  });
+  console.log("\nquoteAmountIn:", wrappedAmountIn.toExact());
+  console.log("minAmountOut:", minAmountOut.toExact());
 
   const txIds = await swapOnlyAmm({
     connection,

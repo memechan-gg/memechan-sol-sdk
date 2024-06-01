@@ -18,6 +18,7 @@ type CreateMarketTxInput = {
   wallet: PublicKey;
   signer: Keypair;
   connection: Connection;
+  marketIdSeed: PublicKey;
 };
 
 export async function createMarket(input: CreateMarketTxInput) {
@@ -40,6 +41,7 @@ export async function getCreateMarketTransactions(
     connection: input.connection,
     wallet: input.wallet,
     baseInfo: input.baseToken,
+    marketIdSeed: input.marketIdSeed,
     quoteInfo: input.quoteToken,
     // set based on https://docs.raydium.io/raydium/updates/archive/creating-an-openbook-amm-pool
     lotSize: 1,
