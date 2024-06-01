@@ -1323,70 +1323,6 @@ export class BoundPoolClient {
     return { createMarketTransactions, goLiveTransaction: transaction, stakingId, ammId };
   }
 
-  public async goLive(args: GoLiveArgs): Promise<[StakingPoolClient, LivePoolClient]> {
-    return await retry({ fn: () => this.goLiveInternal(args), functionName: "goLive", retries: 10 });
-  }
-
-  private async goLiveInternal(args: GoLiveArgs): Promise<[StakingPoolClient, LivePoolClient]> {
-    // Get needed transactions
-    const { createMarketTransactions, goLiveTransaction, stakingId, ammId } = await this.getGoLiveTransaction(args);
-
-    // Send transaction to create market
-    const createMarketSignatures = await sendTx(this.client.connection, args.user, createMarketTransactions, {
-      skipPreflight: true,
-    });
-    console.log("create market signatures:", JSON.stringify(createMarketSignatures));
-
-    // Check market is created successfully
-    const { blockhash, lastValidBlockHeight } = await this.client.connection.getLatestBlockhash("confirmed");
-    const createMarketTxResult = await this.client.connection.confirmTransaction(
-      {
-        signature: createMarketSignatures[0],
-        blockhash: blockhash,
-        lastValidBlockHeight: lastValidBlockHeight,
-      },
-      "confirmed",
-    );
-
-    if (createMarketTxResult.value.err) {
-      console.error("createMarketTxResult:", createMarketTxResult);
-      throw new Error("createMarketTxResult failed");
-    }
-
-    // Send transaction to go live
-    const goLiveSignature = await sendAndConfirmTransaction(this.client.connection, goLiveTransaction, [args.user], {
-      skipPreflight: true,
-      commitment: "confirmed",
-    });
-    console.log("go live signature:", goLiveSignature);
-
-    // Check go live succeeded
-    const { blockhash: blockhash1, lastValidBlockHeight: lastValidBlockHeight1 } =
-      await this.client.connection.getLatestBlockhash("confirmed");
-    const goLiveTxResult = await this.client.connection.confirmTransaction(
-      {
-        signature: goLiveSignature,
-        blockhash: blockhash1,
-        lastValidBlockHeight: lastValidBlockHeight1,
-      },
-      "confirmed",
-    );
-
-    if (goLiveTxResult.value.err) {
-      console.error("goLiveTxResult:", goLiveTxResult);
-      throw new Error("goLiveTxResult failed");
-    }
-
-    const stakingPoolInstance = await StakingPoolClient.fromStakingPoolId({
-      client: this.client,
-      poolAccountAddressId: stakingId,
-    });
-
-    const livePool = await LivePoolClient.fromAmmId(ammId, this.client);
-
-    return [stakingPoolInstance, livePool];
-  }
-
   public static async getGoLiveTransaction(args: GetGoLiveTransactionStaticArgs): Promise<{
     createMarketTransactions: (Transaction | VersionedTransaction)[];
     goLiveTransaction: Transaction;
@@ -1488,6 +1424,10 @@ export class BoundPoolClient {
     transaction.add(goLiveInstruction);
 
     return { createMarketTransactions, goLiveTransaction: transaction, stakingId, ammId };
+  }
+
+  public async goLive(args: GoLiveArgs): Promise<[StakingPoolClient, LivePoolClient]> {
+    return await BoundPoolClient.goLive({ ...args, client: this.client, memeMint: this.memeTokenMint });
   }
 
   public static async goLive(args: GoLiveStaticArgs): Promise<[StakingPoolClient, LivePoolClient]> {
