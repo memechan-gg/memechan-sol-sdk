@@ -1145,6 +1145,8 @@ export class BoundPoolClient {
       TOKEN_PROGRAM_ID,
     ).publicKey;
 
+    console.log("get golive instructions");
+
     const goLiveInstruction = await client.memechanProgram.methods
       .goLive(raydiumAmmAuthority.nonce)
       .accounts({
@@ -1175,6 +1177,8 @@ export class BoundPoolClient {
         raydiumProgram: PROGRAMIDS.AmmV4,
       })
       .instruction();
+
+    console.log("goLiveInstruction: ", goLiveInstruction);
 
     transaction.add(goLiveInstruction);
 
