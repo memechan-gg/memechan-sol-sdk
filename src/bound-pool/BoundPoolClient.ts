@@ -525,13 +525,13 @@ export class BoundPoolClient {
     // TODO: Check whether user has enough amount of quoute token
     const { tx, memeTicketKeypair } = await this.getBuyMemeTransaction(input);
 
-    const txId = await sendAndConfirmTransaction(this.client.connection, tx, [input.signer, memeTicketKeypair], {
-      skipPreflight: true,
-      commitment: "confirmed",
-      preflightCommitment: "confirmed",
+    const txMethod = getSendAndConfirmTransactionMethod({
+      connection: this.client.connection,
+      transaction: tx,
+      signers: [input.signer, memeTicketKeypair],
     });
 
-    return txId;
+    return await txMethod();
   }
 
   /**
