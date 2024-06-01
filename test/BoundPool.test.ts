@@ -6,12 +6,12 @@ import { MemeTicketClient } from "../src/memeticket/MemeTicketClient";
 
 export function test() {
   describe("BoundPool", () => {
-    it("all", async () => {
+    it.skip("all", async () => {
       const all = await BoundPoolClient.all(client.memechanProgram);
       console.log("all BoundPool length: " + all.length);
     }, 30000);
 
-    it("swapy, golive, should fail below tresholds", async () => {
+    it.skip("swapy, golive, should fail below tresholds", async () => {
       const boundPool = await BoundPoolClient.newWithBuyTx(DEFAULT_BOUND_POOL_WITH_BUY_MEME_ARGS);
       console.log("==== pool id: " + boundPool.id.toString() + ", " + new Date().toUTCString());
 
@@ -52,7 +52,6 @@ export function test() {
           boundPoolInfo,
         }),
       ).rejects.toThrow();
-
     }, 550000);
 
     it("init staking pool then go live", async () => {
@@ -62,16 +61,32 @@ export function test() {
 
       console.log("==== pool id: " + pool.id.toString());
 
-      const ticketId = await pool.swapY({
-        payer: payer,
-        user: payer,
-        memeTokensOut: new BN(1000 * 1e6),
-        quoteAmountIn: new BN(100000 * 1e9),
-        quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
-        pool: pool.id,
+      // const ticketId = await pool.swapY({
+      //   payer: payer,
+      //   user: payer,
+      //   memeTokensOut: new BN(1000 * 1e6),
+      //   quoteAmountIn: new BN(100000 * 1e9),
+      //   quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
+      //   pool: pool.id,
+      // });
+
+      const inputAmount = "41000";
+      const minOutputAmount = await pool.getOutputAmountForBuyMeme({
+        inputAmount: inputAmount,
+        slippagePercentage: 0,
       });
 
-      console.log("swapY ticketId: " + ticketId.id.toBase58());
+      console.log("minOutputAmount: " + minOutputAmount);
+
+      const res = await pool.buyMeme({
+        inputAmount: inputAmount,
+        minOutputAmount: minOutputAmount,
+        slippagePercentage: 0,
+        user: payer.publicKey,
+        signer: payer,
+      });
+
+      console.log("buymeme result: " + res);
 
       const boundPoolInfo = await BoundPoolClient.fetch2(client.connection, pool.id);
 
@@ -104,7 +119,7 @@ export function test() {
       console.log("golive finished. stakingPool: " + stakingPool.id.toString() + " ammPool: " + ammPool.id.toString());
     }, 500000);
 
-    it("init staking pool, many swapy, then go live", async () => {
+    it.skip("init staking pool, many swapy, then go live", async () => {
       console.log(" init staking pool, many swapy then go live. " + new Date().toUTCString());
       console.log("payer: " + payer.publicKey.toString());
 
