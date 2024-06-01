@@ -1220,107 +1220,13 @@ export class BoundPoolClient {
     stakingId: PublicKey;
     ammId: PublicKey;
   }> {
-    const {
-      boundPoolInfo,
-      user,
-      feeDestinationWalletAddress,
-      memeVault,
-      quoteVault,
-      transaction = new Transaction(),
-    } = args;
-    const stakingId = BoundPoolClient.findStakingPda(
-      boundPoolInfo.memeReserve.mint,
-      this.client.memechanProgram.programId,
-    );
-    const stakingSigner = StakingPoolClient.findSignerPda(stakingId, this.client.memechanProgram.programId);
-    const baseTokenInfo = new Token(
-      TOKEN_PROGRAM_ID,
-      new PublicKey(boundPoolInfo.memeReserve.mint),
-      MEMECHAN_MEME_TOKEN_DECIMALS,
-    );
-    const quoteTokenInfo = MEMECHAN_QUOTE_TOKEN;
-
-    // TODO: Put all the transactions into one (now they exceed trx size limit)
-    const { marketId, transactions: createMarketTransactions } = await getCreateMarketTransactions({
-      baseToken: baseTokenInfo,
-      quoteToken: quoteTokenInfo,
-      wallet: user.publicKey,
-      signer: user,
-      connection: this.client.connection,
+    return await BoundPoolClient.getGoLiveTransaction({
+      ...args,
+      client: this.client,
+      memeMint: args.boundPoolInfo.memeReserve.mint,
+      transaction: new Transaction(),
+      payer: args.user,
     });
-    // const createMarketInstructions = getCreateMarketInstructions(transactions);
-    // createMarketTransaction.add(...createMarketInstructions);
-
-    transaction.add(
-      SystemProgram.transfer({
-        fromPubkey: user.publicKey,
-        toPubkey: stakingSigner,
-        lamports: RAYDIUM_PROTOCOL_FEE + TRANSFER_FEE,
-      }),
-    );
-
-    const modifyComputeUnits = ComputeBudgetProgram.setComputeUnitLimit({
-      units: 250000,
-    });
-
-    transaction.add(modifyComputeUnits);
-
-    const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
-      microLamports: COMPUTE_UNIT_PRICE,
-    });
-
-    transaction.add(addPriorityFee);
-
-    const feeDestination = new PublicKey(feeDestinationWalletAddress);
-    const ammId = BoundPoolClient.getAssociatedId({ programId: PROGRAMIDS.AmmV4, marketId });
-    const raydiumAmmAuthority = BoundPoolClient.getAssociatedAuthority({ programId: PROGRAMIDS.AmmV4 });
-    const openOrders = BoundPoolClient.getAssociatedOpenOrders({ programId: PROGRAMIDS.AmmV4, marketId });
-    const targetOrders = BoundPoolClient.getAssociatedTargetOrders({ programId: PROGRAMIDS.AmmV4, marketId });
-    const ammConfig = BoundPoolClient.getAssociatedConfigId({ programId: PROGRAMIDS.AmmV4 });
-    const raydiumLpMint = BoundPoolClient.getAssociatedLpMint({ programId: PROGRAMIDS.AmmV4, marketId });
-    const raydiumMemeVault = BoundPoolClient.getAssociatedBaseVault({ programId: PROGRAMIDS.AmmV4, marketId });
-    const raydiumWsolVault = BoundPoolClient.getAssociatedQuoteVault({ programId: PROGRAMIDS.AmmV4, marketId });
-
-    const userDestinationLpTokenAta = BoundPoolClient.getATAAddress(
-      stakingSigner,
-      raydiumLpMint,
-      TOKEN_PROGRAM_ID,
-    ).publicKey;
-
-    const goLiveInstruction = await this.client.memechanProgram.methods
-      .goLive(raydiumAmmAuthority.nonce)
-      .accounts({
-        signer: user.publicKey,
-        poolMemeVault: memeVault,
-        poolQuoteVault: quoteVault,
-        quoteMint: this.quoteTokenMint,
-        staking: stakingId,
-        stakingPoolSignerPda: stakingSigner,
-        raydiumLpMint: raydiumLpMint,
-        raydiumAmm: ammId,
-        raydiumAmmAuthority: raydiumAmmAuthority.publicKey,
-        raydiumMemeVault: raydiumMemeVault,
-        raydiumQuoteVault: raydiumWsolVault,
-        marketProgramId: PROGRAMIDS.OPENBOOK_MARKET,
-        systemProgram: SystemProgram.programId,
-        tokenProgram: TOKEN_PROGRAM_ID,
-        marketAccount: marketId,
-        clock: SYSVAR_CLOCK_PUBKEY,
-        rent: SYSVAR_RENT_PUBKEY,
-        openOrders: openOrders,
-        targetOrders: targetOrders,
-        memeMint: boundPoolInfo.memeReserve.mint,
-        ammConfig: ammConfig,
-        ataProgram: ATA_PROGRAM_ID,
-        feeDestinationInfo: feeDestination,
-        userDestinationLpTokenAta: userDestinationLpTokenAta,
-        raydiumProgram: PROGRAMIDS.AmmV4,
-      })
-      .instruction();
-
-    transaction.add(goLiveInstruction);
-
-    return { createMarketTransactions, goLiveTransaction: transaction, stakingId, ammId };
   }
 
   public static async getGoLiveTransaction(args: GetGoLiveTransactionStaticArgs): Promise<{
