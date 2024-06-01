@@ -77,7 +77,12 @@ export async function swapOnlyAmm(input: SawpOnlyAmmInputInfo) {
   innerTransactions[0].instructions.unshift(addPriorityFee);
   innerTransactions[0].instructionTypes.unshift(InstructionType.setComputeUnitPrice);
 
-  return { txids: await buildAndSendTx(connection, wallet, innerTransactions, { skipPreflight: true }) };
+  return {
+    txids: await buildAndSendTx(connection, wallet, innerTransactions, {
+      skipPreflight: true,
+      preflightCommitment: "confirmed",
+    }),
+  };
 }
 
 // async function howToUse() {

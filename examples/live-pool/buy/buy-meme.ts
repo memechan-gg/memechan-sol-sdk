@@ -21,7 +21,10 @@ export const buyMeme = async () => {
   });
   console.log("\nbuyTransactions:", buyTransactions);
 
-  const signatures = await buildAndSendTx(connection, payer, buyTransactions, { skipPreflight: true });
+  const signatures = await buildAndSendTx(connection, payer, buyTransactions, {
+    skipPreflight: true,
+    preflightCommitment: "confirmed",
+  });
   console.log("\nbuy meme signatures:", signatures);
 };
 

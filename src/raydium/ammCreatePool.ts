@@ -80,6 +80,7 @@ export async function ammCreatePool(input: TestTxInputInfo) {
   return {
     txids: await buildAndSendTx(input.connection, input.wallet, initPoolInstructionResponse.innerTransactions, {
       skipPreflight: true,
+      preflightCommitment: "confirmed",
     }),
     ammPool: initPoolInstructionResponse.address,
     poolInfo,
