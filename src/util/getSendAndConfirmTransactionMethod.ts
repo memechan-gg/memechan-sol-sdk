@@ -22,7 +22,7 @@ export function getSendAndConfirmTransactionMethod({
   transaction: Transaction;
   signers: Signer[];
   options?: ConfirmOptions;
-}): () => Promise<void> {
+}): () => Promise<string> {
   return async () => {
     const latestBlockhash = await connection.getLatestBlockhash("confirmed");
     console.log("Latest blockhash: ", latestBlockhash);
@@ -50,5 +50,6 @@ export function getSendAndConfirmTransactionMethod({
 
     const tx = await sendAndConfirmTransaction(connection, updatedTransaction, signers, options);
     console.log("Transaction confirmed: ", tx);
+    return tx;
   };
 }
