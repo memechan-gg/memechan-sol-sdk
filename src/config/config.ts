@@ -36,7 +36,7 @@ export const MEMECHAN_FEE_WALLET_ID = "feeLPZEfzJFwDR11cdMWE3nSa4nr7sPPM4u6tmDTw
 export const RAYDIUM_PROTOCOL_FEE = 400_000_000; // 0.4 SOL on Mainnet.
 
 export const TRANSFER_FEE = 60_000_000;
-export const COMPUTE_UNIT_PRICE = 100_000; // priority fee
+export const COMPUTE_UNIT_PRICE = 100_000; // priority fee. 0.1 lamports per compute unit
 // export const FEE_DESTINATION_ID = "3XMrhbv989VxAMi3DErLV9eJht1pHppW5LbKxe9fkEFR"; // devnet
 
 export const FEE_DESTINATION_ID = "7YttLkHDoNj9wyDur5pM1ejNaAvT9X4eqaYcHQqtj2G5";

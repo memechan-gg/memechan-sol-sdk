@@ -1,10 +1,10 @@
 import assert from "assert";
 
-import { jsonInfo2PoolKeys, Liquidity, LiquidityPoolKeys, Percent, Token, TokenAmount } from "@raydium-io/raydium-sdk";
-import { Connection, Keypair } from "@solana/web3.js";
+import { InstructionType, jsonInfo2PoolKeys, Liquidity, LiquidityPoolKeys, Percent, Token, TokenAmount } from "@raydium-io/raydium-sdk";
+import { ComputeBudgetProgram, Connection, Keypair } from "@solana/web3.js";
 import { formatAmmKeysById } from "./formatAmmKeysById";
 import { makeTxVersion } from "./config";
-import { MEMECHAN_QUOTE_MINT } from "../config/config";
+import { COMPUTE_UNIT_PRICE, MEMECHAN_QUOTE_MINT } from "../config/config";
 import { buildAndSendTx, getWalletTokenAccount } from "../util";
 
 export type WalletTokenAccounts = Awaited<ReturnType<typeof getWalletTokenAccount>>;
@@ -62,6 +62,12 @@ export async function swapOnlyAmm(input: SawpOnlyAmmInputInfo) {
   });
 
   console.log("amountOut:", amountOut.toFixed(), "  minAmountOut: ", minAmountOut.toFixed());
+  const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
+    microLamports: COMPUTE_UNIT_PRICE,
+  });
+
+  innerTransactions[0].instructions.unshift(addPriorityFee);
+  innerTransactions[0].instructionTypes.unshift(InstructionType.setComputeUnitPrice);
 
   return { txids: await buildAndSendTx(connection, wallet, innerTransactions, { skipPreflight: true }) };
 }

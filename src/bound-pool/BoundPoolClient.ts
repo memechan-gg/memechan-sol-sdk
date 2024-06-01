@@ -1494,7 +1494,7 @@ export class BoundPoolClient {
     return await retry({
       fn: () => BoundPoolClient.goLiveInternal(args),
       functionName: "goLiveStatic",
-      retries: 10,
+      retries: 3,
     });
   }
 
@@ -1529,6 +1529,7 @@ export class BoundPoolClient {
     // Send transaction to go live
     const goLiveSignature = await sendAndConfirmTransaction(client.connection, goLiveTransaction, [args.user], {
       skipPreflight: true,
+      preflightCommitment: "confirmed",
       commitment: "confirmed",
     });
     console.log("go live signature:", goLiveSignature);

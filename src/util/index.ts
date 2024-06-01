@@ -1,5 +1,6 @@
 import {
   buildSimpleTransaction,
+  forecastTransactionSize,
   InnerSimpleV0Transaction,
   SPL_ACCOUNT_LAYOUT,
   TOKEN_PROGRAM_ID,
@@ -65,6 +66,7 @@ export async function sendTx(
   options?: SendOptions,
 ): Promise<string[]> {
   const txids: string[] = [];
+  console.log("txs: ", txs.length);
   for (const iTx of txs) {
     if (iTx instanceof VersionedTransaction) {
       iTx.sign([payer]);
@@ -72,6 +74,7 @@ export async function sendTx(
     } else {
       txids.push(await connection.sendTransaction(iTx, [payer], options));
     }
+    await connection.confirmTransaction(txids[txids.length - 1], "confirmed");
   }
   return txids;
 }
