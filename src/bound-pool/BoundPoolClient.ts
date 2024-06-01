@@ -1104,7 +1104,7 @@ export class BoundPoolClient {
       connection: client.connection,
     });
 
-    console.log("createMarketTransaction marketId: ", marketId);
+    console.log("createMarketTransaction marketId 0: ", marketId);
 
     // const createMarketInstructions = getCreateMarketInstructions(transactions);
     // createMarketTransaction.add(...createMarketInstructions);
@@ -1117,11 +1117,15 @@ export class BoundPoolClient {
       }),
     );
 
+    console.log("setComputeUnitLimit");
+
     const modifyComputeUnits = ComputeBudgetProgram.setComputeUnitLimit({
       units: 250000,
     });
 
     transaction.add(modifyComputeUnits);
+
+    console.log("setComputeUnitPrice");
 
     const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
       microLamports: COMPUTE_UNIT_PRICE,
@@ -1130,14 +1134,23 @@ export class BoundPoolClient {
     transaction.add(addPriorityFee);
 
     const feeDestination = new PublicKey(feeDestinationWalletAddress);
+    console.log("feeDestination: ", feeDestination.toBase58());
     const ammId = BoundPoolClient.getAssociatedId({ programId: PROGRAMIDS.AmmV4, marketId });
+    console.log("ammId: ", ammId.toBase58());
     const raydiumAmmAuthority = BoundPoolClient.getAssociatedAuthority({ programId: PROGRAMIDS.AmmV4 });
+    console.log("raydiumAmmAuthority: ", raydiumAmmAuthority.publicKey.toBase58());
     const openOrders = BoundPoolClient.getAssociatedOpenOrders({ programId: PROGRAMIDS.AmmV4, marketId });
+    console.log("openOrders: ", openOrders.toBase58());
     const targetOrders = BoundPoolClient.getAssociatedTargetOrders({ programId: PROGRAMIDS.AmmV4, marketId });
+    console.log("targetOrders: ", targetOrders.toBase58());
     const ammConfig = BoundPoolClient.getAssociatedConfigId({ programId: PROGRAMIDS.AmmV4 });
+    console.log("ammConfig: ", ammConfig.toBase58());
     const raydiumLpMint = BoundPoolClient.getAssociatedLpMint({ programId: PROGRAMIDS.AmmV4, marketId });
+    console.log("raydiumLpMint: ", raydiumLpMint.toBase58());
     const raydiumMemeVault = BoundPoolClient.getAssociatedBaseVault({ programId: PROGRAMIDS.AmmV4, marketId });
+    console.log("raydiumMemeVault: ", raydiumMemeVault.toBase58());
     const raydiumWsolVault = BoundPoolClient.getAssociatedQuoteVault({ programId: PROGRAMIDS.AmmV4, marketId });
+    console.log("raydiumWsolVault: ", raydiumWsolVault.toBase58());
 
     const userDestinationLpTokenAta = BoundPoolClient.getATAAddress(
       stakingSigner,
@@ -1145,7 +1158,7 @@ export class BoundPoolClient {
       TOKEN_PROGRAM_ID,
     ).publicKey;
 
-    console.log("get golive instructions");
+    console.log("get golive instructions. : " + userDestinationLpTokenAta.toBase58());
 
     const goLiveInstruction = await client.memechanProgram.methods
       .goLive(raydiumAmmAuthority.nonce)
