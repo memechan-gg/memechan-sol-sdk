@@ -9,7 +9,7 @@ export async function uploadMetadataToIpfs(metadata: TokenMetadata): Promise<str
   const tokenApi = new TokenAPI();
   const fileUploadResult = await tokenApi.uploadFile(metadataFile);
 
-  // TODO: Need to re-visit this, mb change to private pinata gateway?
+  // pump.fun uses this gateway
   const metadataUri = "https://cf-ipfs.com/ipfs/" + fileUploadResult.IpfsHash;
 
   console.log("metadataUri: " + metadataUri);
