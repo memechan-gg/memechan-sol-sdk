@@ -7,7 +7,7 @@ export const ENDPOINT = _ENDPOINT;
 
 export const ATA_PROGRAM_ID = new PublicKey("ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL");
 
-export const makeTxVersion = TxVersion.V0; // LEGACY
+export const makeTxVersion = TxVersion.LEGACY; // LEGACY
 
 export const addLookupTableInfo = LOOKUP_TABLE_CACHE; // only mainnet. other = undefined
-// export const addLookupTableInfo = undefined;
+//export const addLookupTableInfo = undefined;
