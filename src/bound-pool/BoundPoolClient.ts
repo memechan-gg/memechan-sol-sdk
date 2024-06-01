@@ -1077,6 +1077,7 @@ export class BoundPoolClient {
     createMarketTransactions: (Transaction | VersionedTransaction)[];
     goLiveTransaction: Transaction;
     stakingId: PublicKey;
+    marketId: PublicKey;
     ammId: PublicKey;
   }> {
     const {
@@ -1102,6 +1103,9 @@ export class BoundPoolClient {
       signer: user,
       connection: client.connection,
     });
+
+    console.log("createMarketTransaction marketId: ", marketId);
+
     // const createMarketInstructions = getCreateMarketInstructions(transactions);
     // createMarketTransaction.add(...createMarketInstructions);
 
@@ -1174,7 +1178,7 @@ export class BoundPoolClient {
 
     transaction.add(goLiveInstruction);
 
-    return { createMarketTransactions, goLiveTransaction: transaction, stakingId, ammId };
+    return { createMarketTransactions, goLiveTransaction: transaction, stakingId, ammId, marketId };
   }
 
   public async goLive(args: GoLiveArgs): Promise<[StakingPoolClient, LivePoolClient]> {
@@ -1192,29 +1196,37 @@ export class BoundPoolClient {
   private static async goLiveInternal(args: GoLiveStaticArgs): Promise<[StakingPoolClient, LivePoolClient]> {
     const client = args.client;
     // Get needed transactions
-    const { createMarketTransactions, goLiveTransaction, stakingId, ammId } =
+    const { createMarketTransactions, goLiveTransaction, stakingId, ammId, marketId } =
       await BoundPoolClient.getGoLiveTransaction(args);
 
-    // Send transaction to create market
-    const createMarketSignatures = await sendTx(client.connection, args.user, createMarketTransactions, {
-      skipPreflight: true,
-    });
-    console.log("create market signatures:", JSON.stringify(createMarketSignatures));
+    // check if market already exists
+    const marketAccount = await client.connection.getAccountInfo(marketId, "confirmed");
+    console.log("marketAccount: ", marketAccount);
 
-    // Check market is created successfully
-    const { blockhash, lastValidBlockHeight } = await client.connection.getLatestBlockhash("confirmed");
-    const createMarketTxResult = await client.connection.confirmTransaction(
-      {
-        signature: createMarketSignatures[0],
-        blockhash: blockhash,
-        lastValidBlockHeight: lastValidBlockHeight,
-      },
-      "confirmed",
-    );
+    // Send transaction to create market if not
+    if (!marketAccount) {
+      console.log("no market account exists yet, creating sending create market transactions");
+      const createMarketSignatures = await sendTx(client.connection, args.user, createMarketTransactions, {
+        skipPreflight: true,
+      });
+      console.log("create market signatures:", JSON.stringify(createMarketSignatures));
 
-    if (createMarketTxResult.value.err) {
-      console.error("createMarketTxResult:", createMarketTxResult);
-      throw new Error("createMarketTxResult failed");
+      // TODO we migh not need this
+      // Check market is created successfully
+      const { blockhash, lastValidBlockHeight } = await client.connection.getLatestBlockhash("confirmed");
+      const createMarketTxResult = await client.connection.confirmTransaction(
+        {
+          signature: createMarketSignatures[2], // wait for 3rd tx
+          blockhash: blockhash,
+          lastValidBlockHeight: lastValidBlockHeight,
+        },
+        "confirmed",
+      );
+
+      if (createMarketTxResult.value.err) {
+        console.error("createMarketTxResult:", createMarketTxResult);
+        throw new Error("createMarketTxResult failed");
+      }
     }
 
     // Send transaction to go live
