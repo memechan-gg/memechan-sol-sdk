@@ -1494,7 +1494,7 @@ export class BoundPoolClient {
     return await retry({
       fn: () => BoundPoolClient.goLiveInternal(args),
       functionName: "goLiveStatic",
-      retries: 10,
+      retries: 3,
     });
   }
 
