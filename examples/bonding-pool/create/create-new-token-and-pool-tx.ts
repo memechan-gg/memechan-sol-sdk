@@ -7,7 +7,7 @@ import { getTxSize } from "../../../src/util/get-tx-size";
 // yarn tsx examples/bonding-pool/create/create-new-token-and-pool-tx.ts > log.txt 2>&1
 export const createNewTokenAndPoolTx = async () => {
   const { createPoolTransaction, memeMintKeypair } =
-    await BoundPoolClient.getCreateNewBondingPoolAndTokenTransaction({
+    await BoundPoolClient.getCreateNewBondingPoolAndBuyAndTokenWithBuyMemeTransaction({
       admin,
       payer: payer.publicKey,
       client,

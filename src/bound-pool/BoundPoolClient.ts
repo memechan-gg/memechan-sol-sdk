@@ -43,7 +43,6 @@ import {
   GetBuyMemeTransactionArgs,
   GetBuyMemeTransactionOutput,
   GetBuyMemeTransactionStaticArgs,
-  GetCreateNewBondingPoolAndTokenTransactionArgs,
   GetCreateNewBondingPoolAndTokenWithBuyMemeTransactionArgs,
   GetGoLiveTransactionArgs,
   GetGoLiveTransactionStaticArgs,
@@ -193,113 +192,6 @@ export class BoundPoolClient {
     )[0];
   }
 
-  public static async getCreateNewBondingPoolAndTokenTransaction(
-    args: GetCreateNewBondingPoolAndTokenTransactionArgs,
-  ): Promise<{
-    createPoolTransaction: Transaction;
-    memeMintKeypair: Keypair;
-    poolQuoteVault: PublicKey;
-    launchVault: PublicKey;
-  }> {
-    const {
-      admin,
-      payer,
-      client,
-      quoteToken,
-      transaction: createPoolTransaction = new Transaction(),
-      feeQuoteVaultPk,
-      tokenMetadata,
-    } = args;
-    const { connection, memechanProgram } = client;
-
-    const memeMintKeypair = Keypair.generate();
-    const memeMint = memeMintKeypair.publicKey;
-    const id = this.findBoundPoolPda(memeMintKeypair.publicKey, quoteToken.mint, args.client.memechanProgram.programId);
-    const poolSigner = BoundPoolClient.findSignerPda(id, args.client.memechanProgram.programId);
-
-    const createMemeMintWithPriorityInstructions = (
-      await getCreateMintWithPriorityTransaction(
-        connection,
-        payer,
-        poolSigner,
-        null,
-        MEMECHAN_MEME_TOKEN_DECIMALS,
-        memeMintKeypair,
-      )
-    ).instructions;
-
-    createPoolTransaction.add(...createMemeMintWithPriorityInstructions);
-
-    let feeQuoteVault: PublicKey | undefined = feeQuoteVaultPk;
-
-    // If `feeQuoteVaultPk` is not passed in args, we need to find out, whether a quote account for an admin
-    // already exists
-    if (!feeQuoteVault) {
-      feeQuoteVault = await ensureAssociatedTokenAccountWithIX({
-        connection,
-        payer,
-        mint: quoteToken.mint,
-        owner: admin,
-        transaction: createPoolTransaction,
-      });
-    }
-
-    const poolQuoteVault = await ensureAssociatedTokenAccountWithIX({
-      connection,
-      payer,
-      mint: quoteToken.mint,
-      owner: poolSigner,
-      transaction: createPoolTransaction,
-    });
-
-    const launchVault = await ensureAssociatedTokenAccountWithIX({
-      connection,
-      payer,
-      mint: memeMint,
-      owner: poolSigner,
-      transaction: createPoolTransaction,
-    });
-
-    const createPoolInstruction = await memechanProgram.methods
-      .newPool()
-      .accounts({
-        feeQuoteVault: feeQuoteVault,
-        memeVault: launchVault,
-        quoteVault: poolQuoteVault,
-        memeMint: memeMint,
-        pool: id,
-        poolSigner: poolSigner,
-        sender: payer,
-        quoteMint: quoteToken.mint,
-        tokenProgram: TOKEN_PROGRAM_ID,
-        systemProgram: SystemProgram.programId,
-        // TODO: Replace it in a way, that it would respect any target config, not only a hardcoded one
-        targetConfig: MEMECHAN_TARGET_CONFIG,
-      })
-      .instruction();
-
-    createPoolTransaction.add(createPoolInstruction);
-
-    const createTokenInstructions = (
-      await getCreateMetadataTransaction(client, {
-        payer,
-        mint: memeMint,
-        poolSigner,
-        poolId: id,
-        metadata: tokenMetadata,
-      })
-    ).instructions;
-
-    createPoolTransaction.add(...createTokenInstructions);
-
-    return {
-      createPoolTransaction,
-      memeMintKeypair,
-      poolQuoteVault,
-      launchVault,
-    };
-  }
-
   public static async getCreateNewBondingPoolAndBuyAndTokenWithBuyMemeTransaction(
     args: GetCreateNewBondingPoolAndTokenWithBuyMemeTransactionArgs,
   ): Promise<{
@@ -390,7 +282,7 @@ export class BoundPoolClient {
     let memeTicketKeypair: Keypair | undefined = undefined;
     if (args.buyMemeTransactionArgs) {
       const inputAmount = new BigNumber(args.buyMemeTransactionArgs.inputAmount);
-      if (!inputAmount.isZero()) {
+      if (inputAmount.isGreaterThan(0)) {
         const { tx, memeTicketKeypair: newMemeTicketKeypair } = await this.getBuyMemeTransaction({
           ...args.buyMemeTransactionArgs,
           boundPoolId: id,
@@ -425,45 +317,17 @@ export class BoundPoolClient {
   }
 
   public static async new(args: BoundPoolArgs): Promise<BoundPoolClient> {
-    const { payer, client, quoteToken } = args;
-    const { memechanProgram } = client;
+    const { payer } = args;
 
-    const { createPoolTransaction, memeMintKeypair, poolQuoteVault, launchVault } =
-      await this.getCreateNewBondingPoolAndTokenTransaction({ ...args, payer: payer.publicKey });
-
-    const memeMint = memeMintKeypair.publicKey;
-
-    const createPoolTransactionSize = getTxSize(createPoolTransaction, payer.publicKey);
-    console.debug("createPoolTransaction size: ", createPoolTransactionSize);
-
-    const createPoolMethod = getSendAndConfirmTransactionMethod({
-      connection: client.connection,
-      transaction: createPoolTransaction,
-      signers: [payer, memeMintKeypair],
-      options: {
-        commitment: "confirmed",
-        skipPreflight: true,
-        preflightCommitment: "confirmed",
+    return await this.newWithBuyTx({
+      ...args,
+      buyMemeTransactionArgs: {
+        inputAmount: "0",
+        minOutputAmount: "0",
+        slippagePercentage: 0,
+        user: payer.publicKey,
       },
     });
-
-    await retry({
-      fn: createPoolMethod,
-      functionName: "createPoolMethod",
-      retries: 1,
-    });
-
-    const id = this.findBoundPoolPda(memeMint, quoteToken.mint, memechanProgram.programId);
-
-    return new BoundPoolClient(
-      id,
-      client,
-      launchVault,
-      poolQuoteVault,
-      memeMint,
-      quoteToken.mint,
-      new Token(TOKEN_PROGRAM_ID, memeMint, MEMECHAN_MEME_TOKEN_DECIMALS),
-    );
   }
 
   public static async newWithBuyTx(args: BoundPoolWithBuyMemeArgs): Promise<BoundPoolClient> {
