@@ -1200,7 +1200,11 @@ export class BoundPoolClient {
       await BoundPoolClient.getGoLiveTransaction(args);
 
     // check if market already exists
-    const marketAccount = await client.connection.getAccountInfo(marketId, "confirmed");
+    console.log("marketId we try fetch: ", marketId.toBase58());
+    const marketAccount = await client.connection.getAccountInfo(marketId, {
+      commitment: "confirmed",
+      dataSlice: { length: 0, offset: 0 },
+    });
     console.log("marketAccount: ", marketAccount);
 
     // Send transaction to create market if not
@@ -1211,24 +1215,25 @@ export class BoundPoolClient {
       });
       console.log("create market signatures:", JSON.stringify(createMarketSignatures));
 
-      // TODO we migh not need this
+      // TODO we migh need this
       // Check market is created successfully
-      const { blockhash, lastValidBlockHeight } = await client.connection.getLatestBlockhash("confirmed");
-      const createMarketTxResult = await client.connection.confirmTransaction(
-        {
-          signature: createMarketSignatures[2], // wait for 3rd tx
-          blockhash: blockhash,
-          lastValidBlockHeight: lastValidBlockHeight,
-        },
-        "confirmed",
-      );
+      // const { blockhash, lastValidBlockHeight } = await client.connection.getLatestBlockhash("confirmed");
+      // const createMarketTxResult = await client.connection.confirmTransaction(
+      //   {
+      //     signature: createMarketSignatures[2], // wait for 3rd tx
+      //     blockhash: blockhash,
+      //     lastValidBlockHeight: lastValidBlockHeight,
+      //   },
+      //   "confirmed",
+      // );
 
-      if (createMarketTxResult.value.err) {
-        console.error("createMarketTxResult:", createMarketTxResult);
-        throw new Error("createMarketTxResult failed");
-      }
+      // if (createMarketTxResult.value.err) {
+      //   console.error("createMarketTxResult:", createMarketTxResult);
+      //   throw new Error("createMarketTxResult failed");
+      // }
     }
 
+    console.log("send go live transaction");
     // Send transaction to go live
     const goLiveSignature = await sendAndConfirmTransaction(client.connection, goLiveTransaction, [args.user], {
       skipPreflight: true,
