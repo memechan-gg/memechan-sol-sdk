@@ -1,6 +1,5 @@
 import {
   buildSimpleTransaction,
-  forecastTransactionSize,
   InnerSimpleV0Transaction,
   SPL_ACCOUNT_LAYOUT,
   TOKEN_PROGRAM_ID,

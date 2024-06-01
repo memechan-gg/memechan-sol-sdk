@@ -1220,171 +1220,13 @@ export class BoundPoolClient {
     stakingId: PublicKey;
     ammId: PublicKey;
   }> {
-    const {
-      boundPoolInfo,
-      user,
-      feeDestinationWalletAddress,
-      memeVault,
-      quoteVault,
-      transaction = new Transaction(),
-    } = args;
-    const stakingId = BoundPoolClient.findStakingPda(
-      boundPoolInfo.memeReserve.mint,
-      this.client.memechanProgram.programId,
-    );
-    const stakingSigner = StakingPoolClient.findSignerPda(stakingId, this.client.memechanProgram.programId);
-    const baseTokenInfo = new Token(
-      TOKEN_PROGRAM_ID,
-      new PublicKey(boundPoolInfo.memeReserve.mint),
-      MEMECHAN_MEME_TOKEN_DECIMALS,
-    );
-    const quoteTokenInfo = MEMECHAN_QUOTE_TOKEN;
-
-    // TODO: Put all the transactions into one (now they exceed trx size limit)
-    const { marketId, transactions: createMarketTransactions } = await getCreateMarketTransactions({
-      baseToken: baseTokenInfo,
-      quoteToken: quoteTokenInfo,
-      wallet: user.publicKey,
-      signer: user,
-      connection: this.client.connection,
-    });
-    // const createMarketInstructions = getCreateMarketInstructions(transactions);
-    // createMarketTransaction.add(...createMarketInstructions);
-
-    transaction.add(
-      SystemProgram.transfer({
-        fromPubkey: user.publicKey,
-        toPubkey: stakingSigner,
-        lamports: RAYDIUM_PROTOCOL_FEE + TRANSFER_FEE,
-      }),
-    );
-
-    const modifyComputeUnits = ComputeBudgetProgram.setComputeUnitLimit({
-      units: 250000,
-    });
-
-    transaction.add(modifyComputeUnits);
-
-    const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
-      microLamports: COMPUTE_UNIT_PRICE,
-    });
-
-    transaction.add(addPriorityFee);
-
-    const feeDestination = new PublicKey(feeDestinationWalletAddress);
-    const ammId = BoundPoolClient.getAssociatedId({ programId: PROGRAMIDS.AmmV4, marketId });
-    const raydiumAmmAuthority = BoundPoolClient.getAssociatedAuthority({ programId: PROGRAMIDS.AmmV4 });
-    const openOrders = BoundPoolClient.getAssociatedOpenOrders({ programId: PROGRAMIDS.AmmV4, marketId });
-    const targetOrders = BoundPoolClient.getAssociatedTargetOrders({ programId: PROGRAMIDS.AmmV4, marketId });
-    const ammConfig = BoundPoolClient.getAssociatedConfigId({ programId: PROGRAMIDS.AmmV4 });
-    const raydiumLpMint = BoundPoolClient.getAssociatedLpMint({ programId: PROGRAMIDS.AmmV4, marketId });
-    const raydiumMemeVault = BoundPoolClient.getAssociatedBaseVault({ programId: PROGRAMIDS.AmmV4, marketId });
-    const raydiumWsolVault = BoundPoolClient.getAssociatedQuoteVault({ programId: PROGRAMIDS.AmmV4, marketId });
-
-    const userDestinationLpTokenAta = BoundPoolClient.getATAAddress(
-      stakingSigner,
-      raydiumLpMint,
-      TOKEN_PROGRAM_ID,
-    ).publicKey;
-
-    const goLiveInstruction = await this.client.memechanProgram.methods
-      .goLive(raydiumAmmAuthority.nonce)
-      .accounts({
-        signer: user.publicKey,
-        poolMemeVault: memeVault,
-        poolQuoteVault: quoteVault,
-        quoteMint: this.quoteTokenMint,
-        staking: stakingId,
-        stakingPoolSignerPda: stakingSigner,
-        raydiumLpMint: raydiumLpMint,
-        raydiumAmm: ammId,
-        raydiumAmmAuthority: raydiumAmmAuthority.publicKey,
-        raydiumMemeVault: raydiumMemeVault,
-        raydiumQuoteVault: raydiumWsolVault,
-        marketProgramId: PROGRAMIDS.OPENBOOK_MARKET,
-        systemProgram: SystemProgram.programId,
-        tokenProgram: TOKEN_PROGRAM_ID,
-        marketAccount: marketId,
-        clock: SYSVAR_CLOCK_PUBKEY,
-        rent: SYSVAR_RENT_PUBKEY,
-        openOrders: openOrders,
-        targetOrders: targetOrders,
-        memeMint: boundPoolInfo.memeReserve.mint,
-        ammConfig: ammConfig,
-        ataProgram: ATA_PROGRAM_ID,
-        feeDestinationInfo: feeDestination,
-        userDestinationLpTokenAta: userDestinationLpTokenAta,
-        raydiumProgram: PROGRAMIDS.AmmV4,
-      })
-      .instruction();
-
-    transaction.add(goLiveInstruction);
-
-    return { createMarketTransactions, goLiveTransaction: transaction, stakingId, ammId };
-  }
-
-  public async goLive(args: GoLiveArgs): Promise<[StakingPoolClient, LivePoolClient]> {
-    return await retry({ fn: () => this.goLiveInternal(args), functionName: "goLive", retries: 10 });
-  }
-
-  private async goLiveInternal(args: GoLiveArgs): Promise<[StakingPoolClient, LivePoolClient]> {
-    // Get needed transactions
-    const { createMarketTransactions, goLiveTransaction, stakingId, ammId } = await this.getGoLiveTransaction(args);
-
-    // Send transaction to create market
-    const createMarketSignatures = await sendTx(this.client.connection, args.user, createMarketTransactions, {
-      skipPreflight: true,
-    });
-    console.log("create market signatures:", JSON.stringify(createMarketSignatures));
-
-    // Check market is created successfully
-    const { blockhash, lastValidBlockHeight } = await this.client.connection.getLatestBlockhash("confirmed");
-    const createMarketTxResult = await this.client.connection.confirmTransaction(
-      {
-        signature: createMarketSignatures[0],
-        blockhash: blockhash,
-        lastValidBlockHeight: lastValidBlockHeight,
-      },
-      "confirmed",
-    );
-
-    if (createMarketTxResult.value.err) {
-      console.error("createMarketTxResult:", createMarketTxResult);
-      throw new Error("createMarketTxResult failed");
-    }
-
-    // Send transaction to go live
-    const goLiveSignature = await sendAndConfirmTransaction(this.client.connection, goLiveTransaction, [args.user], {
-      skipPreflight: true,
-      commitment: "confirmed",
-    });
-    console.log("go live signature:", goLiveSignature);
-
-    // Check go live succeeded
-    const { blockhash: blockhash1, lastValidBlockHeight: lastValidBlockHeight1 } =
-      await this.client.connection.getLatestBlockhash("confirmed");
-    const goLiveTxResult = await this.client.connection.confirmTransaction(
-      {
-        signature: goLiveSignature,
-        blockhash: blockhash1,
-        lastValidBlockHeight: lastValidBlockHeight1,
-      },
-      "confirmed",
-    );
-
-    if (goLiveTxResult.value.err) {
-      console.error("goLiveTxResult:", goLiveTxResult);
-      throw new Error("goLiveTxResult failed");
-    }
-
-    const stakingPoolInstance = await StakingPoolClient.fromStakingPoolId({
+    return await BoundPoolClient.getGoLiveTransaction({
+      ...args,
       client: this.client,
-      poolAccountAddressId: stakingId,
+      memeMint: args.boundPoolInfo.memeReserve.mint,
+      transaction: new Transaction(),
+      payer: args.user,
     });
-
-    const livePool = await LivePoolClient.fromAmmId(ammId, this.client);
-
-    return [stakingPoolInstance, livePool];
   }
 
   public static async getGoLiveTransaction(args: GetGoLiveTransactionStaticArgs): Promise<{
@@ -1488,6 +1330,10 @@ export class BoundPoolClient {
     transaction.add(goLiveInstruction);
 
     return { createMarketTransactions, goLiveTransaction: transaction, stakingId, ammId };
+  }
+
+  public async goLive(args: GoLiveArgs): Promise<[StakingPoolClient, LivePoolClient]> {
+    return await BoundPoolClient.goLive({ ...args, client: this.client, memeMint: this.memeTokenMint });
   }
 
   public static async goLive(args: GoLiveStaticArgs): Promise<[StakingPoolClient, LivePoolClient]> {
