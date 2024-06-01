@@ -37,7 +37,7 @@ export function createMemechanClient(): MemechanClient {
   const connection = new Connection(getRandomRpcEndpoint(), {
     httpAgent: IS_TEST_ENV ? false : undefined,
     commitment: "confirmed",
-    confirmTransactionInitialTimeout: 90000,
+    confirmTransactionInitialTimeout: 30000,
   });
   return new MemechanClient({
     wallet,

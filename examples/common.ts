@@ -7,7 +7,7 @@ import { getRandomRpcEndpoint } from "../src/util/getRandomRpcEndpoint";
 export const connection = new Connection(getRandomRpcEndpoint(), {
   httpAgent: IS_TEST_ENV ? false : undefined,
   commitment: "confirmed",
-  confirmTransactionInitialTimeout: 90000,
+  confirmTransactionInitialTimeout: 30000,
 });
 
 export const admin = ADMIN_PUB_KEY;
