@@ -69,7 +69,6 @@ export async function swapOnlyAmm(input: SawpOnlyAmmInputInfo) {
     makeTxVersion,
   });
 
-  console.log("amountOut:", amountOut.toFixed(), "  minAmountOut: ", minAmountOut.toFixed());
   const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
     microLamports: COMPUTE_UNIT_PRICE,
   });
