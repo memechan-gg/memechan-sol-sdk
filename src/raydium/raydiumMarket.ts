@@ -196,12 +196,6 @@ export class MarketV2 extends Base {
     const accountLamports = await connection.getMinimumBalanceForRentExemption(165);
     console.log("accountLamports: ", accountLamports);
 
-    const modifyComputeUnits = ComputeBudgetProgram.setComputeUnitLimit({
-      units: 250000,
-    });
-
-    // ins1.push(modifyComputeUnits);
-
     const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
       microLamports: COMPUTE_UNIT_PRICE,
     });
@@ -254,7 +248,6 @@ export class MarketV2 extends Base {
     console.log("bidsLamports: ", bidsLamports);
     console.log("asksLamports: ", asksLamports);
 
-    // ins2.push(modifyComputeUnits);
     ins2.push(addPriorityFee);
     ins2.push(
       SystemProgram.createAccountWithSeed({
@@ -293,7 +286,14 @@ export class MarketV2 extends Base {
         space: bidsSpace,
         programId: marketInfo.programId,
       }),
-      SystemProgram.createAccountWithSeed({
+
+    );
+
+    const ins3: TransactionInstruction[] = [];
+
+    ins3.push(addPriorityFee);
+    ins3.push(
+        SystemProgram.createAccountWithSeed({
         fromPubkey: wallet,
         basePubkey: wallet,
         seed: marketInfo.asks.seed,
@@ -341,6 +341,7 @@ export class MarketV2 extends Base {
           instructions: ins1,
           signers: [],
           instructionTypes: [
+            InstructionType.setComputeUnitPrice,
             InstructionType.createAccount,
             InstructionType.createAccount,
             InstructionType.initAccount,
@@ -351,13 +352,17 @@ export class MarketV2 extends Base {
           instructions: ins2,
           signers: [],
           instructionTypes: [
+            InstructionType.setComputeUnitPrice,
             InstructionType.createAccount,
             InstructionType.createAccount,
             InstructionType.createAccount,
             InstructionType.createAccount,
-            InstructionType.createAccount,
-            InstructionType.initMarket,
           ],
+        },
+        {
+          instructions: ins3,
+          signers: [],
+          instructionTypes: [InstructionType.setComputeUnitPrice, InstructionType.createAccount, InstructionType.initMarket],
         },
       ],
     };
