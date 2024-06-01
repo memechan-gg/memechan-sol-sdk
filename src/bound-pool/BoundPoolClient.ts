@@ -1104,6 +1104,7 @@ export class BoundPoolClient {
       connection: client.connection,
     });
 
+    console.log("stakingId: ", stakingId.toBase58());
     console.log("createMarketTransaction marketId 0: ", marketId);
 
     // const createMarketInstructions = getCreateMarketInstructions(transactions);
@@ -1128,7 +1129,7 @@ export class BoundPoolClient {
     console.log("setComputeUnitPrice");
 
     const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
-      microLamports: COMPUTE_UNIT_PRICE,
+      microLamports: COMPUTE_UNIT_PRICE * 100, // we need high priority, we can always optimize later
     });
 
     transaction.add(addPriorityFee);
@@ -1158,7 +1159,7 @@ export class BoundPoolClient {
       TOKEN_PROGRAM_ID,
     ).publicKey;
 
-    console.log("get golive instructions. : " + userDestinationLpTokenAta.toBase58());
+    console.log("userDestinationLpTokenAta. : " + userDestinationLpTokenAta.toBase58());
 
     const goLiveInstruction = await client.memechanProgram.methods
       .goLive(raydiumAmmAuthority.nonce)
