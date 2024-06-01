@@ -26,6 +26,7 @@ import {
 } from "@solana/web3.js";
 import BN from "bn.js";
 import { COMPUTE_UNIT_PRICE } from "../config/config";
+import { sha256 } from "@noble/hashes/sha256";
 
 function accountFlagsLayout(property = "accountFlags") {
   const ACCOUNT_FLAGS_LAYOUT = new WideBits(property);
@@ -68,6 +69,7 @@ export class MarketV2 extends Base {
   static async makeCreateMarketInstructionSimple<T extends TxVersion>({
     connection,
     wallet,
+    marketIdSeed,
     baseInfo,
     quoteInfo,
     lotSize, // 1
@@ -79,6 +81,7 @@ export class MarketV2 extends Base {
     makeTxVersion: T;
     lookupTableCache?: CacheLTA;
     connection: Connection;
+    marketIdSeed: PublicKey;
     wallet: PublicKey;
     baseInfo: {
       mint: PublicKey;
@@ -92,7 +95,11 @@ export class MarketV2 extends Base {
     tickSize: number;
     dexProgramId: PublicKey;
   }) {
-    const market = generatePubKey({ fromPublicKey: wallet, programId: dexProgramId });
+    const market = MarketV2.generatePubKeyFromSeed({
+      fromSeed: marketIdSeed,
+      fromPublicKey: wallet,
+      programId: dexProgramId,
+    });
     const requestQueue = generatePubKey({ fromPublicKey: wallet, programId: dexProgramId });
     const eventQueue = generatePubKey({ fromPublicKey: wallet, programId: dexProgramId });
     const bids = generatePubKey({ fromPublicKey: wallet, programId: dexProgramId });
@@ -369,6 +376,26 @@ export class MarketV2 extends Base {
         },
       ],
     };
+  }
+
+  public static generatePubKeyFromSeed({
+    fromSeed,
+    fromPublicKey,
+    programId = TOKEN_PROGRAM_ID,
+  }: {
+    fromSeed: PublicKey;
+    fromPublicKey: PublicKey;
+    programId: PublicKey;
+  }) {
+    const seed = fromSeed.toBase58().slice(0, 32);
+    const publicKey = MarketV2.createWithSeed(fromPublicKey, seed, programId);
+    return { publicKey, seed };
+  }
+
+  static createWithSeed(fromPublicKey: PublicKey, seed: string, programId: PublicKey) {
+    const buffer = Buffer.concat([fromPublicKey.toBuffer(), Buffer.from(seed), programId.toBuffer()]);
+    const publicKeyBytes = sha256(buffer);
+    return new PublicKey(publicKeyBytes);
   }
 
   static initializeMarketInstruction({

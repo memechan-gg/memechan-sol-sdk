@@ -1097,6 +1097,7 @@ export class BoundPoolClient {
     const { marketId, transactions: createMarketTransactions } = await getCreateMarketTransactions({
       baseToken: baseTokenInfo,
       quoteToken: quoteTokenInfo,
+      marketIdSeed: stakingId,
       wallet: user.publicKey,
       signer: user,
       connection: client.connection,
