@@ -286,14 +286,13 @@ export class MarketV2 extends Base {
         space: bidsSpace,
         programId: marketInfo.programId,
       }),
-
     );
 
     const ins3: TransactionInstruction[] = [];
 
     ins3.push(addPriorityFee);
     ins3.push(
-        SystemProgram.createAccountWithSeed({
+      SystemProgram.createAccountWithSeed({
         fromPubkey: wallet,
         basePubkey: wallet,
         seed: marketInfo.asks.seed,
@@ -362,7 +361,11 @@ export class MarketV2 extends Base {
         {
           instructions: ins3,
           signers: [],
-          instructionTypes: [InstructionType.setComputeUnitPrice, InstructionType.createAccount, InstructionType.initMarket],
+          instructionTypes: [
+            InstructionType.setComputeUnitPrice,
+            InstructionType.createAccount,
+            InstructionType.initMarket,
+          ],
         },
       ],
     };

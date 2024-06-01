@@ -1,6 +1,14 @@
 import assert from "assert";
 
-import { InstructionType, jsonInfo2PoolKeys, Liquidity, LiquidityPoolKeys, Percent, Token, TokenAmount } from "@raydium-io/raydium-sdk";
+import {
+  InstructionType,
+  jsonInfo2PoolKeys,
+  Liquidity,
+  LiquidityPoolKeys,
+  Percent,
+  Token,
+  TokenAmount,
+} from "@raydium-io/raydium-sdk";
 import { ComputeBudgetProgram, Connection, Keypair } from "@solana/web3.js";
 import { formatAmmKeysById } from "./formatAmmKeysById";
 import { makeTxVersion } from "./config";
