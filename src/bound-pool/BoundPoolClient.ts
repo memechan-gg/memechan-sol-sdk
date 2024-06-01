@@ -1159,7 +1159,7 @@ export class BoundPoolClient {
       TOKEN_PROGRAM_ID,
     ).publicKey;
 
-    console.log("get golive instructions. : " + userDestinationLpTokenAta.toBase58());
+    console.log("userDestinationLpTokenAta. : " + userDestinationLpTokenAta.toBase58());
 
     const goLiveInstruction = await client.memechanProgram.methods
       .goLive(raydiumAmmAuthority.nonce)
