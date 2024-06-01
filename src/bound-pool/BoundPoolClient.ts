@@ -436,9 +436,6 @@ export class BoundPoolClient {
     const createPoolTransactionSize = getTxSize(createPoolTransaction, payer.publicKey);
     console.debug("createPoolTransaction size: ", createPoolTransactionSize);
 
-    // const createTokenTransactionSize = getTxSize(createTokenTransaction, payer.publicKey);
-    // console.debug("createTokenTransaction size: ", createTokenTransactionSize);
-
     const createPoolMethod = getSendAndConfirmTransactionMethod({
       connection: client.connection,
       transaction: createPoolTransaction,
@@ -455,23 +452,6 @@ export class BoundPoolClient {
       functionName: "createPoolMethod",
       retries: 1,
     });
-
-    // const createTokenMethod = getSendAndConfirmTransactionMethod({
-    //   connection: client.connection,
-    //   transaction: createTokenTransaction,
-    //   signers: [payer],
-    //   options: {
-    //     commitment: "confirmed",
-    //     skipPreflight: true,
-    //     preflightCommitment: "confirmed",
-    //   },
-    // });
-
-    // await retry({
-    //   fn: createTokenMethod,
-    //   functionName: "createTokenMethod",
-    //   retries: 1,
-    // });
 
     const id = this.findBoundPoolPda(memeMint, quoteToken.mint, memechanProgram.programId);
 
