@@ -10,4 +10,4 @@ export const ATA_PROGRAM_ID = new PublicKey("ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efT
 export const makeTxVersion = TxVersion.LEGACY; // LEGACY
 
 export const addLookupTableInfo = LOOKUP_TABLE_CACHE; // only mainnet. other = undefined
-//export const addLookupTableInfo = undefined;
+// export const addLookupTableInfo = undefined;
