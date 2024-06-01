@@ -1229,25 +1229,26 @@ export class BoundPoolClient {
       console.log("no market account exists yet, creating sending create market transactions");
       const createMarketSignatures = await sendTx(client.connection, args.user, createMarketTransactions, {
         skipPreflight: true,
+        preflightCommitment: "confirmed",
       });
       console.log("create market signatures:", JSON.stringify(createMarketSignatures));
 
       // TODO we migh need this
       // Check market is created successfully
-      // const { blockhash, lastValidBlockHeight } = await client.connection.getLatestBlockhash("confirmed");
-      // const createMarketTxResult = await client.connection.confirmTransaction(
-      //   {
-      //     signature: createMarketSignatures[2], // wait for 3rd tx
-      //     blockhash: blockhash,
-      //     lastValidBlockHeight: lastValidBlockHeight,
-      //   },
-      //   "confirmed",
-      // );
+      const { blockhash, lastValidBlockHeight } = await client.connection.getLatestBlockhash("confirmed");
+      const createMarketTxResult = await client.connection.confirmTransaction(
+        {
+          signature: createMarketSignatures[2], // wait for 3rd tx
+          blockhash: blockhash,
+          lastValidBlockHeight: lastValidBlockHeight,
+        },
+        "confirmed",
+      );
 
-      // if (createMarketTxResult.value.err) {
-      //   console.error("createMarketTxResult:", createMarketTxResult);
-      //   throw new Error("createMarketTxResult failed");
-      // }
+      if (createMarketTxResult.value.err) {
+        console.error("createMarketTxResult:", createMarketTxResult);
+        throw new Error("createMarketTxResult failed");
+      }
     }
 
     console.log("send go live transaction");

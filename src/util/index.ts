@@ -65,15 +65,18 @@ export async function sendTx(
   options?: SendOptions,
 ): Promise<string[]> {
   const txids: string[] = [];
-  console.log("txs: ", txs.length);
+  console.log("sendTx txs length: ", txs.length);
   for (const iTx of txs) {
+    console.log("iTx0: ", iTx);
     if (iTx instanceof VersionedTransaction) {
       iTx.sign([payer]);
       txids.push(await connection.sendTransaction(iTx, options));
     } else {
       txids.push(await connection.sendTransaction(iTx, [payer], options));
     }
+    console.log("txid1: ", txids[txids.length - 1]);
     await connection.confirmTransaction(txids[txids.length - 1], "confirmed");
+    console.log("txid2: ", txids[txids.length - 1]);
   }
   return txids;
 }
