@@ -7,14 +7,14 @@ import { getWalletTokenAccount } from "../../src/util";
 
 // yarn tsx examples/live-pool/swap.ts > swap.txt 2>&1
 export const swap = async () => {
-  const poolAddress = "3KgPp4q7DpeNSjA7aQSxtEKpDSGHDgf5SQasYUwd7A23";
-  const quoteAmountIn = new TokenAmount(MEMECHAN_QUOTE_TOKEN, 20000000);
+  const ammPoolAddress = "BevUTtVUZQ4LdwWfcq4Uom88yuj1WE2EUiZBgESUsFQT";
+  const quoteAmountIn = new TokenAmount(MEMECHAN_QUOTE_TOKEN, 2000);
   const tokenOut = new Token(
     TOKEN_PROGRAM_ID,
-    "Ag1wTJEa9MyZcdZoNQfYBLobgCjdu9GNeHftZ8X2MLP2",
+    "2Y3jTuAc778X9Fgh9iejxpK6zBYDSwpUdr1Kz5SdGh5x",
     MEMECHAN_MEME_TOKEN_DECIMALS,
   );
-  const slippage = new Percent(1, 10000);
+  const slippage = new Percent(1, 100);
   const walletTokenAccounts = await getWalletTokenAccount(client.connection, payer.publicKey);
 
   const txIds = await swapOnlyAmm({
@@ -22,7 +22,7 @@ export const swap = async () => {
     inputTokenAmount: quoteAmountIn,
     outputToken: tokenOut,
     slippage,
-    targetPool: poolAddress,
+    targetPool: ammPoolAddress,
     wallet: payer,
     walletTokenAccounts,
   });
