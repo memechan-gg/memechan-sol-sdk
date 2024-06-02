@@ -5,15 +5,14 @@ import {
   PublicKey,
   SystemProgram,
   Transaction,
-  sendAndConfirmRawTransaction,
   sendAndConfirmTransaction,
 } from "@solana/web3.js";
-import { MemechanClient } from "../MemechanClient";
-import { CreateTargetConfigArgs } from "./types";
 import BN from "bn.js";
+import { MemechanClient } from "../MemechanClient";
+import { COMPUTE_UNIT_PRICE } from "../config/config";
 import { TargetConfig as CodegenTargetConfig } from "../schema/codegen/accounts";
 import { getSendAndConfirmTransactionMethod } from "../util/getSendAndConfirmTransactionMethod";
-import { COMPUTE_UNIT_PRICE } from "../config/config";
+import { CreateTargetConfigArgs } from "./types";
 
 export class TargetConfigClient {
   public constructor(
