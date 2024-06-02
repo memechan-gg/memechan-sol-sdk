@@ -18,7 +18,8 @@ export const createTargetConfig = async () => {
   // const mint = MEMECHAN_QUOTE_TOKEN.mint; // fake slerf
   const mint = SLERF_MINT;
 
-  const targetAmountRaw = 40_000;
+  // const targetAmountRaw = 40_000;
+  const targetAmountRaw = 400;
   const targetAmountBN = new BN(targetAmountRaw * 10 ** MEMECHAN_QUOTE_TOKEN_DECIMALS);
 
   console.log("targetconfig mint: " + mint.toString());
