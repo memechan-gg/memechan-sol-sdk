@@ -612,6 +612,12 @@ export class BoundPoolClient {
       })
       .instruction();
 
+    const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
+      microLamports: COMPUTE_UNIT_PRICE,
+    });
+
+    transaction.add(addPriorityFee);
+
     transaction.add(buyMemeInstruction);
 
     return { tx: transaction, memeTicketKeypair, inputTokenAccount };

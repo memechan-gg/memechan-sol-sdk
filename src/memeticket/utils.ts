@@ -1,5 +1,5 @@
-import { PublicKey, Transaction, TransactionInstruction } from "@solana/web3.js";
-import { MAX_TRANSACTION_SIZE } from "../config/config";
+import { ComputeBudgetProgram, PublicKey, Transaction, TransactionInstruction } from "@solana/web3.js";
+import { COMPUTE_UNIT_PRICE, MAX_TRANSACTION_SIZE } from "../config/config";
 import { getTxSize } from "../util/get-tx-size";
 
 /**
@@ -28,6 +28,11 @@ export function getOptimizedTransactions(instructions: TransactionInstruction[],
     }
 
     const transaction = new Transaction();
+    const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
+      microLamports: COMPUTE_UNIT_PRICE,
+    });
+    transaction.add(addPriorityFee);
+
     transaction.add(...inst);
 
     if (getTxSize(transaction, feePayer) <= MAX_TRANSACTION_SIZE) {
