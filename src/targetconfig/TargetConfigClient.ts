@@ -1,9 +1,19 @@
-import { Connection, Keypair, PublicKey, SystemProgram, Transaction } from "@solana/web3.js";
+import {
+  ComputeBudgetProgram,
+  Connection,
+  Keypair,
+  PublicKey,
+  SystemProgram,
+  Transaction,
+  sendAndConfirmRawTransaction,
+  sendAndConfirmTransaction,
+} from "@solana/web3.js";
 import { MemechanClient } from "../MemechanClient";
 import { CreateTargetConfigArgs } from "./types";
 import BN from "bn.js";
 import { TargetConfig as CodegenTargetConfig } from "../schema/codegen/accounts";
 import { getSendAndConfirmTransactionMethod } from "../util/getSendAndConfirmTransactionMethod";
+import { COMPUTE_UNIT_PRICE } from "../config/config";
 
 export class TargetConfigClient {
   public constructor(
@@ -89,16 +99,25 @@ export class TargetConfigClient {
   }
 
   public async changeTargetConfig(targetAmount: BN, payer: Keypair): Promise<string> {
+    const tx = new Transaction();
     const result = await this.client.memechanProgram.methods
       .changeTargetConfig(targetAmount)
       .accounts({
         sender: payer.publicKey,
         targetConfig: this.id,
       })
-      .signers([payer])
-      .rpc({ commitment: "confirmed", skipPreflight: true, preflightCommitment: "confirmed" });
+      .instruction();
 
+    tx.add(result);
+
+    const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
+      microLamports: COMPUTE_UNIT_PRICE,
+    });
+    tx.add(addPriorityFee);
+
+    const signature = await sendAndConfirmTransaction(this.client.connection, tx, [payer]);
     console.log("changeTargetConfig result", result);
-    return result;
+
+    return signature;
   }
 }
