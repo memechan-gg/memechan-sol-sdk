@@ -1,9 +1,16 @@
 import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
-import { AccountMeta, PublicKey, Transaction, sendAndConfirmTransaction } from "@solana/web3.js";
+import {
+  AccountMeta,
+  Connection,
+  PublicKey,
+  SystemProgram,
+  Transaction,
+  sendAndConfirmTransaction,
+} from "@solana/web3.js";
 import BigNumber from "bignumber.js";
 import { MemechanClient } from "../MemechanClient";
 import { BoundPoolClient } from "../bound-pool/BoundPoolClient";
-import { MAX_MEME_TOKENS, MEMECHAN_QUOTE_MINT, MEME_TOKEN_DECIMALS } from "../config/config";
+import { MAX_MEME_TOKENS, MEMECHAN_PROGRAM_ID, MEMECHAN_QUOTE_MINT, MEME_TOKEN_DECIMALS } from "../config/config";
 import { MemeTicketClient } from "../memeticket/MemeTicketClient";
 import { getOptimizedTransactions } from "../memeticket/utils";
 import { formatAmmKeysById } from "../raydium/formatAmmKeysById";
@@ -551,5 +558,47 @@ export class StakingPoolClient {
 
   private getAccountMeta(pubkey: PublicKey): AccountMeta {
     return { isSigner: false, isWritable: true, pubkey };
+  }
+
+  /**
+   * Checks if an (AMM) pool is created for the provided memecoin mint.
+   *
+   * The method returns `false` in two cases:
+   * 1. When there is no staking pool at all (i.e., the staking pool is not created yet).
+   * 2. When there is a staking pool but the AMM pool is not created yet.
+   *
+   * @param {Object} params - The parameters for the method.
+   * @param {Connection} params.connection - The connection to the Solana cluster.
+   * @param {PublicKey} params.memeMintPubkey - The public key of the memecoin mint.
+   *
+   * @returns {Promise<boolean>} - A promise that resolves to a boolean indicating whether the AMM pool is created.
+   *
+   * @throws {Error} - If the RPC (network) call to fetch the staking pool information fails.
+   */
+  public static async isAmmPoolIsCreated({
+    connection,
+    memeMintPubkey,
+  }: {
+    connection: Connection;
+    memeMintPubkey: PublicKey;
+  }): Promise<boolean> {
+    const memechanProgramPubkey = new PublicKey(MEMECHAN_PROGRAM_ID);
+    const stakingPda = BoundPoolClient.findStakingPda(memeMintPubkey, memechanProgramPubkey);
+    const stakingInfo = await StakingPool.fetch(connection, stakingPda);
+
+    // if there is no staking pool, than there is no amm pool obviously
+    if (!stakingInfo) {
+      console.warn(
+        `[isAmmPoolIsCreated] No staking pool found for current memeMintPubkey ${memeMintPubkey.toString()}`,
+      );
+
+      return false;
+    }
+
+    const { raydiumAmm } = stakingInfo;
+    const isRaydiumAmmIsEqualToSystemProgramId = raydiumAmm.equals(SystemProgram.programId);
+    const isPoolCreated = !isRaydiumAmmIsEqualToSystemProgramId;
+
+    return isPoolCreated;
   }
 }
