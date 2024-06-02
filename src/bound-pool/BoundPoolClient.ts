@@ -92,6 +92,7 @@ import { ParsedMemeTicket } from "../memeticket/types";
 import { normalizeInputCoinAmount } from "../util/trading/normalizeInputCoinAmount";
 import base58 from "bs58";
 import { ensureAssociatedTokenAccountWithIX } from "../util/ensureAssociatedTokenAccountWithIX";
+import { NoBoundPoolExist } from "./errors";
 
 export class BoundPoolClient {
   private constructor(
@@ -424,7 +425,7 @@ export class BoundPoolClient {
     const accountInfo = await CodegenBoundPool.fetch(connection, accountId);
 
     if (!accountInfo) {
-      throw new Error(`[BoundPoolClient.fetch] No account info found for the pool ${accountId}`);
+      throw new NoBoundPoolExist(`[BoundPoolClient.fetch] No account info found for the pool ${accountId}`);
     }
 
     return accountInfo;

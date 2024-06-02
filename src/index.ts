@@ -65,3 +65,6 @@ export * from "./token/validation/consts";
 export * from "./token/validation/invalidParamErrors";
 export * from "./token/validation/validateCreateCoinParams";
 export * from "./token/validation/validation";
+
+// Errors
+export * from "./bound-pool/errors";
