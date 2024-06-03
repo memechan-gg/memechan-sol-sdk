@@ -2,7 +2,7 @@ import { PublicKey } from "@solana/web3.js";
 import BN from "bn.js";
 import { TokenAPI } from "./TokenAPI";
 import { PROD_BE_URL } from "../config/config";
-import { ConvertedHolderItem, ConvertedHolderMap, QueryHoldersByTokenAddressResponse } from "./types";
+import { ConvertedHolderMap, QueryHoldersByTokenAddressResponse } from "./types";
 
 export class TokenApiHelper {
   /**
