@@ -1,6 +1,6 @@
 import { PublicKey, Signer } from "@solana/web3.js";
 import { z, ZodRawShape } from "zod";
-import { SolanaToken, solanaTokenSchema } from "./schemas/token-schemas";
+import { SolanaToken, solanaTokenHolderSchema, solanaTokenSchema } from "./schemas/token-schemas";
 import { solanaLivePool, SolanaSeedPool, solanaSeedPool, solanaStakingPool } from "./schemas/pools-schema";
 
 export interface TokenMetadata {
@@ -54,3 +54,6 @@ export type UploadFileResponse = {
 export type CreateTokenResponse = {
   token: SolanaToken;
 };
+
+export const paginatedHoldersResultSchema = () => paginatedResultSchema(solanaTokenHolderSchema);
+export type QueryHoldersByTokenAddressResponse = z.infer<ReturnType<typeof paginatedHoldersResultSchema>>;

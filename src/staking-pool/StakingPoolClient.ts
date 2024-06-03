@@ -11,7 +11,13 @@ import {
 import BigNumber from "bignumber.js";
 import { MemechanClient } from "../MemechanClient";
 import { BoundPoolClient } from "../bound-pool/BoundPoolClient";
-import { COMPUTE_UNIT_PRICE, MAX_MEME_TOKENS, MEMECHAN_PROGRAM_ID, MEMECHAN_QUOTE_MINT, MEME_TOKEN_DECIMALS } from "../config/config";
+import {
+  COMPUTE_UNIT_PRICE,
+  MAX_MEME_TOKENS,
+  MEMECHAN_PROGRAM_ID,
+  MEMECHAN_QUOTE_MINT,
+  MEME_TOKEN_DECIMALS,
+} from "../config/config";
 import { MemeTicketClient } from "../memeticket/MemeTicketClient";
 import { getOptimizedTransactions } from "../memeticket/utils";
 import { formatAmmKeysById } from "../raydium/formatAmmKeysById";

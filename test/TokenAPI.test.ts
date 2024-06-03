@@ -1,9 +1,10 @@
 import { Keypair } from "@solana/web3.js";
 import { Auth } from "../src/api/auth/Auth";
-import { BE_URL, isSorted } from "./utils";
+import { isSorted } from "./utils";
 import nacl from "tweetnacl";
 import { TokenAPI } from "../src/api/TokenAPI";
 import { SolanaToken, solanaTokenSchema } from "../src/api/schemas/token-schemas";
+import { BE_URL } from "../src/config/config";
 // eslint-disable-next-line max-len
 
 export function test() {
@@ -114,6 +115,29 @@ export function test() {
       const tokenService = new TokenAPI(BE_URL);
       const result = await tokenService.getToken("PRESALE", token.address);
       solanaTokenSchema.parse(result);
+    });
+
+    it("query presale holders", async () => {
+      const tokenService = new TokenAPI(BE_URL);
+      const result = await tokenService.getHolders({
+        tokenAddress: "3k4cMd1JJiPbUix8KwX3TfupWuEbZgyM6q44HUGJ8mDs",
+        direction: "desc",
+        sortBy: "tokenAmount",
+        paginationToken: "",
+      });
+      expect(result.result.length).toBeGreaterThan(0);
+      expect(result.result[0].tokenAmount).toBeGreaterThan(0);
+    });
+
+    it("query live holders", async () => {
+      const tokenService = new TokenAPI(BE_URL);
+      const result = await tokenService.getHolders({
+        tokenAddress: "BUNgiEKYciGAYG4iE7B8DAeEjBHxkc4mcy3S6NL3r1x5",
+        direction: "desc",
+        sortBy: "tokenAmount",
+      });
+      expect(result.result.length).toBeGreaterThan(0);
+      expect(result.result[0].tokenAmount).toBeGreaterThan(0);
     });
   });
 }

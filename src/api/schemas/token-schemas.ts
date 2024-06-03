@@ -76,6 +76,20 @@ export const createTokenRequestBodySchema = z.object({
   socialLinks: solanaSocialLinks.nullish(),
 });
 
+export const solanaTokenHoldersByTokenAddressRequest = z.object({
+  tokenAddress: z.string(),
+  paginationToken: z.string().optional(),
+  direction: z.literal("asc").or(z.literal("desc")),
+  sortBy: z.literal("tokenAmount").or(z.literal("tokenAmountInPercentage")),
+});
+
+export const solanaTokenHolderSchema = z.object({
+  walletAddress: z.string(),
+  tokenAddress: z.string(),
+  tokenAmount: z.number(),
+  tokenAmountInPercentage: z.number(),
+});
+
 export type SolanaTokenMetadata = z.infer<typeof solanaTokenMetadata>;
 export type SolanaToken = z.infer<typeof solanaTokenSchema>;
 export type SolanaTokenRecordItem = z.infer<typeof solanaTokenRecordSchema>;
@@ -87,3 +101,4 @@ export type TokenStatus = z.infer<typeof tokenStatus>;
 export type TicketStatus = z.infer<typeof tokenStatus>;
 export type QueryTokensRequestParams = z.infer<typeof querySolanaTokensRequestParamsSchema>;
 export type CreateTokenRequestBody = z.infer<typeof createTokenRequestBodySchema>;
+export type SolanaTokenHoldersByTokenAddressRequest = z.infer<typeof solanaTokenHoldersByTokenAddressRequest>;

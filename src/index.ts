@@ -68,3 +68,5 @@ export * from "./token/validation/validation";
 
 // Errors
 export * from "./bound-pool/errors";
+
+export * from "./api/TokenApiHelper";
