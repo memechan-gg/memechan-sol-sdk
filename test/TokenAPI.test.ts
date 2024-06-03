@@ -120,21 +120,23 @@ export function test() {
       const tokenService = new TokenAPI(BE_URL);
       const result = await tokenService.getHolders({
         tokenAddress: "3k4cMd1JJiPbUix8KwX3TfupWuEbZgyM6q44HUGJ8mDs",
-        direction: "asc",
+        direction: "desc",
         sortBy: "tokenAmount",
         paginationToken: "",
       });
-      console.log(result);
+      expect(result.result.length).toBeGreaterThan(0);
+      expect(result.result[0].tokenAmount).toBeGreaterThan(0);
     });
 
     it("query live holders", async () => {
       const tokenService = new TokenAPI(BE_URL);
       const result = await tokenService.getHolders({
         tokenAddress: "BUNgiEKYciGAYG4iE7B8DAeEjBHxkc4mcy3S6NL3r1x5",
-        direction: "asc",
+        direction: "desc",
         sortBy: "tokenAmount",
       });
-      console.log(result);
+      expect(result.result.length).toBeGreaterThan(0);
+      expect(result.result[0].tokenAmount).toBeGreaterThan(0);
     });
   });
 }
