@@ -44,10 +44,11 @@ export const FEE_DESTINATION_ID = "7YttLkHDoNj9wyDur5pM1ejNaAvT9X4eqaYcHQqtj2G5"
 export const SLERF_MINT = new PublicKey("7BgBvyjrZX1YKz4oh9mjb8ZScatkkwb8DzFx7LoiVkM3");
 
 // TODO: Replace it with SLERF Mint when prod
-// export const MEMECHAN_QUOTE_MINT = new PublicKey("9pECN2xxLQo22bFYpsNr3T3eW1UdEDtSqPQopFrGv7n4"); // dev fake slerf
-export const MEMECHAN_QUOTE_MINT = SLERF_MINT;
+export const MEMECHAN_QUOTE_MINT = new PublicKey("9pECN2xxLQo22bFYpsNr3T3eW1UdEDtSqPQopFrGv7n4"); // dev fake slerf
+// export const MEMECHAN_QUOTE_MINT = SLERF_MINT;
 // TODO: Replace it with the actual value
-export const MEMECHAN_TARGET_CONFIG = new PublicKey("CiXYgXYBwg9CvjYNcpjxjYViWbdDQVePhhZpWdwfEziN");
+// export const MEMECHAN_TARGET_CONFIG = new PublicKey("CiXYgXYBwg9CvjYNcpjxjYViWbdDQVePhhZpWdwfEziN"); // prod
+export const MEMECHAN_TARGET_CONFIG = new PublicKey("EEeLC1a7qbK2mbvfYt8owGzQcBjYguE1FWhWYuGjyABu");
 export const MEMECHAN_QUOTE_TOKEN_DECIMALS = 9; // current devnet quote token decimals
 export const MEMECHAN_QUOTE_TOKEN: Token = new Token(
   TOKEN_PROGRAM_ID,
