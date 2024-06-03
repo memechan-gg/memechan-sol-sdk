@@ -66,4 +66,4 @@ export type ConvertedHolderItem = {
   percetange: number; // Assuming tokenAmountInPercentage is a number
 };
 
-export type ConvertedHolderMap = Map<string, ConvertedHolderItem[]>;
+export type ConvertedHolderMap = Map<string, ConvertedHolderItem>;
