@@ -116,7 +116,6 @@ export function test() {
       solanaTokenSchema.parse(result);
     });
 
-    it("query holders", async () => {
     it("query presale holders", async () => {
       const tokenService = new TokenAPI(BE_URL);
       const result = await tokenService.getHolders({
