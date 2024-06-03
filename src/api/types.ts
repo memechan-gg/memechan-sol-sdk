@@ -2,6 +2,7 @@ import { PublicKey, Signer } from "@solana/web3.js";
 import { z, ZodRawShape } from "zod";
 import { SolanaToken, solanaTokenHolderSchema, solanaTokenSchema } from "./schemas/token-schemas";
 import { solanaLivePool, SolanaSeedPool, solanaSeedPool, solanaStakingPool } from "./schemas/pools-schema";
+import BN from "bn.js";
 
 export interface TokenMetadata {
   name: string;
@@ -57,3 +58,12 @@ export type CreateTokenResponse = {
 
 export const paginatedHoldersResultSchema = () => paginatedResultSchema(solanaTokenHolderSchema);
 export type QueryHoldersByTokenAddressResponse = z.infer<ReturnType<typeof paginatedHoldersResultSchema>>;
+
+export type ConvertedHolderItem = {
+  owner: PublicKey;
+  pool: PublicKey;
+  amount: BN;
+  percetange: number; // Assuming tokenAmountInPercentage is a number
+};
+
+export type ConvertedHolderMap = Map<string, ConvertedHolderItem[]>;
