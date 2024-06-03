@@ -117,12 +117,23 @@ export function test() {
     });
 
     it("query holders", async () => {
+    it("query presale holders", async () => {
       const tokenService = new TokenAPI(BE_URL);
       const result = await tokenService.getHolders({
         tokenAddress: "3k4cMd1JJiPbUix8KwX3TfupWuEbZgyM6q44HUGJ8mDs",
         direction: "asc",
         sortBy: "tokenAmount",
         paginationToken: "",
+      });
+      console.log(result);
+    });
+
+    it("query live holders", async () => {
+      const tokenService = new TokenAPI(BE_URL);
+      const result = await tokenService.getHolders({
+        tokenAddress: "BUNgiEKYciGAYG4iE7B8DAeEjBHxkc4mcy3S6NL3r1x5",
+        direction: "asc",
+        sortBy: "tokenAmount",
       });
       console.log(result);
     });
