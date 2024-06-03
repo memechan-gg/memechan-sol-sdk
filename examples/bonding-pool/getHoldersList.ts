@@ -6,8 +6,8 @@ import { client, connection } from "../common";
 export async function getHoldersList() {
   const poolAddress = new PublicKey("3KzDGG71bzzZUApLNukyqVPZs4EJBd6SpJMh6ze6SDp2");
 
-  const holdersMap = await BoundPoolClient.getHoldersList(poolAddress, client);
-  console.log("holdersMap:", holdersMap);
+  const holdersList = await BoundPoolClient.getHoldersList(poolAddress, client);
+  console.log("holdersList:", holdersList);
 }
 
 getHoldersList();
