@@ -49,7 +49,6 @@ export class TokenAPI {
     const { tokenAddress, paginationToken, direction, sortBy } = params;
     // eslint-disable-next-line max-len
     const request = `${this.url}/sol/holders?tokenAddress=${tokenAddress}${paginationToken ? "&paginationToken=" + paginationToken : ""}&direction=${direction}&sortBy=${sortBy}`;
-    console.log(request);
     return jsonFetch(request, {
       method: "GET",
     });
