@@ -1,5 +1,5 @@
+import { BE_URL } from "../src";
 import { ChartApi } from "../src/api/ChartApi";
-import { BE_URL } from "./utils";
 
 export function test() {
   describe("Charts API", () => {

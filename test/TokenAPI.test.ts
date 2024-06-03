@@ -1,9 +1,10 @@
 import { Keypair } from "@solana/web3.js";
 import { Auth } from "../src/api/auth/Auth";
-import { BE_URL, isSorted } from "./utils";
+import { isSorted } from "./utils";
 import nacl from "tweetnacl";
 import { TokenAPI } from "../src/api/TokenAPI";
 import { SolanaToken, solanaTokenSchema } from "../src/api/schemas/token-schemas";
+import { BE_URL } from "../src/config/config";
 // eslint-disable-next-line max-len
 
 export function test() {

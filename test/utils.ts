@@ -13,5 +13,3 @@ export const isSorted = <T>(array: T[], attribute: keyof T, order: "asc" | "desc
 
   return true;
 };
-
-export const BE_URL = "https://h9crl8krnj.execute-api.us-east-1.amazonaws.com/prod";
