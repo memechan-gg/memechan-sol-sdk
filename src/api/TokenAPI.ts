@@ -46,13 +46,13 @@ export class TokenAPI {
    * @return {Promise<QueryHoldersByTokenAddressResponse>} A promise that resolves with the holders data.
    */
   getHolders(params: SolanaTokenHoldersByTokenAddressRequest): Promise<QueryHoldersByTokenAddressResponse> {
-    return jsonFetch(
-      // eslint-disable-next-line max-len
-      `${this.url}/sol/holders?tokenAddress=${params.tokenAddress}&${params.paginationToken ? "?paginationToken=" + params.paginationToken : ""}&direction=${params.direction}&sortBy${params.sortBy}`,
-      {
-        method: "GET",
-      },
-    );
+    const { tokenAddress, paginationToken, direction, sortBy } = params;
+    // eslint-disable-next-line max-len
+    const request = `${this.url}/sol/holders?tokenAddress=${tokenAddress}${paginationToken ? "&paginationToken=" + paginationToken : ""}&direction=${direction}&sortBy=${sortBy}`;
+    console.log(request);
+    return jsonFetch(request, {
+      method: "GET",
+    });
   }
 
   /**
