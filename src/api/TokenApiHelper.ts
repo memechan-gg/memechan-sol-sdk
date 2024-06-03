@@ -18,10 +18,8 @@ export class TokenApiHelper {
       direction: "desc",
       sortBy: "tokenAmount",
     });
-    console.log("holdersFromApi:", holdersFromApi);
 
-    const convertedHolders = TokenApiHelper.convertBoundPoolHolders(holdersFromApi);
-    console.log("convertedHolders:", convertedHolders);
+    return TokenApiHelper.convertBoundPoolHolders(holdersFromApi);
   }
 
   /**
