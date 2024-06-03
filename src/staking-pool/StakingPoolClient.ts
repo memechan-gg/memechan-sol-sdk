@@ -1,6 +1,7 @@
 import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import {
   AccountMeta,
+  ComputeBudgetProgram,
   Connection,
   PublicKey,
   SystemProgram,
@@ -10,7 +11,7 @@ import {
 import BigNumber from "bignumber.js";
 import { MemechanClient } from "../MemechanClient";
 import { BoundPoolClient } from "../bound-pool/BoundPoolClient";
-import { MAX_MEME_TOKENS, MEMECHAN_PROGRAM_ID, MEMECHAN_QUOTE_MINT, MEME_TOKEN_DECIMALS } from "../config/config";
+import { COMPUTE_UNIT_PRICE, MAX_MEME_TOKENS, MEMECHAN_PROGRAM_ID, MEMECHAN_QUOTE_MINT, MEME_TOKEN_DECIMALS } from "../config/config";
 import { MemeTicketClient } from "../memeticket/MemeTicketClient";
 import { getOptimizedTransactions } from "../memeticket/utils";
 import { formatAmmKeysById } from "../raydium/formatAmmKeysById";
@@ -153,6 +154,12 @@ export class StakingPoolClient {
       owner: user,
       transaction: tx,
     });
+
+    const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
+      microLamports: COMPUTE_UNIT_PRICE,
+    });
+
+    tx.add(addPriorityFee);
 
     const unstakeInstruction = await this.client.memechanProgram.methods
       .unstake(args.amount)
