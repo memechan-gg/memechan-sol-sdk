@@ -1,7 +1,7 @@
 {
   "name": "@avernikoz/memechan-sol-sdk",
   "description": "Typescript SDK for memechan.gg",
-  "version": "1.0.89-mainnet-slerf",
+  "version": "1.0.90-mainnet-slerf-fake",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "directories": {
