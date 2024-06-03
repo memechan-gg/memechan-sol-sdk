@@ -86,7 +86,7 @@ export const solanaTokenHoldersByTokenAddressRequest = z.object({
 export const solanaTokenHolderSchema = z.object({
   walletAddress: z.string(),
   tokenAddress: z.string(),
-  tokenAmount: z.number(),
+  tokenAmount: z.string(),
   tokenAmountInPercentage: z.number(),
 });
 

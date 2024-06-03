@@ -2,6 +2,7 @@ import { PublicKey } from "@solana/web3.js";
 import BN from "bn.js";
 import { TokenAPI } from "./TokenAPI";
 import { PROD_BE_URL } from "../config/config";
+import { ConvertedHolderMap, QueryHoldersByTokenAddressResponse } from "./types";
 
 export class TokenApiHelper {
   /**
@@ -27,13 +28,14 @@ export class TokenApiHelper {
    *
    * @param holdersFromApi The holders data from the Backend API
    * @returns The holders map with the wallet address as the key and MemeTicketFields[] as data
+   *
+   * @Note Do not relay on `percetange` value for pre-sale (bound pool)
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public static convertBoundPoolHolders(holdersFromApi: any) {
-    const holdersMap = new Map();
+  public static convertBoundPoolHolders(holdersFromApi: QueryHoldersByTokenAddressResponse) {
+    const holdersMap: ConvertedHolderMap = new Map();
 
-    holdersFromApi.result.forEach((holder: { walletAddress: string; tokenAddress: string; tokenAmount: BN }) => {
-      const { walletAddress, tokenAddress, tokenAmount } = holder;
+    holdersFromApi.result.forEach((holder) => {
+      const { walletAddress, tokenAddress, tokenAmount, tokenAmountInPercentage } = holder;
 
       // Create PublicKey instances
       const ownerPublicKey = new PublicKey(walletAddress);
@@ -47,13 +49,20 @@ export class TokenApiHelper {
         owner: ownerPublicKey,
         pool: poolPublicKey,
         amount: amountBN,
+        percetange: tokenAmountInPercentage,
       };
 
       // Add to holdersMap
       if (!holdersMap.has(walletAddress)) {
-        holdersMap.set(walletAddress, []);
+        holdersMap.set(walletAddress, holderData);
+      } else if (holdersMap.has(walletAddress)) {
+        const holder = holdersMap.get(walletAddress);
+
+        // satisfy ts
+        if (!holder) {
+          throw new Error(`[convertBoundPoolHolders] holdersMap is inconsistent, ${walletAddress} duplicated`);
+        }
       }
-      holdersMap.get(walletAddress).push(holderData);
     });
 
     return holdersMap;
