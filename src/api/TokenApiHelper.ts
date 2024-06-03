@@ -54,16 +54,14 @@ export class TokenApiHelper {
 
       // Add to holdersMap
       if (!holdersMap.has(walletAddress)) {
-        holdersMap.set(walletAddress, [holderData]);
+        holdersMap.set(walletAddress, holderData);
       } else if (holdersMap.has(walletAddress)) {
         const holder = holdersMap.get(walletAddress);
 
         // satisfy ts
         if (!holder) {
-          throw new Error(`[convertBoundPoolHolders] holder is undefined ${walletAddress}`);
+          throw new Error(`[convertBoundPoolHolders] holdersMap is inconsistent, ${walletAddress} duplicated`);
         }
-
-        holder.push(holderData);
       }
     });
 
