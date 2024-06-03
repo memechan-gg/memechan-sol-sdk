@@ -20,7 +20,6 @@ describe("sdk tests", () => {
   describe("BE", () => {
     authService.test();
     chartApi.test();
-    holders.test();
     poolService.test();
     socialAPI.test();
     tokenApi.test();
@@ -31,6 +30,7 @@ describe("sdk tests", () => {
     boundPoolCreation.test();
     boundPool.test();
     boundPoolTrading.test();
+    holders.test();
     memeTicket.test();
     quoteTokenMint.test();
     stakingPool.test();

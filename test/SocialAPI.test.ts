@@ -1,10 +1,11 @@
 import { Keypair } from "@solana/web3.js";
 import nacl from "tweetnacl";
-import { BE_URL, isSorted } from "./utils";
+import { isSorted } from "./utils";
 import { TokenAPI } from "../src/api/TokenAPI";
 import { Auth } from "../src/api/auth/Auth";
 import { SocialAPI } from "../src/api/social/SocialAPI";
 import { SolanaToken } from "../src/api/schemas/token-schemas";
+import { BE_URL } from "../src";
 
 const socialAPI = new SocialAPI(BE_URL);
 

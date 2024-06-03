@@ -1,7 +1,7 @@
 import nacl from "tweetnacl";
-import { BE_URL } from "./utils";
 import { Keypair } from "@solana/web3.js";
 import { Auth } from "../src/api/auth/Auth";
+import { BE_URL } from "../src/config/config";
 
 export function test() {
   describe("AuthService", () => {

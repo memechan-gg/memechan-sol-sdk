@@ -6,8 +6,15 @@ import {
   createCoinRequestBodySchema,
   CreateTokenRequestBody,
   QueryTokensRequestParams,
+  SolanaTokenHoldersByTokenAddressRequest,
 } from "./schemas/token-schemas";
-import { CreateTokenResponse, GetTokenResponse, QueryTokensResponse, UploadFileResponse } from "./types";
+import {
+  CreateTokenResponse,
+  GetTokenResponse,
+  QueryHoldersByTokenAddressResponse,
+  QueryTokensResponse,
+  UploadFileResponse,
+} from "./types";
 
 /**
  * Service class for handling coin-related operations.
@@ -28,6 +35,21 @@ export class TokenAPI {
    */
   getToken(status: TokenStatus, tokenAddress: string): Promise<GetTokenResponse> {
     return jsonFetch(`${this.url}/sol/${status.toLowerCase()}/token?tokenAddress=${tokenAddress}`, {
+      method: "GET",
+    });
+  }
+
+  /**
+   * Fetches data about a specific coin.
+   * @param {SolanaTokenHoldersByTokenAddressRequest} params - The query parameters to filter holders.
+   * @throws Will throw an error if authentication session is not active.
+   * @return {Promise<QueryHoldersByTokenAddressResponse>} A promise that resolves with the holders data.
+   */
+  getHolders(params: SolanaTokenHoldersByTokenAddressRequest): Promise<QueryHoldersByTokenAddressResponse> {
+    const { tokenAddress, paginationToken, direction, sortBy } = params;
+    // eslint-disable-next-line max-len
+    const request = `${this.url}/sol/holders?tokenAddress=${tokenAddress}${paginationToken ? "&paginationToken=" + paginationToken : ""}&direction=${direction}&sortBy=${sortBy}`;
+    return jsonFetch(request, {
       method: "GET",
     });
   }
