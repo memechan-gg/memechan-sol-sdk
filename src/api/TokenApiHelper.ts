@@ -28,8 +28,9 @@ export class TokenApiHelper {
    *
    * @param holdersFromApi The holders data from the Backend API
    * @returns The holders map with the wallet address as the key and MemeTicketFields[] as data
+   *
+   * @Note Do not relay on `percetange` value for pre-sale (bound pool)
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public static convertBoundPoolHolders(holdersFromApi: QueryHoldersByTokenAddressResponse) {
     const holdersMap: ConvertedHolderMap = new Map();
 
