@@ -115,5 +115,16 @@ export function test() {
       const result = await tokenService.getToken("PRESALE", token.address);
       solanaTokenSchema.parse(result);
     });
+
+    it("query holders", async () => {
+      const tokenService = new TokenAPI(BE_URL);
+      const result = await tokenService.getHolders({
+        tokenAddress: "3k4cMd1JJiPbUix8KwX3TfupWuEbZgyM6q44HUGJ8mDs",
+        direction: "asc",
+        sortBy: "tokenAmount",
+        paginationToken: "",
+      });
+      console.log(result);
+    });
   });
 }
