@@ -146,11 +146,11 @@ export class StakingPoolClient {
     const stakingInfo = await this.fetch();
     const user = args.user;
 
-    const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
-      microLamports: COMPUTE_UNIT_PRICE,
-    });
+    // const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
+    //   microLamports: COMPUTE_UNIT_PRICE,
+    // });
 
-    tx.add(addPriorityFee);
+    // tx.add(addPriorityFee);
 
     const associatedMemeTokenAddress = await ensureAssociatedTokenAccountWithIX({
       connection: this.client.connection,
