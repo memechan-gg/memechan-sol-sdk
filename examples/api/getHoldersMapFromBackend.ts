@@ -3,7 +3,6 @@ import { BoundPoolClient } from "../../src/bound-pool/BoundPoolClient";
 import { client } from "../common";
 import { TokenApiHelper } from "../../src/api/TokenApiHelper";
 import { PROD_BE_URL, StakingPoolClient } from "../../src";
-import { ASSOCIATED_TOKEN_PROGRAM_ID, TOKEN_PROGRAM_ID, getAssociatedTokenAddressSync } from "@solana/spl-token";
 
 // yarn tsx examples/api/getHoldersMapFromBackend.ts > getHoldersMapFromBackend.txt 2>&1
 
@@ -24,24 +23,18 @@ export async function getHoldersMapFromBackend() {
 
   const stakingPoolAddress = BoundPoolClient.findStakingPda(liveTokenAddress, client.memechanProgram.programId);
   console.log("stakingPoolId:", stakingPoolAddress.toBase58());
-  const stakingPoolSigner = StakingPoolClient.findSignerPda(stakingPoolAddress, client.memechanProgram.programId);
-  console.log("stakingPoolSigner:", stakingPoolSigner.toBase58());
-  const stakingMemeVaultAddress = getAssociatedTokenAddressSync(
-    tokenAddress,
-    stakingPoolSigner,
-    true,
-    TOKEN_PROGRAM_ID,
-    ASSOCIATED_TOKEN_PROGRAM_ID,
+
+  const stakingHoldersList = await StakingPoolClient.getHoldersList(
+    stakingPoolBoundPoolAddress,
+    liveTokenAddress,
+    client,
   );
-
-  console.log("stakingMemeVaultAddress:", stakingMemeVaultAddress.toBase58());
-
-  const stakingHoldersList = await StakingPoolClient.getHoldersList(stakingPoolBoundPoolAddress, liveTokenAddress, client);
   console.log("staking pool holders list:", stakingHoldersList);
 
   const liveBeHoldersMap = await TokenApiHelper.getStakingPoolHoldersList(
     liveTokenAddress,
-    stakingPoolSigner,
+    stakingPoolAddress,
+    client.memechanProgram.programId,
     PROD_BE_URL,
   );
   console.log("staking pool beHoldersMap:", liveBeHoldersMap);

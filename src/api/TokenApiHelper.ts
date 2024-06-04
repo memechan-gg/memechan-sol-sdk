@@ -4,6 +4,7 @@ import { TokenAPI } from "./TokenAPI";
 import { BE_URL, MEME_TOKEN_DECIMALS } from "../config/config";
 import { ConvertedHolderMap, QueryHoldersByTokenAddressResponse } from "./types";
 import BigNumber from "bignumber.js";
+import { StakingPoolClient } from "../staking-pool/StakingPoolClient";
 
 export class TokenApiHelper {
   /**
@@ -37,7 +38,8 @@ export class TokenApiHelper {
    */
   public static async getStakingPoolHoldersList(
     tokenAddress: PublicKey,
-    stakingSignerId: PublicKey,
+    stakingPoolId: PublicKey,
+    memeChanProgramId: PublicKey,
     beUrl: string = BE_URL,
   ): Promise<
     [
@@ -61,6 +63,8 @@ export class TokenApiHelper {
       };
     });
 
+    const stakingSignerId = StakingPoolClient.findSignerPda(stakingPoolId, memeChanProgramId);
+    console.log("stakingSignerId", stakingSignerId.toBase58());
     // Find the holder with the stakingSigner
     const stakingHolder = holdersList.find((holder) => holder.address === stakingSignerId.toBase58()) || {
       address: "",
