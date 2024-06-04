@@ -1,7 +1,7 @@
 import { PublicKey } from "@solana/web3.js";
 import BN from "bn.js";
 import { TokenAPI } from "./TokenAPI";
-import { BE_URL } from "../config/config";
+import { BE_URL, MEME_TOKEN_DECIMALS } from "../config/config";
 import { ConvertedHolderMap, QueryHoldersByTokenAddressResponse } from "./types";
 import BigNumber from "bignumber.js";
 
@@ -91,14 +91,16 @@ export class TokenApiHelper {
       const ownerPublicKey = new PublicKey(walletAddress);
       const poolPublicKey = new PublicKey(tokenAddress);
 
-      // Convert tokenAmount to BN
-      const amountBN = new BN(tokenAmount);
+      console.log("tokenAmount", tokenAmount);
+      const tokenAmountBigNum = new BigNumber(tokenAmount).multipliedBy(MEME_TOKEN_DECIMALS);
+      console.log("tokenAmountBigNum", tokenAmountBigNum.toString());
+      const tokenAmountBN = new BN(tokenAmountBigNum.toString());
 
       // Create the holder data object
       const holderData = {
         owner: ownerPublicKey,
         pool: poolPublicKey,
-        amount: amountBN,
+        amount: tokenAmountBN,
         percetange: tokenAmountInPercentage,
       };
 
