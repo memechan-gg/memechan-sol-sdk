@@ -37,7 +37,7 @@ export class TokenApiHelper {
    */
   public static async getStakingPoolHoldersList(
     tokenAddress: PublicKey,
-    stakingPoolId: PublicKey,
+    stakingSignerId: PublicKey,
     beUrl: string = BE_URL,
   ): Promise<
     [
@@ -61,14 +61,14 @@ export class TokenApiHelper {
       };
     });
 
-    // Find the holder with the stakingId
-    const stakingHolder = holdersList.find((holder) => holder.address === stakingPoolId.toBase58()) || {
+    // Find the holder with the stakingSigner
+    const stakingHolder = holdersList.find((holder) => holder.address === stakingSignerId.toBase58()) || {
       address: "",
       tokenAmount: new BigNumber(0),
     };
 
     // Filter out the stakingHolder from the holdersList
-    const filteredHoldersList = holdersList.filter((holder) => holder.address !== stakingPoolId.toBase58());
+    const filteredHoldersList = holdersList.filter((holder) => holder.address !== stakingSignerId.toBase58());
 
     return [filteredHoldersList, { address: stakingHolder.address, amount: stakingHolder.tokenAmount }];
   }
