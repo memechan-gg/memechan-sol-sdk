@@ -1,7 +1,7 @@
 import { PublicKey } from "@solana/web3.js";
 import { BoundPoolClient } from "../../src/bound-pool/BoundPoolClient";
 import { client } from "../common";
-import { TokenApiHelper } from "../../src/api/TokenApiHelper";
+import { TokenApiHelper } from "../../src/api/helpers/TokenApiHelper";
 import { PROD_BE_URL, StakingPoolClient } from "../../src";
 
 // yarn tsx examples/api/getHoldersMapFromBackend.ts > getHoldersMapFromBackend.txt 2>&1
