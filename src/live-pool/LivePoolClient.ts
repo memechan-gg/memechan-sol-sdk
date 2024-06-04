@@ -13,6 +13,7 @@ import {
 } from "./types";
 import { getNumeratorAndDenominator } from "./utils";
 import { MemechanClient } from "../MemechanClient";
+import BN from "bn.js";
 
 export class LivePoolClient {
   private constructor(
@@ -44,11 +45,24 @@ export class LivePoolClient {
     }
 
     const poolKeys = jsonInfo2PoolKeys(targetPoolInfo);
-    const poolInfo = await Liquidity.fetchInfo({ connection, poolKeys });
+
+    const [baseReserve, quoteReserve] = [
+      await connection.getTokenAccountBalance(poolKeys.baseVault),
+      await connection.getTokenAccountBalance(poolKeys.quoteVault),
+    ];
 
     const { minAmountOut } = Liquidity.computeAmountOut({
       poolKeys: poolKeys,
-      poolInfo: poolInfo,
+      poolInfo: {
+        status: new BN(0),
+        baseDecimals: 0,
+        quoteDecimals: 0,
+        lpDecimals: 0,
+        baseReserve: new BN(baseReserve.value.amount),
+        quoteReserve: new BN(quoteReserve.value.amount),
+        lpSupply: new BN(0),
+        startTime: new BN(0),
+      },
       amountIn: quoteAmountIn,
       currencyOut: tokenOut,
       slippage,
@@ -130,11 +144,24 @@ export class LivePoolClient {
     }
 
     const poolKeys = jsonInfo2PoolKeys(targetPoolInfo);
-    const poolInfo = await Liquidity.fetchInfo({ connection, poolKeys });
+
+    const [baseReserve, quoteReserve] = [
+      await connection.getTokenAccountBalance(poolKeys.baseVault),
+      await connection.getTokenAccountBalance(poolKeys.quoteVault),
+    ];
 
     const { minAmountOut } = Liquidity.computeAmountOut({
       poolKeys: poolKeys,
-      poolInfo: poolInfo,
+      poolInfo: {
+        status: new BN(0),
+        baseDecimals: 0,
+        quoteDecimals: 0,
+        lpDecimals: 0,
+        baseReserve: new BN(baseReserve.value.amount),
+        quoteReserve: new BN(quoteReserve.value.amount),
+        lpSupply: new BN(0),
+        startTime: new BN(0),
+      },
       amountIn: memeAmountIn,
       currencyOut: tokenOut,
       slippage,
@@ -212,9 +239,23 @@ export class LivePoolClient {
     const tokenOut = new Token(TOKEN_PROGRAM_ID, poolKeys.baseMint, MEMECHAN_MEME_TOKEN_DECIMALS);
     const slippage = new Percent(1, 10000);
 
+    const [baseReserve, quoteReserve] = [
+      await connection.getTokenAccountBalance(poolKeys.baseVault),
+      await connection.getTokenAccountBalance(poolKeys.quoteVault),
+    ];
+
     const { amountOut } = Liquidity.computeAmountOut({
       poolKeys: poolKeys,
-      poolInfo: await Liquidity.fetchInfo({ connection, poolKeys }),
+      poolInfo: {
+        status: new BN(0),
+        baseDecimals: 0,
+        quoteDecimals: 0,
+        lpDecimals: 0,
+        baseReserve: new BN(baseReserve.value.amount),
+        quoteReserve: new BN(quoteReserve.value.amount),
+        lpSupply: new BN(0),
+        startTime: new BN(0),
+      },
       amountIn: quoteAmountIn,
       currencyOut: tokenOut,
       slippage: slippage,
