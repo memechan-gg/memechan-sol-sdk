@@ -1,7 +1,6 @@
 import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import {
   AccountMeta,
-  ComputeBudgetProgram,
   Connection,
   PublicKey,
   SystemProgram,
@@ -9,19 +8,15 @@ import {
   sendAndConfirmTransaction,
 } from "@solana/web3.js";
 import BigNumber from "bignumber.js";
+import BN from "bn.js";
 import { MemechanClient } from "../MemechanClient";
 import { BoundPoolClient } from "../bound-pool/BoundPoolClient";
-import {
-  COMPUTE_UNIT_PRICE,
-  MAX_MEME_TOKENS,
-  MEMECHAN_PROGRAM_ID,
-  MEMECHAN_QUOTE_MINT,
-  MEME_TOKEN_DECIMALS,
-} from "../config/config";
+import { MAX_MEME_TOKENS, MEMECHAN_PROGRAM_ID, MEMECHAN_QUOTE_MINT, MEME_TOKEN_DECIMALS } from "../config/config";
 import { MemeTicketClient } from "../memeticket/MemeTicketClient";
 import { getOptimizedTransactions } from "../memeticket/utils";
 import { formatAmmKeysById } from "../raydium/formatAmmKeysById";
 import { MemeTicketFields, StakingPool, StakingPoolFields } from "../schema/codegen/accounts";
+import { ensureAssociatedTokenAccountWithIX } from "../util/ensureAssociatedTokenAccountWithIX";
 import { getSendAndConfirmTransactionMethod } from "../util/getSendAndConfirmTransactionMethod";
 import { retry } from "../util/retry";
 import {
@@ -37,8 +32,6 @@ import {
   WithdrawFeesArgs,
   getAvailableWithdrawFeesAmountArgs,
 } from "./types";
-import { ensureAssociatedTokenAccountWithIX } from "../util/ensureAssociatedTokenAccountWithIX";
-import BN from "bn.js";
 
 export class StakingPoolClient {
   constructor(
