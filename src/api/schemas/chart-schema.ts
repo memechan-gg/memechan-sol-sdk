@@ -20,7 +20,7 @@ export const requestChartSchema = z.object({
 export const requestPriceSchema = z.object({
   address: z.string(),
   symbol: symbols,
-  type: z.literal("seedPool"),
+  type: z.literal("seedPool").or(z.literal("livePool")),
 });
 
 export const updatePriceSchema = z.object({
