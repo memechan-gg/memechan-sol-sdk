@@ -17,7 +17,7 @@ export async function getHoldersMapFromBackend() {
   console.log("bound pool beHoldersMap:", beHoldersMap);
 
   const liveTokenAddress = new PublicKey("Cq7tKjeic5c4YFZPsvCskGQRYCqGbyGMVjqL1ud1hVaL");
-  const stakingPoolAddress = new PublicKey("FADx3TtbVU54daPqb7PR7RS9GmA4QuWfTizMVpupHoWy");
+  const stakingPoolAddress = new PublicKey("68ZabJYtRmVkxr8iXGoincvQKGSGq6P4iTsbcHXCXHsS");
   const stakingHoldersList = await StakingPoolClient.getHoldersList(boundPoolAddress, liveTokenAddress, client);
   console.log("staking pool holders list:", stakingHoldersList);
 
