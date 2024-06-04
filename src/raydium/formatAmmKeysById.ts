@@ -9,21 +9,25 @@ import {
 import { Connection, PublicKey } from "@solana/web3.js";
 
 export async function formatAmmKeysById(id: string, connection: Connection): Promise<ApiPoolInfoV4> {
-  // TODO: Combine getAccountInfo into getMultipleAccounts
-  console.log("formatAmmKeysById id: " + id);
   const account = await connection.getAccountInfo(new PublicKey(id), { commitment: "confirmed" });
-
   if (account === null) throw Error(" get id info error ");
   const info = LIQUIDITY_STATE_LAYOUT_V4.decode(account.data);
 
-  const marketId = info.marketId;
-  const marketAccount = await connection.getAccountInfo(marketId, "confirmed");
-  if (marketAccount === null) throw Error(" get market info error");
-  const marketInfo = MARKET_STATE_LAYOUT_V3.decode(marketAccount.data);
+  const accounts = await connection.getMultipleAccountsInfo(
+    [new PublicKey(info.marketId), new PublicKey(info.lpMint)],
+    "confirmed",
+  );
 
-  const lpMint = info.lpMint;
-  const lpMintAccount = await connection.getAccountInfo(lpMint, "confirmed");
-  if (lpMintAccount === null) throw Error(" get lp mint info error");
+  if (accounts === null) throw Error("get market and lp mint accounts error ");
+
+  // Destructure the accounts array
+  const [marketAccount, lpMintAccount] = accounts;
+
+  if (marketAccount == null) throw Error("get market account error ");
+  if (lpMintAccount == null) throw Error("get lp mint account error ");
+
+  // Decode the account data using your custom layouts
+  const marketInfo = MARKET_STATE_LAYOUT_V3.decode(marketAccount.data);
   const lpMintInfo = SPL_MINT_LAYOUT.decode(lpMintAccount.data);
 
   return {
