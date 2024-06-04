@@ -78,4 +78,4 @@ export const FULL_MEME_AMOUNT_CONVERTED = new BigNumber(DEFAULT_MAX_M_LP)
   .div(10 ** MEMECHAN_MEME_TOKEN_DECIMALS)
   .toString();
 
-export const endpoints = ["https://mainnet.helius-rpc.com/?api-key=413f291b-0469-4ae6-b1e7-008e0377a3ed"];
+export const endpoints = ["https://rpc1.memechan.xyz/"];
