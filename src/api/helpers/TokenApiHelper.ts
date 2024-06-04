@@ -1,10 +1,10 @@
 import { PublicKey } from "@solana/web3.js";
 import BN from "bn.js";
-import { TokenAPI } from "./TokenAPI";
-import { BE_URL, MEME_TOKEN_DECIMALS } from "../config/config";
-import { ConvertedHolderMap, QueryHoldersByTokenAddressResponse } from "./types";
+import { TokenAPI } from "../TokenAPI";
+import { BE_URL, MEME_TOKEN_DECIMALS } from "../../config/config";
+import { ConvertedHolderMap, QueryHoldersByTokenAddressResponse } from "../types";
 import BigNumber from "bignumber.js";
-import { StakingPoolClient } from "../staking-pool/StakingPoolClient";
+import { StakingPoolClient } from "../../staking-pool/StakingPoolClient";
 
 export class TokenApiHelper {
   /**
