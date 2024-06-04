@@ -454,7 +454,7 @@ export class StakingPoolClient {
    * Fetches all unique token holders and memetickets owners for pool; then returns thier addresses
    */
   public static async getHoldersList(
-    pool: PublicKey,
+    boundPool: PublicKey,
     mint: PublicKey,
     client: MemechanClient,
   ): Promise<
@@ -466,7 +466,7 @@ export class StakingPoolClient {
     const stakingId = BoundPoolClient.findStakingPda(mint, client.memechanProgram.programId);
     const stakingPDA = StakingPoolClient.findSignerPda(stakingId, client.memechanProgram.programId).toBase58();
 
-    const ticketHolderList = await BoundPoolClient.getHoldersMap(pool, client);
+    const ticketHolderList = await BoundPoolClient.getHoldersMap(boundPool, client);
     const [tokenHolderList, stakingTokens] = await StakingPoolClient.getTokenHolderListHelius(
       mint,
       stakingPDA,
