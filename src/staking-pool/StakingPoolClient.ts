@@ -146,6 +146,12 @@ export class StakingPoolClient {
     const stakingInfo = await this.fetch();
     const user = args.user;
 
+    const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
+      microLamports: COMPUTE_UNIT_PRICE,
+    });
+
+    tx.add(addPriorityFee);
+
     const associatedMemeTokenAddress = await ensureAssociatedTokenAccountWithIX({
       connection: this.client.connection,
       payer: user,
@@ -160,12 +166,6 @@ export class StakingPoolClient {
       owner: user,
       transaction: tx,
     });
-
-    const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
-      microLamports: COMPUTE_UNIT_PRICE,
-    });
-
-    tx.add(addPriorityFee);
 
     const unstakeInstruction = await this.client.memechanProgram.methods
       .unstake(args.amount)
