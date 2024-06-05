@@ -4,6 +4,7 @@ import { HttpRequest } from "@smithy/protocol-http";
 import { SignatureV4 } from "@smithy/signature-v4";
 import { getFetchFn } from "./get-fetch";
 import { getHeaders } from "./get-headers";
+import { API_GATEWAY_FQDN } from "../config/config";
 
 export type SignedFetcherOptions = {
   service: string;
@@ -25,10 +26,7 @@ export const createSignedFetcher: CreateSignedFetcher = (opts: SignedFetcherOpti
     const url = new URL(typeof input === "string" ? input : input instanceof URL ? input.href : input.url);
 
     const sigHeaders = getHeaders(init?.headers);
-    sigHeaders.set("host", "h9crl8krnj.execute-api.us-east-1.amazonaws.com");
-
-    const headers = getHeaders(init?.headers);
-    headers.set("host", url.host);
+    sigHeaders.set("host", API_GATEWAY_FQDN);
 
     const request = new HttpRequest({
       hostname: url.hostname,
@@ -52,6 +50,9 @@ export const createSignedFetcher: CreateSignedFetcher = (opts: SignedFetcherOpti
     });
 
     const signedRequest = await signer.sign(request);
+
+    const headers = getHeaders(init?.headers);
+    headers.set("host", url.host);
 
     return fetchFn(url, {
       ...init,
