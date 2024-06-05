@@ -64,7 +64,6 @@ export class TokenApiHelper {
     });
 
     const stakingSignerId = StakingPoolClient.findSignerPda(stakingPoolId, memeChanProgramId);
-    console.log("stakingSignerId", stakingSignerId.toBase58());
     // Find the holder with the stakingSigner
     const stakingHolder = holdersList.find((holder) => holder.address === stakingSignerId.toBase58()) || {
       address: "",
@@ -95,9 +94,7 @@ export class TokenApiHelper {
       const ownerPublicKey = new PublicKey(walletAddress);
       const poolPublicKey = new PublicKey(tokenAddress);
 
-      console.log("tokenAmount", tokenAmount);
       const tokenAmountBigNum = new BigNumber(tokenAmount).multipliedBy(MEME_TOKEN_DECIMALS);
-      console.log("tokenAmountBigNum", tokenAmountBigNum.toString());
       const tokenAmountBN = new BN(tokenAmountBigNum.toString());
 
       // Create the holder data object
