@@ -68,6 +68,18 @@ export function test() {
       );
     });
 
+    it("getPrice (token address)", async () => {
+      const api = new ChartApi(BE_URL);
+      console.log(
+        "GET LIVE POOL PRICE",
+        await api.getPrice({
+          address: "Cq7tKjeic5c4YFZPsvCskGQRYCqGbyGMVjqL1ud1hVaL",
+          symbol: "SLERF",
+          type: "livePool",
+        }),
+      );
+    });
+
     it("updatePrice (token address)", async () => {
       const api = new ChartApi(BE_URL);
       console.log(
