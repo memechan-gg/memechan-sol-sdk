@@ -2,7 +2,7 @@ import { PublicKey } from "@solana/web3.js";
 import { BoundPoolClient } from "../../src/bound-pool/BoundPoolClient";
 import { client } from "../common";
 import { TokenApiHelper } from "../../src/api/helpers/TokenApiHelper";
-import { PROD_BE_URL, StakingPoolClient } from "../../src";
+import { BE_URL, StakingPoolClient } from "../../src";
 
 // yarn tsx examples/api/getHoldersMapFromBackend.ts > getHoldersMapFromBackend.txt 2>&1
 
@@ -13,7 +13,7 @@ export async function getHoldersMapFromBackend() {
   console.log("holdersMap:", holdersMap);
 
   const tokenAddress = new PublicKey("3k4cMd1JJiPbUix8KwX3TfupWuEbZgyM6q44HUGJ8mDs");
-  const beHoldersMap = await TokenApiHelper.getBondingPoolHoldersMap(tokenAddress, PROD_BE_URL);
+  const beHoldersMap = await TokenApiHelper.getBondingPoolHoldersMap(tokenAddress, BE_URL);
   console.log("bound pool beHoldersMap:", beHoldersMap);
 
   // ========================================
@@ -35,7 +35,7 @@ export async function getHoldersMapFromBackend() {
     liveTokenAddress,
     stakingPoolAddress,
     client.memechanProgram.programId,
-    PROD_BE_URL,
+    BE_URL,
   );
   console.log("staking pool beHoldersMap:", liveBeHoldersMap);
 }

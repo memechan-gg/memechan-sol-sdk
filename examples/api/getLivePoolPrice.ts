@@ -1,8 +1,8 @@
-import { ChartApi, PROD_BE_URL } from "../../src";
+import { ChartApi, BE_URL } from "../../src";
 
 // yarn tsx examples/api/getLivePoolPrice.ts > getLivePoolPrice.txt 2>&1
 export async function getLivePoolPrice() {
-  const api = new ChartApi(PROD_BE_URL);
+  const api = new ChartApi(BE_URL);
   console.log(
     "GET PRICE",
     await api.getPrice({
