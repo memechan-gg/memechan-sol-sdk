@@ -62,6 +62,12 @@ export const getLikeCounterRequestBody = z.object({
   replyId: z.string().nullish(),
 });
 
+export const getLikesRequestBody = z.object({
+  userId: z.string(),
+  coinType: z.string(),
+  paginationToken: z.string().nullish(),
+});
+
 export const getLikeCounterResponseBody = z.object({
   alreadyLiked: z.boolean(),
 });
@@ -76,3 +82,4 @@ export type CreateThreadRequestBody = z.infer<typeof createThreadRequestBody>;
 export type CreateThreadReplyBody = z.infer<typeof createThreadReplyRequestBody>;
 export type IncrementLikeCounterRequestBody = z.infer<typeof incrementLikeCounterRequestBody>;
 export type GetLikeCounterRequestBody = z.infer<typeof getLikeCounterRequestBody>;
+export type GetLikesForUserRequestBody = z.infer<typeof getLikesRequestBody>;
