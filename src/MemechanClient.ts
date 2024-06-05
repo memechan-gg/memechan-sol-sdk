@@ -6,7 +6,7 @@ import { MEMECHAN_PROGRAM_ID } from "./config/config";
 export interface MemechanClientConfigArgs {
   wallet: Wallet;
   connection: Connection;
-  heliusApiUrl: string;
+  heliusApiUrl?: string;
   simulationKeypair: Keypair;
 }
 
@@ -15,7 +15,7 @@ export class MemechanClient {
   public connection: Connection;
   public memechanProgram: Program<MemechanSol>;
   public anchorProvider: AnchorProvider;
-  public heliusApiUrl: string;
+  public heliusApiUrl: string | null;
   public simulationKeypair: Keypair;
 
   constructor(config: MemechanClientConfigArgs) {
@@ -23,7 +23,7 @@ export class MemechanClient {
 
     this.wallet = wallet;
     this.connection = connection;
-    this.heliusApiUrl = heliusApiUrl;
+    this.heliusApiUrl = heliusApiUrl ?? null;
     const provider = new AnchorProvider(this.connection, wallet, {
       commitment: "confirmed",
       preflightCommitment: "confirmed",

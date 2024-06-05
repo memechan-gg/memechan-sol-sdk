@@ -452,6 +452,8 @@ export class StakingPoolClient {
 
   /**
    * Fetches all unique token holders and memetickets owners for pool; then returns thier addresses
+   *
+   * @throws an error if `client.heliusApiUrl` is not provided to the MemechanClient or empty
    */
   public static async getHoldersList(
     boundPool: PublicKey,
@@ -463,6 +465,11 @@ export class StakingPoolClient {
       { address: string; amount: BigNumber },
     ]
   > {
+    if (!client.heliusApiUrl) {
+      console.warn(`[getHoldersList] is empty: ${client.heliusApiUrl}`);
+      throw new Error("[getHoldersList] Fetching holders is only possible if heliusApiUrl is provided and non-empty.");
+    }
+
     const stakingId = BoundPoolClient.findStakingPda(mint, client.memechanProgram.programId);
     const stakingPDA = StakingPoolClient.findSignerPda(stakingId, client.memechanProgram.programId).toBase58();
 
