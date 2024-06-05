@@ -24,12 +24,15 @@ export const createSignedFetcher: CreateSignedFetcher = (opts: SignedFetcherOpti
 
     const url = new URL(typeof input === "string" ? input : input instanceof URL ? input.href : input.url);
 
+    const sigHeaders = getHeaders(init?.headers);
+    sigHeaders.set("host", "h9crl8krnj.execute-api.us-east-1.amazonaws.com");
+
     const headers = getHeaders(init?.headers);
     headers.set("host", url.host);
 
     const request = new HttpRequest({
       hostname: url.hostname,
-      path: url.pathname,
+      path: "/prod" + url.pathname,
       protocol: url.protocol,
       port: url.port ? Number(url.port) : undefined,
       username: url.username,
@@ -38,7 +41,7 @@ export const createSignedFetcher: CreateSignedFetcher = (opts: SignedFetcherOpti
       body: init?.body,
       query: Object.fromEntries(url.searchParams.entries()),
       fragment: url.hash,
-      headers: Object.fromEntries(headers.entries()),
+      headers: Object.fromEntries(sigHeaders.entries()),
     });
 
     const signer = new SignatureV4({
@@ -52,7 +55,7 @@ export const createSignedFetcher: CreateSignedFetcher = (opts: SignedFetcherOpti
 
     return fetchFn(url, {
       ...init,
-      headers: signedRequest.headers,
+      headers: { ...signedRequest.headers, ...{ host: url.host } },
       body: signedRequest.body,
       method: signedRequest.method,
     });
