@@ -7,6 +7,7 @@ import { PROGRAM_ID } from "../programId";
 export interface SwapYArgs {
   coinInAmount: BN;
   coinXMinValue: BN;
+  ticketNumber: BN;
 }
 
 export interface SwapYAccounts {
@@ -20,14 +21,14 @@ export interface SwapYAccounts {
   systemProgram: PublicKey;
 }
 
-export const layout = borsh.struct([borsh.u64("coinInAmount"), borsh.u64("coinXMinValue")]);
+export const layout = borsh.struct([borsh.u64("coinInAmount"), borsh.u64("coinXMinValue"), borsh.u64("ticketNumber")]);
 
 export function swapY(args: SwapYArgs, accounts: SwapYAccounts) {
   const keys = [
     { pubkey: accounts.pool, isSigner: false, isWritable: true },
     { pubkey: accounts.quoteVault, isSigner: false, isWritable: true },
     { pubkey: accounts.userSol, isSigner: false, isWritable: true },
-    { pubkey: accounts.memeTicket, isSigner: true, isWritable: true },
+    { pubkey: accounts.memeTicket, isSigner: false, isWritable: true },
     { pubkey: accounts.owner, isSigner: true, isWritable: true },
     { pubkey: accounts.poolSignerPda, isSigner: false, isWritable: false },
     { pubkey: accounts.tokenProgram, isSigner: false, isWritable: false },
@@ -39,6 +40,7 @@ export function swapY(args: SwapYArgs, accounts: SwapYAccounts) {
     {
       coinInAmount: args.coinInAmount,
       coinXMinValue: args.coinXMinValue,
+      ticketNumber: args.ticketNumber,
     },
     buffer,
   );

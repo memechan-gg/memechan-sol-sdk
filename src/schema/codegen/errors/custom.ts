@@ -1,3 +1,4 @@
+/* eslint-disable no-multi-str */
 export type CustomError =
   | InvalidAccountInput
   | InvalidArg
@@ -51,13 +52,11 @@ export class SlippageExceeded extends Error {
   readonly code = 6002;
   readonly name = "SlippageExceeded";
   readonly msg =
-    // eslint-disable-next-line no-multi-str
     "Given amount of tokens to swap would result in \
         less than minimum requested tokens to receive";
 
   constructor() {
     super(
-      // eslint-disable-next-line no-multi-str
       "6002: Given amount of tokens to swap would result in \
         less than minimum requested tokens to receive",
     );
