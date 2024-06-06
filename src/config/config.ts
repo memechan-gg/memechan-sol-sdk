@@ -13,6 +13,8 @@ export const BE_URL = "https://api.memechan.gg";
 // export const BE_URL = "https://waqxcrbt93.execute-api.us-east-1.amazonaws.com/prod"; // dev
 export const BE_REGION = "us-east-1";
 
+export const API_GATEWAY_FQDN = "h9crl8krnj.execute-api.us-east-1.amazonaws.com";
+
 /**
  * The Memechan program ID on Solana.
  * This is the entry point of the Memechan smart contract.

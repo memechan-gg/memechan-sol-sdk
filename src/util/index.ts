@@ -15,6 +15,7 @@ import {
   Transaction,
   VersionedTransaction,
 } from "@solana/web3.js";
+import BigNumber from "bignumber.js";
 import { findProgramAddress } from "../common/helpers";
 import { addLookupTableInfo, ATA_PROGRAM_ID, makeTxVersion } from "../raydium/config";
 
@@ -104,3 +105,26 @@ export async function sleepTime(ms: number) {
   console.log(new Date().toLocaleString(), "sleepTime", ms);
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
+
+export const getMintBalanceFromTokenAccounts = ({
+  mint,
+  tokenAccounts,
+  decimals,
+}: {
+  mint: string;
+  tokenAccounts: TokenAccount[];
+  decimals: number;
+}): { rawBalance: string; formattedBalance: string } => {
+  const mintTokenAccounts = tokenAccounts.filter(
+    ({ accountInfo: { mint: accountMint } }) => accountMint.toString() === mint,
+  );
+
+  const rawBalance = mintTokenAccounts.reduce(
+    (sum: BigNumber, { accountInfo: { amount } }) => sum.plus(amount.toString()),
+    new BigNumber(0),
+  );
+
+  const formattedBalance = rawBalance.div(10 ** decimals);
+
+  return { rawBalance: rawBalance.toString(), formattedBalance: formattedBalance.toString() };
+};
