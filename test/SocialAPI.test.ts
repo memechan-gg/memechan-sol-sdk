@@ -180,5 +180,13 @@ export function test() {
       });
       expect(isSorted(result, "likeCounter", "asc")).toBe(true);
     });
+
+    it("get likes", async () => {
+      const { result } = await socialAPI.getLikes({
+        coinType: "BUNgiEKYciGAYG4iE7B8DAeEjBHxkc4mcy3S6NL3r1x5",
+        walletAddress: "HLaPceN1Hct4qvDC21PetsaVkyUrBC97n1FYeXAZ4mz5",
+      });
+      expect(result.length).toBeGreaterThan(0);
+    });
   });
 }
