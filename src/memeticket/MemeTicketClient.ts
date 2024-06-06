@@ -32,6 +32,8 @@ export class MemeTicketClient {
     return await program.account.memeTicket.all();
   }
 
+  public static findTicketPda({ poolPubKey, userPubKey }: { poolPubKey: PublicKey; user: PublicKey }) {}
+
   public async getBoundMergeTransaction({
     transaction,
     pool,
