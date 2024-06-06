@@ -1,8 +1,15 @@
 import { Program } from "@coral-xyz/anchor";
-import { GetProgramAccountsFilter, PublicKey, Transaction, sendAndConfirmTransaction } from "@solana/web3.js";
+import {
+  AccountInfo,
+  Connection,
+  GetProgramAccountsFilter,
+  PublicKey,
+  Transaction,
+  sendAndConfirmTransaction,
+} from "@solana/web3.js";
 import BigNumber from "bignumber.js";
 import { MemechanClient } from "../MemechanClient";
-import { MemeTicket as CodegenMemeTicket, MemeTicketFields } from "../schema/codegen/accounts";
+import { MemeTicket as CodegenMemeTicket, MemeTicket, MemeTicketFields } from "../schema/codegen/accounts";
 import { MemechanSol } from "../schema/types/memechan_sol";
 import {
   BoundMerge,
@@ -231,6 +238,28 @@ export class MemeTicketClient {
       availableAmount: availableAmount.toString(),
       availableAmountWithDecimals: availableAmountWithDecimals.toString(),
     };
+  }
+
+  public static async fetchTicketsByIds(ticketIds: string[], connection: Connection) {
+    const ticketIdPubkeys = ticketIds.map((id) => new PublicKey(id));
+    const accountInfos = await connection.getMultipleAccountsInfo(ticketIdPubkeys);
+    const foundAccountInfos = accountInfos.filter((info): info is AccountInfo<Buffer> => info !== null);
+
+    const decodedTickets = foundAccountInfos.map((info) => MemeTicket.decode(info.data));
+
+    const parsedTickets = decodedTickets.map((ticket, index) => {
+      const id = new PublicKey(ticketIds[index]);
+      const jsonTicket = ticket.toJSON();
+
+      return {
+        id,
+        jsonFields: jsonTicket,
+        fields: ticket,
+        amountWithDecimals: new BigNumber(jsonTicket.amount).dividedBy(10 ** MEMECHAN_MEME_TOKEN_DECIMALS).toString(),
+      };
+    });
+
+    return parsedTickets;
   }
 
   /**
