@@ -250,7 +250,7 @@
         {
           "name": "memeTicket",
           "isMut": true,
-          "isSigner": true
+          "isSigner": false
         },
         {
           "name": "owner",
@@ -280,6 +280,10 @@
         },
         {
           "name": "coinXMinValue",
+          "type": "u64"
+        },
+        {
+          "name": "ticketNumber",
           "type": "u64"
         }
       ]
@@ -479,7 +483,7 @@
           "name": "poolQuoteVault",
           "isMut": true,
           "isSigner": false,
-          "docs": ["Staking Pool WSOL vault"]
+          "docs": ["Staking Pool Quote vault"]
         },
         {
           "name": "memeMint",
