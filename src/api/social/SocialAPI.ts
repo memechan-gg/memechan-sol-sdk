@@ -9,6 +9,9 @@ import {
   createThreadRequestBody,
   getLikeCounterRequestBody,
   GetLikeCounterRequestBody,
+  GetLikesForUserRequestBody,
+  getLikesRequestBody,
+  GetUserLikesResult,
   incrementLikeCounterRequestBody,
   IncrementLikeCounterRequestBody,
   QueryThreadsReplyRequestParams,
@@ -52,6 +55,15 @@ export class SocialAPI {
       method: "GET",
     });
     return alreadyLiked;
+  }
+
+  async getLikes(params: GetLikesForUserRequestBody): Promise<GetUserLikesResult> {
+    const queryParams = new URLSearchParams(getLikesRequestBody.parse(params) as Record<string, string>);
+    const url = `${this.url}/likes?${queryParams}`;
+    console.log("url: ", url);
+    return await jsonFetch(url, {
+      method: "GET",
+    });
   }
 
   createThreadReply(params: CreateThreadReplyBody): Promise<void> {

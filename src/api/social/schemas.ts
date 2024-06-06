@@ -62,9 +62,21 @@ export const getLikeCounterRequestBody = z.object({
   replyId: z.string().nullish(),
 });
 
+export const getLikesRequestBody = z.object({
+  walletAddress: z.string(),
+  coinType: z.string(),
+  paginationToken: z.string().nullish(),
+});
+
 export const getLikeCounterResponseBody = z.object({
   alreadyLiked: z.boolean(),
 });
+
+export const likeResultSchema = z.object({
+  id: z.string(),
+});
+
+const likesResult = paginatedResultSchema(likeResultSchema);
 
 export type ThreadsResult = z.infer<typeof threadsResult>;
 export type ThreadRepliesResult = z.infer<typeof threadRepliesResult>;
@@ -76,3 +88,5 @@ export type CreateThreadRequestBody = z.infer<typeof createThreadRequestBody>;
 export type CreateThreadReplyBody = z.infer<typeof createThreadReplyRequestBody>;
 export type IncrementLikeCounterRequestBody = z.infer<typeof incrementLikeCounterRequestBody>;
 export type GetLikeCounterRequestBody = z.infer<typeof getLikeCounterRequestBody>;
+export type GetLikesForUserRequestBody = z.infer<typeof getLikesRequestBody>;
+export type GetUserLikesResult = z.infer<typeof likesResult>;
