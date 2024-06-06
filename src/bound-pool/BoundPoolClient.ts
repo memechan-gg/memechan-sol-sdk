@@ -524,12 +524,12 @@ export class BoundPoolClient {
    */
   public async buyMeme(input: BuyMemeArgs): Promise<string> {
     // TODO: Check whether user has enough amount of quoute token
-    const { tx, memeTicketKeypair } = await this.getBuyMemeTransaction(input);
+    const { tx } = await this.getBuyMemeTransaction(input);
 
     const txMethod = getSendAndConfirmTransactionMethod({
       connection: this.client.connection,
       transaction: tx,
-      signers: [input.signer, memeTicketKeypair],
+      signers: [input.signer],
     });
 
     return await txMethod();
