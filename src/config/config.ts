@@ -73,6 +73,7 @@ export const DEFAULT_MAX_M = 800_000_000_000_000;
 export const DECIMALS_S = 1_000_000_000;
 
 export const MAX_TRANSACTION_SIZE = 1232;
+// TODO: CHANGE ADMIN IF NECCESSARY BEFORE PROD
 export const ADMIN_PUB_KEY = new PublicKey("KZbAoMgCcb2gDEn2Ucea86ux84y25y3ybbWQGQpd9D6");
 export const FULL_MEME_AMOUNT_CONVERTED = new BigNumber(DEFAULT_MAX_M_LP)
   .plus(DEFAULT_MAX_M)
