@@ -10,7 +10,7 @@ import {
 import BigNumber from "bignumber.js";
 import { MemechanClient } from "../MemechanClient";
 import { MEMECHAN_MEME_TOKEN_DECIMALS, MEMECHAN_PROGRAM_ID } from "../config/config";
-import { MemeTicket as CodegenMemeTicket, MemeTicket, MemeTicketFields } from "../schema/codegen/accounts";
+import { MemeTicket, MemeTicketFields } from "../schema/codegen/accounts";
 import { MemechanSol } from "../schema/types/memechan_sol";
 import {
   BoundMerge,
@@ -213,43 +213,6 @@ export class MemeTicketClient {
     const fetchedTickets = await program.account.memeTicket.all(filters);
     const tickets = fetchedTickets.map((ticket) => ticket.account);
     return tickets;
-  }
-
-  public static async fetchTicketsByUser(
-    pool: PublicKey,
-    client: MemechanClient,
-    user: PublicKey,
-  ): Promise<ParsedMemeTicket[]> {
-    const program = client.memechanProgram;
-    const filters: GetProgramAccountsFilter[] = [
-      {
-        memcmp: {
-          bytes: pool.toBase58(),
-          offset: 40,
-        },
-      },
-      {
-        memcmp: {
-          bytes: user.toBase58(),
-          offset: 8,
-        },
-      },
-    ];
-
-    const fetchedTickets = await program.account.memeTicket.all(filters);
-
-    const parsedTickets = fetchedTickets.map((ticket) => {
-      const jsonTicket = new CodegenMemeTicket(ticket.account).toJSON();
-
-      return {
-        id: ticket.publicKey,
-        jsonFields: jsonTicket,
-        fields: ticket.account,
-        amountWithDecimals: new BigNumber(jsonTicket.amount).dividedBy(10 ** MEMECHAN_MEME_TOKEN_DECIMALS).toString(),
-      };
-    });
-
-    return parsedTickets;
   }
 
   public static async fetchTicketsByUser2(

@@ -1335,8 +1335,10 @@ export class BoundPoolClient {
     return (await BoundPoolClient.getHoldersList(pool, client)).length;
   }
 
-  public static async getHoldersMap(pool: PublicKey, client: MemechanClient) {
-    const tickets = await MemeTicketClient.fetchRelatedTickets(pool, client);
+  public static async getHoldersMap(poolId: PublicKey, client: MemechanClient) {
+    const pool = await BoundPoolClient.fetch2(client.connection, poolId);
+
+    const tickets = await MemeTicketClient.fetchRelatedTickets(poolId, client);
     const uniqueHolders: Map<string, MemeTicketFields[]> = new Map();
 
     tickets.forEach((ticket) => {
@@ -1346,6 +1348,17 @@ export class BoundPoolClient {
       }
       uniqueHolders.get(addr)?.push(ticket);
     });
+
+    // add bound pool as holder
+    const feeVaultQuoteAddress = pool.feeVaultQuote.toBase58();
+    if (!uniqueHolders.has(feeVaultQuoteAddress)) {
+      const adminTicket = {
+        amount: pool.adminFeesMeme,
+        owner: pool.feeVaultQuote,
+        pool: poolId,
+      } as MemeTicketFields;
+      uniqueHolders.set(feeVaultQuoteAddress, [adminTicket]);
+    }
 
     return uniqueHolders;
   }
