@@ -8,6 +8,7 @@ on:
   push:
     branches-ignore:
       - "*"
+  workflow_dispatch:
 
 jobs:
   build:
@@ -27,16 +28,29 @@ jobs:
         run: yarn install --frozen-lockfile
 
       - name: Run Lint
-        run: |
-          yarn lint
+        run: yarn lint
 
       - name: Run Build
-        run: |
-          yarn build
+        run: yarn build
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+          cache: "yarn"
+
+      - name: Install Dependencies
+        run: yarn install --frozen-lockfile
 
       - name: Run Tests
-        run: |
-          yarn test
+        run: yarn test
         env:
           TEST_USER_SECRET_KEY: "[243,209,26,170,233,220,87,246,186,249,184,131,192,150,226,199,18,71,26,246,200,191,25,134,244,44,8,42,32,11,185,194,110,166,26,137,37,31,69,91,254,102,98,209,147,249,231,211,203,50,49,57,51,108,131,241,247,65,131,158,141,92,105,228]"
           RPC_API_CLUSTER: https://rpc.ankr.com/solana_devnet
@@ -44,6 +58,41 @@ jobs:
           USER_ID: 8SvkUtJZCyJwSQGkiszwcRcPv7c8pPSr8GVEppGNN7DV
           HELIUS_API_URL: https://mainnet.helius-rpc.com/?api-key=89bb46d5-c874-4de8-873c-4a7cebdd7376
 
+  security_audit:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+          cache: "yarn"
+
+      - name: Install Dependencies
+        run: yarn install --frozen-lockfile
+
       - name: Run Security Audit
-        run: |
-          yarn audit --groups dependencies
+        run: yarn audit --groups dependencies
+
+  publish:
+    name: Publish
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.event_name == 'workflow_dispatch'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+          cache: "yarn"
+
+      - name: Install Dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Publish
+        run: yarn run publish
