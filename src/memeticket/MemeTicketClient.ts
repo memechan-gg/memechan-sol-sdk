@@ -47,7 +47,6 @@ export class MemeTicketClient {
       MemeTicketClient.getMemeTicketPDA({
         userId,
         poolId,
-        memechanProgramId: new PublicKey(MEMECHAN_PROGRAM_ID),
         ticketNumber: i + MemeTicketClient.TICKET_NUMBER_START,
       }),
     );
@@ -59,12 +58,10 @@ export class MemeTicketClient {
     ticketNumber,
     poolId,
     userId,
-    memechanProgramId,
   }: {
     ticketNumber: number;
     poolId: PublicKey;
     userId: PublicKey;
-    memechanProgramId: PublicKey;
   }): PublicKey {
     // 8 bytes array
     const dv = new DataView(new ArrayBuffer(8), 0);
@@ -74,7 +71,7 @@ export class MemeTicketClient {
     // find pda
     const pda = PublicKey.findProgramAddressSync(
       [poolId.toBytes(), userId.toBytes(), new Uint8Array(dv.buffer)],
-      memechanProgramId,
+      new PublicKey(MEMECHAN_PROGRAM_ID),
     )[0];
 
     return pda;
