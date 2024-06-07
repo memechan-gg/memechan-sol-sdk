@@ -4,10 +4,10 @@ import { client, payer } from "../../common";
 
 // yarn tsx examples/bonding-pool/trading/sell-meme.ts
 (async () => {
-  const poolAccountAddressId = new PublicKey("8T83gG397gcCaFh8hLiMECmhrmkLS7vtptMeLvCgwKde");
+  const poolAccountAddressId = new PublicKey("2ST4K87fWWYdeJ5SWyrv7bdSZmd3cYoqsthDeQZZn2TY");
   const boundPoolInstance = await BoundPoolClient.fromBoundPoolId({ client, poolAccountAddressId });
 
-  const inputAmount = "567.023231";
+  const inputAmount = "1000000";
 
   const minOutputAmount = await boundPoolInstance.getOutputAmountForSellMeme({
     inputAmount: inputAmount,
