@@ -106,6 +106,6 @@ jobs:
         run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
 
       - name: Publish
-        run: yarn publish --access restricted
+        run: yarn publish --access restricted --minor
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
