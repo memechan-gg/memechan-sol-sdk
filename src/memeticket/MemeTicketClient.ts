@@ -215,43 +215,6 @@ export class MemeTicketClient {
     return tickets;
   }
 
-  public static async fetchTicketsByUser(
-    pool: PublicKey,
-    client: MemechanClient,
-    user: PublicKey,
-  ): Promise<ParsedMemeTicket[]> {
-    const program = client.memechanProgram;
-    const filters: GetProgramAccountsFilter[] = [
-      {
-        memcmp: {
-          bytes: pool.toBase58(),
-          offset: 40,
-        },
-      },
-      {
-        memcmp: {
-          bytes: user.toBase58(),
-          offset: 8,
-        },
-      },
-    ];
-
-    const fetchedTickets = await program.account.memeTicket.all(filters);
-
-    const parsedTickets = fetchedTickets.map((ticket) => {
-      const jsonTicket = new CodegenMemeTicket(ticket.account).toJSON();
-
-      return {
-        id: ticket.publicKey,
-        jsonFields: jsonTicket,
-        fields: ticket.account,
-        amountWithDecimals: new BigNumber(jsonTicket.amount).dividedBy(10 ** MEMECHAN_MEME_TOKEN_DECIMALS).toString(),
-      };
-    });
-
-    return parsedTickets;
-  }
-
   public static async fetchTicketsByUser2(
     pool: PublicKey,
     client: MemechanClient,

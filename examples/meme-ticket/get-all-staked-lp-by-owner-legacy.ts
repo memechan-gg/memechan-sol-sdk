@@ -6,7 +6,7 @@ import { client, payer } from "../common";
 export const getAllStakedLpByOwner = async () => {
   const poolAddress = new PublicKey("6uM2Yf9VbkNndDutv6gxmvs2MsUVvpzLenSKEn7s46No");
 
-  const tickets = await MemeTicketClient.fetchTicketsByUser(poolAddress, client, payer.publicKey);
+  const tickets = await MemeTicketClient.fetchTicketsByUser2(poolAddress, client, payer.publicKey);
 
   console.log("tickets:", tickets);
 };
