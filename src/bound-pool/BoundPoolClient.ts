@@ -1350,14 +1350,13 @@ export class BoundPoolClient {
     });
 
     // add bound pool as holder
-    const feeVaultQuoteAddress = pool.feeVaultQuote.toBase58();
-    if (!uniqueHolders.has(feeVaultQuoteAddress)) {
+    if (!uniqueHolders.has(MEMECHAN_FEE_WALLET_ID)) {
       const adminTicket = {
         amount: pool.adminFeesMeme,
-        owner: pool.feeVaultQuote,
+        owner: new PublicKey(MEMECHAN_FEE_WALLET_ID),
         pool: poolId,
       } as MemeTicketFields;
-      uniqueHolders.set(feeVaultQuoteAddress, [adminTicket]);
+      uniqueHolders.set(MEMECHAN_FEE_WALLET_ID, [adminTicket]);
     }
 
     return uniqueHolders;
