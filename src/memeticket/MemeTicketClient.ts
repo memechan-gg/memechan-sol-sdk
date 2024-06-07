@@ -265,33 +265,8 @@ export class MemeTicketClient {
     return fetchedTickets;
   }
 
-  // Deprecated one
-  public static async fetchAvailableTicketsByUser(pool: PublicKey, client: MemechanClient, user: PublicKey) {
-    const tickets = await MemeTicketClient.fetchTicketsByUser(pool, client, user);
-    const currentTimestamp = Date.now();
-
-    const availableTickets = tickets.filter((ticket) => {
-      const unlockTicketTimestamp = +ticket.jsonFields.untilTimestamp;
-
-      return currentTimestamp >= unlockTicketTimestamp;
-    });
-
-    const availableAmount = availableTickets.reduce((amount: BigNumber, ticket) => {
-      amount = amount.plus(ticket.jsonFields.amount);
-      return amount;
-    }, new BigNumber(0));
-
-    const availableAmountWithDecimals = availableAmount.div(10 ** MEMECHAN_MEME_TOKEN_DECIMALS);
-
-    return {
-      tickets: availableTickets,
-      availableAmount: availableAmount.toString(),
-      availableAmountWithDecimals: availableAmountWithDecimals.toString(),
-    };
-  }
-
   public static async fetchAvailableTicketsByUser2(pool: PublicKey, client: MemechanClient, user: PublicKey) {
-    const tickets = await MemeTicketClient.fetchTicketsByUser(pool, client, user);
+    const tickets = await MemeTicketClient.fetchTicketsByUser2(pool, client, user);
     const currentTimestamp = Date.now();
 
     const availableTickets = tickets.filter((ticket) => {
