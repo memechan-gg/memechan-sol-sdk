@@ -80,3 +80,5 @@ export const FULL_MEME_AMOUNT_CONVERTED = new BigNumber(DEFAULT_MAX_M_LP)
   .toString();
 
 export const endpoints = ["https://rpc1.memechan.xyz/"];
+
+export const CHUNK_SIZE_FOR_GET_MULTIPLE_ACCOUNTS = 100;
