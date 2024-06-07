@@ -1,6 +1,7 @@
 import { PublicKey } from "@solana/web3.js";
 import { BoundPoolClient } from "../../../src/bound-pool/BoundPoolClient";
 import { client, payer } from "../../common";
+import { MemeTicketClient } from "../../../src";
 
 // yarn tsx examples/bonding-pool/trading/buy-meme.ts
 (async () => {
@@ -16,13 +17,16 @@ import { client, payer } from "../../common";
 
   console.debug("minOutputAmount: ", minOutputAmount);
 
+  const tickets = await MemeTicketClient.fetchTicketsByUser2(poolAccountAddressId, client, payer.publicKey);
+  const memeTicketNumber = tickets.length + MemeTicketClient.TICKET_NUMBER_START;
+
   const res = await boundPoolInstance.buyMeme({
     inputAmount: inputAmount,
     minOutputAmount: minOutputAmount,
     slippagePercentage: 0,
     user: payer.publicKey,
     signer: payer,
-    memeTicketNumber: 1,
+    memeTicketNumber: memeTicketNumber,
   });
 
   console.debug("res: ");
