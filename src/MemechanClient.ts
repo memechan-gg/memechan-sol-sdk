@@ -32,7 +32,7 @@ export class MemechanClient {
     setProvider(provider);
     this.anchorProvider = provider;
 
-    console.log("MemechanClient init. Program id: " + MEMECHAN_PROGRAM_ID + " Rpc: " + connection.rpcEndpoint);
+    // console.log("MemechanClient init. Program id: " + MEMECHAN_PROGRAM_ID + " Rpc: " + connection.rpcEndpoint);
 
     this.memechanProgram = new Program<MemechanSol>(IDL, new PublicKey(MEMECHAN_PROGRAM_ID), provider);
     this.simulationKeypair = config.simulationKeypair;

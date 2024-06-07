@@ -41,6 +41,7 @@ export function test() {
         quoteAmountIn: new BN(5000 * 1e9),
         quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
         pool: boundPool.id,
+        memeTicketNumber: 1,
       });
 
       console.log("swapY ticketId: " + ticketId.id.toBase58());
@@ -63,6 +64,7 @@ export function test() {
         quoteAmountIn: new BN(40000 * 1e9),
         quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
         pool: boundPool.id,
+        memeTicketNumber: 2,
       });
 
       tickets.push(new MemeTicketClient(ticketId2.id, client));
@@ -147,6 +149,7 @@ export function test() {
         quoteAmountIn: new BN(500000 * 1e9),
         quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
         pool: boundPool.id,
+        memeTicketNumber: 1,
       });
 
       console.log("swapY ticketId: " + ticketId.id.toBase58());
@@ -204,6 +207,7 @@ export function test() {
         quoteAmountIn: new BN(550000 * 1e9),
         quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
         pool: boundPool.id,
+        memeTicketNumber: 2,
       });
 
       console.log("swapY ticketId: " + ticketId.id.toBase58());
@@ -292,6 +296,7 @@ export function test() {
         quoteAmountIn: new BN(550000 * 1e9),
         quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
         pool: boundPool.id,
+        memeTicketNumber: 1,
       });
 
       console.log("swapY ticketId: " + ticketId.id.toBase58());
@@ -383,6 +388,7 @@ export function test() {
         quoteAmountIn: new BN(5000 * 1e9),
         quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
         pool: boundPool.id,
+        memeTicketNumber: 1,
       });
 
       console.log("swapY ticketId: " + ticketId.id.toBase58());
@@ -405,6 +411,7 @@ export function test() {
         quoteAmountIn: new BN(5550000 * 1e9),
         quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
         pool: boundPool.id,
+        memeTicketNumber: 2,
       });
 
       tickets.push(new MemeTicketClient(ticketId2.id, client));
@@ -528,6 +535,7 @@ export function test() {
         quoteAmountIn: new BN(5000 * 1e9),
         quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
         pool: boundPool.id,
+        memeTicketNumber: 1,
       });
 
       tickets.push(new MemeTicketClient(ticketId.id, client));
@@ -540,6 +548,7 @@ export function test() {
         quoteAmountIn: new BN(40000 * 1e9),
         quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
         pool: boundPool.id,
+        memeTicketNumber: 2,
       });
 
       tickets.push(new MemeTicketClient(ticketId2.id, client));
@@ -616,6 +625,7 @@ export function test() {
         quoteAmountIn: new BN(5000 * 1e9),
         quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
         pool: boundPool.id,
+        memeTicketNumber: 1,
       });
 
       tickets.push(new MemeTicketClient(ticketId.id, client));
@@ -628,6 +638,7 @@ export function test() {
         quoteAmountIn: new BN(40000 * 1e9),
         quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
         pool: boundPool.id,
+        memeTicketNumber: 2,
       });
 
       tickets.push(new MemeTicketClient(ticketId2.id, client));

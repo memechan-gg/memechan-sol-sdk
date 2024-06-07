@@ -1,8 +1,15 @@
 import { Program } from "@coral-xyz/anchor";
-import { GetProgramAccountsFilter, PublicKey, Transaction, sendAndConfirmTransaction } from "@solana/web3.js";
+import {
+  AccountInfo,
+  Connection,
+  GetProgramAccountsFilter,
+  PublicKey,
+  Transaction,
+  sendAndConfirmTransaction,
+} from "@solana/web3.js";
 import BigNumber from "bignumber.js";
 import { MemechanClient } from "../MemechanClient";
-import { MemeTicket as CodegenMemeTicket, MemeTicketFields } from "../schema/codegen/accounts";
+import { MemeTicket as CodegenMemeTicket, MemeTicket, MemeTicketFields } from "../schema/codegen/accounts";
 import { MemechanSol } from "../schema/types/memechan_sol";
 import {
   BoundMerge,
@@ -14,7 +21,7 @@ import {
   StakingMerge,
 } from "./types";
 import { getOptimizedTransactions } from "./utils";
-import { MEMECHAN_MEME_TOKEN_DECIMALS } from "../config/config";
+import { MEMECHAN_MEME_TOKEN_DECIMALS, MEMECHAN_PROGRAM_ID } from "../config/config";
 
 export class MemeTicketClient {
   public constructor(
@@ -24,12 +31,50 @@ export class MemeTicketClient {
     //
   }
 
+  // let's use numbering from 1 always
+  public static TICKET_NUMBER_START = 1;
+
   public async fetch(program = this.client.memechanProgram) {
     return await program.account.memeTicket.fetch(this.id, "confirmed");
   }
 
   public static async all(program: Program<MemechanSol>) {
     return await program.account.memeTicket.all();
+  }
+
+  public static getFirstHunderTicketsPubkeys({ userId, poolId }: { userId: PublicKey; poolId: PublicKey }) {
+    const ticketsList = new Array(100).fill(undefined).map((el, i) =>
+      MemeTicketClient.getMemeTicketPDA({
+        userId,
+        poolId,
+        ticketNumber: i + MemeTicketClient.TICKET_NUMBER_START,
+      }),
+    );
+
+    return ticketsList;
+  }
+
+  public static getMemeTicketPDA({
+    ticketNumber,
+    poolId,
+    userId,
+  }: {
+    ticketNumber: number;
+    poolId: PublicKey;
+    userId: PublicKey;
+  }): PublicKey {
+    // 8 bytes array
+    const dv = new DataView(new ArrayBuffer(8), 0);
+    // set u64 in little endian format
+    dv.setBigUint64(0, BigInt(ticketNumber), true);
+
+    // find pda
+    const pda = PublicKey.findProgramAddressSync(
+      [poolId.toBytes(), userId.toBytes(), new Uint8Array(dv.buffer)],
+      new PublicKey(MEMECHAN_PROGRAM_ID),
+    )[0];
+
+    return pda;
   }
 
   public async getBoundMergeTransaction({
@@ -207,8 +252,21 @@ export class MemeTicketClient {
     return parsedTickets;
   }
 
-  public static async fetchAvailableTicketsByUser(pool: PublicKey, client: MemechanClient, user: PublicKey) {
-    const tickets = await MemeTicketClient.fetchTicketsByUser(pool, client, user);
+  public static async fetchTicketsByUser2(
+    pool: PublicKey,
+    client: MemechanClient,
+    user: PublicKey,
+  ): Promise<ParsedMemeTicket[]> {
+    // TODO: Iterate until we'll not reach empty tickets
+    const ticketsList = MemeTicketClient.getFirstHunderTicketsPubkeys({ userId: user, poolId: pool });
+    const ticketsIdsList = ticketsList.map((ticket) => ticket.toString());
+    const fetchedTickets = await MemeTicketClient.fetchTicketsByIds(ticketsIdsList, client.connection);
+
+    return fetchedTickets;
+  }
+
+  public static async fetchAvailableTicketsByUser2(pool: PublicKey, client: MemechanClient, user: PublicKey) {
+    const tickets = await MemeTicketClient.fetchTicketsByUser2(pool, client, user);
     const currentTimestamp = Date.now();
 
     const availableTickets = tickets.filter((ticket) => {
@@ -229,6 +287,28 @@ export class MemeTicketClient {
       availableAmount: availableAmount.toString(),
       availableAmountWithDecimals: availableAmountWithDecimals.toString(),
     };
+  }
+
+  public static async fetchTicketsByIds(ticketIds: string[], connection: Connection) {
+    const ticketIdPubkeys = ticketIds.map((id) => new PublicKey(id));
+    const accountInfos = await connection.getMultipleAccountsInfo(ticketIdPubkeys);
+    const foundAccountInfos = accountInfos.filter((info): info is AccountInfo<Buffer> => info !== null);
+
+    const decodedTickets = foundAccountInfos.map((info) => MemeTicket.decode(info.data));
+
+    const parsedTickets = decodedTickets.map((ticket, index) => {
+      const id = new PublicKey(ticketIds[index]);
+      const jsonTicket = ticket.toJSON();
+
+      return {
+        id,
+        jsonFields: jsonTicket,
+        fields: ticket,
+        amountWithDecimals: new BigNumber(jsonTicket.amount).dividedBy(10 ** MEMECHAN_MEME_TOKEN_DECIMALS).toString(),
+      };
+    });
+
+    return parsedTickets;
   }
 
   /**

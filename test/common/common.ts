@@ -4,7 +4,7 @@ import { Wallet } from "@coral-xyz/anchor";
 import { MemechanClient } from "../../src/MemechanClient";
 import { ADMIN_PUB_KEY, MEMECHAN_QUOTE_TOKEN } from "../../src/config/config";
 import { getRandomRpcEndpoint } from "../../src/util/getRandomRpcEndpoint";
-import { BoundPoolWithBuyMemeArgs } from "../../src";
+import { BoundPoolWithBuyMemeArgs, MemeTicketClient } from "../../src";
 
 export const admin = ADMIN_PUB_KEY;
 export const payer = Keypair.fromSecretKey(Buffer.from(JSON.parse(TEST_USER_SECRET_KEY)));
@@ -58,5 +58,6 @@ export const DEFAULT_BOUND_POOL_WITH_BUY_MEME_ARGS: BoundPoolWithBuyMemeArgs = {
     minOutputAmount: "1",
     slippagePercentage: 0,
     user: payer.publicKey,
+    memeTicketNumber: MemeTicketClient.TICKET_NUMBER_START,
   },
 };

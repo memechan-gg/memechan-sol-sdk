@@ -2,6 +2,7 @@ import { BN } from "bn.js";
 import { BoundPoolClient } from "../../src/bound-pool/BoundPoolClient";
 import { FEE_DESTINATION_ID, MEMECHAN_QUOTE_TOKEN } from "../../src/config/config";
 import { DUMMY_TOKEN_METADATA, admin, client, payer } from "../common";
+import { MemeTicketClient } from "../../src";
 
 // yarn tsx examples/bonding-pool/go-live.ts > go-live.txt 2>&1
 export const goLive = async () => {
@@ -15,6 +16,9 @@ export const goLive = async () => {
   console.log("boundPool:", boundPool);
   console.log("==== pool id: " + boundPool.id.toString());
 
+  const tickets = await MemeTicketClient.fetchTicketsByUser2(boundPool.id, client, payer.publicKey);
+  const memeTicketNumber = tickets.length + MemeTicketClient.TICKET_NUMBER_START;
+
   const ticketId = await boundPool.swapY({
     payer: payer,
     user: payer,
@@ -22,6 +26,7 @@ export const goLive = async () => {
     quoteAmountIn: new BN(10000000),
     quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
     pool: boundPool.id,
+    memeTicketNumber,
   });
   console.log("ticketId:", ticketId);
 

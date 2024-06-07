@@ -60,7 +60,6 @@ export class SocialAPI {
   async getLikes(params: GetLikesForUserRequestBody): Promise<GetUserLikesResult> {
     const queryParams = new URLSearchParams(getLikesRequestBody.parse(params) as Record<string, string>);
     const url = `${this.url}/likes?${queryParams}`;
-    console.log("url: ", url);
     return await jsonFetch(url, {
       method: "GET",
     });

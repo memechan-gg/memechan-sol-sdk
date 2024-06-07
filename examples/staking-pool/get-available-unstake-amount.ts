@@ -5,8 +5,8 @@ import { MemeTicketClient, StakingPoolClient } from "../../src";
 
 // yarn tsx examples/staking-pool/get-available-unstake-amount.ts > available-unstake-amount.txt 2>&1
 export const getAvailableUnstakeAmount = async () => {
-  const boundPoolAddress = new PublicKey("D3fRV97S8MheYhvm1ofu2N8xsKQuwuHycUFwhMfRDGoi");
-  const stakingPoolAddress = new PublicKey("FMyKyPPmgRHdCVsfvdyuR6Y4BAgNvsQCPQtMAtEcysmm");
+  const boundPoolAddress = new PublicKey("2paxDkj5zFR3DtMVZtmTSbkMYZwFtVZnq2Xv1WFHqgPo");
+  const stakingPoolAddress = new PublicKey("sh5hozk6bENHvG4J5zrqW2S5eKjp68DRPZodCRLSkJU");
 
   // Get staking pool
   const stakingPool = await StakingPoolClient.fromStakingPoolId({ client, poolAccountAddressId: stakingPoolAddress });
@@ -18,7 +18,7 @@ export const getAvailableUnstakeAmount = async () => {
   }
 
   // Get all user tickets
-  const { tickets } = await MemeTicketClient.fetchAvailableTicketsByUser(boundPoolAddress, client, payer.publicKey);
+  const { tickets } = await MemeTicketClient.fetchAvailableTicketsByUser2(boundPoolAddress, client, payer.publicKey);
   console.log("tickets:", tickets);
 
   // Get available unstake amount

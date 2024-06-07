@@ -14,6 +14,7 @@ export interface SwapYArgs {
   quoteAmountIn: BN;
   quoteMint: PublicKey;
   memeTokensOut: BN;
+  memeTicketNumber: number;
 }
 
 export type GetBuyMemeTransactionArgs = {
@@ -23,15 +24,19 @@ export type GetBuyMemeTransactionArgs = {
   minOutputAmount: string;
   slippagePercentage: number;
   transaction?: Transaction;
+  memeTicketNumber: number;
 };
 
 export type BuyMemeArgs = GetBuyMemeTransactionArgs & { signer: Keypair };
 
-export type GetOutputAmountForBuyMeme = Omit<BuyMemeArgs, "minOutputAmount" | "inputTokenAccount" | "user" | "signer">;
+export type GetOutputAmountForBuyMeme = Omit<
+  BuyMemeArgs,
+  "minOutputAmount" | "inputTokenAccount" | "user" | "signer" | "memeTicketNumber"
+>;
 
 export type GetBuyMemeTransactionOutput = {
   tx: Transaction;
-  memeTicketKeypair: Keypair;
+  memeTicketPublicKey: PublicKey;
   inputTokenAccount: PublicKey;
 };
 

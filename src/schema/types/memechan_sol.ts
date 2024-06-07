@@ -250,7 +250,7 @@ export type MemechanSol = {
         {
           name: "memeTicket";
           isMut: true;
-          isSigner: true;
+          isSigner: false;
         },
         {
           name: "owner";
@@ -280,6 +280,10 @@ export type MemechanSol = {
         },
         {
           name: "coinXMinValue";
+          type: "u64";
+        },
+        {
+          name: "ticketNumber";
           type: "u64";
         },
       ];
@@ -479,7 +483,7 @@ export type MemechanSol = {
           name: "poolQuoteVault";
           isMut: true;
           isSigner: false;
-          docs: ["Staking Pool WSOL vault"];
+          docs: ["Staking Pool Quote vault"];
         },
         {
           name: "memeMint";
@@ -1747,7 +1751,7 @@ export type MemechanSol = {
     {
       code: 6002;
       name: "SlippageExceeded";
-      msg: "Given amount of tokens to swap would result in \\\r\n        less than minimum requested tokens to receive";
+      msg: "Given amount of tokens to swap would result in \\\n        less than minimum requested tokens to receive";
     },
     {
       code: 6003;
@@ -2108,7 +2112,7 @@ export const IDL: MemechanSol = {
         {
           name: "memeTicket",
           isMut: true,
-          isSigner: true,
+          isSigner: false,
         },
         {
           name: "owner",
@@ -2138,6 +2142,10 @@ export const IDL: MemechanSol = {
         },
         {
           name: "coinXMinValue",
+          type: "u64",
+        },
+        {
+          name: "ticketNumber",
           type: "u64",
         },
       ],
@@ -2337,7 +2345,7 @@ export const IDL: MemechanSol = {
           name: "poolQuoteVault",
           isMut: true,
           isSigner: false,
-          docs: ["Staking Pool WSOL vault"],
+          docs: ["Staking Pool Quote vault"],
         },
         {
           name: "memeMint",
@@ -3605,7 +3613,7 @@ export const IDL: MemechanSol = {
     {
       code: 6002,
       name: "SlippageExceeded",
-      msg: "Given amount of tokens to swap would result in \\\r\n        less than minimum requested tokens to receive",
+      msg: "Given amount of tokens to swap would result in \\\n        less than minimum requested tokens to receive",
     },
     {
       code: 6003,

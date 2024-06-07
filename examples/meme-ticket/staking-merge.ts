@@ -4,9 +4,9 @@ import { client, payer } from "../common";
 
 // yarn tsx examples/meme-ticket/staking-merge.ts > staking-merge.txt 2>&1
 export const stakingMerge = async () => {
-  const boundPoolAddress = new PublicKey("6X15H5NFQbbLoZ2pfwBaQKd1vnjfhUGUcnQkRs9Jdoqo");
-  const stakingPoolAddress = new PublicKey("HvMGGbeGnnzBMpdFJyr3RudHSqHPEvERF93EmkHPfaxn");
-  const { tickets } = await MemeTicketClient.fetchAvailableTicketsByUser(boundPoolAddress, client, payer.publicKey);
+  const boundPoolAddress = new PublicKey("2paxDkj5zFR3DtMVZtmTSbkMYZwFtVZnq2Xv1WFHqgPo");
+  const stakingPoolAddress = new PublicKey("sh5hozk6bENHvG4J5zrqW2S5eKjp68DRPZodCRLSkJU");
+  const { tickets } = await MemeTicketClient.fetchAvailableTicketsByUser2(boundPoolAddress, client, payer.publicKey);
 
   if (tickets.length > 1) {
     const [destinationTicket, ...sourceTickets] = tickets;

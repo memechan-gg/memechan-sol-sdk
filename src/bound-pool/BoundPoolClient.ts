@@ -200,7 +200,7 @@ export class BoundPoolClient {
     memeMintKeypair: Keypair;
     poolQuoteVault: PublicKey;
     launchVault: PublicKey;
-    memeTicketKeypair?: Keypair;
+    memeTicketPublicKey?: PublicKey;
   }> {
     const {
       payer,
@@ -280,18 +280,18 @@ export class BoundPoolClient {
 
     createPoolTransaction.add(createPoolInstruction);
 
-    let memeTicketKeypair: Keypair | undefined = undefined;
+    let memeTicketPublicKey: PublicKey | undefined = undefined;
     if (args.buyMemeTransactionArgs) {
       const inputAmount = new BigNumber(args.buyMemeTransactionArgs.inputAmount);
       if (inputAmount.isGreaterThan(0)) {
-        const { tx, memeTicketKeypair: newMemeTicketKeypair } = await this.getBuyMemeTransaction({
+        const { tx, memeTicketPublicKey: newMemeTicketPublicKey } = await this.getBuyMemeTransaction({
           ...args.buyMemeTransactionArgs,
           boundPoolId: id,
           poolSignerPda: poolSigner,
           client,
           quoteVault: poolQuoteVault,
         });
-        memeTicketKeypair = newMemeTicketKeypair;
+        memeTicketPublicKey = newMemeTicketPublicKey;
         createPoolTransaction.add(tx);
       }
     }
@@ -313,7 +313,7 @@ export class BoundPoolClient {
       memeMintKeypair,
       poolQuoteVault,
       launchVault,
-      memeTicketKeypair,
+      memeTicketPublicKey,
     };
   }
 
@@ -327,6 +327,7 @@ export class BoundPoolClient {
         minOutputAmount: "0",
         slippagePercentage: 0,
         user: payer.publicKey,
+        memeTicketNumber: 1,
       },
     });
   }
@@ -335,7 +336,7 @@ export class BoundPoolClient {
     const { payer, client, quoteToken } = args;
     const { memechanProgram } = client;
 
-    const { createPoolTransaction, memeMintKeypair, poolQuoteVault, launchVault, memeTicketKeypair } =
+    const { createPoolTransaction, memeMintKeypair, poolQuoteVault, launchVault } =
       await this.getCreateNewBondingPoolAndBuyAndTokenWithBuyMemeTransaction({
         ...args,
         payer: payer.publicKey,
@@ -347,9 +348,6 @@ export class BoundPoolClient {
     console.debug("createPoolTransaction size: ", createPoolTransactionSize);
 
     const signers = [payer, memeMintKeypair];
-    if (memeTicketKeypair) {
-      signers.push(memeTicketKeypair);
-    }
 
     const createPoolMethod = getSendAndConfirmTransactionMethod({
       connection: client.connection,
@@ -384,17 +382,13 @@ export class BoundPoolClient {
   public static async getOutputAmountForNewPoolWithBuyMemeTx(args: BoundPoolWithBuyMemeArgs): Promise<string> {
     const { payer, client } = args;
 
-    const { createPoolTransaction, memeMintKeypair, memeTicketKeypair } =
+    const { createPoolTransaction, memeMintKeypair } =
       await this.getCreateNewBondingPoolAndBuyAndTokenWithBuyMemeTransaction({
         ...args,
         payer: payer.publicKey,
       });
 
     const signers = [payer, memeMintKeypair, client.simulationKeypair];
-    if (memeTicketKeypair) {
-      signers.push(memeTicketKeypair);
-    }
-
     const result = await client.connection.simulateTransaction(createPoolTransaction, signers, true);
 
     // If error happened (e.g. pool is locked)
@@ -471,14 +465,21 @@ export class BoundPoolClient {
   }
 
   public async swapY(input: SwapYArgs): Promise<MemeTicketClient> {
-    const id = Keypair.generate();
+    // const id = Keypair.generate();
     const user = input.user!;
     const payer = input.payer!;
+    const memeTicketNumber = input.memeTicketNumber!;
 
     const pool = input.pool ?? this.id;
     const poolSignerPda = BoundPoolClient.findSignerPda(pool, this.client.memechanProgram.programId);
     const solIn = input.quoteAmountIn;
     const memeOut = input.memeTokensOut;
+
+    const memeTicketPublicKey = MemeTicketClient.getMemeTicketPDA({
+      ticketNumber: memeTicketNumber,
+      poolId: pool,
+      userId: user.publicKey,
+    });
 
     const userQuoteAcc =
       input.userSolAcc ??
@@ -498,9 +499,9 @@ export class BoundPoolClient {
     console.log("memeOut: ", memeOut);
 
     await this.client.memechanProgram.methods
-      .swapY(new BN(solIn), new BN(memeOut))
+      .swapY(new BN(solIn), new BN(memeOut), new BN(memeTicketNumber))
       .accounts({
-        memeTicket: id.publicKey,
+        memeTicket: memeTicketPublicKey,
         owner: user.publicKey,
         pool: pool,
         poolSignerPda: poolSignerPda,
@@ -509,10 +510,10 @@ export class BoundPoolClient {
         systemProgram: SystemProgram.programId,
         tokenProgram: TOKEN_PROGRAM_ID,
       })
-      .signers([user, id])
+      .signers([user])
       .rpc({ skipPreflight: true, commitment: "confirmed", preflightCommitment: "confirmed" });
 
-    return new MemeTicketClient(id.publicKey, this.client);
+    return new MemeTicketClient(memeTicketPublicKey, this.client);
   }
 
   /**
@@ -524,12 +525,12 @@ export class BoundPoolClient {
    */
   public async buyMeme(input: BuyMemeArgs): Promise<string> {
     // TODO: Check whether user has enough amount of quoute token
-    const { tx, memeTicketKeypair } = await this.getBuyMemeTransaction(input);
+    const { tx } = await this.getBuyMemeTransaction(input);
 
     const txMethod = getSendAndConfirmTransactionMethod({
       connection: this.client.connection,
       transaction: tx,
-      signers: [input.signer, memeTicketKeypair],
+      signers: [input.signer],
     });
 
     return await txMethod();
@@ -545,12 +546,25 @@ export class BoundPoolClient {
    * @untested This method is untested and may contain bugs.
    */
   public async getBuyMemeTransaction(input: GetBuyMemeTransactionArgs): Promise<GetBuyMemeTransactionOutput> {
-    const { inputAmount, minOutputAmount, slippagePercentage, user, transaction = new Transaction() } = input;
+    const {
+      inputAmount,
+      minOutputAmount,
+      slippagePercentage,
+      user,
+      transaction = new Transaction(),
+      memeTicketNumber,
+    } = input;
     let { inputTokenAccount } = input;
 
     const pool = this.id;
     const poolSignerPda = this.findSignerPda();
-    const memeTicketKeypair = Keypair.generate();
+    const ticketNumberBN = new BN(memeTicketNumber);
+
+    const memeTicketPublicKey = MemeTicketClient.getMemeTicketPDA({
+      ticketNumber: memeTicketNumber,
+      poolId: pool,
+      userId: user,
+    });
     const connection = this.client.connection;
 
     // input
@@ -566,7 +580,6 @@ export class BoundPoolClient {
       MEMECHAN_MEME_TOKEN_DECIMALS,
     );
     const minOutputBN = new BN(minOutputNormalized.toString());
-
     // If `inputTokenAccount` is not passed in args, we need to find out, whether a quote account for an admin
     // already exists
     if (!inputTokenAccount) {
@@ -599,9 +612,8 @@ export class BoundPoolClient {
     }
 
     const buyMemeInstruction = await this.client.memechanProgram.methods
-      .swapY(inputAmountBN, minOutputBN)
+      .swapY(inputAmountBN, minOutputBN, ticketNumberBN)
       .accounts({
-        memeTicket: memeTicketKeypair.publicKey,
         owner: user,
         pool: pool,
         poolSignerPda: poolSignerPda,
@@ -609,6 +621,7 @@ export class BoundPoolClient {
         userSol: inputTokenAccount,
         systemProgram: SystemProgram.programId,
         tokenProgram: TOKEN_PROGRAM_ID,
+        memeTicket: memeTicketPublicKey,
       })
       .instruction();
 
@@ -620,7 +633,7 @@ export class BoundPoolClient {
 
     transaction.add(buyMemeInstruction);
 
-    return { tx: transaction, memeTicketKeypair, inputTokenAccount };
+    return { tx: transaction, memeTicketPublicKey, inputTokenAccount };
   }
 
   /**
@@ -645,13 +658,17 @@ export class BoundPoolClient {
       poolSignerPda,
       quoteVault,
       client,
+      memeTicketNumber,
     } = input;
     let { inputTokenAccount } = input;
 
     const pool = boundPoolId;
-    // const poolSignerPda = this.findSignerPda();
-    const memeTicketKeypair = Keypair.generate();
-    // const connection = this.client.connection;
+    const ticketNumberBN = new BN(memeTicketNumber);
+    const memeTicketPublicKey = MemeTicketClient.getMemeTicketPDA({
+      ticketNumber: memeTicketNumber,
+      poolId: pool,
+      userId: user,
+    });
 
     // input
     const inputAmountWithDecimals = normalizeInputCoinAmount(inputAmount, MEMECHAN_QUOTE_TOKEN_DECIMALS);
@@ -699,9 +716,9 @@ export class BoundPoolClient {
     }
 
     const buyMemeInstruction = await client.memechanProgram.methods
-      .swapY(inputAmountBN, minOutputBN)
+      .swapY(inputAmountBN, minOutputBN, ticketNumberBN)
       .accounts({
-        memeTicket: memeTicketKeypair.publicKey,
+        memeTicket: memeTicketPublicKey,
         owner: user,
         pool: pool,
         poolSignerPda: poolSignerPda,
@@ -714,7 +731,7 @@ export class BoundPoolClient {
 
     transaction.add(buyMemeInstruction);
 
-    return { tx: transaction, memeTicketKeypair, inputTokenAccount };
+    return { tx: transaction, memeTicketPublicKey, inputTokenAccount };
   }
 
   // TODO(?): Handle for 0 input
@@ -788,7 +805,7 @@ export class BoundPoolClient {
     const connection = this.client.connection;
 
     // Check that user has enough available tickets
-    const { availableAmountWithDecimals, tickets } = await MemeTicketClient.fetchAvailableTicketsByUser(
+    const { availableAmountWithDecimals, tickets } = await MemeTicketClient.fetchAvailableTicketsByUser2(
       pool,
       this.client,
       user,

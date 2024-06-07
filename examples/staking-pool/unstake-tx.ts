@@ -7,8 +7,8 @@ import { MemeTicketClient, StakingPoolClient } from "../../src";
 // yarn tsx examples/staking-pool/unstake-tx.ts > unstake-tx.txt 2>&1
 export const unstake = async () => {
   try {
-    const boundPoolAddress = new PublicKey("4FjqPg6rcp9W5nfNh5SiCaSv9mqbnn3h7AJ4y6TFPMnf");
-    const stakingPoolAddress = new PublicKey("EWuDJ1xifbipiDRm5mwgoGEwY4qFH6ApFT6PMet98Qfc");
+    const boundPoolAddress = new PublicKey("2paxDkj5zFR3DtMVZtmTSbkMYZwFtVZnq2Xv1WFHqgPo");
+    const stakingPoolAddress = new PublicKey("sh5hozk6bENHvG4J5zrqW2S5eKjp68DRPZodCRLSkJU");
 
     // Get staking pool
     const stakingPool = await StakingPoolClient.fromStakingPoolId({ client, poolAccountAddressId: stakingPoolAddress });
@@ -20,7 +20,7 @@ export const unstake = async () => {
     }
 
     // Get all user tickets
-    const { tickets } = await MemeTicketClient.fetchAvailableTicketsByUser(boundPoolAddress, client, payer.publicKey);
+    const { tickets } = await MemeTicketClient.fetchAvailableTicketsByUser2(boundPoolAddress, client, payer.publicKey);
     console.log("tickets:", tickets);
 
     if (tickets.length === 0) {
@@ -29,11 +29,11 @@ export const unstake = async () => {
     }
 
     // Get available unstake amount
-    const amount = await stakingPool.getAvailableUnstakeAmount({
+    const availableAmount = await stakingPool.getAvailableUnstakeAmount({
       tickets: tickets.map((ticket) => ticket.fields),
       stakingPoolVestingConfig: fetchedStakingPool.vestingConfig,
     });
-    console.log("amount:", amount);
+    console.log("available amount:", availableAmount);
 
     // Merge all the tickets into one, because `unstake` method receives only one ticket
     const [destinationTicket, ...sourceTickets] = tickets;
@@ -54,7 +54,8 @@ export const unstake = async () => {
       console.log("[unstake] Nothing to merge, only one ticket available.");
     }
 
-    console.log("[unstake] Unstaking...");
+    const amount = 1000;
+    console.log("[unstake] Unstaking amount: " + amount);
 
     // Unstake
     const transaction = await stakingPool.getUnstakeTransaction({
