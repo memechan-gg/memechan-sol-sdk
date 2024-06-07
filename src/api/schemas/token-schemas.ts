@@ -46,6 +46,8 @@ export const solanaTokenSchema = z.object({
   socialLinks: solanaSocialLinks.nullish(),
   txDigest: z.string(),
   creationTime: z.number(),
+  holdersCount: z.number().optional(),
+  slerfIn: z.number().optional(),
 });
 
 export const solanaTokenMetadata = z.object({
