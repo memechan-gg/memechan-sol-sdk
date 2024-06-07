@@ -15,7 +15,9 @@ export function test() {
       const boundPool = await BoundPoolClient.newWithBuyTx(DEFAULT_BOUND_POOL_WITH_BUY_MEME_ARGS);
       console.log("==== pool id: " + boundPool.id.toString() + ", " + new Date().toUTCString());
 
-      const tickets: MemeTicketClient[] = [];
+      const tickets = await MemeTicketClient.fetchTicketsByUser2(boundPool.id, client, payer.publicKey);
+      let memeTicketNumber = tickets.length + MemeTicketClient.TICKET_NUMBER_START;
+      const ticketClients: MemeTicketClient[] = [];
 
       const ticketId = await boundPool.swapY({
         payer: payer,
@@ -24,9 +26,10 @@ export function test() {
         quoteAmountIn: new BN(500 * 1e9),
         quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
         pool: boundPool.id,
+        memeTicketNumber: memeTicketNumber++, // +1
       });
 
-      tickets.push(new MemeTicketClient(ticketId.id, client));
+      ticketClients.push(new MemeTicketClient(ticketId.id, client));
       console.log("swapY ticketId: " + ticketId.id.toBase58() + ", " + new Date().toUTCString());
 
       const ticketId2 = await boundPool.swapY({
@@ -36,9 +39,10 @@ export function test() {
         quoteAmountIn: new BN(499 * 1e9),
         quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
         pool: boundPool.id,
+        memeTicketNumber: memeTicketNumber++, // +1
       });
 
-      tickets.push(new MemeTicketClient(ticketId2.id, client));
+      ticketClients.push(new MemeTicketClient(ticketId2.id, client));
       console.log("swapY ticketId2: " + ticketId2.id.toBase58() + ", " + new Date().toUTCString());
 
       const boundPoolInfo = await BoundPoolClient.fetch2(client.connection, boundPool.id);
@@ -78,12 +82,16 @@ export function test() {
 
       console.log("minOutputAmount: " + minOutputAmount);
 
+      const tickets = await MemeTicketClient.fetchTicketsByUser2(pool.id, client, payer.publicKey);
+      const memeTicketNumber = tickets.length + MemeTicketClient.TICKET_NUMBER_START;
+
       const res = await pool.buyMeme({
         inputAmount: inputAmount,
         minOutputAmount: minOutputAmount,
         slippagePercentage: 0,
         user: payer.publicKey,
         signer: payer,
+        memeTicketNumber,
       });
 
       console.log("buymeme result: " + res);
@@ -127,6 +135,9 @@ export function test() {
 
       console.log("==== pool id: " + pool.id.toString());
 
+      const tickets = await MemeTicketClient.fetchTicketsByUser2(pool.id, client, payer.publicKey);
+      let memeTicketNumber = tickets.length + MemeTicketClient.TICKET_NUMBER_START;
+
       for (let i = 0; i < 11; i++) {
         const ticketId = await pool.swapY({
           payer: payer,
@@ -135,6 +146,7 @@ export function test() {
           quoteAmountIn: new BN(4000 * 1e9),
           quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
           pool: pool.id,
+          memeTicketNumber: memeTicketNumber++, // +1
         });
 
         console.log("swapY (" + i + ") ticketId: " + ticketId.id.toBase58());

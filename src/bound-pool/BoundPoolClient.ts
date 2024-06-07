@@ -805,7 +805,7 @@ export class BoundPoolClient {
     const connection = this.client.connection;
 
     // Check that user has enough available tickets
-    const { availableAmountWithDecimals, tickets } = await MemeTicketClient.fetchAvailableTicketsByUser(
+    const { availableAmountWithDecimals, tickets } = await MemeTicketClient.fetchAvailableTicketsByUser2(
       pool,
       this.client,
       user,

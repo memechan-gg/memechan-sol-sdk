@@ -3,6 +3,7 @@ import { BoundPoolClient } from "../src/bound-pool/BoundPoolClient";
 import { DUMMY_TOKEN_METADATA, admin, client, payer } from "./common/common";
 import { MEMECHAN_QUOTE_TOKEN } from "../src/config/config";
 import { connection } from "../examples/common";
+import { MemeTicketClient } from "../src";
 
 export function test() {
   describe("SwapY", () => {
@@ -16,6 +17,8 @@ export function test() {
       });
 
       console.log("==== swapy pool id: " + pool.id.toString());
+      const tickets = await MemeTicketClient.fetchTicketsByUser2(pool.id, client, payer.publicKey);
+      const memeTicketNumber = tickets.length + MemeTicketClient.TICKET_NUMBER_START;
 
       // call to the swap endpoint
       const ticketId = await pool.swapY({
@@ -25,6 +28,7 @@ export function test() {
         quoteAmountIn: new BN(1000 * 1e9),
         quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
         pool: pool.id,
+        memeTicketNumber,
       });
 
       console.log("swapY ticketId: " + ticketId.id.toBase58());
@@ -41,6 +45,9 @@ export function test() {
 
       console.log("==== swapy pool id: " + pool.id.toString());
 
+      const tickets = await MemeTicketClient.fetchTicketsByUser2(pool.id, client, payer.publicKey);
+      const memeTicketNumber = tickets.length + MemeTicketClient.TICKET_NUMBER_START;
+
       // call to the swap endpoint
       const ticketId = await pool.swapY({
         payer: payer,
@@ -49,6 +56,7 @@ export function test() {
         quoteAmountIn: new BN(1),
         quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
         pool: pool.id,
+        memeTicketNumber,
       });
 
       console.log("swapY ticketId: " + ticketId.id.toBase58());
@@ -68,6 +76,9 @@ export function test() {
 
       console.log("==== swapy pool id: " + pool.id.toString());
 
+      const tickets = await MemeTicketClient.fetchTicketsByUser2(pool.id, client, payer.publicKey);
+      const memeTicketNumber = tickets.length + MemeTicketClient.TICKET_NUMBER_START;
+
       // call to the swap endpoint
       const ticketId = await pool.swapY({
         payer: payer,
@@ -76,6 +87,7 @@ export function test() {
         quoteAmountIn: new BN(2),
         quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
         pool: pool.id,
+        memeTicketNumber,
       });
 
       console.log("swapY ticketId: " + ticketId.id.toBase58());
@@ -93,6 +105,8 @@ export function test() {
       });
 
       console.log("==== swapy pool id: " + pool.id.toString());
+      const tickets = await MemeTicketClient.fetchTicketsByUser2(pool.id, client, payer.publicKey);
+      const memeTicketNumber = tickets.length + MemeTicketClient.TICKET_NUMBER_START;
 
       // call to the swap endpoint
       const ticketId = await pool.swapY({
@@ -102,6 +116,7 @@ export function test() {
         quoteAmountIn: new BN("999999999999999999"),
         quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
         pool: pool.id,
+        memeTicketNumber: memeTicketNumber,
       });
 
       console.log("swapY ticketId: " + ticketId.id.toBase58());
@@ -120,6 +135,9 @@ export function test() {
 
       console.log("==== swapy pool id: " + pool.id.toString());
 
+      const tickets = await MemeTicketClient.fetchTicketsByUser2(pool.id, client, payer.publicKey);
+      const memeTicketNumber = tickets.length + MemeTicketClient.TICKET_NUMBER_START;
+
       // call to the swap endpoint
       const ticketId = await pool.swapY({
         payer: payer,
@@ -128,6 +146,7 @@ export function test() {
         quoteAmountIn: new BN(40_201_005_025_126), // exact value 40201.005025126
         quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
         pool: pool.id,
+        memeTicketNumber,
       });
 
       console.log("swapY ticketId: " + ticketId.id.toBase58());
@@ -156,6 +175,7 @@ export function test() {
         quoteAmountIn: new BN(40_201_005_000_000), // below exact value 40201.005
         quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
         pool: pool.id,
+        memeTicketNumber: 1,
       });
 
       console.log("swapY ticketId: " + ticketId.id.toBase58());
@@ -185,6 +205,7 @@ export function test() {
           quoteAmountIn: new BN(0),
           quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
           pool: pool.id,
+          memeTicketNumber: 1,
         }),
       ).rejects.toThrow();
       await expect(
@@ -195,6 +216,7 @@ export function test() {
           quoteAmountIn: new BN(0),
           quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
           pool: pool.id,
+          memeTicketNumber: 1,
         }),
       ).rejects.toThrow();
     }, 220000);
@@ -219,6 +241,7 @@ export function test() {
         quoteAmountIn: new BN(-1000 * 1e9),
         quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
         pool: pool.id,
+        memeTicketNumber: 1,
       });
 
       console.log("swaps negative swapY ticketId: " + ticketId.id.toBase58());

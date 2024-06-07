@@ -20,9 +20,11 @@ export function test() {
     it("merge tickets presale", async () => {
       const pool = await BoundPoolClient.fromBoundPoolId({ client, poolAccountAddressId: LIVE_BOUND_POOL_ID });
 
-      const tickets: MemeTicketClient[] = [];
+      const ticketClients: MemeTicketClient[] = [];
+      const tickets = await MemeTicketClient.fetchTicketsByUser2(pool.id, client, payer.publicKey);
+      let memeTicketNumber = tickets.length + MemeTicketClient.TICKET_NUMBER_START;
 
-      tickets.push(
+      ticketClients.push(
         await pool.swapY({
           payer: payer,
           user: payer,
@@ -30,12 +32,13 @@ export function test() {
           quoteAmountIn: new BN(1000),
           quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
           pool: pool.id,
+          memeTicketNumber: memeTicketNumber++, // +1
         }),
       );
 
-      console.log("ticket1: " + tickets[0].id.toBase58());
+      console.log("ticket1: " + ticketClients[0].id.toBase58());
 
-      tickets.push(
+      ticketClients.push(
         await pool.swapY({
           payer: payer,
           user: payer,
@@ -43,12 +46,13 @@ export function test() {
           quoteAmountIn: new BN(2000),
           quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
           pool: pool.id,
+          memeTicketNumber: memeTicketNumber++, // +1
         }),
       );
 
-      console.log("ticket2: " + tickets[1].id.toBase58());
+      console.log("ticket2: " + ticketClients[1].id.toBase58());
 
-      tickets.push(
+      ticketClients.push(
         await pool.swapY({
           payer: payer,
           user: payer,
@@ -56,14 +60,15 @@ export function test() {
           quoteAmountIn: new BN(3000),
           quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
           pool: pool.id,
+          memeTicketNumber: memeTicketNumber++, // +1
         }),
       );
 
-      console.log("ticket3: " + tickets[2].id.toBase58());
+      console.log("ticket3: " + ticketClients[2].id.toBase58());
 
-      const mergedTicket = await tickets[0].boundMerge({
+      const mergedTicket = await ticketClients[0].boundMerge({
         pool: pool.id,
-        ticketsToMerge: [tickets[1], tickets[2]],
+        ticketsToMerge: [ticketClients[1], ticketClients[2]],
         user: payer.publicKey,
         signer: payer,
       });
@@ -80,9 +85,12 @@ export function test() {
         tokenMetadata: DUMMY_TOKEN_METADATA,
       });
 
-      const tickets: MemeTicketClient[] = [];
+      const ticketClients: MemeTicketClient[] = [];
 
-      tickets.push(
+      const tickets = await MemeTicketClient.fetchTicketsByUser2(pool.id, client, payer.publicKey);
+      let memeTicketNumber = tickets.length + MemeTicketClient.TICKET_NUMBER_START;
+
+      ticketClients.push(
         await pool.swapY({
           payer: payer,
           user: payer,
@@ -90,12 +98,13 @@ export function test() {
           quoteAmountIn: new BN(1000),
           quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
           pool: pool.id,
+          memeTicketNumber: memeTicketNumber++, // +1
         }),
       );
 
       console.log("ticket1: " + tickets[0].id.toBase58());
 
-      tickets.push(
+      ticketClients.push(
         await pool.swapY({
           payer: payer,
           user: payer,
@@ -103,12 +112,13 @@ export function test() {
           quoteAmountIn: new BN(2000),
           quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
           pool: pool.id,
+          memeTicketNumber: memeTicketNumber++, // +1
         }),
       );
 
       console.log("ticket2: " + tickets[1].id.toBase58());
 
-      tickets.push(
+      ticketClients.push(
         await pool.swapY({
           payer: payer,
           user: payer,
@@ -116,6 +126,7 @@ export function test() {
           quoteAmountIn: new BN(3000),
           quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
           pool: pool.id,
+          memeTicketNumber: memeTicketNumber++, // +1
         }),
       );
 
@@ -143,9 +154,9 @@ export function test() {
         quoteVault: stakingQuoteVault,
       });
 
-      const mergedTicket = await tickets[0].stakingMerge({
+      const mergedTicket = await ticketClients[0].stakingMerge({
         staking: stakingPool.id,
-        ticketsToMerge: [tickets[1], tickets[2]],
+        ticketsToMerge: [ticketClients[1], ticketClients[2]],
         user: payer.publicKey,
         signer: payer,
       });
@@ -155,6 +166,8 @@ export function test() {
 
     it("close ticket", async () => {
       const pool = await BoundPoolClient.fromBoundPoolId({ client, poolAccountAddressId: LIVE_BOUND_POOL_ID });
+      const tickets = await MemeTicketClient.fetchTicketsByUser2(pool.id, client, payer.publicKey);
+      const memeTicketNumber = tickets.length + MemeTicketClient.TICKET_NUMBER_START;
 
       const ticket = await pool.swapY({
         payer: payer,
@@ -163,6 +176,7 @@ export function test() {
         quoteAmountIn: new BN(1000),
         quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
         pool: pool.id,
+        memeTicketNumber,
       });
 
       console.log("ticket: " + ticket.id.toBase58());
