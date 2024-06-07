@@ -39,7 +39,25 @@ export class MemeTicketClient {
     return await program.account.memeTicket.all();
   }
 
-  public static findTicketPda({ poolPubKey, userPubKey }: { poolPubKey: PublicKey; user: PublicKey }) {}
+  public static getMemeTicketPDA(
+    no: number,
+    poolId: PublicKey,
+    userId: PublicKey,
+    memechanProgramId: PublicKey,
+  ): PublicKey {
+    // 8 bytes array
+    const dv = new DataView(new ArrayBuffer(8), 0);
+    // set u64 in little endian format
+    dv.setBigUint64(0, BigInt(no), true);
+
+    // find pda
+    const pda = PublicKey.findProgramAddressSync(
+      [poolId.toBytes(), userId.toBytes(), new Uint8Array(dv.buffer)],
+      memechanProgramId,
+    )[0];
+
+    return pda;
+  }
 
   public async getBoundMergeTransaction({
     transaction,
