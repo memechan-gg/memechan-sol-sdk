@@ -4,11 +4,11 @@ import { client } from "../../common";
 
 // yarn tsx examples/bonding-pool/trading/get-output-amount-for-buy-meme.ts
 (async () => {
-  const poolAccountAddressId = new PublicKey("8T83gG397gcCaFh8hLiMECmhrmkLS7vtptMeLvCgwKde");
+  const poolAccountAddressId = new PublicKey("2ST4K87fWWYdeJ5SWyrv7bdSZmd3cYoqsthDeQZZn2TY");
   const boundPoolInstance = await BoundPoolClient.fromBoundPoolId({ client, poolAccountAddressId });
 
   const res = await boundPoolInstance.getOutputAmountForBuyMeme({
-    inputAmount: "0.568",
+    inputAmount: "312",
     slippagePercentage: 0,
   });
 
