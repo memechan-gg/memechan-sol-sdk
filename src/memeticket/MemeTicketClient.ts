@@ -40,7 +40,7 @@ export class MemeTicketClient {
   }
 
   public static getMemeTicketPDA(
-    no: number,
+    ticketNumber: number,
     poolId: PublicKey,
     userId: PublicKey,
     memechanProgramId: PublicKey,
@@ -48,7 +48,7 @@ export class MemeTicketClient {
     // 8 bytes array
     const dv = new DataView(new ArrayBuffer(8), 0);
     // set u64 in little endian format
-    dv.setBigUint64(0, BigInt(no), true);
+    dv.setBigUint64(0, BigInt(ticketNumber), true);
 
     // find pda
     const pda = PublicKey.findProgramAddressSync(
