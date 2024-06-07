@@ -256,7 +256,7 @@ export class MemeTicketClient {
     pool: PublicKey,
     client: MemechanClient,
     user: PublicKey,
-  ): Promise<ParsedMemeTicket[]> {
+  ): Promise<ReturnType<typeof MemeTicketClient.fetchTicketsByIds>> {
     // TODO: Iterate until we'll not reach empty tickets
     const ticketsList = MemeTicketClient.getFirstHunderTicketsPubkeys({ userId: user, poolId: pool });
     const ticketsIdsList = ticketsList.map((ticket) => ticket.toString());
@@ -266,7 +266,7 @@ export class MemeTicketClient {
   }
 
   public static async fetchAvailableTicketsByUser2(pool: PublicKey, client: MemechanClient, user: PublicKey) {
-    const tickets = await MemeTicketClient.fetchTicketsByUser2(pool, client, user);
+    const { tickets } = await MemeTicketClient.fetchTicketsByUser2(pool, client, user);
     const currentTimestamp = Date.now();
 
     const availableTickets = tickets.filter((ticket) => {
@@ -293,9 +293,18 @@ export class MemeTicketClient {
     const ticketIdPubkeys = ticketIds.map((id) => new PublicKey(id));
     const accountInfos = await connection.getMultipleAccountsInfo(ticketIdPubkeys);
 
+    const freeIndexes: number[] = [];
+    const lockedIndexes: number[] = [];
+
     const foundAccountsData: { accountInfo: AccountInfo<Buffer>; index: number }[] = accountInfos.reduce(
       (dataArray: { accountInfo: AccountInfo<Buffer>; index: number }[], accountInfo, index) => {
-        if (accountInfo !== null) dataArray.push({ accountInfo, index });
+        if (accountInfo !== null) {
+          dataArray.push({ accountInfo, index });
+          lockedIndexes.push(index);
+        } else {
+          freeIndexes.push(index);
+        }
+
         return dataArray;
       },
       [],
@@ -314,7 +323,7 @@ export class MemeTicketClient {
       };
     });
 
-    return parsedTickets;
+    return { tickets: parsedTickets, freeIndexes, lockedIndexes };
   }
 
   /**

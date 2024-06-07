@@ -17,7 +17,7 @@ export function test() {
       });
 
       console.log("==== swapy pool id: " + pool.id.toString());
-      const tickets = await MemeTicketClient.fetchTicketsByUser2(pool.id, client, payer.publicKey);
+      const { tickets } = await MemeTicketClient.fetchTicketsByUser2(pool.id, client, payer.publicKey);
       const memeTicketNumber = tickets.length + MemeTicketClient.TICKET_NUMBER_START;
 
       // call to the swap endpoint
@@ -45,7 +45,7 @@ export function test() {
 
       console.log("==== swapy pool id: " + pool.id.toString());
 
-      const tickets = await MemeTicketClient.fetchTicketsByUser2(pool.id, client, payer.publicKey);
+      const { tickets } = await MemeTicketClient.fetchTicketsByUser2(pool.id, client, payer.publicKey);
       const memeTicketNumber = tickets.length + MemeTicketClient.TICKET_NUMBER_START;
 
       // call to the swap endpoint
@@ -76,7 +76,7 @@ export function test() {
 
       console.log("==== swapy pool id: " + pool.id.toString());
 
-      const tickets = await MemeTicketClient.fetchTicketsByUser2(pool.id, client, payer.publicKey);
+      const { tickets } = await MemeTicketClient.fetchTicketsByUser2(pool.id, client, payer.publicKey);
       const memeTicketNumber = tickets.length + MemeTicketClient.TICKET_NUMBER_START;
 
       // call to the swap endpoint
@@ -105,7 +105,7 @@ export function test() {
       });
 
       console.log("==== swapy pool id: " + pool.id.toString());
-      const tickets = await MemeTicketClient.fetchTicketsByUser2(pool.id, client, payer.publicKey);
+      const { tickets } = await MemeTicketClient.fetchTicketsByUser2(pool.id, client, payer.publicKey);
       const memeTicketNumber = tickets.length + MemeTicketClient.TICKET_NUMBER_START;
 
       // call to the swap endpoint
@@ -135,7 +135,7 @@ export function test() {
 
       console.log("==== swapy pool id: " + pool.id.toString());
 
-      const tickets = await MemeTicketClient.fetchTicketsByUser2(pool.id, client, payer.publicKey);
+      const { tickets } = await MemeTicketClient.fetchTicketsByUser2(pool.id, client, payer.publicKey);
       const memeTicketNumber = tickets.length + MemeTicketClient.TICKET_NUMBER_START;
 
       // call to the swap endpoint

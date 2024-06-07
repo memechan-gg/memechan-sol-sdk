@@ -16,7 +16,7 @@ export const getAvailableWithdrawFeesAmount = async () => {
   // call addfees to accumulate fees
   await stakingPool.addFees({ payer, ammPoolId: ammPoolAddress });
 
-  const tickets = await MemeTicketClient.fetchTicketsByUser2(boundPoolAddress, client, payer.publicKey);
+  const { tickets } = await MemeTicketClient.fetchTicketsByUser2(boundPoolAddress, client, payer.publicKey);
   const ticketFields = tickets.map((ticket) => ticket.fields);
 
   // Get available withdraw fees amount

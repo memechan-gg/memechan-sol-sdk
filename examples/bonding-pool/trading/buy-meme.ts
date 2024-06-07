@@ -17,7 +17,7 @@ import { MemeTicketClient } from "../../../src";
 
   console.debug("minOutputAmount: ", minOutputAmount);
 
-  const tickets = await MemeTicketClient.fetchTicketsByUser2(poolAccountAddressId, client, payer.publicKey);
+  const { tickets } = await MemeTicketClient.fetchTicketsByUser2(poolAccountAddressId, client, payer.publicKey);
   const memeTicketNumber = tickets.length + MemeTicketClient.TICKET_NUMBER_START;
 
   console.debug("memeTicketNumber: ", memeTicketNumber);
