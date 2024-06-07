@@ -14,3 +14,4 @@ export { withdrawFees, WithdrawFeesAccounts } from "./withdrawFees";
 export { boundMergeTickets, BoundMergeTicketsAccounts } from "./boundMergeTickets";
 export { stakingMergeTickets, StakingMergeTicketsAccounts } from "./stakingMergeTickets";
 export { closeTicket, CloseTicketAccounts } from "./closeTicket";
+export { withdrawAdminFee, WithdrawAdminFeeAccounts } from "./withdrawAdminFee";

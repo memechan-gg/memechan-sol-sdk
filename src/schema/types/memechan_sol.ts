@@ -899,6 +899,44 @@ export type MemechanSol = {
       ];
       args: [];
     },
+    {
+      name: "withdrawAdminFee";
+      accounts: [
+        {
+          name: "sender";
+          isMut: true;
+          isSigner: true;
+        },
+        {
+          name: "pool";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "boundPoolSignerPda";
+          isMut: false;
+          isSigner: false;
+        },
+        {
+          name: "poolQuoteVault";
+          isMut: true;
+          isSigner: false;
+          docs: ["Bonding Pool Quote Vault"];
+        },
+        {
+          name: "feeVaultQuote";
+          isMut: true;
+          isSigner: false;
+          docs: ["Bonding Pool Fee Vault"];
+        },
+        {
+          name: "tokenProgram";
+          isMut: false;
+          isSigner: false;
+        },
+      ];
+      args: [];
+    },
   ];
   accounts: [
     {
@@ -2757,6 +2795,44 @@ export const IDL: MemechanSol = {
           name: "owner",
           isMut: true,
           isSigner: true,
+        },
+      ],
+      args: [],
+    },
+    {
+      name: "withdrawAdminFee",
+      accounts: [
+        {
+          name: "sender",
+          isMut: true,
+          isSigner: true,
+        },
+        {
+          name: "pool",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "boundPoolSignerPda",
+          isMut: false,
+          isSigner: false,
+        },
+        {
+          name: "poolQuoteVault",
+          isMut: true,
+          isSigner: false,
+          docs: ["Bonding Pool Quote Vault"],
+        },
+        {
+          name: "feeVaultQuote",
+          isMut: true,
+          isSigner: false,
+          docs: ["Bonding Pool Fee Vault"],
+        },
+        {
+          name: "tokenProgram",
+          isMut: false,
+          isSigner: false,
         },
       ],
       args: [],
