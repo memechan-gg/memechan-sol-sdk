@@ -16,7 +16,7 @@ export const goLive = async () => {
   console.log("boundPool:", boundPool);
   console.log("==== pool id: " + boundPool.id.toString());
 
-  const tickets = await MemeTicketClient.fetchTicketsByUser2(boundPool.id, client, payer.publicKey);
+  const { tickets } = await MemeTicketClient.fetchTicketsByUser2(boundPool.id, client, payer.publicKey);
   const memeTicketNumber = tickets.length + MemeTicketClient.TICKET_NUMBER_START;
 
   const ticketId = await boundPool.swapY({

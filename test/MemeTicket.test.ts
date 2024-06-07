@@ -21,7 +21,7 @@ export function test() {
       const pool = await BoundPoolClient.fromBoundPoolId({ client, poolAccountAddressId: LIVE_BOUND_POOL_ID });
 
       const ticketClients: MemeTicketClient[] = [];
-      const tickets = await MemeTicketClient.fetchTicketsByUser2(pool.id, client, payer.publicKey);
+      const { tickets } = await MemeTicketClient.fetchTicketsByUser2(pool.id, client, payer.publicKey);
       let memeTicketNumber = tickets.length + MemeTicketClient.TICKET_NUMBER_START;
 
       ticketClients.push(
@@ -87,7 +87,7 @@ export function test() {
 
       const ticketClients: MemeTicketClient[] = [];
 
-      const tickets = await MemeTicketClient.fetchTicketsByUser2(pool.id, client, payer.publicKey);
+      const { tickets } = await MemeTicketClient.fetchTicketsByUser2(pool.id, client, payer.publicKey);
       let memeTicketNumber = tickets.length + MemeTicketClient.TICKET_NUMBER_START;
 
       ticketClients.push(
@@ -166,7 +166,7 @@ export function test() {
 
     it("close ticket", async () => {
       const pool = await BoundPoolClient.fromBoundPoolId({ client, poolAccountAddressId: LIVE_BOUND_POOL_ID });
-      const tickets = await MemeTicketClient.fetchTicketsByUser2(pool.id, client, payer.publicKey);
+      const { tickets } = await MemeTicketClient.fetchTicketsByUser2(pool.id, client, payer.publicKey);
       const memeTicketNumber = tickets.length + MemeTicketClient.TICKET_NUMBER_START;
 
       const ticket = await pool.swapY({

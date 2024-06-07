@@ -19,7 +19,7 @@ export function test() {
       const mintUtils = new MintUtils(client.connection, payer);
       const getAccount1 = await mintUtils.getOrCreateTokenAccount(MEMECHAN_QUOTE_TOKEN.mint, payer, payer.publicKey);
 
-      const tickets = await MemeTicketClient.fetchTicketsByUser2(pool.id, client, payer.publicKey);
+      const { tickets } = await MemeTicketClient.fetchTicketsByUser2(pool.id, client, payer.publicKey);
       const memeTicketNumber = tickets.length + MemeTicketClient.TICKET_NUMBER_START;
 
       const ticketId = await pool.swapY({
