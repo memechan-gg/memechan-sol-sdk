@@ -10,7 +10,7 @@ import {
 import BigNumber from "bignumber.js";
 import { MemechanClient } from "../MemechanClient";
 import { MEMECHAN_MEME_TOKEN_DECIMALS, MEMECHAN_PROGRAM_ID } from "../config/config";
-import { MemeTicket as CodegenMemeTicket, MemeTicket, MemeTicketFields } from "../schema/codegen/accounts";
+import { MemeTicket, MemeTicketFields } from "../schema/codegen/accounts";
 import { MemechanSol } from "../schema/types/memechan_sol";
 import {
   BoundMerge,
