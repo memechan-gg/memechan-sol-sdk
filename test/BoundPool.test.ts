@@ -15,7 +15,7 @@ export function test() {
       const boundPool = await BoundPoolClient.newWithBuyTx(DEFAULT_BOUND_POOL_WITH_BUY_MEME_ARGS);
       console.log("==== pool id: " + boundPool.id.toString() + ", " + new Date().toUTCString());
 
-      const tickets = await MemeTicketClient.fetchTicketsByUser2(boundPool.id, client, payer.publicKey);
+      const { tickets } = await MemeTicketClient.fetchTicketsByUser2(boundPool.id, client, payer.publicKey);
       let memeTicketNumber = tickets.length + MemeTicketClient.TICKET_NUMBER_START;
       const ticketClients: MemeTicketClient[] = [];
 
@@ -82,7 +82,7 @@ export function test() {
 
       console.log("minOutputAmount: " + minOutputAmount);
 
-      const tickets = await MemeTicketClient.fetchTicketsByUser2(pool.id, client, payer.publicKey);
+      const { tickets } = await MemeTicketClient.fetchTicketsByUser2(pool.id, client, payer.publicKey);
       const memeTicketNumber = tickets.length + MemeTicketClient.TICKET_NUMBER_START;
 
       const res = await pool.buyMeme({
@@ -135,7 +135,7 @@ export function test() {
 
       console.log("==== pool id: " + pool.id.toString());
 
-      const tickets = await MemeTicketClient.fetchTicketsByUser2(pool.id, client, payer.publicKey);
+      const { tickets } = await MemeTicketClient.fetchTicketsByUser2(pool.id, client, payer.publicKey);
       let memeTicketNumber = tickets.length + MemeTicketClient.TICKET_NUMBER_START;
 
       for (let i = 0; i < 11; i++) {
