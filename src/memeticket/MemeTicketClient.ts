@@ -9,6 +9,7 @@ import {
 } from "@solana/web3.js";
 import BigNumber from "bignumber.js";
 import { MemechanClient } from "../MemechanClient";
+import { MEMECHAN_MEME_TOKEN_DECIMALS, MEMECHAN_PROGRAM_ID } from "../config/config";
 import { MemeTicket as CodegenMemeTicket, MemeTicket, MemeTicketFields } from "../schema/codegen/accounts";
 import { MemechanSol } from "../schema/types/memechan_sol";
 import {
@@ -21,7 +22,6 @@ import {
   StakingMerge,
 } from "./types";
 import { getOptimizedTransactions } from "./utils";
-import { MEMECHAN_MEME_TOKEN_DECIMALS, MEMECHAN_PROGRAM_ID } from "../config/config";
 
 export class MemeTicketClient {
   public constructor(
@@ -292,18 +292,24 @@ export class MemeTicketClient {
   public static async fetchTicketsByIds(ticketIds: string[], connection: Connection) {
     const ticketIdPubkeys = ticketIds.map((id) => new PublicKey(id));
     const accountInfos = await connection.getMultipleAccountsInfo(ticketIdPubkeys);
-    const foundAccountInfos = accountInfos.filter((info): info is AccountInfo<Buffer> => info !== null);
 
-    const decodedTickets = foundAccountInfos.map((info) => MemeTicket.decode(info.data));
+    const foundAccountsData: { accountInfo: AccountInfo<Buffer>; index: number }[] = accountInfos.reduce(
+      (dataArray: { accountInfo: AccountInfo<Buffer>; index: number }[], accountInfo, index) => {
+        if (accountInfo !== null) dataArray.push({ accountInfo, index });
+        return dataArray;
+      },
+      [],
+    );
 
-    const parsedTickets = decodedTickets.map((ticket, index) => {
+    const parsedTickets: ParsedMemeTicket[] = foundAccountsData.map(({ accountInfo, index }) => {
       const id = new PublicKey(ticketIds[index]);
-      const jsonTicket = ticket.toJSON();
+      const decodedTicket = MemeTicket.decode(accountInfo.data);
+      const jsonTicket = decodedTicket.toJSON();
 
       return {
         id,
         jsonFields: jsonTicket,
-        fields: ticket,
+        fields: decodedTicket,
         amountWithDecimals: new BigNumber(jsonTicket.amount).dividedBy(10 ** MEMECHAN_MEME_TOKEN_DECIMALS).toString(),
       };
     });
