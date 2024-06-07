@@ -43,6 +43,7 @@ export class StakingPoolClient {
     public lpVault: PublicKey,
     public lpMint: PublicKey,
     public quoteVault: PublicKey,
+    public raydiumAmm: PublicKey,
   ) {}
 
   public static async fromStakingPoolId({
@@ -66,6 +67,7 @@ export class StakingPoolClient {
       stakingPoolObjectData.lpVault,
       stakingPoolObjectData.lpMint,
       stakingPoolObjectData.quoteVault,
+      stakingPoolObjectData.raydiumAmm,
     );
 
     return boundClientInstance;
