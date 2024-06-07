@@ -898,6 +898,44 @@
         }
       ],
       "args": []
+    },
+    {
+      "name": "withdrawAdminFee",
+      "accounts": [
+        {
+          "name": "sender",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "pool",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "boundPoolSignerPda",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "poolQuoteVault",
+          "isMut": true,
+          "isSigner": false,
+          "docs": ["Bonding Pool Quote Vault"]
+        },
+        {
+          "name": "feeVaultQuote",
+          "isMut": true,
+          "isSigner": false,
+          "docs": ["Bonding Pool Fee Vault"]
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
     }
   ],
   "accounts": [
@@ -1860,8 +1898,5 @@
       "code": 6026,
       "name": "NoFeesToAdd"
     }
-  ],
-  "metadata": {
-    "address": "cYsHcSU42XESLPquuN1ga94jm1wVMg11wVcxqvofA3k"
-  }
+  ]
 }
