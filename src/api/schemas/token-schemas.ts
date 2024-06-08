@@ -47,7 +47,7 @@ export const solanaTokenSchema = z.object({
   txDigest: z.string(),
   creationTime: z.number(),
   holdersCount: z.number().optional(),
-  slerfIn: z.number().optional(),
+  slerfIn: z.string().nullish(),
 });
 
 export const solanaTokenMetadata = z.object({
