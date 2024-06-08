@@ -23,7 +23,7 @@ export const API_GATEWAY_FQDN = "h9crl8krnj.execute-api.us-east-1.amazonaws.com"
  *
  * @constant {string}
  */
-export const MEMECHAN_PROGRAM_ID = "cYsHcSU42XESLPquuN1ga94jm1wVMg11wVcxqvofA3k";
+export const MEMECHAN_PROGRAM_ID = "memeVtsr1AqAjfRzW2PuzymQdP2m7SgL6FQ1xgMc9MR";
 
 /**
  * The Memechan fee wallet id.
@@ -44,12 +44,10 @@ export const FEE_DESTINATION_ID = "7YttLkHDoNj9wyDur5pM1ejNaAvT9X4eqaYcHQqtj2G5"
 
 export const SLERF_MINT = new PublicKey("7BgBvyjrZX1YKz4oh9mjb8ZScatkkwb8DzFx7LoiVkM3");
 
-// TODO: Replace it with SLERF Mint when prod
-export const MEMECHAN_QUOTE_MINT = new PublicKey("9pECN2xxLQo22bFYpsNr3T3eW1UdEDtSqPQopFrGv7n4"); // dev fake slerf
-// export const MEMECHAN_QUOTE_MINT = SLERF_MINT;
-// TODO: Replace it with the actual value
-// export const MEMECHAN_TARGET_CONFIG = new PublicKey("CiXYgXYBwg9CvjYNcpjxjYViWbdDQVePhhZpWdwfEziN"); // prod
-export const MEMECHAN_TARGET_CONFIG = new PublicKey("EEeLC1a7qbK2mbvfYt8owGzQcBjYguE1FWhWYuGjyABu");
+// export const MEMECHAN_QUOTE_MINT = new PublicKey("9pECN2xxLQo22bFYpsNr3T3eW1UdEDtSqPQopFrGv7n4"); // dev fake slerf
+export const MEMECHAN_QUOTE_MINT = SLERF_MINT;
+export const MEMECHAN_TARGET_CONFIG = new PublicKey("5g13tz8GKWySjtzPRARuzzQM7LbMCUBMPGPef5PKe4JJ"); // prod
+// export const MEMECHAN_TARGET_CONFIG = new PublicKey("EEeLC1a7qbK2mbvfYt8owGzQcBjYguE1FWhWYuGjyABu"); // dev
 export const MEMECHAN_QUOTE_TOKEN_DECIMALS = 9; // current devnet quote token decimals
 export const MEMECHAN_QUOTE_TOKEN: Token = new Token(
   TOKEN_PROGRAM_ID,
@@ -73,7 +71,6 @@ export const DEFAULT_MAX_M = 800_000_000_000_000;
 export const DECIMALS_S = 1_000_000_000;
 
 export const MAX_TRANSACTION_SIZE = 1232;
-// TODO: CHANGE ADMIN IF NECCESSARY BEFORE PROD
 export const ADMIN_PUB_KEY = new PublicKey("KZbAoMgCcb2gDEn2Ucea86ux84y25y3ybbWQGQpd9D6");
 export const FULL_MEME_AMOUNT_CONVERTED = new BigNumber(DEFAULT_MAX_M_LP)
   .plus(DEFAULT_MAX_M)
