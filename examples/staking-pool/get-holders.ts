@@ -6,7 +6,7 @@ import { PublicKey } from "@solana/web3.js";
 export async function getHolders() {
   const stakingPool = await StakingPoolClient.fromStakingPoolId({
     client,
-    poolAccountAddressId: new PublicKey("7pt2VQv1h6VqHmFgm1R2xgAusvkzqPbabUGYdZRytkcs"),
+    poolAccountAddressId: new PublicKey("sh5hozk6bENHvG4J5zrqW2S5eKjp68DRPZodCRLSkJU"),
   });
   console.log("stakingPool:", stakingPool);
 
