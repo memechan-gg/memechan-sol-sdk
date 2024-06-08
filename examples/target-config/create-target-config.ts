@@ -1,10 +1,10 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import BN from "bn.js";
 import { TargetConfigClient, sleep } from "../../src";
 import {
   MEMECHAN_MEME_TOKEN_DECIMALS,
   MEMECHAN_QUOTE_TOKEN,
   MEMECHAN_QUOTE_TOKEN_DECIMALS,
-  MEMECHAN_TARGET_CONFIG,
   SLERF_MINT,
 } from "../../src/config/config";
 import { MintUtils } from "../../src/token/mintUtils";
@@ -19,7 +19,8 @@ export const createTargetConfig = async () => {
   const mint = SLERF_MINT;
 
   // const targetAmountRaw = 40_000;
-  const targetAmountRaw = 400;
+  // const targetAmountRaw = 400;
+  const targetAmountRaw = 30_000;
   const targetAmountBN = new BN(targetAmountRaw * 10 ** MEMECHAN_QUOTE_TOKEN_DECIMALS);
 
   console.log("targetconfig mint: " + mint.toString());
