@@ -230,7 +230,7 @@ export class LivePoolClient {
     const targetPoolInfo = await formatAmmKeysById(poolAddress, connection);
     const poolKeys = jsonInfo2PoolKeys(targetPoolInfo);
 
-    const quoteAmountIn = new TokenAmount(MEMECHAN_QUOTE_TOKEN, 10);
+    const quoteAmountIn = new TokenAmount(MEMECHAN_QUOTE_TOKEN, 1000);
     const tokenOut = new Token(TOKEN_PROGRAM_ID, poolKeys.baseMint, MEMECHAN_MEME_TOKEN_DECIMALS);
     const slippage = new Percent(1, 10000);
 
