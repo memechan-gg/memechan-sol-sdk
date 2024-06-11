@@ -2,6 +2,8 @@ import { TOKEN_PROGRAM_ID, Token } from "@raydium-io/raydium-sdk";
 import { PublicKey } from "@solana/web3.js";
 import BigNumber from "bignumber.js";
 
+export const BE_URL_DEV = "https://dmgrnigolfno6.cloudfront.net";
+
 /**
  * The base URL for the backend API for fetching off-chain data.
  * This endpoint ideally should point to the environment-specific endpoint, but currently it's only prod one
