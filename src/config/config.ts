@@ -89,3 +89,7 @@ export const CHUNK_SIZE_FOR_GET_MULTIPLE_ACCOUNTS = 100;
 // Vesting
 
 export const VESTING_PROGRAM_ID = new PublicKey("4JDLXnMpPN129YHbGTwn16hW6xt2QgkfdYPMAgMQAcV5");
+
+// Pre-sale
+
+export const PRESALE_ADDRESS = new PublicKey("AXen9e3RFS46k8n29TLsUc65ngnyPCB6L2pazyLZQEX5");
