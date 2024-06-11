@@ -1,4 +1,4 @@
-import { TokenAccountWithBNAmount } from "./types";
+import { TokenAccountWithBNAmount } from "../types";
 
 /**
  * Sorts an array of TokenAccountWithBNAmount objects by the amountBN property in descending order.
