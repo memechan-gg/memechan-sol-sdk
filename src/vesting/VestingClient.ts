@@ -75,20 +75,18 @@ export class VestingClient {
 
   public static async getClaimTransaction({
     amount,
-    user,
-    mint,
-    vesting,
+    vesting: { beneficiary, mint, vault },
     vestingId,
     transaction,
   }: GetClaimTransactionArgs) {
     const tx = transaction ?? new Transaction();
 
-    const userTokenAccount = getAssociatedTokenAddressSync(mint, user, false);
+    const userTokenAccount = getAssociatedTokenAddressSync(mint, beneficiary, false);
 
     const createATAIdempotentInstruction = createAssociatedTokenAccountIdempotentInstruction(
-      user,
+      beneficiary,
       userTokenAccount,
-      user,
+      beneficiary,
       mint,
     );
 
@@ -97,9 +95,9 @@ export class VestingClient {
     const withdrawIx = withdraw(
       { amount: amount },
       {
-        beneficiary: user,
+        beneficiary,
         userTokenAccount,
-        vault: vesting.vault,
+        vault,
         vesting: vestingId,
         vestingSigner: VestingClient.getVestingSigner(vestingId),
 
