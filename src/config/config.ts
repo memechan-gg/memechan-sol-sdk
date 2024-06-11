@@ -83,3 +83,7 @@ export const FULL_MEME_AMOUNT_CONVERTED = new BigNumber(DEFAULT_MAX_M_LP)
 export const endpoints = ["https://rpc1.memechan.xyz/"];
 
 export const CHUNK_SIZE_FOR_GET_MULTIPLE_ACCOUNTS = 100;
+
+// Vesting
+
+export const VESTING_PROGRAM_ID = new PublicKey("4JDLXnMpPN129YHbGTwn16hW6xt2QgkfdYPMAgMQAcV5");
