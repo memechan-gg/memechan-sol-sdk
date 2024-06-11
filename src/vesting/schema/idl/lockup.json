@@ -48,6 +48,10 @@
       ],
       "args": [
         {
+          "name": "vestingNumber",
+          "type": "u64"
+        },
+        {
           "name": "depositAmount",
           "type": "u64"
         },

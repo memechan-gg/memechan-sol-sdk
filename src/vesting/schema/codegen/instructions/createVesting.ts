@@ -4,6 +4,7 @@ import * as borsh from "@project-serum/borsh"; // eslint-disable-line @typescrip
 import { PROGRAM_ID } from "../programId";
 
 export interface CreateVestingArgs {
+  vestingNumber: BN;
   depositAmount: BN;
   startTs: BN;
   endTs: BN;
@@ -22,6 +23,7 @@ export interface CreateVestingAccounts {
 }
 
 export const layout = borsh.struct([
+  borsh.u64("vestingNumber"),
   borsh.u64("depositAmount"),
   borsh.i64("startTs"),
   borsh.i64("endTs"),
@@ -47,6 +49,7 @@ export function createVesting(args: CreateVestingArgs, accounts: CreateVestingAc
   const buffer = Buffer.alloc(1000);
   const len = layout.encode(
     {
+      vestingNumber: args.vestingNumber,
       depositAmount: args.depositAmount,
       startTs: args.startTs,
       endTs: args.endTs,

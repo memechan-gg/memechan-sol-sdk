@@ -48,6 +48,10 @@ export type Lockup = {
       ];
       args: [
         {
+          name: "vestingNumber";
+          type: "u64";
+        },
+        {
           name: "depositAmount";
           type: "u64";
         },
@@ -276,6 +280,10 @@ export const IDL: Lockup = {
         },
       ],
       args: [
+        {
+          name: "vestingNumber",
+          type: "u64",
+        },
         {
           name: "depositAmount",
           type: "u64",
