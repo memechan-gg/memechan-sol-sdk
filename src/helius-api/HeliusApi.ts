@@ -1,9 +1,10 @@
-import { PublicKey } from "@solana/web3.js";
+import { Connection, PublicKey } from "@solana/web3.js";
 import BigNumber from "bignumber.js";
 import { TokenAccount, isErrorResult, validateTokenAccountResponseData } from "./typeguard";
 import { sleep } from "../common/helpers";
 import { TokenAccountWithBNAmount } from "./types";
-import { sortByAmount } from "./utils";
+import { sortByAmount } from "./utils/sortByAmount";
+import { getSignatures } from "./utils/getSignatures";
 
 /**
  * Service class for handling helius-related calls.
@@ -88,5 +89,44 @@ export class HeliusApi {
     return { allOwners, allOwnersLength: allOwners.size, allOwnersList, sortedByAmountList };
   }
 
-  public async getAllTransactionSingaturesByAddress({ presaleAddress, startPresaleTimestamp, endPresaleTimestamp }) {}
+  public async getAllTransactionSingaturesByAddress({
+    address,
+    connection,
+  }: {
+    address: PublicKey;
+    connection: Connection;
+  }) {
+    let count = 0;
+    let signCount = 0;
+    const txList = [];
+
+    const signaturesProvider = getSignatures({
+      connection,
+      job: "findSignatureByPubkey",
+      publicKey: address,
+      limit: 1000,
+      // eslint-disable-next-line max-len
+      // untilTransactionSignature: "2f39jgK8NSA5pkYLjbDKsbVz2teYVev7rZEF2MYZSboE5fNUNLEsS4SdCAen8DJPAmgDrxngBGCqqBnXQWhtyPKs",
+    });
+
+    for await (const signatures of signaturesProvider) {
+      if (!signatures.length) {
+        console.log("[insertMissingAutoCompoundTransactions] no signatures ...");
+        continue;
+      }
+
+      count++;
+      signCount += signatures.length;
+      txList.push(signatures);
+
+      console.log(
+        "[getAllTransactionSingaturesByAddress]",
+        `Processing batch number ${count} of ${signatures.length} signatures, total sign count: ${signCount}`,
+      );
+    }
+
+    return {
+      txSignatureList: txList,
+    };
+  }
 }
