@@ -24,6 +24,8 @@
     "prettier-format": "prettier --config .prettierrc 'src/**/*.ts' --write",
     "codegen": "yarn run rimraf src/schema/codegen/ && yarn run anchor-client-gen src/schema/idl/memechan_sol.json src/schema/codegen/ && yarn run fix:generated",
     "fix:generated": "ESLINT_USE_FLAT_CONFIG=false yarn run eslint src/schema/codegen/ --fix && yarn run prettier --write src/schema/codegen/**/*.ts",
+    "codegen:vesting": "yarn run rimraf src/vesting/schema/codegen/ && yarn run anchor-client-gen src/vesting/schema/idl/lockup.json src/vesting/schema/codegen/ && yarn run fix:generated:vesting",
+    "fix:generated:vesting": "ESLINT_USE_FLAT_CONFIG=false yarn run eslint src/vesting/schema/codegen/ --fix && yarn run prettier --write src/vesting/schema/codegen/**/*.ts",
     "deploy": "yarn lint && yarn build && yarn publish --access restricted"
   },
   "dependencies": {

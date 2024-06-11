@@ -34,9 +34,9 @@ module.exports = {
     "prettier/prettier": [
       "error",
       {
-        "endOfLine": "auto"
-      }
-    ]
+        endOfLine: "auto",
+      },
+    ],
   },
   overrides: [
     {
@@ -55,7 +55,19 @@ module.exports = {
         "valid-jsdoc": "off",
         "require-jsdoc": "off",
         "max-len": "off",
-        camelcase: "off"
+        camelcase: "off",
+      },
+    },
+    {
+      files: ["src/vesting/schema/codegen/**/*"],
+      rules: {
+        "@typescript-eslint/ban-types": "off",
+        "@typescript-eslint/no-explicit-any": "off",
+        "@typescript-eslint/no-unused-vars": "off",
+        "valid-jsdoc": "off",
+        "require-jsdoc": "off",
+        "max-len": "off",
+        camelcase: "off",
       },
     },
   ],
