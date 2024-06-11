@@ -87,4 +87,6 @@ export class HeliusApi {
 
     return { allOwners, allOwnersLength: allOwners.size, allOwnersList, sortedByAmountList };
   }
+
+  public async getAllTransactionsByAddress({ presaleAddress, startPresaleTimestamp, endPresaleTimestamp }) {}
 }
