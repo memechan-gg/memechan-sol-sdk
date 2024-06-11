@@ -10,4 +10,5 @@ export type GetClaimTransactionArgs = {
   transaction?: Transaction;
   user: PublicKey;
   vestingId: PublicKey;
+  mint: PublicKey;
 };
