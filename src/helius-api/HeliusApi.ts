@@ -117,7 +117,7 @@ export class HeliusApi {
 
       count++;
       signCount += signatures.length;
-      txList.push(signatures);
+      txList.push(...signatures);
 
       console.log(
         "[getAllTransactionSingaturesByAddress]",
@@ -127,6 +127,7 @@ export class HeliusApi {
 
     return {
       txSignatureList: txList,
+      txSignatureListSize: txList.length,
     };
   }
 }
