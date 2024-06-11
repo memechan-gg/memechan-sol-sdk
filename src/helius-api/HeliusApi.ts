@@ -5,6 +5,7 @@ import { sleep } from "../common/helpers";
 import { TokenAccountWithBNAmount } from "./types";
 import { sortByAmount } from "./utils/sortByAmount";
 import { getSignatures } from "./utils/getSignatures";
+import { splitByChunk } from "../util/splitByChunk";
 
 /**
  * Service class for handling helius-related calls.
@@ -13,8 +14,12 @@ export class HeliusApi {
   /**
    * Constructs a new HeliusApi instance.
    * @param {string} heliusUrl - Helius private DAS api (not rpc one)
+   * @param {string} heliusApiKey - Helius api key
    */
-  constructor(private heliusUrl: string) {}
+  constructor(
+    private heliusUrl: string,
+    private heliusApiKey: string,
+  ) {}
 
   public async getTokenHolders({ mint }: { mint: PublicKey }) {
     let page = 1;
@@ -129,5 +134,34 @@ export class HeliusApi {
       txSignatureList: txList,
       txSignatureListSize: txList.length,
     };
+  }
+
+  public async getAllParsedTransactions({ signatures }: { signatures: string[] }) {
+    const MAX_CHUNK_SIZE_FOR_HELIUS_API = 100;
+    const signaturesChunks = splitByChunk(signatures, MAX_CHUNK_SIZE_FOR_HELIUS_API);
+
+    const parsedDataList = [];
+
+    // TODO: Handle 7wwNYSDQF3DX3QZZsEubdqtkpj1homTApvCULFuoJEo7 transferred a total 0.000011 SOL to multiple accounts.
+    // TODO: Handle errors
+    // TODO: Handle shape
+    for (const signatureChunk of signaturesChunks) {
+      const response = await fetch(`https://api.helius.xyz/v0/transactions?api-key=${this.heliusApiKey}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          transactions: signatureChunk,
+        }),
+      });
+      const data = await response.json();
+      parsedDataList.push(data);
+
+      // prevent rate-limit from helius api
+      await sleep(5_000);
+    }
+
+    return parsedDataList;
   }
 }
