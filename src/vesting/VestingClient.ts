@@ -15,7 +15,6 @@ import {
   createAssociatedTokenAccountIdempotentInstruction,
   getAssociatedTokenAddressSync,
 } from "@solana/spl-token";
-import { client } from "../../examples/common";
 
 export class VestingClient {
   public constructor(public id: PublicKey) {}
@@ -53,12 +52,11 @@ export class VestingClient {
     return vesting;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public static getVestingClaimableAmount({ vesting }: GetVestingClaimableAmountArgs) {
     const currentTsSeconds = Date.now() / 1000;
 
     if (currentTsSeconds < vesting.startTs.toNumber()) {
-      return BigNumber(0);
+      return new BigNumber(0);
     }
 
     const duration = vesting.endTs.sub(vesting.startTs);
@@ -72,14 +70,18 @@ export class VestingClient {
 
     const availableTokens = totalAvailable.sub(withdrawn);
 
-    return BigNumber(availableTokens.toString());
+    return new BigNumber(availableTokens.toString());
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public static async getClaimTransaction({ amount, user, mint, vestingId, transaction }: GetClaimTransactionArgs) {
+  public static async getClaimTransaction({
+    amount,
+    user,
+    mint,
+    vesting,
+    vestingId,
+    transaction,
+  }: GetClaimTransactionArgs) {
     const tx = transaction ?? new Transaction();
-
-    const vesting = (await Vesting.fetch(client.connection, vestingId))!;
 
     const userTokenAccount = getAssociatedTokenAddressSync(mint, user, false);
 
