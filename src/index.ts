@@ -5,6 +5,7 @@ export * from "./live-pool/LivePoolClient";
 export * from "./memeticket/MemeTicketClient";
 export * from "./staking-pool/StakingPoolClient";
 export * from "./targetconfig/TargetConfigClient";
+export * from "./vesting/VestingClient";
 
 // Client types
 export * from "./bound-pool/types";
@@ -12,6 +13,7 @@ export * from "./live-pool/types";
 export * from "./memeticket/types";
 export * from "./staking-pool/types";
 export * from "./targetconfig/types";
+export * from "./vesting/types";
 
 // Config
 export * from "./config/config";
@@ -47,6 +49,7 @@ export * from "./schema/codegen/accounts/MemeTicket";
 export * from "./schema/codegen/accounts/StakingPool";
 export * from "./schema/codegen/accounts/TargetConfig";
 export * from "./schema/types/memechan_sol";
+export * from "./vesting/schema/codegen/accounts/Vesting";
 
 // Utils
 export * from "./common/helpers";
