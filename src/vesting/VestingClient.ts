@@ -68,6 +68,9 @@ export class VestingClient {
     if (currentTsSeconds < vesting.startTs.toNumber()) {
       return new BigNumber(0);
     }
+    if (currentTsSeconds >= vesting.endTs.toNumber()) {
+      return new BigNumber(vesting.outstanding.toString());
+    }
 
     const duration = vesting.endTs.sub(vesting.startTs);
     const periodSeconds = duration.div(vesting.periodCount);
