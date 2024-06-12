@@ -15,6 +15,8 @@ import { readDataFromJsonFile, saveDataToJsonFile } from "../../utils";
   const { aggregatedTxsByOwnerList } = HeliusApiInstance.processAllParsedTransactions({
     parsedTransactionsList: parsedDataList,
     targetAddress: PRESALE_ADDRESS.toString(),
+    // fromTimestamp: 1717459200,
+    // toTimestamp: 1717894800,
     // TODO: Add timestampFrom and timestampTo
   });
 
@@ -61,6 +63,7 @@ import { readDataFromJsonFile, saveDataToJsonFile } from "../../utils";
   const userTokenAllocationDataFinal = userAllocations.map((el) => ({
     account: el.user,
     amount: el.tokenAllocationIncludingBonus,
+    amountUI: el.tokenAllocationIncludingBonus.dividedBy(10 ** CHAN_TOKEN_DECIMALS),
   }));
 
   saveDataToJsonFile(bonusAppliedData, "get-applied-bonus-data");
