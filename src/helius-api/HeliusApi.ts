@@ -2,7 +2,13 @@ import { Connection, PublicKey } from "@solana/web3.js";
 import BigNumber from "bignumber.js";
 import { TokenAccount, isErrorResult, validateTokenAccountResponseData } from "./typeguards/typeguard";
 import { sleep } from "../common/helpers";
-import { FilteredOutTxsDataByReason, ParsedTxData, TokenAccountWithBNAmount } from "./types";
+import {
+  AggregatedTxData,
+  AggregatedTxDataWithBonus,
+  FilteredOutTxsDataByReason,
+  ParsedTxData,
+  TokenAccountWithBNAmount,
+} from "./types";
 import { sortByAmount } from "./utils/sortByAmount";
 import { getSignatures } from "./utils/getSignatures";
 import { splitByChunk } from "../util/splitByChunk";
@@ -286,5 +292,58 @@ export class HeliusApi {
       aggregatedTxsByOwnerList,
       aggregatedTxsByOwnerListSize: aggregatedTxsByOwnerList.length,
     };
+  }
+
+  public getAppliedBonusDataByUser({
+    aggregatedListByUserAmounts,
+    bonusSignatureList,
+  }: {
+    aggregatedListByUserAmounts: AggregatedTxData[];
+    bonusSignatureList: string[];
+  }) {
+    const BONUS_PERCENTAGE = 5;
+
+    // Create a map from the bonusSignatureList, trimming any extra spaces
+    const bonusSignatureMap: Record<string, boolean> = {};
+    bonusSignatureList.forEach((signature) => {
+      const cleanSignature = signature.trim();
+      bonusSignatureMap[cleanSignature] = true;
+    });
+
+    let totalBonusTxs = 0;
+
+    // Process each AggregatedTxData to check for bonuses and modify accordingly
+    const bonusAppliedData: AggregatedTxDataWithBonus[] = aggregatedListByUserAmounts.map((data) => {
+      let hasBonus = false;
+
+      // Check if any transferData signature matches the bonusSignatureMap
+      data.transferData.forEach((transfer) => {
+        const cleanSignature = transfer.signature.trim();
+        const isTransferSignatureIsBonusSignature = bonusSignatureMap[cleanSignature];
+        if (isTransferSignatureIsBonusSignature) {
+          hasBonus = true;
+          totalBonusTxs++;
+        }
+      });
+
+      let totalIncludingBonusBN = data.totalBN;
+      if (hasBonus) {
+        const bonusAmount = data.totalBN.multipliedBy(BONUS_PERCENTAGE).dividedBy(100);
+        totalIncludingBonusBN = data.totalBN.plus(bonusAmount);
+      }
+
+      console.debug(`User ${data.user} ${hasBonus ? "gets" : "does not get"} the bonus.`);
+
+      return {
+        ...data,
+        bonus: hasBonus,
+        totalIncludingBonusBN,
+      };
+    });
+
+    console.debug(`All bonus txs length: ${bonusSignatureList.length}`);
+    console.debug(`Applied bonus txs length: ${totalBonusTxs}`);
+
+    return { bonusAppliedData };
   }
 }
