@@ -252,17 +252,19 @@ export class VestingClient {
   }
 
   public static getHoldersVestingData({
-    sortedHolders,
+    sortedPatsHolders,
+    usersWithoutPats,
     startTs,
   }: {
-    sortedHolders: TokenAccountWithBNAmount[];
+    sortedPatsHolders: TokenAccountWithBNAmount[];
+    usersWithoutPats: TokenAccountWithBNAmount[];
     startTs: number;
   }) {
-    const holdersCountDividedByDaysCount = new BigNumber(sortedHolders.length).div(
+    const holdersCountDividedByDaysCount = new BigNumber(sortedPatsHolders.length).div(
       VestingClient.MAX_VESTING_DAYS_COUNT,
     );
 
-    const vestingData = sortedHolders.reduce((data: UserVestingData[], { account, amountBN }, index) => {
+    const patsHoldersVestingData = sortedPatsHolders.reduce((data: UserVestingData[], { account, amountBN }, index) => {
       const userVestingPeriod = VestingClient.getHolderVestingPeriodInSeconds({
         holdersCountDividedByDaysCount,
         userNumber: index,
@@ -275,6 +277,17 @@ export class VestingClient {
       return data;
     }, []);
 
-    return vestingData;
+    const usersWithoutPatsVestingData = usersWithoutPats.map(({ account, amountBN }) => {
+      const vestingDays = new BigNumber(VestingClient.MAX_VESTING_DAYS_COUNT);
+      const vestingHours = vestingDays.multipliedBy(24);
+      const vestingMinutes = vestingHours.multipliedBy(60);
+      const vestingSeconds = vestingMinutes.multipliedBy(60).toNumber().toFixed();
+
+      const endTs = new BigNumber(startTs).plus(vestingSeconds).toNumber();
+
+      return { beneficiary: account, amount: amountBN.toString(), endTs, startTs };
+    });
+
+    return [...patsHoldersVestingData, ...usersWithoutPatsVestingData];
   }
 }

@@ -7,9 +7,21 @@ export const getUsersVestingData = async () => {
   const sortedPatsHolders: TokenAccountWithBNAmount[] = (await readDataFromJsonFile(
     "pats-holders-sorted-by-amount",
   )) as TokenAccountWithBNAmount[];
+  console.log("pats holders count:", sortedPatsHolders.length);
+
+  const allHolders: TokenAccountWithBNAmount[] = (await readDataFromJsonFile(
+    "all-holders",
+  )) as TokenAccountWithBNAmount[];
+  console.log("all holders count:", allHolders.length);
+
+  const usersWithoutPats: TokenAccountWithBNAmount[] = allHolders.filter(
+    ({ account: holder }) => sortedPatsHolders.find(({ account: patsHolder }) => patsHolder === holder) === undefined,
+  );
+  console.log("users without pats count:", usersWithoutPats.length);
 
   const usersVestingData = VestingClient.getHoldersVestingData({
-    sortedHolders: sortedPatsHolders,
+    sortedPatsHolders,
+    usersWithoutPats,
     // TODO: Replace start timestamp with prod one
     startTs: 1718211618,
   });
