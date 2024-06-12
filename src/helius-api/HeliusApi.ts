@@ -1,11 +1,13 @@
 import { Connection, PublicKey } from "@solana/web3.js";
 import BigNumber from "bignumber.js";
-import { TokenAccount, isErrorResult, validateTokenAccountResponseData } from "./typeguard";
+import { TokenAccount, isErrorResult, validateTokenAccountResponseData } from "./typeguards/typeguard";
 import { sleep } from "../common/helpers";
-import { TokenAccountWithBNAmount } from "./types";
+import { FilteredOutTxsDataByReason, ParsedTxData, TokenAccountWithBNAmount } from "./types";
 import { sortByAmount } from "./utils/sortByAmount";
 import { getSignatures } from "./utils/getSignatures";
 import { splitByChunk } from "../util/splitByChunk";
+import { TransactionDataByDigest, isArrayOfTransactionDataByDigest } from "./typeguards/txTypeguard";
+import { aggregateTxsByOwner } from "./utils/aggregateAmountByOwner";
 
 /**
  * Service class for handling helius-related calls.
@@ -136,7 +138,10 @@ export class HeliusApi {
     };
   }
 
-  public async getAllParsedTransactions({ signatures }: { signatures: string[] }) {
+  public async getAllParsedTransactions({ signatures }: { signatures: string[] }): Promise<{
+    parsedDataList: TransactionDataByDigest[];
+    parsedDataListSize: number;
+  }> {
     const MAX_CHUNK_SIZE_FOR_HELIUS_API = 100;
     const signaturesChunks = splitByChunk(signatures, MAX_CHUNK_SIZE_FOR_HELIUS_API);
 
@@ -144,9 +149,7 @@ export class HeliusApi {
     let count = 0;
     let signCount = 0;
 
-    // TODO: Handle 7wwNYSDQF3DX3QZZsEubdqtkpj1homTApvCULFuoJEo7 transferred a total 0.000011 SOL to multiple accounts.
     // TODO: Handle errors
-    // TODO: Handle shape
     for (const signatureChunk of signaturesChunks) {
       console.log(
         "[getAllParsedTransactions]",
@@ -162,17 +165,126 @@ export class HeliusApi {
           transactions: signatureChunk,
         }),
       });
-      const data = await response.json();
+      const parsedSignaturesData = await response.json();
+
+      const isValidTxData = isArrayOfTransactionDataByDigest(parsedSignaturesData);
+
+      if (!isValidTxData) {
+        console.debug("[getAllParsedTransactions] wrong shape of parsed tx data: ", parsedSignaturesData);
+        throw new Error("[getAllParsedTransactions] wrong shape of parsed tx data");
+      }
+
       count++;
       signCount += signatureChunk.length;
-      parsedDataList.push(data);
+      parsedDataList.push(...parsedSignaturesData);
 
       // prevent rate-limit from helius api
-      await sleep(500);
+      await sleep(100);
     }
 
     return { parsedDataList, parsedDataListSize: parsedDataList.length };
   }
 
-  public async processAllParsedTransactions({ parsedTransactionsList }: { parsedTransactionsList }) {}
+  public async processAllParsedTransactions({
+    parsedTransactionsList,
+    targetAddress,
+    fromTimestamp,
+    toTimestamp,
+  }: {
+    parsedTransactionsList: TransactionDataByDigest[];
+    targetAddress: string;
+    fromTimestamp?: number;
+    toTimestamp?: number;
+  }) {
+    // Warn if fromTimestamp or toTimestamp is not set up
+    if (fromTimestamp === undefined) {
+      console.warn("[processAllParsedTransactions] fromTimestamp is not set up");
+    }
+    if (toTimestamp === undefined) {
+      console.warn("[processAllParsedTransactions] toTimestamp is not set up");
+    }
+
+    const filteredOutTxsDataByReason: FilteredOutTxsDataByReason = {
+      failedTxs: [],
+      noNativeTransfer: [],
+      notCorrespondingToTargetAddress: [],
+      beforeFromTimestamp: [],
+      afterToTimestamp: [],
+    };
+
+    const filteredOutFailedTxs = parsedTransactionsList.filter((tx) => {
+      // filter out failed tx
+      if (tx.transactionError !== null) {
+        console.warn(`tx ${tx.signature} failed tx, filtering it out`);
+        filteredOutTxsDataByReason.failedTxs.push(tx);
+        return false;
+      }
+
+      // filter out txs that doesn't have native sol address
+      if (tx.nativeTransfers.length === 0) {
+        console.warn(`tx ${tx.signature} doesn't contain native transfer (SOL), filtering it out`);
+        filteredOutTxsDataByReason.noNativeTransfer.push(tx);
+        return false;
+      }
+
+      // filter out txs that are not corresponding to targetAddress
+      if (tx.nativeTransfers.some((el) => el.toUserAccount !== targetAddress)) {
+        console.warn(`tx ${tx.signature} doesn't contain target address as a destination one, filtering it out`);
+        filteredOutTxsDataByReason.notCorrespondingToTargetAddress.push(tx);
+        return false;
+      }
+
+      // filter out txs that are sent before fromTimestamp timestamp
+      if (fromTimestamp !== undefined && tx.timestamp < fromTimestamp) {
+        console.warn(`tx ${tx.signature} was sent before fromTimestamp, filtering it out`);
+        filteredOutTxsDataByReason.beforeFromTimestamp.push(tx);
+        return false;
+      }
+
+      // filter out txs that are sent after toTimestamp timestamp
+      if (toTimestamp !== undefined && tx.timestamp > toTimestamp) {
+        console.warn(`tx ${tx.signature} was sent after toTimestamp, filtering it out`);
+        filteredOutTxsDataByReason.afterToTimestamp.push(tx);
+        return false;
+      }
+
+      return true;
+    });
+
+    console.debug(
+      `Filtred txs size: ${filteredOutFailedTxs.length}, initial txs: ${parsedTransactionsList.length}, 
+      filtred: ${parsedTransactionsList.length - filteredOutFailedTxs.length}}`,
+    );
+
+    const parsedTxData: ParsedTxData[] = filteredOutFailedTxs.map((tx) => {
+      // TODO: Maybe we should filter out them initially? (not a critical tho)
+      const filtredTransferAmountsToDestination = tx.nativeTransfers.filter((el) => el.toUserAccount === targetAddress);
+
+      if (filtredTransferAmountsToDestination.length > 1) {
+        console.warn(`More than one transfer amount to destination for ${tx.signature}`);
+      }
+
+      const solTransferAmountsToDestination = filtredTransferAmountsToDestination.reduce((acc: BigNumber, el) => {
+        return acc.plus(el.amount);
+      }, new BigNumber(0));
+
+      return {
+        signature: tx.signature,
+        timestamp: tx.timestamp,
+        amountBN: solTransferAmountsToDestination,
+        user: tx.feePayer,
+      };
+    });
+
+    const aggregatedTxsByOwner = aggregateTxsByOwner(parsedTxData);
+    const aggregatedTxsByOwnerList = Object.values(aggregatedTxsByOwner);
+
+    return {
+      filteredOutTxsDataByReason,
+      notAggregatedByOwnerList: parsedTxData,
+      aggregatedTxsByOwnerMap: aggregatedTxsByOwner,
+      aggregatedTxsByOwnerList,
+      aggregatedTxsByOwnerListSize: aggregatedTxsByOwnerList.length,
+    };
+  }
 }
