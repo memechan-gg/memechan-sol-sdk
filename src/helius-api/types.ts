@@ -29,6 +29,11 @@ export type AggregatedTxDataWithBonus = AggregatedTxData & {
   totalIncludingBonusBN: BigNumber;
 };
 
+export type UserPercentageData = AggregatedTxDataWithBonus & {
+  percentageOfTotalIncludingBonus: BigNumber;
+  percentageOfTotalExcludingBonus: BigNumber;
+};
+
 export type FilteredOutTxsDataByReason = {
   failedTxs: TransactionDataByDigest[];
   noNativeTransfer: TransactionDataByDigest[];

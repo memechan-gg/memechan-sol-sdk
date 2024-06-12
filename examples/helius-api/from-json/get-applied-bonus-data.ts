@@ -1,4 +1,4 @@
-import { PRESALE_ADDRESS } from "../../../src";
+import { DECIMALS_S, PRESALE_ADDRESS } from "../../../src";
 import { TransactionDataByDigest } from "../../../src/helius-api/typeguards/txTypeguard";
 import { HeliusApiInstance } from "../../common";
 import { readDataFromJsonFile, saveDataToJsonFile } from "../../utils";
@@ -11,7 +11,7 @@ import { readDataFromJsonFile, saveDataToJsonFile } from "../../utils";
 
   console.debug("parsedDataList: ", parsedDataList);
 
-  const { aggregatedTxsByOwnerList } = await HeliusApiInstance.processAllParsedTransactions({
+  const { aggregatedTxsByOwnerList } = HeliusApiInstance.processAllParsedTransactions({
     parsedTransactionsList: parsedDataList,
     targetAddress: PRESALE_ADDRESS.toString(),
     // TODO: Add timestampFrom and timestampTo
@@ -24,15 +24,21 @@ import { readDataFromJsonFile, saveDataToJsonFile } from "../../utils";
 
   const bonusSignatureList = Object.keys(bonusListRaw);
 
-  const { bonusAppliedData } = await HeliusApiInstance.getAppliedBonusDataByUser({
+  const { bonusAppliedData } = HeliusApiInstance.getAppliedBonusDataByUser({
     aggregatedListByUserAmounts: aggregatedTxsByOwnerList,
     bonusSignatureList,
   });
-
-  // console.debug("aggregatedTxsByOwnerList: ", aggregatedTxsByOwnerList);
-  // console.debug("aggregatedTxsByOwnerMap: ", aggregatedTxsByOwnerMap);
-  // console.debug("filteredOutTxsDataByReason: ", filteredOutTxsDataByReason);
   console.debug("aggregatedTxsByOwnerListSize: ", bonusAppliedData.length);
 
+  const { userPercentages, totalAmountExcludingBonus, totalAmountInludingBonus } =
+    HeliusApiInstance.calculateUserPercentages(bonusAppliedData);
+
+  console.debug(`Total amount (including bonus) (raw): ${totalAmountInludingBonus.toString()}`);
+  console.debug(`Total amount (excluding bonus) (raw): ${totalAmountExcludingBonus.toString()}`);
+
+  console.debug(`Total amount (including bonus) (SOL): ${totalAmountInludingBonus.dividedBy(DECIMALS_S).toString()}`);
+  console.debug(`Total amount (excluding bonus) (SOL): ${totalAmountExcludingBonus.dividedBy(DECIMALS_S).toString()}`);
+
   saveDataToJsonFile(bonusAppliedData, "get-applied-bonus-data");
+  saveDataToJsonFile(userPercentages, "users-percentages-data");
 })();

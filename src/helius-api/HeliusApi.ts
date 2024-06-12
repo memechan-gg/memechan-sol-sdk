@@ -8,6 +8,7 @@ import {
   FilteredOutTxsDataByReason,
   ParsedTxData,
   TokenAccountWithBNAmount,
+  UserPercentageData,
 } from "./types";
 import { sortByAmount } from "./utils/sortByAmount";
 import { getSignatures } from "./utils/getSignatures";
@@ -191,7 +192,7 @@ export class HeliusApi {
     return { parsedDataList, parsedDataListSize: parsedDataList.length };
   }
 
-  public async processAllParsedTransactions({
+  public processAllParsedTransactions({
     parsedTransactionsList,
     targetAddress,
     fromTimestamp,
@@ -345,5 +346,33 @@ export class HeliusApi {
     console.debug(`Applied bonus txs length: ${totalBonusTxs}`);
 
     return { bonusAppliedData };
+  }
+
+  public calculateUserPercentages(data: AggregatedTxDataWithBonus[]): {
+    totalAmountInludingBonus: BigNumber;
+    totalAmountExcludingBonus: BigNumber;
+    userPercentages: UserPercentageData[];
+  } {
+    const totalAmountInludingBonus = data.reduce((acc, user) => acc.plus(user.totalIncludingBonusBN), new BigNumber(0));
+    const totalAmountExcludingBonus = data.reduce((acc, user) => acc.plus(user.totalBN), new BigNumber(0));
+
+    const userPercentages = data.map((user) => {
+      const percentageOfTotalIncludingBonus = user.totalIncludingBonusBN
+        .dividedBy(totalAmountInludingBonus)
+        .multipliedBy(100);
+
+      const percentageOfTotalExcludingBonus = user.totalBN.dividedBy(totalAmountExcludingBonus).multipliedBy(100);
+      return {
+        ...user,
+        percentageOfTotalIncludingBonus,
+        percentageOfTotalExcludingBonus,
+      };
+    });
+
+    return {
+      totalAmountInludingBonus,
+      totalAmountExcludingBonus,
+      userPercentages,
+    };
   }
 }
