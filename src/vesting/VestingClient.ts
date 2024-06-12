@@ -10,7 +10,7 @@ import { ComputeBudgetProgram, PublicKey, SystemProgram, Transaction } from "@so
 import BigNumber from "bignumber.js";
 import BN from "bn.js";
 import { COMPUTE_UNIT_PRICE, MAX_TRANSACTION_SIZE, VESTING_PROGRAM_ID } from "../config/config";
-import { TokenAccountWithBNAmount } from "../helius-api/types";
+import { TokenAccountRaw } from "../helius-api/types";
 import { getTxSize } from "../util/get-tx-size";
 import { getTxCopy } from "../util/getTxCopy";
 import { Vesting } from "./schema/codegen/accounts";
@@ -256,15 +256,15 @@ export class VestingClient {
     usersWithoutPats,
     startTs,
   }: {
-    sortedPatsHolders: TokenAccountWithBNAmount[];
-    usersWithoutPats: TokenAccountWithBNAmount[];
+    sortedPatsHolders: TokenAccountRaw[];
+    usersWithoutPats: TokenAccountRaw[];
     startTs: number;
   }) {
     const holdersCountDividedByDaysCount = new BigNumber(sortedPatsHolders.length).div(
       VestingClient.MAX_VESTING_DAYS_COUNT,
     );
 
-    const patsHoldersVestingData = sortedPatsHolders.reduce((data: UserVestingData[], { account, amountBN }, index) => {
+    const patsHoldersVestingData = sortedPatsHolders.reduce((data: UserVestingData[], { account, amount }, index) => {
       const userVestingPeriod = VestingClient.getHolderVestingPeriodInSeconds({
         holdersCountDividedByDaysCount,
         userNumber: index,
@@ -272,12 +272,12 @@ export class VestingClient {
 
       const endTs = new BigNumber(startTs).plus(userVestingPeriod).toNumber();
 
-      data.push({ beneficiary: account, amount: amountBN.toString(), endTs, startTs });
+      data.push({ beneficiary: account, amount, endTs, startTs });
 
       return data;
     }, []);
 
-    const usersWithoutPatsVestingData = usersWithoutPats.map(({ account, amountBN }) => {
+    const usersWithoutPatsVestingData = usersWithoutPats.map(({ account, amount }) => {
       const vestingDays = new BigNumber(VestingClient.MAX_VESTING_DAYS_COUNT);
       const vestingHours = vestingDays.multipliedBy(24);
       const vestingMinutes = vestingHours.multipliedBy(60);
@@ -285,7 +285,7 @@ export class VestingClient {
 
       const endTs = new BigNumber(startTs).plus(vestingSeconds).toNumber();
 
-      return { beneficiary: account, amount: amountBN.toString(), endTs, startTs };
+      return { beneficiary: account, amount, endTs, startTs };
     });
 
     return [...patsHoldersVestingData, ...usersWithoutPatsVestingData];
