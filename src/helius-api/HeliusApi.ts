@@ -157,44 +157,56 @@ export class HeliusApi {
     let count = 0;
     let signCount = 0;
 
-    // TODO: Handle errors
     for (const signatureChunk of signaturesChunks) {
-      console.log(
-        "[getAllParsedTransactions]",
-        `Processing batch number ${count} of ${signatureChunk.length} signatures, total sign count: ${signCount}`,
-      );
+      let attempts = 0;
+      let parsedSignaturesData = [];
 
-      const response = await fetch(`https://api.helius.xyz/v0/transactions?api-key=${this.heliusApiKey}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          transactions: signatureChunk,
-        }),
-      });
-      const parsedSignaturesData = await response.json();
-      // console.debug("parsedSignaturesData: ", parsedSignaturesData);
-
-      const isValidTxData = isArrayOfTransactionDataByDigest(parsedSignaturesData);
-
-      if (!isValidTxData) {
-        console.debug("[getAllParsedTransactions] wrong shape of parsed tx data: ", parsedSignaturesData);
-        throw new Error("[getAllParsedTransactions] wrong shape of parsed tx data");
-      }
-
-      // check that parsedSigndaturesLength is same as in current chunk
-      if (signatureChunk.length !== parsedSignaturesData.length) {
-        console.warn(
-          `[getAllParsedTransactions] data length doesn't match with original, 
-          signatureChunk.length: ${signatureChunk.length}
-          parsedSignaturesData.length: ${parsedSignaturesData.length}
-          `,
+      while (attempts < 10) {
+        console.log(
+          "[getAllParsedTransactions]",
+          `Processing batch number ${count} of ${signatureChunk.length} signatures, total sign count: ${signCount}`,
         );
 
-        printMissingTransactions(signatureChunk, parsedSignaturesData);
+        const response = await fetch(`https://api.helius.xyz/v0/transactions?api-key=${this.heliusApiKey}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            transactions: signatureChunk,
+          }),
+        });
+        parsedSignaturesData = await response.json();
 
-        // throw new Error("[getAllParsedTransactions] parsed data length is different from original sign chunk");
+        const isValidTxData = isArrayOfTransactionDataByDigest(parsedSignaturesData);
+
+        if (!isValidTxData) {
+          console.debug("[getAllParsedTransactions] wrong shape of parsed tx data: ", parsedSignaturesData);
+          throw new Error("[getAllParsedTransactions] wrong shape of parsed tx data");
+        }
+
+        // check that parsedSignaturesLength is same as in current chunk
+        if (signatureChunk.length !== parsedSignaturesData.length) {
+          console.warn(
+            `[getAllParsedTransactions] data length doesn't match with original, 
+            signatureChunk.length: ${signatureChunk.length}
+            parsedSignaturesData.length: ${parsedSignaturesData.length}
+            `,
+          );
+
+          printMissingTransactions(signatureChunk, parsedSignaturesData);
+
+          attempts++;
+          if (attempts < 10) {
+            console.warn(`[getAllParsedTransactions] Retrying chunk ${count}, attempt ${attempts}`);
+            await sleep(500); // prevent rate-limit from helius api
+            continue;
+          } else {
+            throw new Error("[getAllParsedTransactions] Unable to retrieve correct data after 10 attempts");
+          }
+        }
+
+        break;
       }
 
       count++;
