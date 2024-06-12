@@ -1,9 +1,10 @@
-import { PublicKey, Transaction } from "@solana/web3.js";
-import { VESTING_PROGRAM_ID } from "../config/config";
+import { ComputeBudgetProgram, PublicKey, SystemProgram, Transaction } from "@solana/web3.js";
+import { COMPUTE_UNIT_PRICE, VESTING_PROGRAM_ID } from "../config/config";
 import { Vesting } from "./schema/codegen/accounts";
 import {
   FetchVestingByUserArgs,
   GetClaimTransactionArgs,
+  GetCreateVestingTransactionArgs,
   GetVestingClaimableAmountArgs,
   GetVestingPdaArgs,
 } from "./types";
@@ -13,8 +14,12 @@ import { withdraw } from "./schema/codegen/instructions";
 import {
   TOKEN_PROGRAM_ID,
   createAssociatedTokenAccountIdempotentInstruction,
+  createAssociatedTokenAccountInstruction,
+  getAssociatedTokenAddress,
   getAssociatedTokenAddressSync,
 } from "@solana/spl-token";
+import { Program } from "@coral-xyz/anchor";
+import { IDL, Lockup } from "./schema/types/lockup";
 
 export class VestingClient {
   public constructor(public id: PublicKey) {}
@@ -106,6 +111,45 @@ export class VestingClient {
     );
 
     tx.add(withdrawIx);
+
+    return tx;
+  }
+
+  public static async getCreateVestingTransaction({ beneficiary, admin, mint }: GetCreateVestingTransactionArgs) {
+    const vestingProgram = new Program<Lockup>(IDL, VESTING_PROGRAM_ID);
+
+    const ts = Date.now() / 1000;
+    const lockupTimeSeconds = 24 * 3600;
+    const periods = 24 * 60;
+
+    const vesting = this.getVestingPDA({ vestingNumber: VestingClient.VESTING_NUMBER_START, user: beneficiary });
+    const vestingSigner = this.getVestingSigner(vesting);
+    const vault = getAssociatedTokenAddressSync(mint, vestingSigner, true);
+
+    const tx = new Transaction();
+    const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
+      microLamports: COMPUTE_UNIT_PRICE,
+    });
+
+    tx.add(addPriorityFee);
+
+    tx.add(createAssociatedTokenAccountInstruction(admin, vault, vestingSigner, mint));
+
+    tx.add(
+      await vestingProgram.methods
+        .createVesting(new BN(1), new BN(1 * 10 ** 6), new BN(ts), new BN(ts + lockupTimeSeconds), new BN(periods))
+        .accounts({
+          beneficiary,
+          depositorAuthority: admin,
+          depositorTokenAccount: await getAssociatedTokenAddress(mint, admin, false),
+          vault: vault,
+          vesting,
+          vestingSigner,
+          tokenProgram: TOKEN_PROGRAM_ID,
+          systemProgram: SystemProgram.programId,
+        })
+        .transaction(),
+    );
 
     return tx;
   }
