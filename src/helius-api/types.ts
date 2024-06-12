@@ -8,7 +8,7 @@ export type TokenAccountRaw = {
 
 export type TokenAccountWithBNAmount = {
   account: string;
-  amountBN: BigNumber;
+  amount: BigNumber;
 };
 
 export type ParsedTxData = {

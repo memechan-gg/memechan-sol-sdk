@@ -7,6 +7,6 @@ import { TokenAccountWithBNAmount } from "../types";
  */
 export function sortByAmount(array: TokenAccountWithBNAmount[]): TokenAccountWithBNAmount[] {
   return array.sort((a, b) => {
-    return b.amountBN.comparedTo(a.amountBN);
+    return b.amount.comparedTo(a.amount);
   });
 }

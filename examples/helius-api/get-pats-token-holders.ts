@@ -11,7 +11,7 @@ export const getTokenHoldersExample = async () => {
   saveDataToJsonFile(result.sortedByAmountList, "pats-holders-sorted-by-amount");
 
   // Checks
-  const totalPatsAmount = result.sortedByAmountList.reduce((acc, el) => acc.plus(el.amountBN), new BigNumber(0));
+  const totalPatsAmount = result.sortedByAmountList.reduce((acc, el) => acc.plus(el.amount), new BigNumber(0));
 
   console.debug("totalPatsAmount: ", totalPatsAmount.toString());
 };

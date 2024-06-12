@@ -9,7 +9,6 @@ import {
   ParsedTxData,
   TokenAccountWithBNAmount,
   UserAllocationsData,
-  UserPercentageData,
 } from "./types";
 import { sortByAmount } from "./utils/sortByAmount";
 import { getSignatures } from "./utils/getSignatures";
@@ -98,7 +97,7 @@ export class HeliusApi {
 
     const allOwnersList: TokenAccountWithBNAmount[] = Array.from(allOwners.entries()).map((el) => ({
       account: el[0],
-      amountBN: el[1],
+      amount: el[1],
     }));
 
     const sortedByAmountList = sortByAmount(allOwnersList);
