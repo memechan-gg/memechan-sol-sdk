@@ -357,7 +357,11 @@ export class HeliusApi {
 
       let totalIncludingBonusBN = data.totalBN;
       if (hasBonus) {
-        const bonusAmount = data.totalBN.multipliedBy(BONUS_PERCENTAGE).dividedBy(100);
+        const bonusAmount = data.totalBN
+          .multipliedBy(BONUS_PERCENTAGE)
+          .dividedBy(100)
+          .integerValue(BigNumber.ROUND_DOWN);
+
         totalIncludingBonusBN = data.totalBN.plus(bonusAmount);
       }
 
@@ -390,6 +394,7 @@ export class HeliusApi {
         .multipliedBy(100);
 
       const percentageOfTotalExcludingBonus = user.totalBN.dividedBy(totalAmountExcludingBonus).multipliedBy(100);
+
       return {
         ...user,
         percentageOfTotalIncludingBonus,
