@@ -1,4 +1,5 @@
-import { DECIMALS_S, PRESALE_ADDRESS } from "../../../src";
+/* eslint-disable max-len */
+import { CHAN_TOKEN_DECIMALS, DECIMALS_S, PRESALE_ADDRESS } from "../../../src";
 import { TransactionDataByDigest } from "../../../src/helius-api/typeguards/txTypeguard";
 import { HeliusApiInstance } from "../../common";
 import { readDataFromJsonFile, saveDataToJsonFile } from "../../utils";
@@ -30,15 +31,32 @@ import { readDataFromJsonFile, saveDataToJsonFile } from "../../utils";
   });
   console.debug("aggregatedTxsByOwnerListSize: ", bonusAppliedData.length);
 
-  const { userPercentages, totalAmountExcludingBonus, totalAmountInludingBonus } =
-    HeliusApiInstance.calculateUserPercentages(bonusAppliedData);
+  const {
+    userAllocations,
+    totalAmountExcludingBonus,
+    totalAmountInludingBonus,
+    totalUserAllocationsIncludingBonus,
+    totalUserAllocationsExcludingBonus,
+  } = HeliusApiInstance.calculateUserAllocations(bonusAppliedData);
 
+  // totals
   console.debug(`Total amount (including bonus) (raw): ${totalAmountInludingBonus.toString()}`);
   console.debug(`Total amount (excluding bonus) (raw): ${totalAmountExcludingBonus.toString()}`);
 
   console.debug(`Total amount (including bonus) (SOL): ${totalAmountInludingBonus.dividedBy(DECIMALS_S).toString()}`);
   console.debug(`Total amount (excluding bonus) (SOL): ${totalAmountExcludingBonus.dividedBy(DECIMALS_S).toString()}`);
 
+  // totals by users
+  console.debug(`Total amount by users (including bonus) (raw): ${totalUserAllocationsIncludingBonus.toString()}`);
+  console.debug(`Total amount by users (excluding bonus) (raw): ${totalUserAllocationsExcludingBonus.toString()}`);
+
+  console.debug(
+    `Total amount by users (including bonus) (CHAN): ${totalUserAllocationsIncludingBonus.dividedBy(10 ** CHAN_TOKEN_DECIMALS).toString()}`,
+  );
+  console.debug(
+    `Total amount by users (excluding bonus) (CHAN): ${totalUserAllocationsExcludingBonus.dividedBy(10 ** CHAN_TOKEN_DECIMALS).toString()}`,
+  );
+
   saveDataToJsonFile(bonusAppliedData, "get-applied-bonus-data");
-  saveDataToJsonFile(userPercentages, "users-percentages-data");
+  saveDataToJsonFile(userAllocations, "users-allocations-data");
 })();

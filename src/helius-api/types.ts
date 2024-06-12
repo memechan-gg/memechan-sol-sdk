@@ -1,6 +1,11 @@
 import BigNumber from "bignumber.js";
 import { TransactionDataByDigest } from "./typeguards/txTypeguard";
 
+export type TokenAccountRaw = {
+  account: string;
+  amount: string;
+};
+
 export type TokenAccountWithBNAmount = {
   account: string;
   amountBN: BigNumber;
@@ -29,9 +34,9 @@ export type AggregatedTxDataWithBonus = AggregatedTxData & {
   totalIncludingBonusBN: BigNumber;
 };
 
-export type UserPercentageData = AggregatedTxDataWithBonus & {
-  percentageOfTotalIncludingBonus: BigNumber;
-  percentageOfTotalExcludingBonus: BigNumber;
+export type UserAllocationsData = AggregatedTxDataWithBonus & {
+  tokenAllocationIncludingBonus: BigNumber;
+  tokenAllocationExcludingBonus: BigNumber;
 };
 
 export type FilteredOutTxsDataByReason = {

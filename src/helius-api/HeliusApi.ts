@@ -8,6 +8,7 @@ import {
   FilteredOutTxsDataByReason,
   ParsedTxData,
   TokenAccountWithBNAmount,
+  UserAllocationsData,
   UserPercentageData,
 } from "./types";
 import { sortByAmount } from "./utils/sortByAmount";
@@ -16,6 +17,7 @@ import { splitByChunk } from "../util/splitByChunk";
 import { TransactionDataByDigest, isArrayOfTransactionDataByDigest } from "./typeguards/txTypeguard";
 import { aggregateTxsByOwner } from "./utils/aggregateAmountByOwner";
 import { printMissingTransactions } from "./utils/printMissingTransactions";
+import { PRESALE_AMOUNT_IN_CHAN_RAW } from "../config/config";
 
 /**
  * Service class for handling helius-related calls.
@@ -380,32 +382,50 @@ export class HeliusApi {
     return { bonusAppliedData };
   }
 
-  public calculateUserPercentages(data: AggregatedTxDataWithBonus[]): {
+  public calculateUserAllocations(data: AggregatedTxDataWithBonus[]): {
     totalAmountInludingBonus: BigNumber;
     totalAmountExcludingBonus: BigNumber;
-    userPercentages: UserPercentageData[];
+    totalUserAllocationsIncludingBonus: BigNumber;
+    totalUserAllocationsExcludingBonus: BigNumber;
+    userAllocations: UserAllocationsData[];
   } {
     const totalAmountInludingBonus = data.reduce((acc, user) => acc.plus(user.totalIncludingBonusBN), new BigNumber(0));
     const totalAmountExcludingBonus = data.reduce((acc, user) => acc.plus(user.totalBN), new BigNumber(0));
 
-    const userPercentages = data.map((user) => {
-      const percentageOfTotalIncludingBonus = user.totalIncludingBonusBN
+    const userAllocations = data.map((user) => {
+      const tokenAllocationIncludingBonus = user.totalIncludingBonusBN
+        .multipliedBy(PRESALE_AMOUNT_IN_CHAN_RAW)
         .dividedBy(totalAmountInludingBonus)
-        .multipliedBy(100);
+        .integerValue(BigNumber.ROUND_DOWN);
 
-      const percentageOfTotalExcludingBonus = user.totalBN.dividedBy(totalAmountExcludingBonus).multipliedBy(100);
+      const tokenAllocationExcludingBonus = user.totalBN
+        .multipliedBy(PRESALE_AMOUNT_IN_CHAN_RAW)
+        .dividedBy(totalAmountExcludingBonus)
+        .integerValue(BigNumber.ROUND_DOWN);
 
       return {
         ...user,
-        percentageOfTotalIncludingBonus,
-        percentageOfTotalExcludingBonus,
+        tokenAllocationIncludingBonus,
+        tokenAllocationExcludingBonus,
       };
     });
+
+    const totalUserAllocationsIncludingBonus = userAllocations.reduce(
+      (acc, el) => acc.plus(el.tokenAllocationIncludingBonus),
+      new BigNumber(0),
+    );
+
+    const totalUserAllocationsExcludingBonus = userAllocations.reduce(
+      (acc, el) => acc.plus(el.tokenAllocationExcludingBonus),
+      new BigNumber(0),
+    );
 
     return {
       totalAmountInludingBonus,
       totalAmountExcludingBonus,
-      userPercentages,
+      totalUserAllocationsIncludingBonus,
+      totalUserAllocationsExcludingBonus,
+      userAllocations,
     };
   }
 }

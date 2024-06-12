@@ -93,3 +93,6 @@ export const VESTING_PROGRAM_ID = new PublicKey("4JDLXnMpPN129YHbGTwn16hW6xt2Qgk
 // Pre-sale
 
 export const PRESALE_ADDRESS = new PublicKey("AXen9e3RFS46k8n29TLsUc65ngnyPCB6L2pazyLZQEX5");
+export const CHAN_TOKEN_DECIMALS = 9;
+export const PRESALE_AMOUNT_IN_CHAN = new BigNumber(380_000_000);
+export const PRESALE_AMOUNT_IN_CHAN_RAW = PRESALE_AMOUNT_IN_CHAN.multipliedBy(10 ** CHAN_TOKEN_DECIMALS);
