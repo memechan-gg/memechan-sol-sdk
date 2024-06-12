@@ -1,4 +1,4 @@
-import { VestingClient } from "../../src";
+import { UserVestingData, VestingClient } from "../../src";
 import { TokenAccountRaw } from "../../src/helius-api/types";
 import { readDataFromJsonFile, saveDataToJsonFile } from "../utils";
 
@@ -19,7 +19,7 @@ export const getUsersVestingData = async () => {
   );
   console.log("users without pats count:", usersWithoutPats.length);
 
-  const usersVestingData = VestingClient.getHoldersVestingData({
+  const usersVestingData: UserVestingData[] = VestingClient.getHoldersVestingData({
     sortedPatsHolders,
     usersWithoutPats,
     // TODO: Replace start timestamp with prod one
