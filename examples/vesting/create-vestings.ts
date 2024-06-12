@@ -1,20 +1,19 @@
-import fs from "fs";
-import { VestingClient } from "../../src";
+import { UserVestingData, VestingClient } from "../../src";
 import { connection, payer } from "../common";
 import { PublicKey } from "@solana/web3.js";
+import { readDataFromJsonFile } from "../utils";
 
-// TODO: Add path to file with data
-const usersVestingDataJsonPath = "path_to_file";
-// TODO: Add typeguard for this data
-const usersVestingData = JSON.parse(fs.readFileSync(usersVestingDataJsonPath, "utf-8"));
-
+// yarn tsx examples/vesting/create-vestings.ts > create-vestings.txt 2>&1
 const createVesting = async () => {
+  const usersVestingData = (await readDataFromJsonFile("users-vesting-data")) as UserVestingData[];
+
   const batchedTransactions = await VestingClient.getBatchedCreateVestingTransactions({
     payer: payer.publicKey,
     // TODO: Replace mint with real one
-    mint: new PublicKey(""),
+    mint: new PublicKey("9pECN2xxLQo22bFYpsNr3T3eW1UdEDtSqPQopFrGv7n4"),
     vestingsData: usersVestingData,
   });
+  console.log("count of transactions:", batchedTransactions.length);
 
   const failedIndexes: number[] = [];
 
