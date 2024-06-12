@@ -35,7 +35,7 @@ import { saveDataToJsonFile } from "../utils";
   console.debug("aggregatedTxsByOwnerMap: ", aggregatedTxsByOwnerMap);
   console.debug("filteredOutTxsDataByReason: ", filteredOutTxsDataByReason);
 
-  saveDataToJsonFile(aggregatedTxsByOwnerList, "aggregated-lust-by-user-pre-sale-amount");
+  saveDataToJsonFile(aggregatedTxsByOwnerList, "aggregated-list-by-user-pre-sale-amount");
   saveDataToJsonFile(aggregatedTxsByOwnerMap, "aggregated-map-by-user-pre-sale-amount");
   saveDataToJsonFile(filteredOutTxsDataByReason, "filter-out-txs-data-by-reson");
 })();
