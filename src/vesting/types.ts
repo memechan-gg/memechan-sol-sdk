@@ -11,3 +11,11 @@ export type GetClaimTransactionArgs = {
   vesting: Vesting;
   vestingId: PublicKey;
 };
+export type GetCreateVestingTransactionArgs = {
+  beneficiary: PublicKey;
+  admin: PublicKey;
+  mint: PublicKey;
+  startTs: number;
+  endTs: number;
+  amount: BN;
+};

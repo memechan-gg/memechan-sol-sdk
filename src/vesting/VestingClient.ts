@@ -1,9 +1,10 @@
-import { PublicKey, Transaction } from "@solana/web3.js";
-import { VESTING_PROGRAM_ID } from "../config/config";
+import { ComputeBudgetProgram, PublicKey, SystemProgram, Transaction } from "@solana/web3.js";
+import { COMPUTE_UNIT_PRICE, MAX_TRANSACTION_SIZE, VESTING_PROGRAM_ID } from "../config/config";
 import { Vesting } from "./schema/codegen/accounts";
 import {
   FetchVestingByUserArgs,
   GetClaimTransactionArgs,
+  GetCreateVestingTransactionArgs,
   GetVestingClaimableAmountArgs,
   GetVestingPdaArgs,
 } from "./types";
@@ -13,8 +14,14 @@ import { withdraw } from "./schema/codegen/instructions";
 import {
   TOKEN_PROGRAM_ID,
   createAssociatedTokenAccountIdempotentInstruction,
+  createAssociatedTokenAccountInstruction,
+  getAssociatedTokenAddress,
   getAssociatedTokenAddressSync,
 } from "@solana/spl-token";
+import { Program } from "@coral-xyz/anchor";
+import { IDL, Lockup } from "./schema/types/lockup";
+import { getTxSize } from "../util/get-tx-size";
+import { getTxCopy } from "../util/getTxCopy";
 
 export class VestingClient {
   public constructor(public id: PublicKey) {}
@@ -106,6 +113,122 @@ export class VestingClient {
     );
 
     tx.add(withdrawIx);
+
+    return tx;
+  }
+
+  public static async getCreateVestingTransaction({
+    beneficiary,
+    admin,
+    mint,
+    startTs,
+    endTs,
+    amount,
+  }: GetCreateVestingTransactionArgs) {
+    const vestingProgram = new Program<Lockup>(IDL, VESTING_PROGRAM_ID);
+
+    const lockupTimeSeconds = new BigNumber(endTs).minus(startTs);
+    const periods = Math.ceil(lockupTimeSeconds.div(60).toNumber());
+
+    const vesting = this.getVestingPDA({ vestingNumber: VestingClient.VESTING_NUMBER_START, user: beneficiary });
+    const vestingSigner = this.getVestingSigner(vesting);
+    const vault = getAssociatedTokenAddressSync(mint, vestingSigner, true);
+
+    const tx = new Transaction();
+
+    tx.add(createAssociatedTokenAccountInstruction(admin, vault, vestingSigner, mint));
+
+    tx.add(
+      await vestingProgram.methods
+        .createVesting(
+          new BN(VestingClient.VESTING_NUMBER_START),
+          amount,
+          new BN(startTs),
+          new BN(endTs),
+          new BN(periods),
+        )
+        .accounts({
+          beneficiary,
+          depositorAuthority: admin,
+          depositorTokenAccount: await getAssociatedTokenAddress(mint, admin, false),
+          vault: vault,
+          vesting,
+          vestingSigner,
+          tokenProgram: TOKEN_PROGRAM_ID,
+          systemProgram: SystemProgram.programId,
+        })
+        .transaction(),
+    );
+
+    return tx;
+  }
+
+  public static async getBatchedCreateVestingTransactions({
+    payer,
+    vestingsData,
+    mint,
+  }: {
+    vestingsData: { beneficiary: PublicKey; amount: BN; startTs: number; endTs: number }[];
+    payer: PublicKey;
+    mint: PublicKey;
+  }) {
+    const transactions: Transaction[] = [];
+    let currentTransaction = this.getInitCreateVestingsTransaction();
+    // This flag is needed for a final step
+    let vestingTxIsAdded = false;
+
+    for (const { amount, beneficiary, endTs, startTs } of vestingsData) {
+      const newVestingTx = await this.getCreateVestingTransaction({
+        admin: payer,
+        beneficiary,
+        mint,
+        amount,
+        endTs,
+        startTs,
+      });
+
+      const txWithAddition = new Transaction().add(currentTransaction).add(newVestingTx);
+      const txWithAdditionSize = getTxSize(txWithAddition, payer);
+
+      if (txWithAdditionSize > MAX_TRANSACTION_SIZE) {
+        // Need to copy tx before pushing, otherwise we will always have only 1 tx because of how JavaScript refs work
+        const txToPush = getTxCopy(currentTransaction);
+        transactions.push(txToPush);
+
+        currentTransaction = this.getInitCreateVestingsTransaction();
+        currentTransaction.add(newVestingTx);
+
+        vestingTxIsAdded = true;
+      } else if (txWithAdditionSize === MAX_TRANSACTION_SIZE) {
+        // Need to copy tx before pushing, otherwise we will always have only 1 tx because of how JavaScript refs work
+        const txToPush = getTxCopy(currentTransaction);
+        transactions.push(txToPush);
+
+        currentTransaction = this.getInitCreateVestingsTransaction();
+
+        vestingTxIsAdded = false;
+      } else {
+        currentTransaction = txWithAddition;
+
+        vestingTxIsAdded = true;
+      }
+    }
+
+    if (vestingTxIsAdded) {
+      // Need to copy tx before pushing, otherwise we will always have only 1 tx because of how JavaScript refs work
+      const txToPush = getTxCopy(currentTransaction);
+      transactions.push(txToPush);
+    }
+
+    return transactions;
+  }
+
+  public static getInitCreateVestingsTransaction() {
+    const tx = new Transaction();
+    const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
+      microLamports: COMPUTE_UNIT_PRICE,
+    });
+    tx.add(addPriorityFee);
 
     return tx;
   }
