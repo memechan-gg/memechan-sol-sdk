@@ -2,7 +2,7 @@ import { PRESALE_ADDRESS } from "../../src";
 import { HeliusApiInstance, connection } from "../common";
 import { saveDataToJsonFile } from "../utils";
 
-// yarn tsx examples/helius-api/get-parsed-transactions-by-address.ts
+// yarn tsx examples/helius-api/get-parsed-transactions-by-address.ts > log-1.txt 2>&1
 (async () => {
   const signatureData = await HeliusApiInstance.getAllTransactionSingaturesByAddress({
     address: PRESALE_ADDRESS,

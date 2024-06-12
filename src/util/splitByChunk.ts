@@ -1,5 +1,5 @@
 // https://stackoverflow.com/a/11764168
-export function splitByChunk(arr: unknown[], len: number) {
+export function splitByChunk<T>(arr: T[], len: number) {
   if (len <= 0 || parseInt(String(len)) != len) {
     return [];
   }

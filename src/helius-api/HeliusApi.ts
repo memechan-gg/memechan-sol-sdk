@@ -15,6 +15,7 @@ import { getSignatures } from "./utils/getSignatures";
 import { splitByChunk } from "../util/splitByChunk";
 import { TransactionDataByDigest, isArrayOfTransactionDataByDigest } from "./typeguards/txTypeguard";
 import { aggregateTxsByOwner } from "./utils/aggregateAmountByOwner";
+import { printMissingTransactions } from "./utils/printMissingTransactions";
 
 /**
  * Service class for handling helius-related calls.
@@ -173,6 +174,7 @@ export class HeliusApi {
         }),
       });
       const parsedSignaturesData = await response.json();
+      // console.debug("parsedSignaturesData: ", parsedSignaturesData);
 
       const isValidTxData = isArrayOfTransactionDataByDigest(parsedSignaturesData);
 
@@ -181,12 +183,26 @@ export class HeliusApi {
         throw new Error("[getAllParsedTransactions] wrong shape of parsed tx data");
       }
 
+      // check that parsedSigndaturesLength is same as in current chunk
+      if (signatureChunk.length !== parsedSignaturesData.length) {
+        console.warn(
+          `[getAllParsedTransactions] data length doesn't match with original, 
+          signatureChunk.length: ${signatureChunk.length}
+          parsedSignaturesData.length: ${parsedSignaturesData.length}
+          `,
+        );
+
+        printMissingTransactions(signatureChunk, parsedSignaturesData);
+
+        // throw new Error("[getAllParsedTransactions] parsed data length is different from original sign chunk");
+      }
+
       count++;
       signCount += signatureChunk.length;
       parsedDataList.push(...parsedSignaturesData);
 
       // prevent rate-limit from helius api
-      await sleep(100);
+      await sleep(500);
     }
 
     return { parsedDataList, parsedDataListSize: parsedDataList.length };
