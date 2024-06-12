@@ -1,7 +1,7 @@
 import { Wallet } from "@coral-xyz/anchor";
 import { Connection, Keypair } from "@solana/web3.js";
 import { ADMIN_PUB_KEY, Auth, BE_URL, MemechanClient, TokenAPI } from "../src";
-import { HELIUS_API_URL, IS_TEST_ENV, TEST_USER_SECRET_KEY } from "./env";
+import { HELIUS_API_KEY, HELIUS_API_URL, IS_TEST_ENV, TEST_USER_SECRET_KEY } from "./env";
 import { getRandomRpcEndpoint } from "../src/util/getRandomRpcEndpoint";
 import { HeliusApi } from "../src/helius-api/HeliusApi";
 
@@ -35,4 +35,4 @@ export const DUMMY_TOKEN_METADATA = {
 
 export const TokenApiInstance = new TokenAPI(BE_URL);
 export const AuthApiInstance = new Auth(BE_URL);
-export const HeliusApiInstance = new HeliusApi(HELIUS_API_URL);
+export const HeliusApiInstance = new HeliusApi(HELIUS_API_URL, HELIUS_API_KEY);

@@ -1,16 +1,4 @@
-import { ComputeBudgetProgram, PublicKey, SystemProgram, Transaction } from "@solana/web3.js";
-import { COMPUTE_UNIT_PRICE, MAX_TRANSACTION_SIZE, VESTING_PROGRAM_ID } from "../config/config";
-import { Vesting } from "./schema/codegen/accounts";
-import {
-  FetchVestingByUserArgs,
-  GetClaimTransactionArgs,
-  GetCreateVestingTransactionArgs,
-  GetVestingClaimableAmountArgs,
-  GetVestingPdaArgs,
-} from "./types";
-import BN from "bn.js";
-import BigNumber from "bignumber.js";
-import { withdraw } from "./schema/codegen/instructions";
+import { Program } from "@coral-xyz/anchor";
 import {
   TOKEN_PROGRAM_ID,
   createAssociatedTokenAccountIdempotentInstruction,
@@ -18,15 +6,30 @@ import {
   getAssociatedTokenAddress,
   getAssociatedTokenAddressSync,
 } from "@solana/spl-token";
-import { Program } from "@coral-xyz/anchor";
-import { IDL, Lockup } from "./schema/types/lockup";
+import { ComputeBudgetProgram, PublicKey, SystemProgram, Transaction } from "@solana/web3.js";
+import BigNumber from "bignumber.js";
+import BN from "bn.js";
+import { COMPUTE_UNIT_PRICE, MAX_TRANSACTION_SIZE, VESTING_PROGRAM_ID } from "../config/config";
+import { TokenAccountWithBNAmount } from "../helius-api/types";
 import { getTxSize } from "../util/get-tx-size";
 import { getTxCopy } from "../util/getTxCopy";
+import { Vesting } from "./schema/codegen/accounts";
+import { withdraw } from "./schema/codegen/instructions";
+import { IDL, Lockup } from "./schema/types/lockup";
+import {
+  FetchVestingByUserArgs,
+  GetClaimTransactionArgs,
+  GetCreateVestingTransactionArgs,
+  GetVestingClaimableAmountArgs,
+  GetVestingPdaArgs,
+  UserVestingData,
+} from "./types";
 
 export class VestingClient {
   public constructor(public id: PublicKey) {}
 
   public static VESTING_NUMBER_START = 1;
+  public static MAX_VESTING_DAYS_COUNT = 14;
 
   public static getVestingPDA({ vestingNumber, user }: GetVestingPdaArgs) {
     // 8 bytes array
@@ -168,7 +171,7 @@ export class VestingClient {
     vestingsData,
     mint,
   }: {
-    vestingsData: { beneficiary: PublicKey; amount: BN; startTs: number; endTs: number }[];
+    vestingsData: UserVestingData[];
     payer: PublicKey;
     mint: PublicKey;
   }) {
@@ -180,9 +183,9 @@ export class VestingClient {
     for (const { amount, beneficiary, endTs, startTs } of vestingsData) {
       const newVestingTx = await this.getCreateVestingTransaction({
         admin: payer,
-        beneficiary,
+        beneficiary: new PublicKey(beneficiary),
         mint,
-        amount,
+        amount: new BN(amount),
         endTs,
         startTs,
       });
@@ -231,5 +234,47 @@ export class VestingClient {
     tx.add(addPriorityFee);
 
     return tx;
+  }
+
+  public static getHolderVestingPeriodInSeconds({
+    userNumber,
+    holdersCountDividedByDaysCount,
+  }: {
+    userNumber: number;
+    holdersCountDividedByDaysCount: BigNumber;
+  }) {
+    const vestingDays = new BigNumber(userNumber).div(holdersCountDividedByDaysCount);
+    const vestingHours = vestingDays.multipliedBy(24);
+    const vestingMinutes = vestingHours.multipliedBy(60);
+    const vestingSeconds = vestingMinutes.multipliedBy(60).toNumber().toFixed();
+
+    return vestingSeconds;
+  }
+
+  public static getHoldersVestingData({
+    sortedHolders,
+    startTs,
+  }: {
+    sortedHolders: TokenAccountWithBNAmount[];
+    startTs: number;
+  }) {
+    const holdersCountDividedByDaysCount = new BigNumber(sortedHolders.length).div(
+      VestingClient.MAX_VESTING_DAYS_COUNT,
+    );
+
+    const vestingData = sortedHolders.reduce((data: UserVestingData[], { account, amountBN }, index) => {
+      const userVestingPeriod = VestingClient.getHolderVestingPeriodInSeconds({
+        holdersCountDividedByDaysCount,
+        userNumber: index,
+      });
+
+      const endTs = new BigNumber(startTs).plus(userVestingPeriod).toNumber();
+
+      data.push({ beneficiary: account, amount: amountBN.toString(), endTs, startTs });
+
+      return data;
+    }, []);
+
+    return vestingData;
   }
 }

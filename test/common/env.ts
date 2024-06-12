@@ -13,6 +13,9 @@ if (!process.env.USER_ID?.length) {
 if (!process.env.HELIUS_API_URL?.length) {
   throw new Error("Empty HELIUS_API_URL");
 }
+if (!process.env.HELIUS_API_KEY?.length) {
+  throw new Error("Empty HELIUS_API_KEY");
+}
 
 export const TEST_USER_SECRET_KEY = process.env.TEST_USER_SECRET_KEY;
 export const RPC_API_CLUSTER = process.env.RPC_API_CLUSTER;
@@ -20,4 +23,4 @@ export const WSS_API_CLUSTER = process.env.WSS_API_CLUSTER;
 export const USER_ID = process.env.USER_ID;
 export const IS_TEST_ENV = process.env.NODE_ENV === "test";
 export const HELIUS_API_URL = process.env.HELIUS_API_URL;
-
+export const HELIUS_API_KEY = process.env.HELIUS_API_KEY;
