@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import BigNumber from "bignumber.js";
 import { CHAN_TOKEN_DECIMALS, UserVestingData, VestingClient } from "../../src";
 import { TokenAccountRaw } from "../../src/helius-api/types";
@@ -22,8 +23,11 @@ export const getUsersVestingData = async () => {
   const presaleInvestorsWithPats = presaleInvestors.filter((el) => patsHoldersMap.has(el.account));
   const presaleInvestorsWithoutPats = presaleInvestors.filter((el) => !patsHoldersMap.has(el.account));
 
-  console.debug(`users without pats count:, ${presaleInvestorsWithoutPats.length}`);
-  console.debug(`users with pats count:, ${presaleInvestorsWithPats.length}`);
+  console.debug(`presale investors without pats count:, ${presaleInvestorsWithoutPats.length}`);
+  console.debug(`presale investors with pats count:, ${presaleInvestorsWithPats.length}`);
+  console.debug(
+    `presale investors with pats and without pats: ${presaleInvestorsWithoutPats.length + presaleInvestorsWithPats.length}`,
+  );
 
   const usersVestingData: UserVestingData[] = VestingClient.getHoldersVestingData({
     sortedPatsHolders: presaleInvestorsWithPats,
