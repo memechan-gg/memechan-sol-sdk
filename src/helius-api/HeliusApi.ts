@@ -235,7 +235,7 @@ export class HeliusApi {
       }
 
       // filter out txs that are not corresponding to targetAddress
-      if (tx.nativeTransfers.some((el) => el.toUserAccount !== targetAddress)) {
+      if (tx.nativeTransfers.every((el) => el.toUserAccount !== targetAddress)) {
         console.warn(`tx ${tx.signature} doesn't contain target address as a destination one, filtering it out`);
         filteredOutTxsDataByReason.notCorrespondingToTargetAddress.push(tx);
         return false;
