@@ -9,7 +9,7 @@ import {
 import { ComputeBudgetProgram, PublicKey, SystemProgram, Transaction } from "@solana/web3.js";
 import BigNumber from "bignumber.js";
 import BN from "bn.js";
-import { COMPUTE_UNIT_PRICE, MAX_TRANSACTION_SIZE, VESTING_PROGRAM_ID } from "../config/config";
+import { CHAN_TOKEN_DECIMALS, COMPUTE_UNIT_PRICE, MAX_TRANSACTION_SIZE, VESTING_PROGRAM_ID } from "../config/config";
 import { TokenAccountRaw } from "../helius-api/types";
 import { getTxSize } from "../util/get-tx-size";
 import { getTxCopy } from "../util/getTxCopy";
@@ -272,7 +272,13 @@ export class VestingClient {
 
       const endTs = new BigNumber(startTs).plus(userVestingPeriod).toNumber();
 
-      data.push({ beneficiary: account, amount, endTs, startTs });
+      data.push({
+        beneficiary: account,
+        amount,
+        amountUI: new BigNumber(amount).dividedBy(10 ** CHAN_TOKEN_DECIMALS).toString(),
+        endTs,
+        startTs,
+      });
 
       return data;
     }, []);
@@ -285,7 +291,13 @@ export class VestingClient {
 
       const endTs = new BigNumber(startTs).plus(vestingSeconds).toNumber();
 
-      return { beneficiary: account, amount, endTs, startTs };
+      return {
+        beneficiary: account,
+        amount,
+        amountUI: new BigNumber(amount).dividedBy(10 ** CHAN_TOKEN_DECIMALS).toString(),
+        endTs,
+        startTs,
+      };
     });
 
     return [...patsHoldersVestingData, ...usersWithoutPatsVestingData];

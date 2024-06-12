@@ -19,4 +19,4 @@ export type GetCreateVestingTransactionArgs = {
   endTs: number;
   amount: BN;
 };
-export type UserVestingData = { beneficiary: string; amount: string; startTs: number; endTs: number };
+export type UserVestingData = { beneficiary: string; amount: string; amountUI: string; startTs: number; endTs: number };
