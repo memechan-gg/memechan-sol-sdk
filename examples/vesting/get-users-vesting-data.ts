@@ -9,7 +9,9 @@ export const getUsersVestingData = async () => {
   )) as TokenAccountRaw[];
   console.log("pats holders count:", sortedPatsHolders.length);
 
-  const allHolders: TokenAccountRaw[] = (await readDataFromJsonFile("all-holders")) as TokenAccountRaw[];
+  const allHolders: TokenAccountRaw[] = (await readDataFromJsonFile(
+    "chan-token-allocations-by-user-final",
+  )) as TokenAccountRaw[];
   console.log("all holders count:", allHolders.length);
 
   const usersWithoutPats: TokenAccountRaw[] = allHolders.filter(

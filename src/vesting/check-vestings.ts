@@ -2,21 +2,22 @@ import { Program } from "@coral-xyz/anchor";
 import { VESTING_PROGRAM_ID } from "../config/config";
 import { IDL, Lockup } from "./schema/types/lockup";
 import { client } from "../../examples/common";
+import { TokenAccountRaw } from "../helius-api/types";
 
 export interface UserAmount {
   user: string;
   amount: string;
 }
 
-export async function checkVesting(userAmountsList: UserAmount[]): Promise<{
+export async function checkVesting(userAmountsList: TokenAccountRaw[]): Promise<{
   notFoundInDoc: UserAmount[];
   vestingDataMismatched: UserAmount[];
   notFoundInVesting: UserAmount[];
 }> {
   const userAmountMap: Map<string, string> = new Map();
-  userAmountsList.forEach((e) => userAmountMap.set(e.user, e.amount));
+  userAmountsList.forEach((e) => userAmountMap.set(e.account, e.amount));
   const foundUsers: Map<string, boolean> = new Map();
-  userAmountsList.forEach((e) => foundUsers.set(e.user, false));
+  userAmountsList.forEach((e) => foundUsers.set(e.account, false));
 
   const vestingProgram = new Program<Lockup>(IDL, VESTING_PROGRAM_ID);
   client.connection;
