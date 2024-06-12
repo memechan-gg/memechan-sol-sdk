@@ -141,11 +141,18 @@ export class HeliusApi {
     const signaturesChunks = splitByChunk(signatures, MAX_CHUNK_SIZE_FOR_HELIUS_API);
 
     const parsedDataList = [];
+    let count = 0;
+    let signCount = 0;
 
     // TODO: Handle 7wwNYSDQF3DX3QZZsEubdqtkpj1homTApvCULFuoJEo7 transferred a total 0.000011 SOL to multiple accounts.
     // TODO: Handle errors
     // TODO: Handle shape
     for (const signatureChunk of signaturesChunks) {
+      console.log(
+        "[getAllParsedTransactions]",
+        `Processing batch number ${count} of ${signatureChunk.length} signatures, total sign count: ${signCount}`,
+      );
+
       const response = await fetch(`https://api.helius.xyz/v0/transactions?api-key=${this.heliusApiKey}`, {
         method: "POST",
         headers: {
@@ -156,12 +163,16 @@ export class HeliusApi {
         }),
       });
       const data = await response.json();
+      count++;
+      signCount += signatureChunk.length;
       parsedDataList.push(data);
 
       // prevent rate-limit from helius api
-      await sleep(5_000);
+      await sleep(500);
     }
 
-    return parsedDataList;
+    return { parsedDataList, parsedDataListSize: parsedDataList.length };
   }
+
+  public async processAllParsedTransactions({ parsedTransactionsList }: { parsedTransactionsList }) {}
 }

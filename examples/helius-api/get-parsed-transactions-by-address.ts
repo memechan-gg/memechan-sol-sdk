@@ -8,10 +8,16 @@ import { saveDataToJsonFile } from "../utils";
     address: PRESALE_ADDRESS,
     connection,
   });
-  console.debug("signatureData: ", signatureData);
 
-  const res = await HeliusApiInstance.getAllParsedTransactions({ signatures: signatureData.txSignatureList });
-  console.debug("res: ", res);
+  console.debug("signatureData.txSignatureList: ", signatureData.txSignatureList);
+  console.debug("signatureData.txSignatureListSize: ", signatureData.txSignatureListSize);
 
-  saveDataToJsonFile(res, `tx-parsed-tx-data-for-pre-sale-address-${PRESALE_ADDRESS}`);
+  const { parsedDataList, parsedDataListSize } = await HeliusApiInstance.getAllParsedTransactions({
+    signatures: signatureData.txSignatureList,
+  });
+
+  console.debug("parsedDataList: ", parsedDataList);
+  console.debug("parsedDataListSize: ", parsedDataListSize);
+
+  saveDataToJsonFile(parsedDataList, `tx-parsed-tx-data-for-pre-sale-address-${PRESALE_ADDRESS}`);
 })();
