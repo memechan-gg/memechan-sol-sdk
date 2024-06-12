@@ -24,6 +24,11 @@ export type AggregatedTxData = {
   }[];
 };
 
+export type AggregatedTxDataWithBonus = AggregatedTxData & {
+  bonus: boolean;
+  totalIncludingBonusBN: BigNumber;
+};
+
 export type FilteredOutTxsDataByReason = {
   failedTxs: TransactionDataByDigest[];
   noNativeTransfer: TransactionDataByDigest[];
