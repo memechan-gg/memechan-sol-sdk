@@ -1,4 +1,5 @@
 /* eslint-disable max-len */
+import BigNumber from "bignumber.js";
 import { CHAN_TOKEN_DECIMALS, DECIMALS_S, PRESALE_ADDRESS } from "../../../src";
 import { TransactionDataByDigest } from "../../../src/helius-api/typeguards/txTypeguard";
 import { HeliusApiInstance } from "../../common";
@@ -65,6 +66,14 @@ import { readDataFromJsonFile, saveDataToJsonFile } from "../../utils";
     amount: el.tokenAllocationIncludingBonus,
     amountUI: el.tokenAllocationIncludingBonus.dividedBy(10 ** CHAN_TOKEN_DECIMALS),
   }));
+
+  const allUserTokenAmounts = userTokenAllocationDataFinal.reduce(
+    (acc, el) => acc.plus(new BigNumber(el.amount)),
+    new BigNumber(0),
+  );
+
+  console.debug(`allUserTokenAmounts ${allUserTokenAmounts.toString()}`);
+  console.debug(`allUserTokenAmounts ${allUserTokenAmounts.dividedBy(10 ** CHAN_TOKEN_DECIMALS).toString()}`);
 
   saveDataToJsonFile(bonusAppliedData, "get-applied-bonus-data");
   saveDataToJsonFile(userAllocations, "users-allocations-data");
