@@ -10,6 +10,7 @@ export const getUsersVestingData = async () => {
 
   const usersVestingData = VestingClient.getHoldersVestingData({
     sortedHolders: sortedPatsHolders,
+    // TODO: Replace start timestamp with prod one
     startTs: 1718211618,
   });
 
