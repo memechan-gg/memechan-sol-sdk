@@ -57,6 +57,13 @@ import { readDataFromJsonFile, saveDataToJsonFile } from "../../utils";
     `Total amount by users (excluding bonus) (CHAN): ${totalUserAllocationsExcludingBonus.dividedBy(10 ** CHAN_TOKEN_DECIMALS).toString()}`,
   );
 
+  // little processing
+  const userTokenAllocationDataFinal = userAllocations.map((el) => ({
+    account: el.user,
+    amount: el.tokenAllocationIncludingBonus,
+  }));
+
   saveDataToJsonFile(bonusAppliedData, "get-applied-bonus-data");
   saveDataToJsonFile(userAllocations, "users-allocations-data");
+  saveDataToJsonFile(userTokenAllocationDataFinal, "chan-token-allocations-by-user-final");
 })();
