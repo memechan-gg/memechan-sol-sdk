@@ -247,8 +247,12 @@ export class VestingClient {
     holdersCountDividedByDaysCount: BigNumber;
   }) {
     const vestingDays = new BigNumber(userNumber).div(holdersCountDividedByDaysCount);
+
     const vestingHours = vestingDays.multipliedBy(24);
-    const vestingMinutes = vestingHours.multipliedBy(60);
+    const vestingHoursWithLowerBound = Math.max(vestingHours.toNumber(), 1);
+    const vestingHoursWithLowerBoundBigNumber = new BigNumber(vestingHoursWithLowerBound);
+
+    const vestingMinutes = vestingHoursWithLowerBoundBigNumber.multipliedBy(60);
     const vestingSeconds = vestingMinutes.multipliedBy(60).toNumber().toFixed();
 
     return vestingSeconds;
@@ -270,7 +274,7 @@ export class VestingClient {
     const patsHoldersVestingData = sortedPatsHolders.reduce((data: UserVestingData[], { account, amount }, index) => {
       const userVestingPeriod = VestingClient.getHolderVestingPeriodInSeconds({
         holdersCountDividedByDaysCount,
-        userNumber: index,
+        userNumber: index + 1, // We need to increment the index to avoid having 0 for the first element
       });
 
       const endTs = new BigNumber(startTs).plus(userVestingPeriod).toNumber();
