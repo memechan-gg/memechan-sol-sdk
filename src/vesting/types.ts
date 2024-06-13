@@ -1,6 +1,7 @@
 import { Connection, PublicKey, Transaction } from "@solana/web3.js";
 import { Vesting } from "./schema/codegen/accounts";
 import BN from "bn.js";
+import { TokenAccountRaw } from "../helius-api/types";
 
 export type GetVestingPdaArgs = { vestingNumber: number; user: PublicKey };
 export type FetchVestingByUserArgs = { user: PublicKey; connection: Connection };
@@ -20,3 +21,5 @@ export type GetCreateVestingTransactionArgs = {
   amount: BN;
 };
 export type UserVestingData = { beneficiary: string; amount: string; amountUI: string; startTs: number; endTs: number };
+
+export type PatsHolderMapWithIndex = { [patsHolderAddress: string]: TokenAccountRaw & { index: number } };
