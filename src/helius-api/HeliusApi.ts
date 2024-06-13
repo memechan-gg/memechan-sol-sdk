@@ -287,8 +287,12 @@ export class HeliusApi {
       }
 
       // not allowed addresses
-      if (VestingClient.NOT_ALLOWED_ADDRESSES_FOR_VESTING_LIST.includes(tx.feePayer)) {
-        console.warn(`tx ${tx.signature} was from not allowed address ${tx.feePayer}, filtering it out`);
+      const isSentFromNotAllowedAddresses = tx.nativeTransfers.some((el) =>
+        VestingClient.NOT_ALLOWED_ADDRESSES_FOR_VESTING_LIST.includes(el.fromUserAccount),
+      );
+
+      if (isSentFromNotAllowedAddresses) {
+        console.warn(`tx ${tx.signature} was from not allowed fee payer ${tx.feePayer}, filtering it out`);
         filteredOutTxsDataByReason.notAllowedAddresses.push(tx);
         return false;
       }
