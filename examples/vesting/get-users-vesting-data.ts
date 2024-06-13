@@ -33,7 +33,7 @@ export const getUsersVestingData = async () => {
     sortedPatsHolders: presaleInvestorsWithPats,
     usersWithoutPats: presaleInvestorsWithoutPats,
     // TODO: Replace start timestamp with prod one
-    startTs: 1718211618,
+    startTs: 1718269200, // Thursday, June 13, 2024 9:00:00 AM GMT +0
   });
 
   // check that amounts are consistent
