@@ -45,4 +45,5 @@ export type FilteredOutTxsDataByReason = {
   notCorrespondingToTargetAddress: TransactionDataByDigest[];
   beforeFromTimestamp: TransactionDataByDigest[];
   afterToTimestamp: TransactionDataByDigest[];
+  notAllowedAddresses: TransactionDataByDigest[];
 };

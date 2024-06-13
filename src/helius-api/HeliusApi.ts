@@ -17,6 +17,7 @@ import { TransactionDataByDigest, isArrayOfTransactionDataByDigest } from "./typ
 import { aggregateTxsByOwner } from "./utils/aggregateAmountByOwner";
 import { printMissingTransactions } from "./utils/printMissingTransactions";
 import { PRESALE_AMOUNT_IN_CHAN_RAW } from "../config/config";
+import { VestingClient } from "../vesting/VestingClient";
 
 /**
  * Service class for handling helius-related calls.
@@ -246,6 +247,7 @@ export class HeliusApi {
       notCorrespondingToTargetAddress: [],
       beforeFromTimestamp: [],
       afterToTimestamp: [],
+      notAllowedAddresses: [],
     };
 
     const filteredOutFailedTxs = parsedTransactionsList.filter((tx) => {
@@ -281,6 +283,13 @@ export class HeliusApi {
       if (toTimestamp !== undefined && tx.timestamp > toTimestamp) {
         console.warn(`tx ${tx.signature} was sent after toTimestamp, filtering it out`);
         filteredOutTxsDataByReason.afterToTimestamp.push(tx);
+        return false;
+      }
+
+      // not allowed addresses
+      if (VestingClient.NOT_ALLOWED_ADDRESSES_FOR_VESTING_LIST.includes(tx.feePayer)) {
+        console.warn(`tx ${tx.signature} was from not allowed address ${tx.feePayer}, filtering it out`);
+        filteredOutTxsDataByReason.notAllowedAddresses.push(tx);
         return false;
       }
 
