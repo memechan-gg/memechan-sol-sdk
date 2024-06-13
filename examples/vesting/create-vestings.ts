@@ -1,6 +1,5 @@
-import { UserVestingData, VestingClient } from "../../src";
+import { CHAN_TOKEN, UserVestingData, VestingClient } from "../../src";
 import { connection, payer } from "../common";
-import { PublicKey } from "@solana/web3.js";
 import { readDataFromJsonFile } from "../utils";
 
 // yarn tsx examples/vesting/create-vestings.ts > create-vestings.txt 2>&1
@@ -9,8 +8,7 @@ const createVesting = async () => {
 
   const batchedTransactions = await VestingClient.getBatchedCreateVestingTransactions({
     payer: payer.publicKey,
-    // TODO: Replace mint with real one
-    mint: new PublicKey("9pECN2xxLQo22bFYpsNr3T3eW1UdEDtSqPQopFrGv7n4"),
+    mint: CHAN_TOKEN,
     vestingsData: usersVestingData,
   });
   console.log("count of transactions:", batchedTransactions.length);
