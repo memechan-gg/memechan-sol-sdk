@@ -31,6 +31,14 @@ export class VestingClient {
   public static VESTING_NUMBER_START = 1;
   public static MAX_VESTING_DAYS_COUNT = 14;
 
+  public static NOT_ALLOWED_ADDRESSES_FOR_VESTING_LIST = [
+    "5VCwKtCXgCJ6kit5FybXjvriW3xELsFDhYrPSqtJNmcD",
+    "u6PJ8DtQuPFnfmwHbGFULQ4u4EgjDiyYKjVEsynXq2w",
+
+    "4MPQFbnjvG9GAwYhaZ6aavK7oC8cbi4nDQfkBj1qxqc6",
+    "4yhj7jv9q7cYNbBexrxinSEV9iiVNAh429swdYqMUbid",
+  ];
+
   public static getVestingPDA({ vestingNumber, user }: GetVestingPdaArgs) {
     // 8 bytes array
     const dv = new DataView(new ArrayBuffer(8), 0);
