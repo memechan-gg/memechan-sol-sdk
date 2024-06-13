@@ -22,6 +22,7 @@ import {
   GetCreateVestingTransactionArgs,
   GetVestingClaimableAmountArgs,
   GetVestingPdaArgs,
+  PatsHolderMapWithIndex,
   UserVestingData,
 } from "./types";
 
@@ -267,22 +268,29 @@ export class VestingClient {
   }
 
   public static getHoldersVestingData({
-    sortedPatsHolders,
-    usersWithoutPats,
+    presaleInvestorsWithPats,
+    presaleInvestorsWithoutPats,
+    patsHoldersMapByAddressAndIndex,
+    patsHoldersTotalUsersCount,
     startTs,
   }: {
-    sortedPatsHolders: TokenAccountRaw[];
-    usersWithoutPats: TokenAccountRaw[];
+    presaleInvestorsWithPats: TokenAccountRaw[];
+    presaleInvestorsWithoutPats: TokenAccountRaw[];
+    patsHoldersMapByAddressAndIndex: PatsHolderMapWithIndex;
+    patsHoldersTotalUsersCount: number;
     startTs: number;
   }) {
-    const holdersCountDividedByDaysCount = new BigNumber(sortedPatsHolders.length).div(
+    const holdersCountDividedByDaysCount = new BigNumber(patsHoldersTotalUsersCount).div(
       VestingClient.MAX_VESTING_DAYS_COUNT,
     );
 
-    const patsHoldersVestingData = sortedPatsHolders.reduce((data: UserVestingData[], { account, amount }, index) => {
+    const patsHoldersVestingData = presaleInvestorsWithPats.reduce((data: UserVestingData[], { account, amount }) => {
+      const patsUser = patsHoldersMapByAddressAndIndex[account];
+      const userNumber = patsUser.index + 1; // We need to increment the index to avoid having 0 for the first element
+
       const userVestingPeriod = VestingClient.getHolderVestingPeriodInSeconds({
         holdersCountDividedByDaysCount,
-        userNumber: index + 1, // We need to increment the index to avoid having 0 for the first element
+        userNumber,
       });
 
       const endTs = new BigNumber(startTs).plus(userVestingPeriod).toNumber();
@@ -298,7 +306,7 @@ export class VestingClient {
       return data;
     }, []);
 
-    const usersWithoutPatsVestingData = usersWithoutPats.map(({ account, amount }) => {
+    const usersWithoutPatsVestingData = presaleInvestorsWithoutPats.map(({ account, amount }) => {
       const vestingDays = new BigNumber(VestingClient.MAX_VESTING_DAYS_COUNT);
       const vestingHours = vestingDays.multipliedBy(24);
       const vestingMinutes = vestingHours.multipliedBy(60);

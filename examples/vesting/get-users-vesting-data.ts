@@ -1,6 +1,6 @@
 /* eslint-disable max-len */
 import BigNumber from "bignumber.js";
-import { CHAN_TOKEN_DECIMALS, UserVestingData, VestingClient } from "../../src";
+import { CHAN_TOKEN_DECIMALS, PatsHolderMapWithIndex, UserVestingData, VestingClient } from "../../src";
 import { TokenAccountRaw } from "../../src/helius-api/types";
 import { readDataFromJsonFile, saveDataToJsonFile } from "../utils";
 import { toMap } from "../../src/util/toMap";
@@ -18,7 +18,11 @@ export const getUsersVestingData = async () => {
   console.log("all holders count:", presaleInvestors.length);
 
   const patsHoldersMap = toMap(sortedPatsHolders, (el) => el.account);
-  // const presaleInvestorsMap = toMap(presaleInvestors, (el) => el.account);
+  const patsHoldersMapByAddressAndIndex = sortedPatsHolders.reduce((acc: PatsHolderMapWithIndex, el, index) => {
+    acc[el.account] = { ...el, index };
+
+    return acc;
+  }, {});
 
   const presaleInvestorsWithPats = presaleInvestors.filter((el) => patsHoldersMap.has(el.account));
   const presaleInvestorsWithoutPats = presaleInvestors.filter((el) => !patsHoldersMap.has(el.account));
@@ -30,8 +34,10 @@ export const getUsersVestingData = async () => {
   );
 
   const usersVestingData: UserVestingData[] = VestingClient.getHoldersVestingData({
-    sortedPatsHolders: presaleInvestorsWithPats,
-    usersWithoutPats: presaleInvestorsWithoutPats,
+    presaleInvestorsWithPats: presaleInvestorsWithPats,
+    presaleInvestorsWithoutPats: presaleInvestorsWithoutPats,
+    patsHoldersMapByAddressAndIndex,
+    patsHoldersTotalUsersCount: sortedPatsHolders.length,
     // TODO: Replace start timestamp with prod one
     startTs: 1718269200, // Thursday, June 13, 2024 9:00:00 AM GMT +0
   });
