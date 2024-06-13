@@ -33,7 +33,7 @@ export const getUsersVestingData = async () => {
     `presale investors with pats and without pats: ${presaleInvestorsWithoutPats.length + presaleInvestorsWithPats.length}`,
   );
 
-  const usersVestingData: UserVestingData[] = VestingClient.getHoldersVestingData({
+  const { allUsersVestingData, sortedAllUsersVestingData } = VestingClient.getHoldersVestingData({
     presaleInvestorsWithPats: presaleInvestorsWithPats,
     presaleInvestorsWithoutPats: presaleInvestorsWithoutPats,
     patsHoldersMapByAddressAndIndex,
@@ -44,7 +44,7 @@ export const getUsersVestingData = async () => {
 
   // check that amounts are consistent
 
-  const allUserTokenAmounts = usersVestingData.reduce(
+  const allUserTokenAmounts = sortedAllUsersVestingData.reduce(
     (acc, el) => acc.plus(new BigNumber(el.amount)),
     new BigNumber(0),
   );
@@ -52,7 +52,8 @@ export const getUsersVestingData = async () => {
   console.debug(`allUserTokenAmounts ${allUserTokenAmounts.toString()}`);
   console.debug(`allUserTokenAmounts ${allUserTokenAmounts.dividedBy(10 ** CHAN_TOKEN_DECIMALS).toString()}`);
 
-  saveDataToJsonFile(usersVestingData, "users-vesting-data");
+  saveDataToJsonFile(sortedAllUsersVestingData, "users-vesting-data");
+  saveDataToJsonFile(allUsersVestingData, "unsorted-users-vesting-data");
 };
 
 getUsersVestingData();

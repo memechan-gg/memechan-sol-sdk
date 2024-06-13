@@ -323,6 +323,9 @@ export class VestingClient {
       };
     });
 
-    return [...patsHoldersVestingData, ...usersWithoutPatsVestingData];
+    const allUsersVestingData = [...patsHoldersVestingData, ...usersWithoutPatsVestingData];
+    const sortedAllUsersVestingData = allUsersVestingData.sort((a, b) => a.endTs - b.endTs);
+
+    return { allUsersVestingData, sortedAllUsersVestingData };
   }
 }
