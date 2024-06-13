@@ -13,13 +13,14 @@ import { readDataFromJsonFile, saveDataToJsonFile } from "../../utils";
 
   console.debug("parsedDataList: ", parsedDataList);
 
-  const { aggregatedTxsByOwnerList } = HeliusApiInstance.processAllParsedTransactions({
+  const { aggregatedTxsByOwnerList, filteredOutTxsDataByReason } = HeliusApiInstance.processAllParsedTransactions({
     parsedTransactionsList: parsedDataList,
     targetAddress: PRESALE_ADDRESS.toString(),
     // fromTimestamp: 1717459200,
     // toTimestamp: 1717894800,
     // TODO: Add timestampFrom and timestampTo
   });
+  saveDataToJsonFile(filteredOutTxsDataByReason, "filter-out-txs-data-by-reson");
 
   const bonusListRaw = await readDataFromJsonFile("bonus-list");
   if (!bonusListRaw) {

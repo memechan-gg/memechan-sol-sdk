@@ -24,7 +24,7 @@ import { saveDataToJsonFile } from "../utils";
     aggregatedTxsByOwnerListSize,
     aggregatedTxsByOwnerMap,
     filteredOutTxsDataByReason,
-  } = await HeliusApiInstance.processAllParsedTransactions({
+  } = HeliusApiInstance.processAllParsedTransactions({
     parsedTransactionsList: parsedDataList,
     targetAddress: PRESALE_ADDRESS.toString(),
     // TODO: Add timestampFrom and timestampTo
