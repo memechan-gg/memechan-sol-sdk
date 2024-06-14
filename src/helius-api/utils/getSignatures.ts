@@ -18,7 +18,6 @@ export const getSignatures = async function* ({
   // Solana RPC searches from latest transaction until the first one. The limit is 1000 and we should request again
   // in case we need more. Docs:
   // https://solana-labs.github.io/solana-web3.js/modules.html#confirmedsignaturesforaddress2options
-  const confirmedSignaturesInfo = [];
   let options: SignaturesForAddressOptions = untilTransactionSignature
     ? { until: untilTransactionSignature.trim(), limit: limit || 500 }
     : { limit: limit || 500 };
