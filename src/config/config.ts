@@ -49,8 +49,8 @@ export const SLERF_MINT = new PublicKey("7BgBvyjrZX1YKz4oh9mjb8ZScatkkwb8DzFx7Lo
 // https://explorer.solana.com/address/35fN6LMYt6cKsemgbR28nFooiJtcnvaKPCeRXyuMKfoF
 export const PATS_MINT = new PublicKey("35fN6LMYt6cKsemgbR28nFooiJtcnvaKPCeRXyuMKfoF");
 
-// export const MEMECHAN_QUOTE_MINT = new PublicKey("9pECN2xxLQo22bFYpsNr3T3eW1UdEDtSqPQopFrGv7n4"); // dev fake slerf
-export const MEMECHAN_QUOTE_MINT = SLERF_MINT;
+export const MEMECHAN_QUOTE_MINT = new PublicKey("9pECN2xxLQo22bFYpsNr3T3eW1UdEDtSqPQopFrGv7n4"); // dev fake slerf
+// export const MEMECHAN_QUOTE_MINT = SLERF_MINT; // prod
 // export const MEMECHAN_TARGET_CONFIG = new PublicKey("5g13tz8GKWySjtzPRARuzzQM7LbMCUBMPGPef5PKe4JJ"); // prod
 export const MEMECHAN_TARGET_CONFIG = new PublicKey("EEeLC1a7qbK2mbvfYt8owGzQcBjYguE1FWhWYuGjyABu"); // dev
 export const MEMECHAN_QUOTE_TOKEN_DECIMALS = 9; // current devnet quote token decimals
