@@ -25,7 +25,7 @@ export const API_GATEWAY_FQDN = "h9crl8krnj.execute-api.us-east-1.amazonaws.com"
  *
  * @constant {string}
  */
-export const MEMECHAN_PROGRAM_ID = "memeVtsr1AqAjfRzW2PuzymQdP2m7SgL6FQ1xgMc9MR";
+export const MEMECHAN_PROGRAM_ID = "cYsHcSU42XESLPquuN1ga94jm1wVMg11wVcxqvofA3k";
 
 /**
  * The Memechan fee wallet id.
