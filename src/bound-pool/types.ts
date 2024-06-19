@@ -89,6 +89,7 @@ export interface GoLiveArgs {
 export type GoLiveStaticArgs = Omit<GoLiveArgs, "boundPoolInfo"> & {
   memeMint: PublicKey;
   client: MemechanClient;
+  quoteMint: PublicKey;
 };
 
 export type GetGoLiveTransactionArgs = GoLiveArgs & { transaction?: Transaction };
@@ -122,6 +123,7 @@ export interface BoundPoolWithBuyMemeArgs {
   quoteToken: Token;
   tokenMetadata: TokenMetadata;
   buyMemeTransactionArgs: GetBuyMemeTransactionArgs;
+  targetConfig: PublicKey;
 }
 
 export type GetCreateNewBondingPoolAndTokenTransactionArgs = Omit<BoundPoolArgs, "payer"> & {
@@ -135,6 +137,7 @@ export type GetBuyMemeTransactionStaticArgs = GetBuyMemeTransactionArgs & {
   poolSignerPda: PublicKey;
   client: MemechanClient;
   quoteVault: PublicKey;
+  quoteMint: PublicKey;
 };
 
 export type GetCreateNewBondingPoolAndTokenWithBuyMemeTransactionArgs =

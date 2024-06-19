@@ -1,10 +1,20 @@
+import { Token } from "@raydium-io/raydium-sdk";
 import { PublicKey } from "@solana/web3.js";
 
-export interface TokenConfig {
-  mint: PublicKey;
-  targetConfig: PublicKey;
-  decimals: number;
-  name: string;
+export class TokenInfo extends Token {
+  public readonly targetConfig: PublicKey;
+
+  constructor(
+    programId: PublicKey,
+    mint: PublicKey,
+    decimals: number,
+    symbol: string,
+    name: string,
+    targetConfig: PublicKey,
+  ) {
+    super(programId, mint, decimals, symbol, name);
+    this.targetConfig = targetConfig;
+  }
 }
 
 export enum TokenSymbol {

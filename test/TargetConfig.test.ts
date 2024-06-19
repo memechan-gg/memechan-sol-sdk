@@ -1,9 +1,9 @@
 import BN from "bn.js";
 import { sleep } from "../src/common/helpers";
-import { MEMECHAN_QUOTE_TOKEN, MEMECHAN_TARGET_CONFIG } from "../src/config/config";
 import { TargetConfigClient } from "../src/targetconfig/TargetConfigClient";
 import { MintUtils } from "../src/token/mintUtils";
 import { client, payer } from "./common/common";
+import { TOKEN_INFOS } from "../src";
 
 export function test() {
   describe("TargetConfigClient", () => {
@@ -11,7 +11,7 @@ export function test() {
       const mintUtils = new MintUtils(client.connection, payer);
       // const mint = await mintUtils.createMint(MEMECHAN_MEME_TOKEN_DECIMALS);
 
-      const mint = MEMECHAN_QUOTE_TOKEN.mint;
+      const mint = TOKEN_INFOS.WSOL.mint;
 
       console.log("targetconfig mint: " + mint.toString());
 
@@ -29,7 +29,7 @@ export function test() {
     it("change_target_config", async () => {
       const targetConfig = await TargetConfigClient.fromTargetConfigId({
         client,
-        accountAddressId: MEMECHAN_TARGET_CONFIG,
+        accountAddressId: TOKEN_INFOS.WSOL.targetConfig,
       });
 
       console.log("original targetConfig: ", targetConfig.tokenTargetAmount);

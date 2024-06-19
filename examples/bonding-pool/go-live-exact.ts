@@ -1,6 +1,7 @@
 import { PublicKey } from "@solana/web3.js";
 import { client, payer } from "../common";
 import { BoundPoolClient, FEE_DESTINATION_ID, StakingPool, StakingPoolClient } from "../../src";
+import { getAccount } from "@solana/spl-token";
 
 // yarn tsx examples/bonding-pool/go-live-exact.ts > go-live-exact.txt 2>&1
 export const goLiveExact = async () => {
@@ -24,6 +25,8 @@ export const goLiveExact = async () => {
  // console.log("stakingMemeVault: " + stakingMemeVault.toString());
  // console.log("stakingQuoteVault: " + stakingQuoteVault.toString());
 
+  const quoteAccount = await getAccount(client.connection, stakingPool.quoteVault);
+
   const [a] = await BoundPoolClient.goLive({
     payer: payer,
     user: payer,
@@ -32,6 +35,7 @@ export const goLiveExact = async () => {
     feeDestinationWalletAddress: FEE_DESTINATION_ID,
     memeVault: stakingPool.memeVault,
     quoteVault: stakingPool.quoteVault,
+    quoteMint: quoteAccount.mint,
   });
 
   console.log("Go live finished | Staking pool id: " + stakingPool.id.toString());

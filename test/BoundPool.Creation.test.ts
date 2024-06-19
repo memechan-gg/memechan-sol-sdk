@@ -1,6 +1,5 @@
 import { BoundPoolClient } from "../src/bound-pool/BoundPoolClient";
 import { DEFAULT_BOUND_POOL_WITH_BUY_MEME_ARGS, DUMMY_TOKEN_METADATA, admin, client, payer } from "./common/common";
-import { MEMECHAN_QUOTE_TOKEN } from "../src/config/config";
 
 export function test() {
   describe("BoundPoolClient Creation Tests", () => {
@@ -89,7 +88,7 @@ export function test() {
           admin,
           payer,
           client,
-          quoteToken: MEMECHAN_QUOTE_TOKEN,
+          quoteToken: DEFAULT_BOUND_POOL_WITH_BUY_MEME_ARGS.quoteToken,
           tokenMetadata: metadata,
         });
 

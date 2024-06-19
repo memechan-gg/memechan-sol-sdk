@@ -1,4 +1,4 @@
-import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
+import { TOKEN_PROGRAM_ID, getAccount } from "@solana/spl-token";
 import {
   AccountMeta,
   Connection,
@@ -11,7 +11,7 @@ import BigNumber from "bignumber.js";
 import BN from "bn.js";
 import { MemechanClient } from "../MemechanClient";
 import { BoundPoolClient } from "../bound-pool/BoundPoolClient";
-import { MAX_MEME_TOKENS, MEMECHAN_PROGRAM_ID, MEMECHAN_QUOTE_MINT, MEME_TOKEN_DECIMALS } from "../config/config";
+import { MAX_MEME_TOKENS, MEMECHAN_PROGRAM_ID, MEME_TOKEN_DECIMALS } from "../config/config";
 import { MemeTicketClient } from "../memeticket/MemeTicketClient";
 import { getOptimizedTransactions } from "../memeticket/utils";
 import { formatAmmKeysById } from "../raydium/formatAmmKeysById";
@@ -141,11 +141,7 @@ export class StakingPoolClient {
     const stakingInfo = await this.fetch();
     const user = args.user;
 
-    // const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
-    //   microLamports: COMPUTE_UNIT_PRICE,
-    // });
-
-    // tx.add(addPriorityFee);
+    const quoteAccount = await getAccount(this.client.connection, stakingInfo.quoteVault);
 
     const associatedMemeTokenAddress = await ensureAssociatedTokenAccountWithIX({
       connection: this.client.connection,
@@ -157,7 +153,7 @@ export class StakingPoolClient {
     const associatedQuoteTokenAddress = await ensureAssociatedTokenAccountWithIX({
       connection: this.client.connection,
       payer: user,
-      mint: MEMECHAN_QUOTE_MINT,
+      mint: quoteAccount.mint,
       owner: user,
       transaction: tx,
     });
@@ -284,10 +280,12 @@ export class StakingPoolClient {
       transaction: tx,
     });
 
+    const quoteAccount = await getAccount(this.client.connection, stakingInfo.quoteVault);
+
     const quoteAccountPublicKey = await ensureAssociatedTokenAccountWithIX({
       connection: this.client.connection,
       payer: args.user,
-      mint: MEMECHAN_QUOTE_MINT,
+      mint: quoteAccount.mint,
       owner: args.user,
       transaction: tx,
     });

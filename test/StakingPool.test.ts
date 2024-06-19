@@ -1,7 +1,7 @@
 import BN from "bn.js";
 import { BoundPoolClient } from "../src/bound-pool/BoundPoolClient";
 import { sleep } from "../src/common/helpers";
-import { FEE_DESTINATION_ID, MEMECHAN_MEME_TOKEN_DECIMALS, MEMECHAN_QUOTE_TOKEN } from "../src/config/config";
+import { FEE_DESTINATION_ID, MEMECHAN_MEME_TOKEN_DECIMALS, TOKEN_INFOS } from "../src/config/config";
 import { StakingPoolClient } from "../src/staking-pool/StakingPoolClient";
 import { DUMMY_TOKEN_METADATA, admin, client, payer } from "./common/common";
 import { MemeTicketClient } from "../src/memeticket/MemeTicketClient";
@@ -27,7 +27,7 @@ export function test() {
         admin,
         payer,
         client,
-        quoteToken: MEMECHAN_QUOTE_TOKEN,
+        quoteToken: TOKEN_INFOS.WSOL,
         tokenMetadata: DUMMY_TOKEN_METADATA,
       });
 
@@ -39,7 +39,7 @@ export function test() {
         user: payer,
         memeTokensOut: new BN(100 * 1e6),
         quoteAmountIn: new BN(5000 * 1e9),
-        quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
+        quoteMint: TOKEN_INFOS.WSOL.mint,
         pool: boundPool.id,
         memeTicketNumber: 1,
       });
@@ -62,7 +62,7 @@ export function test() {
         user: payer,
         memeTokensOut: new BN(4000 * 1e6),
         quoteAmountIn: new BN(40000 * 1e9),
-        quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
+        quoteMint: TOKEN_INFOS.WSOL.mint,
         pool: boundPool.id,
         memeTicketNumber: 2,
       });
@@ -92,7 +92,7 @@ export function test() {
       const ammPool = livePool.ammPoolInfo;
       console.log("ammPool: " + JSON.stringify(ammPool));
 
-      const inputToken = MEMECHAN_QUOTE_TOKEN;
+      const inputToken = TOKEN_INFOS.WSOL;
       const outputToken = new Token(TOKEN_PROGRAM_ID, ammPool.baseMint, MEMECHAN_MEME_TOKEN_DECIMALS);
       const inputTokenAmount = new TokenAmount(inputToken, 1000 * 1e9);
       const slippage = new Percent(5, 100);
@@ -134,7 +134,7 @@ export function test() {
         admin,
         payer,
         client,
-        quoteToken: MEMECHAN_QUOTE_TOKEN,
+        quoteToken: TOKEN_INFOS.WSOL,
         tokenMetadata: DUMMY_TOKEN_METADATA,
       });
 
@@ -147,7 +147,7 @@ export function test() {
         user: payer,
         memeTokensOut: new BN(1000 * 1e6),
         quoteAmountIn: new BN(500000 * 1e9),
-        quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
+        quoteMint: TOKEN_INFOS.WSOL.mint,
         pool: boundPool.id,
         memeTicketNumber: 1,
       });
@@ -192,7 +192,7 @@ export function test() {
         admin,
         payer,
         client,
-        quoteToken: MEMECHAN_QUOTE_TOKEN,
+        quoteToken: TOKEN_INFOS.WSOL,
         tokenMetadata: DUMMY_TOKEN_METADATA,
       });
 
@@ -205,7 +205,7 @@ export function test() {
         user: payer,
         memeTokensOut: new BN(3000 * 1e6),
         quoteAmountIn: new BN(550000 * 1e9),
-        quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
+        quoteMint: TOKEN_INFOS.WSOL.mint,
         pool: boundPool.id,
         memeTicketNumber: 2,
       });
@@ -237,7 +237,7 @@ export function test() {
       const ammPool = livePool.ammPoolInfo;
       console.log("ammPool: " + JSON.stringify(ammPool));
 
-      const inputToken = MEMECHAN_QUOTE_TOKEN;
+      const inputToken = TOKEN_INFOS.WSOL;
       const outputToken = new Token(TOKEN_PROGRAM_ID, ammPool.baseMint, MEMECHAN_MEME_TOKEN_DECIMALS);
       const inputTokenAmount = new TokenAmount(inputToken, 1000 * 1e9);
       const slippage = new Percent(5, 100);
@@ -281,7 +281,7 @@ export function test() {
         admin,
         payer,
         client,
-        quoteToken: MEMECHAN_QUOTE_TOKEN,
+        quoteToken: TOKEN_INFOS.WSOL,
         tokenMetadata: DUMMY_TOKEN_METADATA,
       });
 
@@ -294,7 +294,7 @@ export function test() {
         user: payer,
         memeTokensOut: new BN(3000 * 1e6),
         quoteAmountIn: new BN(550000 * 1e9),
-        quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
+        quoteMint: TOKEN_INFOS.WSOL.mint,
         pool: boundPool.id,
         memeTicketNumber: 1,
       });
@@ -326,7 +326,7 @@ export function test() {
       const ammPool = livePool.ammPoolInfo;
       console.log("ammPool: " + JSON.stringify(ammPool));
 
-      const inputToken = MEMECHAN_QUOTE_TOKEN;
+      const inputToken = TOKEN_INFOS.WSOL;
       const outputToken = new Token(TOKEN_PROGRAM_ID, ammPool.baseMint, MEMECHAN_MEME_TOKEN_DECIMALS);
       const inputTokenAmount = new TokenAmount(inputToken, 1000 * 1e9);
       const slippage = new Percent(5, 100);
@@ -373,7 +373,7 @@ export function test() {
         admin,
         payer,
         client,
-        quoteToken: MEMECHAN_QUOTE_TOKEN,
+        quoteToken: TOKEN_INFOS.WSOL,
         tokenMetadata: DUMMY_TOKEN_METADATA,
       });
 
@@ -386,7 +386,7 @@ export function test() {
         user: payer,
         memeTokensOut: new BN(100 * 1e6),
         quoteAmountIn: new BN(5000 * 1e9),
-        quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
+        quoteMint: TOKEN_INFOS.WSOL.mint,
         pool: boundPool.id,
         memeTicketNumber: 1,
       });
@@ -409,7 +409,7 @@ export function test() {
         user: payer,
         memeTokensOut: new BN(4000 * 1e6),
         quoteAmountIn: new BN(5550000 * 1e9),
-        quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
+        quoteMint: TOKEN_INFOS.WSOL.mint,
         pool: boundPool.id,
         memeTicketNumber: 2,
       });
@@ -439,7 +439,7 @@ export function test() {
       const ammPool = livePool.ammPoolInfo;
       console.log("ammPool: " + JSON.stringify(ammPool));
 
-      const inputToken = MEMECHAN_QUOTE_TOKEN;
+      const inputToken = TOKEN_INFOS.WSOL;
       const outputToken = new Token(TOKEN_PROGRAM_ID, ammPool.baseMint, MEMECHAN_MEME_TOKEN_DECIMALS);
       const inputTokenAmount = new TokenAmount(inputToken, 1000 * 1e9);
       const slippage = new Percent(5, 100);
@@ -520,7 +520,7 @@ export function test() {
         admin,
         payer,
         client,
-        quoteToken: MEMECHAN_QUOTE_TOKEN,
+        quoteToken: TOKEN_INFOS.WSOL,
         tokenMetadata: DUMMY_TOKEN_METADATA,
       });
 
@@ -533,7 +533,7 @@ export function test() {
         user: payer,
         memeTokensOut: new BN(100 * 1e6),
         quoteAmountIn: new BN(5000 * 1e9),
-        quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
+        quoteMint: TOKEN_INFOS.WSOL.mint,
         pool: boundPool.id,
         memeTicketNumber: 1,
       });
@@ -546,7 +546,7 @@ export function test() {
         user: payer,
         memeTokensOut: new BN(100 * 1e6),
         quoteAmountIn: new BN(40000 * 1e9),
-        quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
+        quoteMint: TOKEN_INFOS.WSOL.mint,
         pool: boundPool.id,
         memeTicketNumber: 2,
       });
@@ -576,7 +576,7 @@ export function test() {
       const ammPool = livePool.ammPoolInfo;
       console.log("ammPool: " + JSON.stringify(ammPool));
 
-      const inputToken = MEMECHAN_QUOTE_TOKEN;
+      const inputToken = TOKEN_INFOS.WSOL;
       const outputToken = new Token(TOKEN_PROGRAM_ID, ammPool.baseMint, MEMECHAN_MEME_TOKEN_DECIMALS);
       const inputTokenAmount = new TokenAmount(inputToken, 1000 * 1e9);
       const slippage = new Percent(5, 100);
@@ -611,7 +611,7 @@ export function test() {
         admin,
         payer,
         client,
-        quoteToken: MEMECHAN_QUOTE_TOKEN,
+        quoteToken: TOKEN_INFOS.WSOL,
         tokenMetadata: DUMMY_TOKEN_METADATA,
       });
 
@@ -623,7 +623,7 @@ export function test() {
         user: payer,
         memeTokensOut: new BN(100 * 1e6),
         quoteAmountIn: new BN(5000 * 1e9),
-        quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
+        quoteMint: TOKEN_INFOS.WSOL.mint,
         pool: boundPool.id,
         memeTicketNumber: 1,
       });
@@ -636,7 +636,7 @@ export function test() {
         user: payer,
         memeTokensOut: new BN(4000 * 1e6),
         quoteAmountIn: new BN(40000 * 1e9),
-        quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
+        quoteMint: TOKEN_INFOS.WSOL.mint,
         pool: boundPool.id,
         memeTicketNumber: 2,
       });
@@ -666,7 +666,7 @@ export function test() {
       const ammPool = livePool.ammPoolInfo;
       console.log("ammPool: " + JSON.stringify(ammPool));
 
-      const inputToken = MEMECHAN_QUOTE_TOKEN;
+      const inputToken = TOKEN_INFOS.WSOL;
       const outputToken = new Token(TOKEN_PROGRAM_ID, ammPool.baseMint, MEMECHAN_MEME_TOKEN_DECIMALS);
       const inputTokenAmount = new TokenAmount(inputToken, 10000);
       const slippage = new Percent(5, 100);

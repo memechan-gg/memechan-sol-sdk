@@ -2,7 +2,7 @@ import { ApiPoolInfoV4, Liquidity, Percent, Token, TokenAmount, jsonInfo2PoolKey
 import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import { Connection, PublicKey } from "@solana/web3.js";
 import BigNumber from "bignumber.js";
-import { MEMECHAN_MEME_TOKEN_DECIMALS, MEMECHAN_QUOTE_TOKEN } from "../config/config";
+import { MEMECHAN_MEME_TOKEN_DECIMALS } from "../config/config";
 import { makeTxVersion } from "../raydium/config";
 import { formatAmmKeysById } from "../raydium/formatAmmKeysById";
 import {
@@ -15,6 +15,7 @@ import { getNumeratorAndDenominator } from "./utils";
 import { MemechanClient } from "../MemechanClient";
 import BN from "bn.js";
 import { getMultipleTokenBalances } from "../util/getMultipleTokenBalances";
+import { getTokenInfoByMint } from "../config/helpers";
 
 export class LivePoolClient {
   private constructor(
@@ -34,7 +35,6 @@ export class LivePoolClient {
     slippagePercentage,
     connection,
   }: GetSwapMemeOutputArgs): Promise<SwapMemeOutput> {
-    const quoteAmountIn = new TokenAmount(MEMECHAN_QUOTE_TOKEN, amountIn, false);
     const tokenOut = new Token(TOKEN_PROGRAM_ID, memeCoinMint, MEMECHAN_MEME_TOKEN_DECIMALS);
     const { numerator, denominator } = getNumeratorAndDenominator(slippagePercentage);
     const slippage = new Percent(numerator, denominator);
@@ -48,6 +48,9 @@ export class LivePoolClient {
     const poolKeys = jsonInfo2PoolKeys(targetPoolInfo);
 
     const [baseReserve, quoteReserve] = await getReserveBalances(connection, [poolKeys.baseVault, poolKeys.quoteVault]);
+
+    const quoteTokenInfo = getTokenInfoByMint(poolKeys.quoteMint);
+    const quoteAmountIn = new TokenAmount(quoteTokenInfo, amountIn, false);
 
     const { minAmountOut } = Liquidity.computeAmountOut({
       poolKeys: poolKeys,
@@ -131,7 +134,6 @@ export class LivePoolClient {
   }: GetSwapMemeOutputArgs): Promise<SwapMemeOutput> {
     const memeToken = new Token(TOKEN_PROGRAM_ID, memeCoinMint, MEMECHAN_MEME_TOKEN_DECIMALS);
     const memeAmountIn = new TokenAmount(memeToken, amountIn, false);
-    const tokenOut = MEMECHAN_QUOTE_TOKEN;
     const { numerator, denominator } = getNumeratorAndDenominator(slippagePercentage);
     const slippage = new Percent(numerator, denominator);
 
@@ -144,6 +146,8 @@ export class LivePoolClient {
     const poolKeys = jsonInfo2PoolKeys(targetPoolInfo);
 
     const [baseReserve, quoteReserve] = await getReserveBalances(connection, [poolKeys.baseVault, poolKeys.quoteVault]);
+
+    const quoteTokenInfo = getTokenInfoByMint(poolKeys.quoteMint);
 
     const { minAmountOut } = Liquidity.computeAmountOut({
       poolKeys: poolKeys,
@@ -158,7 +162,7 @@ export class LivePoolClient {
         startTime: new BN(0),
       },
       amountIn: memeAmountIn,
-      currencyOut: tokenOut,
+      currencyOut: quoteTokenInfo,
       slippage,
     });
 
@@ -230,7 +234,9 @@ export class LivePoolClient {
     const targetPoolInfo = await formatAmmKeysById(poolAddress, connection);
     const poolKeys = jsonInfo2PoolKeys(targetPoolInfo);
 
-    const quoteAmountIn = new TokenAmount(MEMECHAN_QUOTE_TOKEN, 1000);
+    const quoteTokenInfo = getTokenInfoByMint(poolKeys.quoteMint);
+    const quoteAmountIn = new TokenAmount(quoteTokenInfo, 1000, false);
+
     const tokenOut = new Token(TOKEN_PROGRAM_ID, poolKeys.baseMint, MEMECHAN_MEME_TOKEN_DECIMALS);
     const slippage = new Percent(1, 10000);
 

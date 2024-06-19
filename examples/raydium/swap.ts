@@ -1,6 +1,6 @@
 import { Percent, Token, TokenAmount } from "@raydium-io/raydium-sdk";
 import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
-import { MEMECHAN_MEME_TOKEN_DECIMALS, MEMECHAN_QUOTE_TOKEN } from "../../src/config/config";
+import { MEMECHAN_MEME_TOKEN_DECIMALS, TOKEN_INFOS } from "../../src/config/config";
 import { swapOnlyAmm } from "../../src/raydium/swapOnlyAmm";
 import { client, connection, payer } from "../common";
 import { getWalletTokenAccount } from "../../src/util";
@@ -11,7 +11,7 @@ export const swap = async () => {
   const poolAddress = "BevUTtVUZQ4LdwWfcq4Uom88yuj1WE2EUiZBgESUsFQT";
   const memeMint = "2Y3jTuAc778X9Fgh9iejxpK6zBYDSwpUdr1Kz5SdGh5x";
 
-  const quoteAmountIn = new TokenAmount(MEMECHAN_QUOTE_TOKEN, 10000000);
+  const quoteAmountIn = new TokenAmount(TOKEN_INFOS.SLERF, 10000000);
   const tokenOut = new Token(TOKEN_PROGRAM_ID, memeMint, MEMECHAN_MEME_TOKEN_DECIMALS);
   const slippage = new Percent(1, 10000);
   const walletTokenAccounts = await getWalletTokenAccount(client.connection, payer.publicKey);

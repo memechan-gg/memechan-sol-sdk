@@ -1,6 +1,6 @@
 import { BN } from "bn.js";
 import { BoundPoolClient } from "../../src/bound-pool/BoundPoolClient";
-import { FEE_DESTINATION_ID, MEMECHAN_QUOTE_TOKEN } from "../../src/config/config";
+import { FEE_DESTINATION_ID, TOKEN_INFOS } from "../../src/config/config";
 import { DUMMY_TOKEN_METADATA, admin, client, payer } from "../common";
 import { MemeTicketClient } from "../../src";
 
@@ -10,7 +10,7 @@ export const goLive = async () => {
     admin,
     payer,
     client,
-    quoteToken: MEMECHAN_QUOTE_TOKEN,
+    quoteToken: TOKEN_INFOS.WSOL,
     tokenMetadata: DUMMY_TOKEN_METADATA,
   });
   console.log("boundPool:", boundPool);
@@ -24,7 +24,7 @@ export const goLive = async () => {
     user: payer,
     memeTokensOut: new BN(10000),
     quoteAmountIn: new BN(10000000),
-    quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
+    quoteMint: TOKEN_INFOS.WSOL.mint,
     pool: boundPool.id,
     memeTicketNumber,
   });

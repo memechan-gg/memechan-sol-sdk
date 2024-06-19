@@ -1,7 +1,7 @@
 import { BN } from "@coral-xyz/anchor";
 import { BoundPoolClient } from "../src/bound-pool/BoundPoolClient";
 import { DEFAULT_BOUND_POOL_WITH_BUY_MEME_ARGS, client, payer } from "./common/common";
-import { FEE_DESTINATION_ID, MEMECHAN_QUOTE_TOKEN } from "../src/config/config";
+import { FEE_DESTINATION_ID } from "../src/config/config";
 import { MemeTicketClient } from "../src/memeticket/MemeTicketClient";
 
 export function test() {
@@ -24,7 +24,7 @@ export function test() {
         user: payer,
         memeTokensOut: new BN(100 * 1e6),
         quoteAmountIn: new BN(500 * 1e9),
-        quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
+        quoteMint: DEFAULT_BOUND_POOL_WITH_BUY_MEME_ARGS.quoteToken.mint,
         pool: boundPool.id,
         memeTicketNumber: memeTicketNumber++, // +1
       });
@@ -37,7 +37,7 @@ export function test() {
         user: payer,
         memeTokensOut: new BN(100 * 1e6),
         quoteAmountIn: new BN(499 * 1e9),
-        quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
+        quoteMint: DEFAULT_BOUND_POOL_WITH_BUY_MEME_ARGS.quoteToken.mint,
         pool: boundPool.id,
         memeTicketNumber: memeTicketNumber++, // +1
       });
@@ -144,7 +144,7 @@ export function test() {
           user: payer,
           memeTokensOut: new BN(100 * 1e6),
           quoteAmountIn: new BN(4000 * 1e9),
-          quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
+          quoteMint: DEFAULT_BOUND_POOL_WITH_BUY_MEME_ARGS.quoteToken.mint,
           pool: pool.id,
           memeTicketNumber: memeTicketNumber++, // +1
         });

@@ -65,6 +65,7 @@ export const unstake = async () => {
     });
 
     console.log("payer: " + payer.publicKey.toBase58());
+    return;
     const signature = await sendAndConfirmTransaction(client.connection, transaction, [payer], {
       commitment: "confirmed",
       skipPreflight: true,

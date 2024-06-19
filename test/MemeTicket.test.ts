@@ -1,6 +1,6 @@
 import BN from "bn.js";
 import { BoundPoolClient } from "../src/bound-pool/BoundPoolClient";
-import { FEE_DESTINATION_ID, MEMECHAN_QUOTE_TOKEN } from "../src/config/config";
+import { FEE_DESTINATION_ID, TOKEN_INFOS } from "../src/config/config";
 import { MemeTicketClient } from "../src/memeticket/MemeTicketClient";
 import { MintUtils } from "../src/token/mintUtils";
 import { DUMMY_TOKEN_METADATA, LIVE_BOUND_POOL_ID, admin, client, payer } from "./common/common";
@@ -30,7 +30,7 @@ export function test() {
           user: payer,
           memeTokensOut: new BN(1),
           quoteAmountIn: new BN(1000),
-          quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
+          quoteMint: TOKEN_INFOS.WSOL.mint,
           pool: pool.id,
           memeTicketNumber: memeTicketNumber++, // +1
         }),
@@ -44,7 +44,7 @@ export function test() {
           user: payer,
           memeTokensOut: new BN(2),
           quoteAmountIn: new BN(2000),
-          quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
+          quoteMint: TOKEN_INFOS.WSOL.mint,
           pool: pool.id,
           memeTicketNumber: memeTicketNumber++, // +1
         }),
@@ -58,7 +58,7 @@ export function test() {
           user: payer,
           memeTokensOut: new BN(3),
           quoteAmountIn: new BN(3000),
-          quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
+          quoteMint: TOKEN_INFOS.WSOL.mint,
           pool: pool.id,
           memeTicketNumber: memeTicketNumber++, // +1
         }),
@@ -81,7 +81,7 @@ export function test() {
         admin,
         payer,
         client,
-        quoteToken: MEMECHAN_QUOTE_TOKEN,
+        quoteToken: TOKEN_INFOS.WSOL,
         tokenMetadata: DUMMY_TOKEN_METADATA,
       });
 
@@ -96,7 +96,7 @@ export function test() {
           user: payer,
           memeTokensOut: new BN(1),
           quoteAmountIn: new BN(1000),
-          quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
+          quoteMint: TOKEN_INFOS.WSOL.mint,
           pool: pool.id,
           memeTicketNumber: memeTicketNumber++, // +1
         }),
@@ -110,7 +110,7 @@ export function test() {
           user: payer,
           memeTokensOut: new BN(2),
           quoteAmountIn: new BN(2000),
-          quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
+          quoteMint: TOKEN_INFOS.WSOL.mint,
           pool: pool.id,
           memeTicketNumber: memeTicketNumber++, // +1
         }),
@@ -124,7 +124,7 @@ export function test() {
           user: payer,
           memeTokensOut: new BN(3),
           quoteAmountIn: new BN(3000),
-          quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
+          quoteMint: TOKEN_INFOS.WSOL.mint,
           pool: pool.id,
           memeTicketNumber: memeTicketNumber++, // +1
         }),
@@ -174,7 +174,7 @@ export function test() {
         user: payer,
         memeTokensOut: new BN(1),
         quoteAmountIn: new BN(1000),
-        quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
+        quoteMint: TOKEN_INFOS.WSOL.mint,
         pool: pool.id,
         memeTicketNumber,
       });
@@ -186,13 +186,13 @@ export function test() {
       console.log("ticketInfo: ", ticketInfo);
 
       const mintUtils = new MintUtils(client.connection, payer);
-      const quoteAccount = await mintUtils.getOrCreateTokenAccount(MEMECHAN_QUOTE_TOKEN.mint, payer, payer.publicKey);
+      const quoteAccount = await mintUtils.getOrCreateTokenAccount(TOKEN_INFOS.WSOL.mint, payer, payer.publicKey);
 
       const swapXTxResult = await pool.swapX({
         user: payer,
         memeAmountIn: ticketInfo.amount,
         minQuoteAmountOut: new BN(1),
-        quoteMint: MEMECHAN_QUOTE_TOKEN.mint,
+        quoteMint: TOKEN_INFOS.WSOL.mint,
         userMemeTicket: ticket,
         userQuoteAcc: quoteAccount.address,
       });

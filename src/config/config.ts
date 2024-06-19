@@ -1,7 +1,7 @@
-import { TOKEN_PROGRAM_ID, Token } from "@raydium-io/raydium-sdk";
+import { TOKEN_PROGRAM_ID } from "@raydium-io/raydium-sdk";
 import { PublicKey } from "@solana/web3.js";
 import BigNumber from "bignumber.js";
-import { TokenConfig } from "./types";
+import { TokenInfo } from "./types";
 import { NATIVE_MINT } from "@solana/spl-token";
 
 export const BE_URL_DEV = "https://dmgrnigolfno6.cloudfront.net";
@@ -65,19 +65,31 @@ export const PATS_MINT = new PublicKey("35fN6LMYt6cKsemgbR28nFooiJtcnvaKPCeRXyuM
 //   "WSOL",
 // );
 
-export const QUOTE_TOKEN_CONFIGS: { [symbol: string]: TokenConfig } = {
-  WSOL: {
-    mint: NATIVE_MINT,
-    targetConfig: new PublicKey("C1PwZ2gxgfk3Bzku1fvRGBXeoTVnxteLiTDq3JLxvJTP"),
-    decimals: 9,
-    name: "WSOL",
-  },
-  SLERF: {
-    mint: new PublicKey("9pECN2xxLQo22bFYpsNr3T3eW1UdEDtSqPQopFrGv7n4"),
-    targetConfig: new PublicKey("EEeLC1a7qbK2mbvfYt8owGzQcBjYguE1FWhWYuGjyABu"),
-    decimals: 9,
-    name: "SLERF",
-  },
+export const TOKEN_INFOS: { [symbol: string]: TokenInfo } = {
+  WSOL: new TokenInfo(
+    TOKEN_PROGRAM_ID,
+    NATIVE_MINT,
+    9,
+    "WSOL",
+    "WSOL",
+    new PublicKey("C1PwZ2gxgfk3Bzku1fvRGBXeoTVnxteLiTDq3JLxvJTP"),
+  ),
+  // SLERF: {
+  //   mint: new PublicKey("7BgBvyjrZX1YKz4oh9mjb8ZScatkkwb8DzFx7LoiVkM3"),
+  //   targetConfig: new PublicKey("5g13tz8GKWySjtzPRARuzzQM7LbMCUBMPGPef5PKe4JJ"),
+  //   decimals: 9,
+  //   name: "SLERF",
+  // },
+  SLERF:
+    // dev
+    new TokenInfo(
+      TOKEN_PROGRAM_ID,
+      new PublicKey("9pECN2xxLQo22bFYpsNr3T3eW1UdEDtSqPQopFrGv7n4"),
+      9,
+      "SLERF",
+      "SLERF",
+      new PublicKey("EEeLC1a7qbK2mbvfYt8owGzQcBjYguE1FWhWYuGjyABu"),
+    ),
 };
 
 export const MEMECHAN_MEME_TOKEN_DECIMALS = 6;
