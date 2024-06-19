@@ -4,6 +4,10 @@ export interface TokenConfig {
   mint: PublicKey;
   targetConfig: PublicKey;
   decimals: number;
-  symbol: string;
   name: string;
+}
+
+export enum TokenSymbol {
+  WSOL = "WSOL",
+  SLERF = "SLERF",
 }

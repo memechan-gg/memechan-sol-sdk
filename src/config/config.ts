@@ -2,6 +2,7 @@ import { TOKEN_PROGRAM_ID, Token } from "@raydium-io/raydium-sdk";
 import { PublicKey } from "@solana/web3.js";
 import BigNumber from "bignumber.js";
 import { TokenConfig } from "./types";
+import { NATIVE_MINT } from "@solana/spl-token";
 
 export const BE_URL_DEV = "https://dmgrnigolfno6.cloudfront.net";
 
@@ -51,50 +52,43 @@ export const FEE_DESTINATION_ID = "7YttLkHDoNj9wyDur5pM1ejNaAvT9X4eqaYcHQqtj2G5"
 // https://explorer.solana.com/address/35fN6LMYt6cKsemgbR28nFooiJtcnvaKPCeRXyuMKfoF
 export const PATS_MINT = new PublicKey("35fN6LMYt6cKsemgbR28nFooiJtcnvaKPCeRXyuMKfoF");
 
-export const MEMECHAN_QUOTE_MINT = new PublicKey("So11111111111111111111111111111111111111112"); // dev fake slerf
+// export const MEMECHAN_QUOTE_MINT = new PublicKey("So11111111111111111111111111111111111111112"); // dev fake slerf
 // export const MEMECHAN_QUOTE_MINT = SLERF_MINT; // prod
 // export const MEMECHAN_TARGET_CONFIG = new PublicKey("5g13tz8GKWySjtzPRARuzzQM7LbMCUBMPGPef5PKe4JJ"); // prod
-export const MEMECHAN_TARGET_CONFIG = new PublicKey("C1PwZ2gxgfk3Bzku1fvRGBXeoTVnxteLiTDq3JLxvJTP"); // dev
-export const MEMECHAN_QUOTE_TOKEN_DECIMALS = 9; // current devnet quote token decimals
-export const MEMECHAN_QUOTE_TOKEN: Token = new Token(
-  TOKEN_PROGRAM_ID,
-  MEMECHAN_QUOTE_MINT,
-  MEMECHAN_QUOTE_TOKEN_DECIMALS,
-  "WSOL",
-  "WSOL",
-);
+// export const MEMECHAN_TARGET_CONFIG = new PublicKey("C1PwZ2gxgfk3Bzku1fvRGBXeoTVnxteLiTDq3JLxvJTP"); // dev
+// export const MEMECHAN_QUOTE_TOKEN_DECIMALS = 9; // current devnet quote token decimals
+// export const MEMECHAN_QUOTE_TOKEN: Token = new Token(
+//   TOKEN_PROGRAM_ID,
+//   MEMECHAN_QUOTE_MINT,
+//   MEMECHAN_QUOTE_TOKEN_DECIMALS,
+//   "WSOL",
+//   "WSOL",
+// );
 
-export const TOKEN_CONFIGS: TokenConfig[] = [
-  {
-    mint: new PublicKey("So11111111111111111111111111111111111111112"),
+export const QUOTE_TOKEN_CONFIGS: { [symbol: string]: TokenConfig } = {
+  WSOL: {
+    mint: NATIVE_MINT,
     targetConfig: new PublicKey("C1PwZ2gxgfk3Bzku1fvRGBXeoTVnxteLiTDq3JLxvJTP"),
     decimals: 9,
-    symbol: "WSOL",
     name: "WSOL",
   },
-  {
+  SLERF: {
     mint: new PublicKey("9pECN2xxLQo22bFYpsNr3T3eW1UdEDtSqPQopFrGv7n4"),
     targetConfig: new PublicKey("EEeLC1a7qbK2mbvfYt8owGzQcBjYguE1FWhWYuGjyABu"),
     decimals: 9,
-    symbol: "SLERF",
     name: "SLERF",
   },
-  // Add more token configurations as needed
-];
+};
 
 export const MEMECHAN_MEME_TOKEN_DECIMALS = 6;
 
 // Contract constants
 export const MEME_TOKEN_DECIMALS = 1_000_000;
 export const WSOL_DECIMALS = 1_000_000_000;
-export const MAX_TICKET_TOKENS = 800_000_000;
 export const MAX_MEME_TOKENS = 1_000_000_000;
 
-export const DEFAULT_PRICE_FACTOR = 2;
 export const DEFAULT_MAX_M_LP = 200_000_000_000_000;
 export const DEFAULT_MAX_M = 800_000_000_000_000;
-
-export const DECIMALS_S = 1_000_000_000;
 
 export const MAX_TRANSACTION_SIZE = 1232;
 export const ADMIN_PUB_KEY = new PublicKey("KZbAoMgCcb2gDEn2Ucea86ux84y25y3ybbWQGQpd9D6");
