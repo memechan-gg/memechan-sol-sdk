@@ -258,6 +258,8 @@ export class BoundPoolClient {
       transaction: createPoolTransaction,
     });
 
+    const quoteInfo = getTokenInfoByMint(quoteToken.mint);
+
     const createPoolInstruction = await memechanProgram.methods
       .newPool()
       .accounts({
@@ -271,6 +273,7 @@ export class BoundPoolClient {
         quoteMint: quoteToken.mint,
         tokenProgram: TOKEN_PROGRAM_ID,
         systemProgram: SystemProgram.programId,
+        targetConfig: quoteInfo.targetConfig,
       })
       .instruction();
 
