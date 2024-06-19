@@ -3,6 +3,7 @@ import BN from "bn.js";
 import { TargetConfigClient, sleep } from "../../src";
 import {
   MEMECHAN_MEME_TOKEN_DECIMALS,
+  MEMECHAN_QUOTE_MINT,
   MEMECHAN_QUOTE_TOKEN,
   MEMECHAN_QUOTE_TOKEN_DECIMALS,
   SLERF_MINT,
@@ -16,7 +17,7 @@ export const createTargetConfig = async () => {
   // const mint = await mintUtils.createMint(MEMECHAN_MEME_TOKEN_DECIMALS);
 
   // const mint = MEMECHAN_QUOTE_TOKEN.mint; // fake slerf
-  const mint = SLERF_MINT;
+  const mint = MEMECHAN_QUOTE_MINT;
 
   // const targetAmountRaw = 40_000;
   // const targetAmountRaw = 400;
