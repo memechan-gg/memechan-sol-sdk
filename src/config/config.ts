@@ -1,6 +1,7 @@
 import { TOKEN_PROGRAM_ID, Token } from "@raydium-io/raydium-sdk";
 import { PublicKey } from "@solana/web3.js";
 import BigNumber from "bignumber.js";
+import { TokenConfig } from "./types";
 
 export const BE_URL_DEV = "https://dmgrnigolfno6.cloudfront.net";
 
@@ -10,7 +11,8 @@ export const BE_URL_DEV = "https://dmgrnigolfno6.cloudfront.net";
  *
  * @constant {string}
  */
-export const BE_URL = "https://api.memechan.gg";
+// export const BE_URL = "https://api.memechan.gg";
+export const BE_URL = BE_URL_DEV;
 
 export const BE_REGION = "us-east-1";
 
@@ -44,23 +46,42 @@ export const COMPUTE_UNIT_PRICE = 200_000; // priority fee. 0.2 lamports per com
 
 export const FEE_DESTINATION_ID = "7YttLkHDoNj9wyDur5pM1ejNaAvT9X4eqaYcHQqtj2G5";
 
-export const SLERF_MINT = new PublicKey("7BgBvyjrZX1YKz4oh9mjb8ZScatkkwb8DzFx7LoiVkM3");
+// export const SLERF_MINT = new PublicKey("7BgBvyjrZX1YKz4oh9mjb8ZScatkkwb8DzFx7LoiVkM3");
 
 // https://explorer.solana.com/address/35fN6LMYt6cKsemgbR28nFooiJtcnvaKPCeRXyuMKfoF
 export const PATS_MINT = new PublicKey("35fN6LMYt6cKsemgbR28nFooiJtcnvaKPCeRXyuMKfoF");
 
-export const MEMECHAN_QUOTE_MINT = new PublicKey("9pECN2xxLQo22bFYpsNr3T3eW1UdEDtSqPQopFrGv7n4"); // dev fake slerf
+export const MEMECHAN_QUOTE_MINT = new PublicKey("So11111111111111111111111111111111111111112"); // dev fake slerf
 // export const MEMECHAN_QUOTE_MINT = SLERF_MINT; // prod
 // export const MEMECHAN_TARGET_CONFIG = new PublicKey("5g13tz8GKWySjtzPRARuzzQM7LbMCUBMPGPef5PKe4JJ"); // prod
-export const MEMECHAN_TARGET_CONFIG = new PublicKey("EEeLC1a7qbK2mbvfYt8owGzQcBjYguE1FWhWYuGjyABu"); // dev
+export const MEMECHAN_TARGET_CONFIG = new PublicKey("C1PwZ2gxgfk3Bzku1fvRGBXeoTVnxteLiTDq3JLxvJTP"); // dev
 export const MEMECHAN_QUOTE_TOKEN_DECIMALS = 9; // current devnet quote token decimals
 export const MEMECHAN_QUOTE_TOKEN: Token = new Token(
   TOKEN_PROGRAM_ID,
   MEMECHAN_QUOTE_MINT,
   MEMECHAN_QUOTE_TOKEN_DECIMALS,
-  "SLERF",
-  "SLERF",
+  "WSOL",
+  "WSOL",
 );
+
+export const TOKEN_CONFIGS: TokenConfig[] = [
+  {
+    mint: new PublicKey("So11111111111111111111111111111111111111112"),
+    targetConfig: new PublicKey("C1PwZ2gxgfk3Bzku1fvRGBXeoTVnxteLiTDq3JLxvJTP"),
+    decimals: 9,
+    symbol: "WSOL",
+    name: "WSOL",
+  },
+  {
+    mint: new PublicKey("9pECN2xxLQo22bFYpsNr3T3eW1UdEDtSqPQopFrGv7n4"),
+    targetConfig: new PublicKey("EEeLC1a7qbK2mbvfYt8owGzQcBjYguE1FWhWYuGjyABu"),
+    decimals: 9,
+    symbol: "SLERF",
+    name: "SLERF",
+  },
+  // Add more token configurations as needed
+];
+
 export const MEMECHAN_MEME_TOKEN_DECIMALS = 6;
 
 // Contract constants
