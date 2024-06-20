@@ -73,6 +73,7 @@ export const TOKEN_INFOS: { [symbol: string]: TokenInfo } = {
     "WSOL",
     "WSOL",
     new PublicKey("C1PwZ2gxgfk3Bzku1fvRGBXeoTVnxteLiTDq3JLxvJTP"),
+    "SOL",
   ),
   // SLERF: {
   //   mint: new PublicKey("7BgBvyjrZX1YKz4oh9mjb8ZScatkkwb8DzFx7LoiVkM3"),

@@ -11,6 +11,7 @@ export class TokenInfo extends Token {
     symbol: string,
     name: string,
     targetConfig: PublicKey,
+    public readonly displayName: string = name,
   ) {
     super(programId, mint, decimals, symbol, name);
     this.targetConfig = targetConfig;
