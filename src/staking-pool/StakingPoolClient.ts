@@ -33,6 +33,8 @@ import {
   getAvailableWithdrawFeesAmountArgs,
 } from "./types";
 import { addUnwrapSOLInstructionIfNativeMint } from "../util/addUnwrapSOLInstructionIfNativeMint";
+import { getTokenInfoByMint } from "../config/helpers";
+import { TokenInfo } from "../config/types";
 
 export class StakingPoolClient {
   constructor(
@@ -446,6 +448,11 @@ export class StakingPoolClient {
    */
   public async fetchRelatedTickets(pool = this.pool, client = this.client): Promise<MemeTicketFields[]> {
     return MemeTicketClient.fetchRelatedTickets(pool, client);
+  }
+
+  public async getTokenInfo(): Promise<TokenInfo> {
+    const quoteAccount = await getAccount(this.client.connection, this.quoteVault);
+    return getTokenInfoByMint(quoteAccount.mint);
   }
 
   /**

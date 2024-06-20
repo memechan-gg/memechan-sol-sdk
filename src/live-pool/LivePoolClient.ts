@@ -16,6 +16,7 @@ import { MemechanClient } from "../MemechanClient";
 import BN from "bn.js";
 import { getMultipleTokenBalances } from "../util/getMultipleTokenBalances";
 import { getTokenInfoByMint } from "../config/helpers";
+import { TokenInfo } from "../config/types";
 
 export class LivePoolClient {
   private constructor(
@@ -23,6 +24,10 @@ export class LivePoolClient {
     public ammPoolInfo: ApiPoolInfoV4,
     public client: MemechanClient,
   ) {}
+
+  public getTokenInfo(): TokenInfo {
+    return getTokenInfoByMint(new PublicKey(this.ammPoolInfo.quoteMint));
+  }
 
   public static async fromAmmId(ammId: PublicKey, client: MemechanClient): Promise<LivePoolClient> {
     return new LivePoolClient(ammId, await formatAmmKeysById(ammId.toBase58(), client.connection), client);

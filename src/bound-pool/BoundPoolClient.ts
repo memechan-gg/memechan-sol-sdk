@@ -85,6 +85,7 @@ import { NoBoundPoolExist } from "./errors";
 import { getTokenInfoByMint } from "../config/helpers";
 import { addWrapSOLInstructionIfNativeMint } from "../util/addWrapSOLInstructionIfNativeMint";
 import { addUnwrapSOLInstructionIfNativeMint } from "../util/addUnwrapSOLInstructionIfNativeMint";
+import { TokenInfo } from "../config/types";
 
 export class BoundPoolClient {
   private constructor(
@@ -1283,6 +1284,10 @@ export class BoundPoolClient {
 
   public async getHoldersList() {
     return BoundPoolClient.getHoldersList(this.id, this.client);
+  }
+
+  public getTokenInfo(): TokenInfo {
+    return getTokenInfoByMint(this.quoteTokenMint);
   }
 
   /**
