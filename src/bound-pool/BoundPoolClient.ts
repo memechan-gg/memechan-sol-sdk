@@ -1330,6 +1330,12 @@ export class BoundPoolClient {
     return uniqueHolders;
   }
 
+  public static async getQuoteTokenDisplayName(poolAddress: PublicKey, connection: Connection) {
+    const pool = await BoundPoolClient.fetch2(connection, poolAddress);
+    const quoteToken = getTokenInfoByMint(pool.quoteReserve.mint);
+    return quoteToken.displayName;
+  }
+
   /**
    * Fetches all unique token holders for pool and returns thier addresses
    */
