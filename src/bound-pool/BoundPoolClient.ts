@@ -92,6 +92,7 @@ import { ensureAssociatedTokenAccountWithIX } from "../util/ensureAssociatedToke
 import { NoBoundPoolExist } from "./errors";
 import { getTokenInfoByMint } from "../config/helpers";
 import { addWrapSOLInstructionIfNativeMint } from "../util/addWrapSOLInstructionIfNativeMint";
+import { addUnwrapSOLInstructionIfNativeMint } from "../util/addUnwrapSOLInstructionIfNativeMint";
 
 export class BoundPoolClient {
   private constructor(
@@ -587,33 +588,16 @@ export class BoundPoolClient {
     // If `inputTokenAccount` is not passed in args, we need to find out, whether a quote account for an admin
     // already exists
     if (!inputTokenAccount) {
-      const associatedToken = getAssociatedTokenAddressSync(
-        this.quoteTokenMint,
-        user,
-        true,
-        TOKEN_PROGRAM_ID,
-        ASSOCIATED_TOKEN_PROGRAM_ID,
-      );
-
-      const account = await getAccount(connection, associatedToken);
-      inputTokenAccount = account.address;
-
-      // If the quote account for the admin doesn't exist, add an instruction to create it
-      if (!inputTokenAccount) {
-        const associatedTransactionInstruction = createAssociatedTokenAccountInstruction(
-          user,
-          associatedToken,
-          user,
-          this.quoteTokenMint,
-          TOKEN_PROGRAM_ID,
-          ASSOCIATED_TOKEN_PROGRAM_ID,
-        );
-
-        transaction.add(associatedTransactionInstruction);
-
-        inputTokenAccount = associatedToken;
-      }
+      inputTokenAccount = await ensureAssociatedTokenAccountWithIX({
+        connection: connection,
+        payer: user,
+        mint: this.quoteTokenMint,
+        owner: user,
+        transaction,
+      });
     }
+
+    addWrapSOLInstructionIfNativeMint(this.quoteTokenMint, user, inputTokenAccount, inputAmountBN, transaction);
 
     const buyMemeInstruction = await this.client.memechanProgram.methods
       .swapY(inputAmountBN, minOutputBN, ticketNumberBN)
@@ -830,32 +814,13 @@ export class BoundPoolClient {
 
     // If `outputTokenAccount` is not passed in args, we need to find out, whether a outputTokenAccount exists for user
     if (!outputTokenAccount) {
-      const associatedToken = getAssociatedTokenAddressSync(
-        this.quoteTokenMint,
-        user,
-        true,
-        TOKEN_PROGRAM_ID,
-        ASSOCIATED_TOKEN_PROGRAM_ID,
-      );
-
-      const account = await getAccount(connection, associatedToken);
-      outputTokenAccount = account.address;
-
-      // If doesn't exist, add an instruction to create it
-      if (!outputTokenAccount) {
-        const associatedTransactionInstruction = createAssociatedTokenAccountInstruction(
-          user,
-          associatedToken,
-          user,
-          this.quoteTokenMint,
-          TOKEN_PROGRAM_ID,
-          ASSOCIATED_TOKEN_PROGRAM_ID,
-        );
-
-        transaction.add(associatedTransactionInstruction);
-
-        outputTokenAccount = associatedToken;
-      }
+      outputTokenAccount = await ensureAssociatedTokenAccountWithIX({
+        connection: connection,
+        payer: user,
+        mint: this.quoteTokenMint,
+        owner: user,
+        transaction,
+      });
     }
 
     const { ticketsRequiredToSell, isMoreThanOneTicket } = await MemeTicketClient.getRequiredTicketsToSell({
@@ -894,6 +859,8 @@ export class BoundPoolClient {
       .instruction();
 
     transaction.add(sellMemeTransactionInstruction);
+
+    await addUnwrapSOLInstructionIfNativeMint(this.quoteTokenMint, user, transaction);
 
     const optimizedTransactions = getOptimizedTransactions(transaction.instructions, input.user);
 
