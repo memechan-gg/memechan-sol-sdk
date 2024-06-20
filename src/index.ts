@@ -18,6 +18,7 @@ export * from "./vesting/types";
 // Config
 export * from "./config/config";
 export * from "./config/helpers";
+export * from "./config/types";
 
 // API
 export * from "./api/auth/Auth";
