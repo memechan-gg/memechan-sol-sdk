@@ -310,6 +310,8 @@ export class StakingPoolClient {
 
     tx.add(withdrawFeesInstruction);
 
+    addUnwrapSOLInstructionIfNativeMint(quoteAccount.mint, args.user, tx);
+
     return tx;
   }
 
