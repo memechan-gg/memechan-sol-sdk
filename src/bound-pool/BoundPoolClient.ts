@@ -610,8 +610,8 @@ export class BoundPoolClient {
     });
 
     transaction.add(addPriorityFee);
-
     transaction.add(buyMemeInstruction);
+    addUnwrapSOLInstructionIfNativeMint(this.quoteTokenMint, user, transaction); // unwrap if we get back some change
 
     return { tx: transaction, memeTicketPublicKey, inputTokenAccount };
   }
