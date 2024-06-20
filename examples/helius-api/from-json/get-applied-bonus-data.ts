@@ -1,6 +1,6 @@
 /* eslint-disable max-len */
 import BigNumber from "bignumber.js";
-import { CHAN_TOKEN_DECIMALS, DECIMALS_S, PRESALE_ADDRESS } from "../../../src";
+import { CHAN_TOKEN_DECIMALS, PRESALE_ADDRESS } from "../../../src";
 import { TransactionDataByDigest } from "../../../src/helius-api/typeguards/txTypeguard";
 import { HeliusApiInstance } from "../../common";
 import { readDataFromJsonFile, saveDataToJsonFile } from "../../utils";
@@ -47,8 +47,8 @@ import { readDataFromJsonFile, saveDataToJsonFile } from "../../utils";
   console.debug(`Total amount (including bonus) (raw): ${totalAmountInludingBonus.toString()}`);
   console.debug(`Total amount (excluding bonus) (raw): ${totalAmountExcludingBonus.toString()}`);
 
-  console.debug(`Total amount (including bonus) (SOL): ${totalAmountInludingBonus.dividedBy(DECIMALS_S).toString()}`);
-  console.debug(`Total amount (excluding bonus) (SOL): ${totalAmountExcludingBonus.dividedBy(DECIMALS_S).toString()}`);
+  // console.debug(`Total amount (including bonus) (SOL): ${totalAmountInludingBonus.dividedBy(DECIMALS_S).toString()}`);
+  // console.debug(`Total amount (excluding bonus) (SOL): ${totalAmountExcludingBonus.dividedBy(DECIMALS_S).toString()}`);
 
   // totals by users
   console.debug(`Total amount by users (including bonus) (raw): ${totalUserAllocationsIncludingBonus.toString()}`);

@@ -9,10 +9,10 @@ import {
   Token,
   TokenAmount,
 } from "@raydium-io/raydium-sdk";
-import { ComputeBudgetProgram, Connection, Keypair } from "@solana/web3.js";
+import { ComputeBudgetProgram, Connection, Keypair, PublicKey } from "@solana/web3.js";
 import { formatAmmKeysById } from "./formatAmmKeysById";
 import { makeTxVersion } from "./config";
-import { COMPUTE_UNIT_PRICE, MEMECHAN_QUOTE_MINT } from "../config/config";
+import { COMPUTE_UNIT_PRICE } from "../config/config";
 import { buildAndSendTx, getWalletTokenAccount } from "../util";
 
 export type WalletTokenAccounts = Awaited<ReturnType<typeof getWalletTokenAccount>>;
@@ -37,7 +37,7 @@ export async function swapOnlyAmm(input: SawpOnlyAmmInputInfo) {
   const poolKeys = jsonInfo2PoolKeys(targetPoolInfo) as LiquidityPoolKeys;
 
   poolKeys.baseMint = input.outputToken.mint;
-  poolKeys.quoteMint = MEMECHAN_QUOTE_MINT;
+  poolKeys.quoteMint = new PublicKey(targetPoolInfo.quoteMint);
 
   // -------- step 1: coumpute amount out --------
 

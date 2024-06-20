@@ -1,6 +1,8 @@
-import { TOKEN_PROGRAM_ID, Token } from "@raydium-io/raydium-sdk";
+import { TOKEN_PROGRAM_ID } from "@raydium-io/raydium-sdk";
 import { PublicKey } from "@solana/web3.js";
 import BigNumber from "bignumber.js";
+import { TokenInfo } from "./types";
+import { NATIVE_MINT } from "@solana/spl-token";
 
 export const BE_URL_DEV = "https://dmgrnigolfno6.cloudfront.net";
 
@@ -10,7 +12,8 @@ export const BE_URL_DEV = "https://dmgrnigolfno6.cloudfront.net";
  *
  * @constant {string}
  */
-export const BE_URL = "https://api.memechan.gg";
+// export const BE_URL = "https://api.memechan.gg";
+export const BE_URL = BE_URL_DEV;
 
 export const BE_REGION = "us-east-1";
 
@@ -44,36 +47,61 @@ export const COMPUTE_UNIT_PRICE = 200_000; // priority fee. 0.2 lamports per com
 
 export const FEE_DESTINATION_ID = "7YttLkHDoNj9wyDur5pM1ejNaAvT9X4eqaYcHQqtj2G5";
 
-export const SLERF_MINT = new PublicKey("7BgBvyjrZX1YKz4oh9mjb8ZScatkkwb8DzFx7LoiVkM3");
+// export const SLERF_MINT = new PublicKey("7BgBvyjrZX1YKz4oh9mjb8ZScatkkwb8DzFx7LoiVkM3");
 
 // https://explorer.solana.com/address/35fN6LMYt6cKsemgbR28nFooiJtcnvaKPCeRXyuMKfoF
 export const PATS_MINT = new PublicKey("35fN6LMYt6cKsemgbR28nFooiJtcnvaKPCeRXyuMKfoF");
 
-export const MEMECHAN_QUOTE_MINT = new PublicKey("9pECN2xxLQo22bFYpsNr3T3eW1UdEDtSqPQopFrGv7n4"); // dev fake slerf
+// export const MEMECHAN_QUOTE_MINT = new PublicKey("So11111111111111111111111111111111111111112"); // dev fake slerf
 // export const MEMECHAN_QUOTE_MINT = SLERF_MINT; // prod
 // export const MEMECHAN_TARGET_CONFIG = new PublicKey("5g13tz8GKWySjtzPRARuzzQM7LbMCUBMPGPef5PKe4JJ"); // prod
-export const MEMECHAN_TARGET_CONFIG = new PublicKey("EEeLC1a7qbK2mbvfYt8owGzQcBjYguE1FWhWYuGjyABu"); // dev
-export const MEMECHAN_QUOTE_TOKEN_DECIMALS = 9; // current devnet quote token decimals
-export const MEMECHAN_QUOTE_TOKEN: Token = new Token(
-  TOKEN_PROGRAM_ID,
-  MEMECHAN_QUOTE_MINT,
-  MEMECHAN_QUOTE_TOKEN_DECIMALS,
-  "SLERF",
-  "SLERF",
-);
+// export const MEMECHAN_TARGET_CONFIG = new PublicKey("C1PwZ2gxgfk3Bzku1fvRGBXeoTVnxteLiTDq3JLxvJTP"); // dev
+// export const MEMECHAN_QUOTE_TOKEN_DECIMALS = 9; // current devnet quote token decimals
+// export const MEMECHAN_QUOTE_TOKEN: Token = new Token(
+//   TOKEN_PROGRAM_ID,
+//   MEMECHAN_QUOTE_MINT,
+//   MEMECHAN_QUOTE_TOKEN_DECIMALS,
+//   "WSOL",
+//   "WSOL",
+// );
+
+export const TOKEN_INFOS: { [symbol: string]: TokenInfo } = {
+  WSOL: new TokenInfo(
+    TOKEN_PROGRAM_ID,
+    NATIVE_MINT,
+    9,
+    "WSOL",
+    "WSOL",
+    new PublicKey("C1PwZ2gxgfk3Bzku1fvRGBXeoTVnxteLiTDq3JLxvJTP"),
+    "SOL",
+  ),
+  // SLERF: {
+  //   mint: new PublicKey("7BgBvyjrZX1YKz4oh9mjb8ZScatkkwb8DzFx7LoiVkM3"),
+  //   targetConfig: new PublicKey("5g13tz8GKWySjtzPRARuzzQM7LbMCUBMPGPef5PKe4JJ"),
+  //   decimals: 9,
+  //   name: "SLERF",
+  // },
+  SLERF:
+    // dev
+    new TokenInfo(
+      TOKEN_PROGRAM_ID,
+      new PublicKey("9pECN2xxLQo22bFYpsNr3T3eW1UdEDtSqPQopFrGv7n4"),
+      9,
+      "SLERF",
+      "SLERF",
+      new PublicKey("EEeLC1a7qbK2mbvfYt8owGzQcBjYguE1FWhWYuGjyABu"),
+    ),
+};
+
 export const MEMECHAN_MEME_TOKEN_DECIMALS = 6;
 
 // Contract constants
 export const MEME_TOKEN_DECIMALS = 1_000_000;
 export const WSOL_DECIMALS = 1_000_000_000;
-export const MAX_TICKET_TOKENS = 800_000_000;
 export const MAX_MEME_TOKENS = 1_000_000_000;
 
-export const DEFAULT_PRICE_FACTOR = 2;
 export const DEFAULT_MAX_M_LP = 200_000_000_000_000;
 export const DEFAULT_MAX_M = 800_000_000_000_000;
-
-export const DECIMALS_S = 1_000_000_000;
 
 export const MAX_TRANSACTION_SIZE = 1232;
 export const ADMIN_PUB_KEY = new PublicKey("KZbAoMgCcb2gDEn2Ucea86ux84y25y3ybbWQGQpd9D6");

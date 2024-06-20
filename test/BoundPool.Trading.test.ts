@@ -2,11 +2,6 @@ import { BN } from "@coral-xyz/anchor";
 import { BoundPoolClient } from "../src/bound-pool/BoundPoolClient";
 import { sleep } from "../src/common/helpers";
 import { DEFAULT_BOUND_POOL_WITH_BUY_MEME_ARGS, client, payer } from "./common/common";
-import {
-  MEMECHAN_MEME_TOKEN_DECIMALS,
-  MEMECHAN_QUOTE_TOKEN,
-  MEMECHAN_QUOTE_TOKEN_DECIMALS,
-} from "../src/config/config";
 import { MemeTicketClient } from "../src/memeticket/MemeTicketClient";
 import { sendAndConfirmTransaction } from "@solana/web3.js";
 import { getTokenBalanceForWallet } from "../src/util/getTokenAccountBalance";
@@ -33,7 +28,7 @@ export function test() {
       const quoteTokenBalanceBefore = await getTokenBalanceForWallet(
         connection,
         payer.publicKey,
-        MEMECHAN_QUOTE_TOKEN.mint,
+        DEFAULT_BOUND_POOL_WITH_BUY_MEME_ARGS.quoteToken.mint,
       );
       console.log("quoteTokenBalanceBefore: ", quoteTokenBalanceBefore);
 
@@ -121,7 +116,7 @@ export function test() {
       const quoteTokenBalanceBeforeBuy = await getTokenBalanceForWallet(
         connection,
         payer.publicKey,
-        MEMECHAN_QUOTE_TOKEN.mint,
+        DEFAULT_BOUND_POOL_WITH_BUY_MEME_ARGS.quoteToken.mint,
       );
       console.log("quoteTokenBalanceBeforeBuy: ", quoteTokenBalanceBeforeBuy);
 

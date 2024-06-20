@@ -2,7 +2,7 @@ import { Connection, Keypair, PublicKey } from "@solana/web3.js";
 import { HELIUS_API_URL, IS_TEST_ENV, TEST_USER_SECRET_KEY } from "./env";
 import { Wallet } from "@coral-xyz/anchor";
 import { MemechanClient } from "../../src/MemechanClient";
-import { ADMIN_PUB_KEY, MEMECHAN_QUOTE_TOKEN } from "../../src/config/config";
+import { ADMIN_PUB_KEY, TOKEN_INFOS } from "../../src/config/config";
 import { getRandomRpcEndpoint } from "../../src/util/getRandomRpcEndpoint";
 import { BoundPoolWithBuyMemeArgs, MemeTicketClient } from "../../src";
 
@@ -51,7 +51,7 @@ export const DEFAULT_BOUND_POOL_WITH_BUY_MEME_ARGS: BoundPoolWithBuyMemeArgs = {
   admin,
   payer,
   client: createMemechanClient(),
-  quoteToken: MEMECHAN_QUOTE_TOKEN,
+  quoteToken: TOKEN_INFOS.WSOL,
   tokenMetadata: DUMMY_TOKEN_METADATA,
   buyMemeTransactionArgs: {
     inputAmount: "10",
@@ -60,4 +60,5 @@ export const DEFAULT_BOUND_POOL_WITH_BUY_MEME_ARGS: BoundPoolWithBuyMemeArgs = {
     user: payer.publicKey,
     memeTicketNumber: MemeTicketClient.TICKET_NUMBER_START,
   },
+  targetConfig: TOKEN_INFOS.WSOL.targetConfig,
 };

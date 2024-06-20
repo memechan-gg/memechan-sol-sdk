@@ -68,10 +68,7 @@ import {
   FULL_MEME_AMOUNT_CONVERTED,
   MEMECHAN_FEE_WALLET_ID,
   MEMECHAN_MEME_TOKEN_DECIMALS,
-  MEMECHAN_QUOTE_MINT,
-  MEMECHAN_QUOTE_TOKEN,
-  MEMECHAN_QUOTE_TOKEN_DECIMALS,
-  MEMECHAN_TARGET_CONFIG,
+  TOKEN_INFOS,
   RAYDIUM_PROTOCOL_FEE,
   TRANSFER_FEE,
 } from "../config/config";
@@ -93,6 +90,9 @@ import { normalizeInputCoinAmount } from "../util/trading/normalizeInputCoinAmou
 import base58 from "bs58";
 import { ensureAssociatedTokenAccountWithIX } from "../util/ensureAssociatedTokenAccountWithIX";
 import { NoBoundPoolExist } from "./errors";
+import { getTokenInfoByMint } from "../config/helpers";
+import { addWrapSOLInstructionIfNativeMint } from "../util/addWrapSOLInstructionIfNativeMint";
+import { addUnwrapSOLInstructionIfNativeMint } from "../util/addUnwrapSOLInstructionIfNativeMint";
 
 export class BoundPoolClient {
   private constructor(
@@ -101,7 +101,7 @@ export class BoundPoolClient {
     public memeVault: PublicKey,
     public quoteVault: PublicKey,
     public memeTokenMint: PublicKey,
-    public quoteTokenMint: PublicKey = MEMECHAN_QUOTE_MINT,
+    public quoteTokenMint: PublicKey = TOKEN_INFOS.WSOL.mint,
     public memeToken: Token,
   ) {
     //
@@ -260,6 +260,8 @@ export class BoundPoolClient {
       transaction: createPoolTransaction,
     });
 
+    const quoteInfo = getTokenInfoByMint(quoteToken.mint);
+
     const createPoolInstruction = await memechanProgram.methods
       .newPool()
       .accounts({
@@ -273,8 +275,7 @@ export class BoundPoolClient {
         quoteMint: quoteToken.mint,
         tokenProgram: TOKEN_PROGRAM_ID,
         systemProgram: SystemProgram.programId,
-        // TODO: Replace it in a way, that it would respect any target config, not only a hardcoded one
-        targetConfig: MEMECHAN_TARGET_CONFIG,
+        targetConfig: quoteInfo.targetConfig,
       })
       .instruction();
 
@@ -290,6 +291,7 @@ export class BoundPoolClient {
           poolSignerPda: poolSigner,
           client,
           quoteVault: poolQuoteVault,
+          quoteMint: quoteToken.mint,
         });
         memeTicketPublicKey = newMemeTicketPublicKey;
         createPoolTransaction.add(tx);
@@ -319,9 +321,10 @@ export class BoundPoolClient {
 
   public static async new(args: BoundPoolArgs): Promise<BoundPoolClient> {
     const { payer } = args;
-
+    const tokenInfo = getTokenInfoByMint(args.quoteToken.mint);
     return await this.newWithBuyTx({
       ...args,
+      targetConfig: tokenInfo.targetConfig,
       buyMemeTransactionArgs: {
         inputAmount: "0",
         minOutputAmount: "0",
@@ -568,7 +571,9 @@ export class BoundPoolClient {
     const connection = this.client.connection;
 
     // input
-    const inputAmountWithDecimals = normalizeInputCoinAmount(inputAmount, MEMECHAN_QUOTE_TOKEN_DECIMALS);
+    const quoteInfo = getTokenInfoByMint(this.quoteTokenMint);
+
+    const inputAmountWithDecimals = normalizeInputCoinAmount(inputAmount, quoteInfo.decimals);
     const inputAmountBN = new BN(inputAmountWithDecimals.toString());
 
     // output
@@ -583,33 +588,16 @@ export class BoundPoolClient {
     // If `inputTokenAccount` is not passed in args, we need to find out, whether a quote account for an admin
     // already exists
     if (!inputTokenAccount) {
-      const associatedToken = getAssociatedTokenAddressSync(
-        this.quoteTokenMint,
-        user,
-        true,
-        TOKEN_PROGRAM_ID,
-        ASSOCIATED_TOKEN_PROGRAM_ID,
-      );
-
-      const account = await getAccount(connection, associatedToken);
-      inputTokenAccount = account.address;
-
-      // If the quote account for the admin doesn't exist, add an instruction to create it
-      if (!inputTokenAccount) {
-        const associatedTransactionInstruction = createAssociatedTokenAccountInstruction(
-          user,
-          associatedToken,
-          user,
-          this.quoteTokenMint,
-          TOKEN_PROGRAM_ID,
-          ASSOCIATED_TOKEN_PROGRAM_ID,
-        );
-
-        transaction.add(associatedTransactionInstruction);
-
-        inputTokenAccount = associatedToken;
-      }
+      inputTokenAccount = await ensureAssociatedTokenAccountWithIX({
+        connection: connection,
+        payer: user,
+        mint: this.quoteTokenMint,
+        owner: user,
+        transaction,
+      });
     }
+
+    addWrapSOLInstructionIfNativeMint(this.quoteTokenMint, user, inputTokenAccount, inputAmountBN, transaction);
 
     const buyMemeInstruction = await this.client.memechanProgram.methods
       .swapY(inputAmountBN, minOutputBN, ticketNumberBN)
@@ -659,6 +647,7 @@ export class BoundPoolClient {
       quoteVault,
       client,
       memeTicketNumber,
+      quoteMint,
     } = input;
     let { inputTokenAccount } = input;
 
@@ -671,7 +660,8 @@ export class BoundPoolClient {
     });
 
     // input
-    const inputAmountWithDecimals = normalizeInputCoinAmount(inputAmount, MEMECHAN_QUOTE_TOKEN_DECIMALS);
+    const quoteInfo = getTokenInfoByMint(quoteMint);
+    const inputAmountWithDecimals = normalizeInputCoinAmount(inputAmount, quoteInfo.decimals);
     const inputAmountBN = new BN(inputAmountWithDecimals.toString());
 
     // output
@@ -687,33 +677,15 @@ export class BoundPoolClient {
     // If `inputTokenAccount` is not passed in args, we need to find out, whether a quote account for an admin
     // already exists
     if (!inputTokenAccount) {
-      const associatedToken = getAssociatedTokenAddressSync(
-        MEMECHAN_QUOTE_MINT,
-        user,
-        true,
-        TOKEN_PROGRAM_ID,
-        ASSOCIATED_TOKEN_PROGRAM_ID,
-      );
-
-      const account = await getAccount(client.connection, associatedToken);
-      inputTokenAccount = account.address;
-
-      // If the quote account for the admin doesn't exist, add an instruction to create it
-      if (!inputTokenAccount) {
-        const associatedTransactionInstruction = createAssociatedTokenAccountInstruction(
-          user,
-          associatedToken,
-          user,
-          MEMECHAN_QUOTE_MINT,
-          TOKEN_PROGRAM_ID,
-          ASSOCIATED_TOKEN_PROGRAM_ID,
-        );
-
-        transaction.add(associatedTransactionInstruction);
-
-        inputTokenAccount = associatedToken;
-      }
+      inputTokenAccount = await ensureAssociatedTokenAccountWithIX({
+        connection: client.connection,
+        payer: user,
+        mint: quoteMint,
+        owner: user,
+        transaction,
+      });
     }
+    addWrapSOLInstructionIfNativeMint(quoteMint, user, inputTokenAccount, inputAmountBN, transaction);
 
     const buyMemeInstruction = await client.memechanProgram.methods
       .swapY(inputAmountBN, minOutputBN, ticketNumberBN)
@@ -741,7 +713,8 @@ export class BoundPoolClient {
     const pool = this.id;
 
     // input & output
-    const inputAmountWithDecimals = normalizeInputCoinAmount(inputAmount, MEMECHAN_QUOTE_TOKEN_DECIMALS);
+    const quoteInfo = getTokenInfoByMint(this.quoteTokenMint);
+    const inputAmountWithDecimals = normalizeInputCoinAmount(inputAmount, quoteInfo.decimals);
     const inputAmountBN = new BN(inputAmountWithDecimals.toString());
     const minOutputBN = new BN(0);
 
@@ -829,45 +802,25 @@ export class BoundPoolClient {
     const inputAmountBN = new BN(inputAmountWithDecimals.toString());
     const inputAmountBignumber = new BigNumber(inputAmountWithDecimals.toString());
 
+    const quoteInfo = getTokenInfoByMint(this.quoteTokenMint);
+
     // output
     // Note: Be aware, we relay on the fact that `MEMECHAN_QUOTE_TOKEN_DECIMALS`
     // would be always set same for all memecoins
     // As well as the fact that memecoins and tickets decimals are always the same
     const minOutputWithSlippage = deductSlippage(new BigNumber(minOutputAmount), slippagePercentage);
-    const minOutputNormalized = normalizeInputCoinAmount(
-      minOutputWithSlippage.toString(),
-      MEMECHAN_QUOTE_TOKEN_DECIMALS,
-    );
+    const minOutputNormalized = normalizeInputCoinAmount(minOutputWithSlippage.toString(), quoteInfo.decimals);
     const minOutputBN = new BN(minOutputNormalized.toString());
 
     // If `outputTokenAccount` is not passed in args, we need to find out, whether a outputTokenAccount exists for user
     if (!outputTokenAccount) {
-      const associatedToken = getAssociatedTokenAddressSync(
-        this.quoteTokenMint,
-        user,
-        true,
-        TOKEN_PROGRAM_ID,
-        ASSOCIATED_TOKEN_PROGRAM_ID,
-      );
-
-      const account = await getAccount(connection, associatedToken);
-      outputTokenAccount = account.address;
-
-      // If doesn't exist, add an instruction to create it
-      if (!outputTokenAccount) {
-        const associatedTransactionInstruction = createAssociatedTokenAccountInstruction(
-          user,
-          associatedToken,
-          user,
-          this.quoteTokenMint,
-          TOKEN_PROGRAM_ID,
-          ASSOCIATED_TOKEN_PROGRAM_ID,
-        );
-
-        transaction.add(associatedTransactionInstruction);
-
-        outputTokenAccount = associatedToken;
-      }
+      outputTokenAccount = await ensureAssociatedTokenAccountWithIX({
+        connection: connection,
+        payer: user,
+        mint: this.quoteTokenMint,
+        owner: user,
+        transaction,
+      });
     }
 
     const { ticketsRequiredToSell, isMoreThanOneTicket } = await MemeTicketClient.getRequiredTicketsToSell({
@@ -907,6 +860,8 @@ export class BoundPoolClient {
 
     transaction.add(sellMemeTransactionInstruction);
 
+    await addUnwrapSOLInstructionIfNativeMint(this.quoteTokenMint, user, transaction);
+
     const optimizedTransactions = getOptimizedTransactions(transaction.instructions, input.user);
 
     return { txs: optimizedTransactions, isMoreThanOneTransaction: optimizedTransactions.length > 1 };
@@ -943,10 +898,12 @@ export class BoundPoolClient {
 
     const { swapOutAmount } = extractSwapDataFromSimulation(result);
 
+    const quoteInfo = getTokenInfoByMint(this.quoteTokenMint);
+
     // output
     // Note: Be aware, we relay on the fact that `MEMECOIN_DECIMALS` would be always set same for all memecoins
     // As well as the fact that memecoins and tickets decimals are always the same
-    const outputAmount = new BigNumber(swapOutAmount).div(10 ** MEMECHAN_QUOTE_TOKEN_DECIMALS);
+    const outputAmount = new BigNumber(swapOutAmount).div(10 ** quoteInfo.decimals);
     const outputAmountRespectingSlippage = deductSlippage(outputAmount, slippagePercentage);
 
     return outputAmountRespectingSlippage.toString();
@@ -1094,6 +1051,7 @@ export class BoundPoolClient {
       memeMint: args.boundPoolInfo.memeReserve.mint,
       transaction: new Transaction(),
       payer: args.user,
+      quoteMint: args.boundPoolInfo.quoteReserve.mint,
     });
   }
 
@@ -1112,11 +1070,13 @@ export class BoundPoolClient {
       memeVault,
       quoteVault,
       transaction = new Transaction(),
+      quoteMint,
     } = args;
     const stakingId = BoundPoolClient.findStakingPda(memeMint, client.memechanProgram.programId);
     const stakingSigner = StakingPoolClient.findSignerPda(stakingId, client.memechanProgram.programId);
     const baseTokenInfo = new Token(TOKEN_PROGRAM_ID, memeMint, MEMECHAN_MEME_TOKEN_DECIMALS);
-    const quoteTokenInfo = MEMECHAN_QUOTE_TOKEN;
+
+    const quoteTokenInfo = getTokenInfoByMint(quoteMint);
 
     // TODO: Put all the transactions into one (now they exceed trx size limit)
     const { marketId, transactions: createMarketTransactions } = await getCreateMarketTransactions({
@@ -1191,7 +1151,7 @@ export class BoundPoolClient {
         signer: user.publicKey,
         poolMemeVault: memeVault,
         poolQuoteVault: quoteVault,
-        quoteMint: MEMECHAN_QUOTE_MINT,
+        quoteMint: quoteMint,
         staking: stakingId,
         stakingPoolSignerPda: stakingSigner,
         raydiumLpMint: raydiumLpMint,
@@ -1224,7 +1184,12 @@ export class BoundPoolClient {
   }
 
   public async goLive(args: GoLiveArgs): Promise<[StakingPoolClient, LivePoolClient]> {
-    return await BoundPoolClient.goLive({ ...args, client: this.client, memeMint: this.memeTokenMint });
+    return await BoundPoolClient.goLive({
+      ...args,
+      client: this.client,
+      memeMint: this.memeTokenMint,
+      quoteMint: this.quoteTokenMint,
+    });
   }
 
   public static async goLive(args: GoLiveStaticArgs): Promise<[StakingPoolClient, LivePoolClient]> {
@@ -1365,6 +1330,12 @@ export class BoundPoolClient {
     return uniqueHolders;
   }
 
+  public static async getQuoteTokenDisplayName(poolAddress: PublicKey, connection: Connection) {
+    const pool = await BoundPoolClient.fetch2(connection, poolAddress);
+    const quoteToken = getTokenInfoByMint(pool.quoteReserve.mint);
+    return quoteToken.displayName;
+  }
+
   /**
    * Fetches all unique token holders for pool and returns thier addresses
    */
@@ -1384,7 +1355,8 @@ export class BoundPoolClient {
     const memeBalance = new BigNumber(boundPoolInfo.memeReserve.tokens.toString());
     const quoteBalance = new BigNumber(boundPoolInfo.quoteReserve.tokens.toString());
 
-    const quoteBalanceConverted = quoteBalance.div(10 ** MEMECHAN_QUOTE_TOKEN_DECIMALS);
+    const quoteInfo = getTokenInfoByMint(boundPoolInfo.quoteReserve.mint);
+    const quoteBalanceConverted = quoteBalance.div(10 ** quoteInfo.decimals);
     const soldMemeConverted = new BigNumber(DEFAULT_MAX_M).minus(memeBalance).div(10 ** MEMECHAN_MEME_TOKEN_DECIMALS);
 
     // In case no meme coins were sold, return 0-prices

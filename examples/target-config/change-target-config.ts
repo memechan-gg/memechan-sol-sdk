@@ -1,6 +1,5 @@
 import BN from "bn.js";
-import { TargetConfigClient } from "../../src";
-import { MEMECHAN_QUOTE_TOKEN_DECIMALS, MEMECHAN_TARGET_CONFIG } from "../../src/config/config";
+import { TOKEN_INFOS, TargetConfigClient } from "../../src";
 import { client, payer } from "../common";
 import { PublicKey } from "@solana/web3.js";
 
@@ -14,7 +13,7 @@ export const changeTargetConfig = async () => {
     accountAddressId: targetConfigAddress,
   });
 
-  const newTargetAmountRaw = 40000 * 10 ** MEMECHAN_QUOTE_TOKEN_DECIMALS;
+  const newTargetAmountRaw = 40000 * 10 ** TOKEN_INFOS.WSOL.decimals;
   // const newTargetAmountRaw = 400 * 10 ** MEMECHAN_QUOTE_TOKEN_DECIMALS;
   const newTargetAmountBN = new BN(newTargetAmountRaw);
 
