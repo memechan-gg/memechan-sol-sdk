@@ -7,12 +7,11 @@ export function addUnwrapSOLInstructionIfNativeMint(
   quoteMint: PublicKey,
   payerPublicKey: PublicKey,
   transaction: Transaction,
-): Transaction {
+) {
   if (quoteMint.equals(NATIVE_MINT)) {
     const unwrapInstruction = unwrapSOLInstruction(payerPublicKey);
     if (unwrapInstruction) {
       transaction.add(unwrapInstruction);
     }
   }
-  return transaction;
 }
