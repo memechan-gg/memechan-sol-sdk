@@ -264,6 +264,12 @@ export class LivePoolClient {
 
     return { priceInQuote: memePriceInQuote, priceInUsd: memePriceInUsd };
   }
+
+  public static async getQuoteTokenDisplayName(ammId: PublicKey, client: MemechanClient) {
+    const pool = await LivePoolClient.fromAmmId(ammId, client);
+    const quoteToken = getTokenInfoByMint(new PublicKey(pool.ammPoolInfo.quoteMint));
+    return quoteToken.displayName;
+  }
 }
 
 async function getReserveBalances(connection: Connection, addresses: PublicKey[]): Promise<[BN, BN]> {
