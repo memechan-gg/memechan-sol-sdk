@@ -3,16 +3,15 @@ import { Transaction, PublicKey } from "@solana/web3.js";
 
 import { unwrapSOLInstruction } from "./unwrapSOLInstruction";
 
-export async function addUnwrapSOLInstructionIfNativeMint(
+export function addUnwrapSOLInstructionIfNativeMint(
   quoteMint: PublicKey,
   payerPublicKey: PublicKey,
   transaction: Transaction,
-): Promise<Transaction> {
+) {
   if (quoteMint.equals(NATIVE_MINT)) {
-    const unwrapInstruction = await unwrapSOLInstruction(payerPublicKey);
+    const unwrapInstruction = unwrapSOLInstruction(payerPublicKey);
     if (unwrapInstruction) {
       transaction.add(unwrapInstruction);
     }
   }
-  return transaction;
 }

@@ -99,6 +99,7 @@ export const MEMECHAN_MEME_TOKEN_DECIMALS = 6;
 export const MEME_TOKEN_DECIMALS = 1_000_000;
 export const WSOL_DECIMALS = 1_000_000_000;
 export const MAX_MEME_TOKENS = 1_000_000_000;
+export const MAX_TICKET_TOKENS = 800_000_000;
 
 export const DEFAULT_MAX_M_LP = 200_000_000_000_000;
 export const DEFAULT_MAX_M = 800_000_000_000_000;
