@@ -852,7 +852,7 @@ export class BoundPoolClient {
 
     transaction.add(sellMemeTransactionInstruction);
 
-    await addUnwrapSOLInstructionIfNativeMint(this.quoteTokenMint, user, transaction);
+    addUnwrapSOLInstructionIfNativeMint(this.quoteTokenMint, user, transaction);
 
     const optimizedTransactions = getOptimizedTransactions(transaction.instructions, input.user);
 
