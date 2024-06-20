@@ -32,6 +32,7 @@ import {
   WithdrawFeesArgs,
   getAvailableWithdrawFeesAmountArgs,
 } from "./types";
+import { addUnwrapSOLInstructionIfNativeMint } from "../util/addUnwrapSOLInstructionIfNativeMint";
 
 export class StakingPoolClient {
   constructor(
@@ -174,6 +175,8 @@ export class StakingPoolClient {
       .instruction();
 
     tx.add(unstakeInstruction);
+
+    addUnwrapSOLInstructionIfNativeMint(quoteAccount.mint, user, tx);
 
     return tx;
   }
