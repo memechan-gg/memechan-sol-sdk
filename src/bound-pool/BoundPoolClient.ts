@@ -91,6 +91,7 @@ import base58 from "bs58";
 import { ensureAssociatedTokenAccountWithIX } from "../util/ensureAssociatedTokenAccountWithIX";
 import { NoBoundPoolExist } from "./errors";
 import { getTokenInfoByMint } from "../config/helpers";
+import { addWrapSOLInstructionIfNativeMint } from "../util/addWrapSOLInstructionIfNativeMint";
 
 export class BoundPoolClient {
   private constructor(
@@ -692,33 +693,15 @@ export class BoundPoolClient {
     // If `inputTokenAccount` is not passed in args, we need to find out, whether a quote account for an admin
     // already exists
     if (!inputTokenAccount) {
-      const associatedToken = getAssociatedTokenAddressSync(
-        quoteMint,
-        user,
-        true,
-        TOKEN_PROGRAM_ID,
-        ASSOCIATED_TOKEN_PROGRAM_ID,
-      );
-
-      const account = await getAccount(client.connection, associatedToken);
-      inputTokenAccount = account.address;
-
-      // If the quote account for the admin doesn't exist, add an instruction to create it
-      if (!inputTokenAccount) {
-        const associatedTransactionInstruction = createAssociatedTokenAccountInstruction(
-          user,
-          associatedToken,
-          user,
-          quoteMint,
-          TOKEN_PROGRAM_ID,
-          ASSOCIATED_TOKEN_PROGRAM_ID,
-        );
-
-        transaction.add(associatedTransactionInstruction);
-
-        inputTokenAccount = associatedToken;
-      }
+      inputTokenAccount = await ensureAssociatedTokenAccountWithIX({
+        connection: client.connection,
+        payer: user,
+        mint: quoteMint,
+        owner: user,
+        transaction,
+      });
     }
+    addWrapSOLInstructionIfNativeMint(quoteMint, user, inputTokenAccount, inputAmountBN, transaction);
 
     const buyMemeInstruction = await client.memechanProgram.methods
       .swapY(inputAmountBN, minOutputBN, ticketNumberBN)
