@@ -75,6 +75,3 @@ export * from "./token/validation/validation";
 export * from "./bound-pool/errors";
 
 export * from "./api/helpers/TokenApiHelper";
-
-// Raydium
-export { Token, Currency } from "@raydium-io/raydium-sdk";
