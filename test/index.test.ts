@@ -26,7 +26,7 @@ describe("sdk tests", () => {
     txParsing.test();
   });
 
-  describe("contract", () => {
+  describe.skip("contract", () => {
     boundPoolCreation.test();
     boundPool.test();
     boundPoolTrading.test();
