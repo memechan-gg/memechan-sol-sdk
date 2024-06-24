@@ -83,6 +83,14 @@ export const TOKEN_INFOS: { [symbol: string]: TokenInfo } = {
     "SLERF",
     new PublicKey("5g13tz8GKWySjtzPRARuzzQM7LbMCUBMPGPef5PKe4JJ"),
   ),
+  CHAN: new TokenInfo(
+    TOKEN_PROGRAM_ID,
+    new PublicKey("ChanGGuDHboPswpTmKDfsTVGQL96VHhmvpwrE4UjWssd"),
+    9,
+    "CHAN",
+    "CHAN",
+    new PublicKey("5g13tz8GKWySjtzPRARuzzQM7LbMCUBMPGPef5PKe4JJ"), // TODO?
+  ),
   // SLERF:
   //   // dev
   //   new TokenInfo(
