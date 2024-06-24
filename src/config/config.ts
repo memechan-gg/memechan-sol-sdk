@@ -28,7 +28,7 @@ export const API_GATEWAY_FQDN = "waqxcrbt93.execute-api.us-east-1.amazonaws.com"
  *
  * @constant {string}
  */
-export const MEMECHAN_PROGRAM_ID = "cYsHcSU42XESLPquuN1ga94jm1wVMg11wVcxqvofA3k";
+export const MEMECHAN_PROGRAM_ID = "CaR9ciDnNnE6WX35tZWrjeGdKUPaft7r4oQGF4JhwVxZ";
 
 /**
  * The Memechan fee wallet id.
@@ -88,7 +88,7 @@ export const TOKEN_INFOS: { [symbol: string]: TokenInfo } = {
     new PublicKey("ChanGGuDHboPswpTmKDfsTVGQL96VHhmvpwrE4UjWssd"),
     9,
     "CHAN",
-    "CHAN",
+    "memechan",
     new PublicKey("5g13tz8GKWySjtzPRARuzzQM7LbMCUBMPGPef5PKe4JJ"), // TODO?
   ),
   // SLERF:
