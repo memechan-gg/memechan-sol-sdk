@@ -75,22 +75,24 @@ export const TOKEN_INFOS: { [symbol: string]: TokenInfo } = {
     new PublicKey("C1PwZ2gxgfk3Bzku1fvRGBXeoTVnxteLiTDq3JLxvJTP"),
     "SOL",
   ),
-  // SLERF: {
-  //   mint: new PublicKey("7BgBvyjrZX1YKz4oh9mjb8ZScatkkwb8DzFx7LoiVkM3"),
-  //   targetConfig: new PublicKey("5g13tz8GKWySjtzPRARuzzQM7LbMCUBMPGPef5PKe4JJ"),
-  //   decimals: 9,
-  //   name: "SLERF",
-  // },
-  SLERF:
-    // dev
-    new TokenInfo(
-      TOKEN_PROGRAM_ID,
-      new PublicKey("9pECN2xxLQo22bFYpsNr3T3eW1UdEDtSqPQopFrGv7n4"),
-      9,
-      "SLERF",
-      "SLERF",
-      new PublicKey("EEeLC1a7qbK2mbvfYt8owGzQcBjYguE1FWhWYuGjyABu"),
-    ),
+  SLERF: new TokenInfo(
+    TOKEN_PROGRAM_ID,
+    new PublicKey("7BgBvyjrZX1YKz4oh9mjb8ZScatkkwb8DzFx7LoiVkM3"),
+    9,
+    "SLERF",
+    "SLERF",
+    new PublicKey("5g13tz8GKWySjtzPRARuzzQM7LbMCUBMPGPef5PKe4JJ"),
+  ),
+  // SLERF:
+  //   // dev
+  //   new TokenInfo(
+  //     TOKEN_PROGRAM_ID,
+  //     new PublicKey("9pECN2xxLQo22bFYpsNr3T3eW1UdEDtSqPQopFrGv7n4"),
+  //     9,
+  //     "SLERF",
+  //     "SLERF",
+  //     new PublicKey("EEeLC1a7qbK2mbvfYt8owGzQcBjYguE1FWhWYuGjyABu"),
+  //   ),
 };
 
 export const MEMECHAN_MEME_TOKEN_DECIMALS = 6;
