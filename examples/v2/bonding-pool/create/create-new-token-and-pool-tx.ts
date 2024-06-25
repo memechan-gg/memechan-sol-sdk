@@ -1,11 +1,11 @@
 import { sendAndConfirmTransaction } from "@solana/web3.js";
-import { admin, payer, DUMMY_TOKEN_METADATA, clientV2 } from "../../common";
-import { getTxSize } from "../../../src/util/get-tx-size";
-import { TOKEN_INFOS, sleep } from "../../../src";
-import { BoundPoolClientV2 } from "../../../src/bound-pool/BoundPoolClientV2";
-import { MemeTicketClientV2 } from "../../../src/memeticket/MemeTicketClientV2";
+import { admin, payer, DUMMY_TOKEN_METADATA, clientV2 } from "../../../common";
+import { getTxSize } from "../../../../src/util/get-tx-size";
+import { TOKEN_INFOS, sleep } from "../../../../src";
+import { BoundPoolClientV2 } from "../../../../src/bound-pool/BoundPoolClientV2";
+import { MemeTicketClientV2 } from "../../../../src/memeticket/MemeTicketClientV2";
 
-// yarn tsx examples/v2/bonding-pool/create-new-token-and-pool-tx.ts > log.txt 2>&1
+// yarn tsx examples/v2/bonding-pool/create/create-new-token-and-pool-tx.ts > log.txt 2>&1
 export const createNewTokenAndPoolTx = async () => {
   const { createPoolTransaction, memeMintKeypair } =
     await BoundPoolClientV2.getCreateNewBondingPoolAndBuyAndTokenWithBuyMemeTransaction({
