@@ -16,6 +16,8 @@ export const createTargetConfig = async () => {
 
   console.log("targetconfig mint: " + mint.toString());
 
+  console.log("payer: " + payer.publicKey.toString());
+
   const targetConfig = await TargetConfigClientV2.new({
     payer: payer,
     client: clientV2,

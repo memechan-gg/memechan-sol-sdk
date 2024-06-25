@@ -29,9 +29,6 @@ export const createNewTokenAndPoolTx = async () => {
     const createPoolTransactionSize = getTxSize(createPoolTransaction, payer.publicKey);
     console.debug("createPoolTransaction size: ", createPoolTransactionSize);
 
-    // const createTokenTransactionSize = getTxSize(createTokenTransaction, payer.publicKey);
-    // console.debug("createTokenTransaction size: ", createTokenTransactionSize);
-
     const createPoolSignature = await sendAndConfirmTransaction(
       clientV2.connection,
       createPoolTransaction,
