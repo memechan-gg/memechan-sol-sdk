@@ -96,7 +96,8 @@ export const TOKEN_INFOS: { [symbol: string]: TokenInfo } = {
   }),
   CHAN: new TokenInfo({
     programId: TOKEN_PROGRAM_ID,
-    mint: new PublicKey("ChanGGuDHboPswpTmKDfsTVGQL96VHhmvpwrE4UjWssd"),
+    // mint: new PublicKey("ChanGGuDHboPswpTmKDfsTVGQL96VHhmvpwrE4UjWssd"),
+    mint: new PublicKey("9pECN2xxLQo22bFYpsNr3T3eW1UdEDtSqPQopFrGv7n4"),
     decimals: 9,
     symbol: "CHAN",
     name: "memechan",
