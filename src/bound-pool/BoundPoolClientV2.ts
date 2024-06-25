@@ -258,7 +258,7 @@ export class BoundPoolClientV2 {
         quoteMint: quoteToken.mint,
         tokenProgram: TOKEN_PROGRAM_ID,
         systemProgram: SystemProgram.programId,
-        targetConfig: quoteInfo.targetConfig,
+        targetConfig: quoteInfo.targetConfigV2,
       })
       .instruction();
 
@@ -307,7 +307,7 @@ export class BoundPoolClientV2 {
     const tokenInfo = getTokenInfoByMint(args.quoteToken.mint);
     return await this.newWithBuyTx({
       ...args,
-      targetConfig: tokenInfo.targetConfig,
+      targetConfig: tokenInfo.targetConfigV2,
       buyMemeTransactionArgs: {
         inputAmount: "0",
         minOutputAmount: "0",
