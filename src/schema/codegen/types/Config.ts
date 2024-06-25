@@ -6,8 +6,7 @@ import * as borsh from "@project-serum/borsh";
 export interface ConfigFields {
   alphaAbs: BN;
   beta: BN;
-  priceFactorNum: BN;
-  priceFactorDenom: BN;
+  priceFactor: BN;
   gammaS: BN;
   gammaM: BN;
   omegaM: BN;
@@ -17,8 +16,7 @@ export interface ConfigFields {
 export interface ConfigJSON {
   alphaAbs: string;
   beta: string;
-  priceFactorNum: string;
-  priceFactorDenom: string;
+  priceFactor: string;
   gammaS: string;
   gammaM: string;
   omegaM: string;
@@ -28,8 +26,7 @@ export interface ConfigJSON {
 export class Config {
   readonly alphaAbs: BN;
   readonly beta: BN;
-  readonly priceFactorNum: BN;
-  readonly priceFactorDenom: BN;
+  readonly priceFactor: BN;
   readonly gammaS: BN;
   readonly gammaM: BN;
   readonly omegaM: BN;
@@ -38,8 +35,7 @@ export class Config {
   constructor(fields: ConfigFields) {
     this.alphaAbs = fields.alphaAbs;
     this.beta = fields.beta;
-    this.priceFactorNum = fields.priceFactorNum;
-    this.priceFactorDenom = fields.priceFactorDenom;
+    this.priceFactor = fields.priceFactor;
     this.gammaS = fields.gammaS;
     this.gammaM = fields.gammaM;
     this.omegaM = fields.omegaM;
@@ -51,8 +47,7 @@ export class Config {
       [
         borsh.u128("alphaAbs"),
         borsh.u128("beta"),
-        borsh.u64("priceFactorNum"),
-        borsh.u64("priceFactorDenom"),
+        borsh.u64("priceFactor"),
         borsh.u64("gammaS"),
         borsh.u64("gammaM"),
         borsh.u64("omegaM"),
@@ -67,8 +62,7 @@ export class Config {
     return new Config({
       alphaAbs: obj.alphaAbs,
       beta: obj.beta,
-      priceFactorNum: obj.priceFactorNum,
-      priceFactorDenom: obj.priceFactorDenom,
+      priceFactor: obj.priceFactor,
       gammaS: obj.gammaS,
       gammaM: obj.gammaM,
       omegaM: obj.omegaM,
@@ -80,8 +74,7 @@ export class Config {
     return {
       alphaAbs: fields.alphaAbs,
       beta: fields.beta,
-      priceFactorNum: fields.priceFactorNum,
-      priceFactorDenom: fields.priceFactorDenom,
+      priceFactor: fields.priceFactor,
       gammaS: fields.gammaS,
       gammaM: fields.gammaM,
       omegaM: fields.omegaM,
@@ -93,8 +86,7 @@ export class Config {
     return {
       alphaAbs: this.alphaAbs.toString(),
       beta: this.beta.toString(),
-      priceFactorNum: this.priceFactorNum.toString(),
-      priceFactorDenom: this.priceFactorDenom.toString(),
+      priceFactor: this.priceFactor.toString(),
       gammaS: this.gammaS.toString(),
       gammaM: this.gammaM.toString(),
       omegaM: this.omegaM.toString(),
@@ -106,8 +98,7 @@ export class Config {
     return new Config({
       alphaAbs: new BN(obj.alphaAbs),
       beta: new BN(obj.beta),
-      priceFactorNum: new BN(obj.priceFactorNum),
-      priceFactorDenom: new BN(obj.priceFactorDenom),
+      priceFactor: new BN(obj.priceFactor),
       gammaS: new BN(obj.gammaS),
       gammaM: new BN(obj.gammaM),
       omegaM: new BN(obj.omegaM),

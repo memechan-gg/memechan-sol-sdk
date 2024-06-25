@@ -359,7 +359,13 @@ export type MemechanSol = {
           name: "stakingQuoteVault";
           isMut: true;
           isSigner: false;
-          docs: ["Bonding Pool WSOL vault"];
+          docs: ["Bonding Pool Quote vault"];
+        },
+        {
+          name: "stakingChanVault";
+          isMut: true;
+          isSigner: false;
+          docs: ["Bonding Pool CHAN vault"];
         },
         {
           name: "memeTicket";
@@ -383,7 +389,364 @@ export type MemechanSol = {
           isSigner: false;
         },
         {
-          name: "marketProgramId";
+          name: "tokenProgram";
+          isMut: false;
+          isSigner: false;
+        },
+        {
+          name: "systemProgram";
+          isMut: false;
+          isSigner: false;
+        },
+      ];
+      args: [];
+    },
+    {
+      name: "initMemeAmmPool";
+      accounts: [
+        {
+          name: "signer";
+          isMut: true;
+          isSigner: true;
+          docs: ["Signer"];
+        },
+        {
+          name: "staking";
+          isMut: true;
+          isSigner: false;
+          docs: ["Staking Pool Account"];
+        },
+        {
+          name: "stakingPoolSignerPda";
+          isMut: true;
+          isSigner: false;
+          docs: ["Staking Pool Signer"];
+        },
+        {
+          name: "stakingMemeVault";
+          isMut: true;
+          isSigner: false;
+          docs: ["Staking Pool Meme vault"];
+        },
+        {
+          name: "stakingQuoteVault";
+          isMut: true;
+          isSigner: false;
+          docs: ["Staking Pool Quote vault"];
+        },
+        {
+          name: "memeMint";
+          isMut: false;
+          isSigner: false;
+          docs: ["Mint Account for Meme"];
+        },
+        {
+          name: "quoteMint";
+          isMut: false;
+          isSigner: false;
+          docs: ["Mint Account for WSOL"];
+        },
+        {
+          name: "lpMint";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "feeOwner";
+          isMut: false;
+          isSigner: false;
+        },
+        {
+          name: "payerPoolLp";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "ammPool";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "mintMetadata";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "aTokenVault";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "aVault";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "aVaultLp";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "aVaultLpMint";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "bTokenVault";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "bVault";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "bVaultLp";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "bVaultLpMint";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "adminTokenAFee";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "adminTokenBFee";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "lockEscrow";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "escrowVault";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "rent";
+          isMut: false;
+          isSigner: false;
+        },
+        {
+          name: "metadataProgram";
+          isMut: false;
+          isSigner: false;
+        },
+        {
+          name: "ataProgram";
+          isMut: false;
+          isSigner: false;
+        },
+        {
+          name: "ammProgram";
+          isMut: false;
+          isSigner: false;
+        },
+        {
+          name: "vaultProgram";
+          isMut: false;
+          isSigner: false;
+        },
+        {
+          name: "tokenProgram";
+          isMut: false;
+          isSigner: false;
+        },
+        {
+          name: "systemProgram";
+          isMut: false;
+          isSigner: false;
+        },
+      ];
+      args: [];
+    },
+    {
+      name: "initChanAmmPool";
+      accounts: [
+        {
+          name: "signer";
+          isMut: true;
+          isSigner: true;
+          docs: ["Signer"];
+        },
+        {
+          name: "staking";
+          isMut: true;
+          isSigner: false;
+          docs: ["Staking Pool Account"];
+        },
+        {
+          name: "stakingPoolSignerPda";
+          isMut: true;
+          isSigner: false;
+          docs: ["Staking Pool Signer"];
+        },
+        {
+          name: "stakingQuoteVault";
+          isMut: true;
+          isSigner: false;
+          docs: ["Staking Pool Chan vault"];
+        },
+        {
+          name: "stakingMemeVault";
+          isMut: true;
+          isSigner: false;
+          docs: ["Staking Pool Meme vault"];
+        },
+        {
+          name: "stakingChanVault";
+          isMut: true;
+          isSigner: false;
+          docs: ["Staking Pool Chan vault"];
+        },
+        {
+          name: "memeMint";
+          isMut: false;
+          isSigner: false;
+          docs: ["Mint Account for Meme"];
+        },
+        {
+          name: "chanMint";
+          isMut: false;
+          isSigner: false;
+          docs: ["Mint Account for Quote"];
+        },
+        {
+          name: "chanSwap";
+          isMut: false;
+          isSigner: false;
+        },
+        {
+          name: "chanSwapSignerPda";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "chanSwapVault";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "feeQuoteVault";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "lpMint";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "feeOwner";
+          isMut: false;
+          isSigner: false;
+        },
+        {
+          name: "payerPoolLp";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "ammPool";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "mintMetadata";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "aTokenVault";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "aVault";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "aVaultLp";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "aVaultLpMint";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "bTokenVault";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "bVault";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "bVaultLp";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "bVaultLpMint";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "adminTokenAFee";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "adminTokenBFee";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "lockEscrow";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "escrowVault";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "rent";
+          isMut: false;
+          isSigner: false;
+        },
+        {
+          name: "metadataProgram";
+          isMut: false;
+          isSigner: false;
+        },
+        {
+          name: "ataProgram";
+          isMut: false;
+          isSigner: false;
+        },
+        {
+          name: "ammProgram";
+          isMut: false;
+          isSigner: false;
+        },
+        {
+          name: "vaultProgram";
           isMut: false;
           isSigner: false;
         },
@@ -453,141 +816,26 @@ export type MemechanSol = {
       ];
     },
     {
-      name: "goLive";
+      name: "newChanSwap";
       accounts: [
         {
-          name: "signer";
+          name: "sender";
           isMut: true;
           isSigner: true;
-          docs: ["Signer"];
         },
         {
-          name: "staking";
+          name: "chanSwap";
           isMut: true;
           isSigner: false;
-          docs: ["Staking Pool Account"];
         },
         {
-          name: "stakingPoolSignerPda";
-          isMut: true;
-          isSigner: false;
-          docs: ["Staking Pool Signer"];
-        },
-        {
-          name: "poolMemeVault";
-          isMut: true;
-          isSigner: false;
-          docs: ["Staking Pool Meme vault"];
-        },
-        {
-          name: "poolQuoteVault";
-          isMut: true;
-          isSigner: false;
-          docs: ["Staking Pool Quote vault"];
-        },
-        {
-          name: "memeMint";
-          isMut: false;
-          isSigner: false;
-          docs: ["Mint Account for Meme"];
-        },
-        {
-          name: "quoteMint";
-          isMut: false;
-          isSigner: false;
-          docs: ["Mint Account for WSOL"];
-        },
-        {
-          name: "openOrders";
-          isMut: true;
-          isSigner: false;
-          docs: ["Open Orders Account"];
-        },
-        {
-          name: "targetOrders";
-          isMut: true;
-          isSigner: false;
-          docs: ["Target Orders Account"];
-        },
-        {
-          name: "marketAccount";
-          isMut: true;
-          isSigner: false;
-          docs: ["Market Orders Account"];
-        },
-        {
-          name: "raydiumAmm";
-          isMut: true;
-          isSigner: false;
-          docs: ["Raydium AMM Account"];
-        },
-        {
-          name: "raydiumAmmAuthority";
-          isMut: true;
-          isSigner: false;
-          docs: ["Raydium AMM Signer"];
-        },
-        {
-          name: "raydiumLpMint";
-          isMut: true;
-          isSigner: false;
-          docs: ["Raydium LP MinT"];
-        },
-        {
-          name: "raydiumMemeVault";
-          isMut: true;
-          isSigner: false;
-          docs: ["Raydium LP Token Account", "Raydium Meme Token Account"];
-        },
-        {
-          name: "raydiumQuoteVault";
-          isMut: true;
-          isSigner: false;
-          docs: ["Raydium WSOL Token Account"];
-        },
-        {
-          name: "ammConfig";
+          name: "chanSwapSignerPda";
           isMut: false;
           isSigner: false;
         },
         {
-          name: "feeDestinationInfo";
+          name: "chanVault";
           isMut: true;
-          isSigner: false;
-        },
-        {
-          name: "userDestinationLpTokenAta";
-          isMut: true;
-          isSigner: false;
-        },
-        {
-          name: "rent";
-          isMut: false;
-          isSigner: false;
-        },
-        {
-          name: "clock";
-          isMut: false;
-          isSigner: false;
-        },
-        {
-          name: "raydiumProgram";
-          isMut: false;
-          isSigner: false;
-        },
-        {
-          name: "ataProgram";
-          isMut: false;
-          isSigner: false;
-        },
-        {
-          name: "marketProgramId";
-          isMut: false;
-          isSigner: false;
-        },
-        {
-          name: "tokenProgram";
-          isMut: false;
           isSigner: false;
         },
         {
@@ -598,8 +846,37 @@ export type MemechanSol = {
       ];
       args: [
         {
-          name: "nonce";
-          type: "u8";
+          name: "newPriceNum";
+          type: "u64";
+        },
+        {
+          name: "newPriceDenom";
+          type: "u64";
+        },
+      ];
+    },
+    {
+      name: "changeChanPrice";
+      accounts: [
+        {
+          name: "sender";
+          isMut: false;
+          isSigner: true;
+        },
+        {
+          name: "chanSwap";
+          isMut: true;
+          isSigner: false;
+        },
+      ];
+      args: [
+        {
+          name: "newPriceNum";
+          type: "u64";
+        },
+        {
+          name: "newPriceDenom";
+          type: "u64";
         },
       ];
     },
@@ -617,7 +894,27 @@ export type MemechanSol = {
           isSigner: false;
         },
         {
+          name: "memeMint";
+          isMut: false;
+          isSigner: false;
+        },
+        {
           name: "quoteVault";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "quoteMint";
+          isMut: false;
+          isSigner: false;
+        },
+        {
+          name: "memeFeeVault";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "quoteFeeVault";
           isMut: true;
           isSigner: false;
         },
@@ -627,7 +924,67 @@ export type MemechanSol = {
           isSigner: false;
         },
         {
-          name: "stakingLpWallet";
+          name: "ammPool";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "lpMint";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "aTokenVault";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "aVault";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "aVaultLp";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "aVaultLpMint";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "bTokenVault";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "bVault";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "bVaultLp";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "bVaultLpMint";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "lockEscrow";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "escrowVault";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "sourceTokens";
           isMut: true;
           isSigner: false;
         },
@@ -637,87 +994,22 @@ export type MemechanSol = {
           isSigner: true;
         },
         {
-          name: "raydiumAmm";
-          isMut: true;
-          isSigner: false;
-        },
-        {
-          name: "raydiumAmmAuthority";
-          isMut: false;
-          isSigner: false;
-        },
-        {
-          name: "raydiumMemeVault";
-          isMut: true;
-          isSigner: false;
-        },
-        {
-          name: "raydiumQuoteVault";
-          isMut: true;
-          isSigner: false;
-        },
-        {
-          name: "raydiumLpMint";
-          isMut: true;
-          isSigner: false;
-        },
-        {
-          name: "openOrders";
-          isMut: true;
-          isSigner: false;
-        },
-        {
-          name: "targetOrders";
-          isMut: true;
-          isSigner: false;
-        },
-        {
-          name: "marketAccount";
-          isMut: true;
-          isSigner: false;
-        },
-        {
-          name: "marketEventQueue";
-          isMut: true;
-          isSigner: false;
-        },
-        {
-          name: "marketCoinVault";
-          isMut: true;
-          isSigner: false;
-        },
-        {
-          name: "marketPcVault";
-          isMut: true;
-          isSigner: false;
-        },
-        {
-          name: "marketVaultSigner";
-          isMut: false;
-          isSigner: false;
-        },
-        {
-          name: "marketBids";
-          isMut: true;
-          isSigner: false;
-        },
-        {
-          name: "marketAsks";
-          isMut: true;
-          isSigner: false;
-        },
-        {
           name: "tokenProgram";
           isMut: false;
           isSigner: false;
         },
         {
-          name: "raydiumProgram";
+          name: "ammProgram";
           isMut: false;
           isSigner: false;
         },
         {
-          name: "marketProgramId";
+          name: "vaultProgram";
+          isMut: false;
+          isSigner: false;
+        },
+        {
+          name: "memoProgram";
           isMut: false;
           isSigner: false;
         },
@@ -748,12 +1040,22 @@ export type MemechanSol = {
           isSigner: false;
         },
         {
+          name: "userChan";
+          isMut: true;
+          isSigner: false;
+        },
+        {
           name: "memeVault";
           isMut: true;
           isSigner: false;
         },
         {
           name: "quoteVault";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "chanVault";
           isMut: true;
           isSigner: false;
         },
@@ -804,12 +1106,22 @@ export type MemechanSol = {
           isSigner: false;
         },
         {
+          name: "userChan";
+          isMut: true;
+          isSigner: false;
+        },
+        {
           name: "memeVault";
           isMut: true;
           isSigner: false;
         },
         {
           name: "quoteVault";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "chanVault";
           isMut: true;
           isSigner: false;
         },
@@ -896,6 +1208,11 @@ export type MemechanSol = {
           isMut: true;
           isSigner: true;
         },
+        {
+          name: "systemProgram";
+          isMut: false;
+          isSigner: false;
+        },
       ];
       args: [];
     },
@@ -936,6 +1253,27 @@ export type MemechanSol = {
         },
       ];
       args: [];
+    },
+    {
+      name: "increaseVesting";
+      accounts: [
+        {
+          name: "sender";
+          isMut: false;
+          isSigner: true;
+        },
+        {
+          name: "staking";
+          isMut: true;
+          isSigner: false;
+        },
+      ];
+      args: [
+        {
+          name: "vestingTsIncrease";
+          type: "u64";
+        },
+      ];
     },
   ];
   accounts: [
@@ -992,6 +1330,26 @@ export type MemechanSol = {
       };
     },
     {
+      name: "chanSwap";
+      type: {
+        kind: "struct";
+        fields: [
+          {
+            name: "chanSolPriceNum";
+            type: "u64";
+          },
+          {
+            name: "chanSolPriceDenom";
+            type: "u64";
+          },
+          {
+            name: "chanVault";
+            type: "publicKey";
+          },
+        ];
+      };
+    },
+    {
       name: "memeTicket";
       type: {
         kind: "struct";
@@ -1014,6 +1372,10 @@ export type MemechanSol = {
           },
           {
             name: "withdrawsQuote";
+            type: "u64";
+          },
+          {
+            name: "withdrawsChan";
             type: "u64";
           },
           {
@@ -1047,31 +1409,29 @@ export type MemechanSol = {
             type: "publicKey";
           },
           {
-            name: "lpVault";
-            type: "publicKey";
-          },
-          {
-            name: "lpMint";
-            type: "publicKey";
-          },
-          {
             name: "quoteVault";
             type: "publicKey";
           },
           {
-            name: "raydiumAmm";
+            name: "quoteMint";
+            type: "publicKey";
+          },
+          {
+            name: "chanVault";
+            type: "publicKey";
+          },
+          {
+            name: "quoteAmmPool";
+            type: "publicKey";
+          },
+          {
+            name: "chanAmmPool";
             type: "publicKey";
           },
           {
             name: "vestingConfig";
             type: {
               defined: "VestingConfig";
-            };
-          },
-          {
-            name: "raydiumFees";
-            type: {
-              defined: "RaydiumAmmFees";
             };
           },
           {
@@ -1085,6 +1445,14 @@ export type MemechanSol = {
           {
             name: "feesYTotal";
             type: "u64";
+          },
+          {
+            name: "feesZTotal";
+            type: "u64";
+          },
+          {
+            name: "isActive";
+            type: "bool";
           },
         ];
       };
@@ -1101,347 +1469,6 @@ export type MemechanSol = {
           {
             name: "tokenMint";
             type: "publicKey";
-          },
-        ];
-      };
-    },
-    {
-      name: "ammConfig";
-      type: {
-        kind: "struct";
-        fields: [
-          {
-            name: "pnlOwner";
-            docs: ["withdraw pnl owner"];
-            type: "publicKey";
-          },
-          {
-            name: "cancelOwner";
-            docs: ["admin amm order owner"];
-            type: "publicKey";
-          },
-          {
-            name: "pending1";
-            docs: ["pending"];
-            type: {
-              array: ["u64", 28];
-            };
-          },
-          {
-            name: "pending2";
-            docs: ["pending"];
-            type: {
-              array: ["u64", 31];
-            };
-          },
-          {
-            name: "createPoolFee";
-            docs: ["init amm pool fee amount"];
-            type: "u64";
-          },
-        ];
-      };
-    },
-    {
-      name: "targetOrders";
-      type: {
-        kind: "struct";
-        fields: [
-          {
-            name: "owner";
-            type: {
-              array: ["u64", 4];
-            };
-          },
-          {
-            name: "buyOrders";
-            type: {
-              array: [
-                {
-                  defined: "TargetOrder";
-                },
-                50,
-              ];
-            };
-          },
-          {
-            name: "padding1";
-            type: {
-              array: ["u64", 8];
-            };
-          },
-          {
-            name: "targetX";
-            type: "u128";
-          },
-          {
-            name: "targetY";
-            type: "u128";
-          },
-          {
-            name: "planXBuy";
-            type: "u128";
-          },
-          {
-            name: "planYBuy";
-            type: "u128";
-          },
-          {
-            name: "planXSell";
-            type: "u128";
-          },
-          {
-            name: "planYSell";
-            type: "u128";
-          },
-          {
-            name: "placedX";
-            type: "u128";
-          },
-          {
-            name: "placedY";
-            type: "u128";
-          },
-          {
-            name: "calcPnlX";
-            type: "u128";
-          },
-          {
-            name: "calcPnlY";
-            type: "u128";
-          },
-          {
-            name: "sellOrders";
-            type: {
-              array: [
-                {
-                  defined: "TargetOrder";
-                },
-                50,
-              ];
-            };
-          },
-          {
-            name: "padding2";
-            type: {
-              array: ["u64", 6];
-            };
-          },
-          {
-            name: "replaceBuyClientId";
-            type: {
-              array: ["u64", 10];
-            };
-          },
-          {
-            name: "replaceSellClientId";
-            type: {
-              array: ["u64", 10];
-            };
-          },
-          {
-            name: "lastOrderNumerator";
-            type: "u64";
-          },
-          {
-            name: "lastOrderDenominator";
-            type: "u64";
-          },
-          {
-            name: "planOrdersCur";
-            type: "u64";
-          },
-          {
-            name: "placeOrdersCur";
-            type: "u64";
-          },
-          {
-            name: "validBuyOrderNum";
-            type: "u64";
-          },
-          {
-            name: "validSellOrderNum";
-            type: "u64";
-          },
-          {
-            name: "padding3";
-            type: {
-              array: ["u64", 10];
-            };
-          },
-          {
-            name: "freeSlotBits";
-            type: "u128";
-          },
-        ];
-      };
-    },
-    {
-      name: "openOrders";
-      type: {
-        kind: "struct";
-        fields: [
-          {
-            name: "accountFlags";
-            type: "u64";
-          },
-          {
-            name: "market";
-            type: {
-              array: ["u64", 4];
-            };
-          },
-          {
-            name: "owner";
-            type: {
-              array: ["u64", 4];
-            };
-          },
-          {
-            name: "nativeCoinFree";
-            type: "u64";
-          },
-          {
-            name: "nativeCoinTotal";
-            type: "u64";
-          },
-          {
-            name: "nativePcFree";
-            type: "u64";
-          },
-          {
-            name: "nativePcTotal";
-            type: "u64";
-          },
-          {
-            name: "freeSlotBits";
-            type: "u128";
-          },
-          {
-            name: "isBidBits";
-            type: "u128";
-          },
-          {
-            name: "orders";
-            type: {
-              array: ["u128", 128];
-            };
-          },
-          {
-            name: "clientOrderIds";
-            type: {
-              array: ["u64", 128];
-            };
-          },
-          {
-            name: "referrerRebatesAccrued";
-            type: "u64";
-          },
-        ];
-      };
-    },
-    {
-      name: "marketState";
-      type: {
-        kind: "struct";
-        fields: [
-          {
-            name: "accountFlags";
-            type: "u64";
-          },
-          {
-            name: "ownAddress";
-            type: {
-              array: ["u64", 4];
-            };
-          },
-          {
-            name: "vaultSignerNonce";
-            type: "u64";
-          },
-          {
-            name: "coinMint";
-            type: {
-              array: ["u64", 4];
-            };
-          },
-          {
-            name: "pcMint";
-            type: {
-              array: ["u64", 4];
-            };
-          },
-          {
-            name: "coinVault";
-            type: {
-              array: ["u64", 4];
-            };
-          },
-          {
-            name: "coinDepositsTotal";
-            type: "u64";
-          },
-          {
-            name: "coinFeesAccrued";
-            type: "u64";
-          },
-          {
-            name: "pcVault";
-            type: {
-              array: ["u64", 4];
-            };
-          },
-          {
-            name: "pcDepositsTotal";
-            type: "u64";
-          },
-          {
-            name: "pcFeesAccrued";
-            type: "u64";
-          },
-          {
-            name: "pcDustThreshold";
-            type: "u64";
-          },
-          {
-            name: "reqQ";
-            type: {
-              array: ["u64", 4];
-            };
-          },
-          {
-            name: "eventQ";
-            type: {
-              array: ["u64", 4];
-            };
-          },
-          {
-            name: "bids";
-            type: {
-              array: ["u64", 4];
-            };
-          },
-          {
-            name: "asks";
-            type: {
-              array: ["u64", 4];
-            };
-          },
-          {
-            name: "coinLotSize";
-            type: "u64";
-          },
-          {
-            name: "pcLotSize";
-            type: "u64";
-          },
-          {
-            name: "feeRateBps";
-            type: "u64";
-          },
-          {
-            name: "referrerRebatesAccrued";
-            type: "u64";
           },
         ];
       };
@@ -1482,7 +1509,11 @@ export type MemechanSol = {
             type: "u128";
           },
           {
-            name: "priceFactor";
+            name: "priceFactorNum";
+            type: "u64";
+          },
+          {
+            name: "priceFactorDenom";
             type: "u64";
           },
           {
@@ -1517,22 +1548,6 @@ export type MemechanSol = {
           },
           {
             name: "feeOutPercent";
-            type: "u64";
-          },
-        ];
-      };
-    },
-    {
-      name: "RaydiumAmmFees";
-      type: {
-        kind: "struct";
-        fields: [
-          {
-            name: "lastCumQuoteFees";
-            type: "u64";
-          },
-          {
-            name: "lastCumMemeFees";
             type: "u64";
           },
         ];
@@ -1584,145 +1599,6 @@ export type MemechanSol = {
           {
             name: "vault";
             type: "publicKey";
-          },
-        ];
-      };
-    },
-    {
-      name: "RaydiumFees";
-      type: {
-        kind: "struct";
-        fields: [
-          {
-            name: "minSeparateNumerator";
-            docs: ["numerator of the min_separate"];
-            type: "u64";
-          },
-          {
-            name: "minSeparateDenominator";
-            docs: ["denominator of the min_separate"];
-            type: "u64";
-          },
-          {
-            name: "tradeFeeNumerator";
-            docs: ["numerator of the fee"];
-            type: "u64";
-          },
-          {
-            name: "tradeFeeDenominator";
-            docs: ["denominator of the fee", "and 'trade_fee_denominator' must be equal to 'min_separate_denominator'"];
-            type: "u64";
-          },
-          {
-            name: "pnlNumerator";
-            docs: ["numerator of the pnl"];
-            type: "u64";
-          },
-          {
-            name: "pnlDenominator";
-            docs: ["denominator of the pnl"];
-            type: "u64";
-          },
-          {
-            name: "swapFeeNumerator";
-            docs: ["numerator of the swap_fee"];
-            type: "u64";
-          },
-          {
-            name: "swapFeeDenominator";
-            docs: ["denominator of the swap_fee"];
-            type: "u64";
-          },
-        ];
-      };
-    },
-    {
-      name: "StateData";
-      type: {
-        kind: "struct";
-        fields: [
-          {
-            name: "needTakePnlCoin";
-            docs: ["delay to take pnl coin"];
-            type: "u64";
-          },
-          {
-            name: "needTakePnlPc";
-            docs: ["delay to take pnl pc"];
-            type: "u64";
-          },
-          {
-            name: "totalPnlPc";
-            docs: ["total pnl pc"];
-            type: "u64";
-          },
-          {
-            name: "totalPnlCoin";
-            docs: ["total pnl coin"];
-            type: "u64";
-          },
-          {
-            name: "poolOpenTime";
-            docs: ["ido pool open time"];
-            type: "u64";
-          },
-          {
-            name: "padding";
-            docs: ["padding for future updates"];
-            type: {
-              array: ["u64", 2];
-            };
-          },
-          {
-            name: "orderbookToInitTime";
-            docs: ["switch from orderbookonly to init"];
-            type: "u64";
-          },
-          {
-            name: "swapCoinInAmount";
-            docs: ["swap coin in amount"];
-            type: "u128";
-          },
-          {
-            name: "swapPcOutAmount";
-            docs: ["swap pc out amount"];
-            type: "u128";
-          },
-          {
-            name: "swapAccPcFee";
-            docs: ["charge pc as swap fee while swap pc to coin"];
-            type: "u64";
-          },
-          {
-            name: "swapPcInAmount";
-            docs: ["swap pc in amount"];
-            type: "u128";
-          },
-          {
-            name: "swapCoinOutAmount";
-            docs: ["swap coin out amount"];
-            type: "u128";
-          },
-          {
-            name: "swapAccCoinFee";
-            docs: ["charge coin as swap fee while swap coin to pc"];
-            type: "u64";
-          },
-        ];
-      };
-    },
-    {
-      name: "TargetOrder";
-      type: {
-        kind: "struct";
-        fields: [
-          {
-            name: "price";
-            type: "u64";
-          },
-          {
-            name: "vol";
-            type: "u64";
           },
         ];
       };
@@ -1894,6 +1770,11 @@ export type MemechanSol = {
     {
       code: 6026;
       name: "NoFeesToAdd";
+    },
+    {
+      code: 6027;
+      name: "StakingIsNotActive";
+      msg: "Staking should be fully initialized before it can be interacted with";
     },
   ];
 };
@@ -2259,7 +2140,13 @@ export const IDL: MemechanSol = {
           name: "stakingQuoteVault",
           isMut: true,
           isSigner: false,
-          docs: ["Bonding Pool WSOL vault"],
+          docs: ["Bonding Pool Quote vault"],
+        },
+        {
+          name: "stakingChanVault",
+          isMut: true,
+          isSigner: false,
+          docs: ["Bonding Pool CHAN vault"],
         },
         {
           name: "memeTicket",
@@ -2283,7 +2170,364 @@ export const IDL: MemechanSol = {
           isSigner: false,
         },
         {
-          name: "marketProgramId",
+          name: "tokenProgram",
+          isMut: false,
+          isSigner: false,
+        },
+        {
+          name: "systemProgram",
+          isMut: false,
+          isSigner: false,
+        },
+      ],
+      args: [],
+    },
+    {
+      name: "initMemeAmmPool",
+      accounts: [
+        {
+          name: "signer",
+          isMut: true,
+          isSigner: true,
+          docs: ["Signer"],
+        },
+        {
+          name: "staking",
+          isMut: true,
+          isSigner: false,
+          docs: ["Staking Pool Account"],
+        },
+        {
+          name: "stakingPoolSignerPda",
+          isMut: true,
+          isSigner: false,
+          docs: ["Staking Pool Signer"],
+        },
+        {
+          name: "stakingMemeVault",
+          isMut: true,
+          isSigner: false,
+          docs: ["Staking Pool Meme vault"],
+        },
+        {
+          name: "stakingQuoteVault",
+          isMut: true,
+          isSigner: false,
+          docs: ["Staking Pool Quote vault"],
+        },
+        {
+          name: "memeMint",
+          isMut: false,
+          isSigner: false,
+          docs: ["Mint Account for Meme"],
+        },
+        {
+          name: "quoteMint",
+          isMut: false,
+          isSigner: false,
+          docs: ["Mint Account for WSOL"],
+        },
+        {
+          name: "lpMint",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "feeOwner",
+          isMut: false,
+          isSigner: false,
+        },
+        {
+          name: "payerPoolLp",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "ammPool",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "mintMetadata",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "aTokenVault",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "aVault",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "aVaultLp",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "aVaultLpMint",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "bTokenVault",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "bVault",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "bVaultLp",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "bVaultLpMint",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "adminTokenAFee",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "adminTokenBFee",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "lockEscrow",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "escrowVault",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "rent",
+          isMut: false,
+          isSigner: false,
+        },
+        {
+          name: "metadataProgram",
+          isMut: false,
+          isSigner: false,
+        },
+        {
+          name: "ataProgram",
+          isMut: false,
+          isSigner: false,
+        },
+        {
+          name: "ammProgram",
+          isMut: false,
+          isSigner: false,
+        },
+        {
+          name: "vaultProgram",
+          isMut: false,
+          isSigner: false,
+        },
+        {
+          name: "tokenProgram",
+          isMut: false,
+          isSigner: false,
+        },
+        {
+          name: "systemProgram",
+          isMut: false,
+          isSigner: false,
+        },
+      ],
+      args: [],
+    },
+    {
+      name: "initChanAmmPool",
+      accounts: [
+        {
+          name: "signer",
+          isMut: true,
+          isSigner: true,
+          docs: ["Signer"],
+        },
+        {
+          name: "staking",
+          isMut: true,
+          isSigner: false,
+          docs: ["Staking Pool Account"],
+        },
+        {
+          name: "stakingPoolSignerPda",
+          isMut: true,
+          isSigner: false,
+          docs: ["Staking Pool Signer"],
+        },
+        {
+          name: "stakingQuoteVault",
+          isMut: true,
+          isSigner: false,
+          docs: ["Staking Pool Chan vault"],
+        },
+        {
+          name: "stakingMemeVault",
+          isMut: true,
+          isSigner: false,
+          docs: ["Staking Pool Meme vault"],
+        },
+        {
+          name: "stakingChanVault",
+          isMut: true,
+          isSigner: false,
+          docs: ["Staking Pool Chan vault"],
+        },
+        {
+          name: "memeMint",
+          isMut: false,
+          isSigner: false,
+          docs: ["Mint Account for Meme"],
+        },
+        {
+          name: "chanMint",
+          isMut: false,
+          isSigner: false,
+          docs: ["Mint Account for Quote"],
+        },
+        {
+          name: "chanSwap",
+          isMut: false,
+          isSigner: false,
+        },
+        {
+          name: "chanSwapSignerPda",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "chanSwapVault",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "feeQuoteVault",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "lpMint",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "feeOwner",
+          isMut: false,
+          isSigner: false,
+        },
+        {
+          name: "payerPoolLp",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "ammPool",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "mintMetadata",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "aTokenVault",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "aVault",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "aVaultLp",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "aVaultLpMint",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "bTokenVault",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "bVault",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "bVaultLp",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "bVaultLpMint",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "adminTokenAFee",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "adminTokenBFee",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "lockEscrow",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "escrowVault",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "rent",
+          isMut: false,
+          isSigner: false,
+        },
+        {
+          name: "metadataProgram",
+          isMut: false,
+          isSigner: false,
+        },
+        {
+          name: "ataProgram",
+          isMut: false,
+          isSigner: false,
+        },
+        {
+          name: "ammProgram",
+          isMut: false,
+          isSigner: false,
+        },
+        {
+          name: "vaultProgram",
           isMut: false,
           isSigner: false,
         },
@@ -2353,141 +2597,26 @@ export const IDL: MemechanSol = {
       ],
     },
     {
-      name: "goLive",
+      name: "newChanSwap",
       accounts: [
         {
-          name: "signer",
+          name: "sender",
           isMut: true,
           isSigner: true,
-          docs: ["Signer"],
         },
         {
-          name: "staking",
+          name: "chanSwap",
           isMut: true,
           isSigner: false,
-          docs: ["Staking Pool Account"],
         },
         {
-          name: "stakingPoolSignerPda",
-          isMut: true,
-          isSigner: false,
-          docs: ["Staking Pool Signer"],
-        },
-        {
-          name: "poolMemeVault",
-          isMut: true,
-          isSigner: false,
-          docs: ["Staking Pool Meme vault"],
-        },
-        {
-          name: "poolQuoteVault",
-          isMut: true,
-          isSigner: false,
-          docs: ["Staking Pool Quote vault"],
-        },
-        {
-          name: "memeMint",
-          isMut: false,
-          isSigner: false,
-          docs: ["Mint Account for Meme"],
-        },
-        {
-          name: "quoteMint",
-          isMut: false,
-          isSigner: false,
-          docs: ["Mint Account for WSOL"],
-        },
-        {
-          name: "openOrders",
-          isMut: true,
-          isSigner: false,
-          docs: ["Open Orders Account"],
-        },
-        {
-          name: "targetOrders",
-          isMut: true,
-          isSigner: false,
-          docs: ["Target Orders Account"],
-        },
-        {
-          name: "marketAccount",
-          isMut: true,
-          isSigner: false,
-          docs: ["Market Orders Account"],
-        },
-        {
-          name: "raydiumAmm",
-          isMut: true,
-          isSigner: false,
-          docs: ["Raydium AMM Account"],
-        },
-        {
-          name: "raydiumAmmAuthority",
-          isMut: true,
-          isSigner: false,
-          docs: ["Raydium AMM Signer"],
-        },
-        {
-          name: "raydiumLpMint",
-          isMut: true,
-          isSigner: false,
-          docs: ["Raydium LP MinT"],
-        },
-        {
-          name: "raydiumMemeVault",
-          isMut: true,
-          isSigner: false,
-          docs: ["Raydium LP Token Account", "Raydium Meme Token Account"],
-        },
-        {
-          name: "raydiumQuoteVault",
-          isMut: true,
-          isSigner: false,
-          docs: ["Raydium WSOL Token Account"],
-        },
-        {
-          name: "ammConfig",
+          name: "chanSwapSignerPda",
           isMut: false,
           isSigner: false,
         },
         {
-          name: "feeDestinationInfo",
+          name: "chanVault",
           isMut: true,
-          isSigner: false,
-        },
-        {
-          name: "userDestinationLpTokenAta",
-          isMut: true,
-          isSigner: false,
-        },
-        {
-          name: "rent",
-          isMut: false,
-          isSigner: false,
-        },
-        {
-          name: "clock",
-          isMut: false,
-          isSigner: false,
-        },
-        {
-          name: "raydiumProgram",
-          isMut: false,
-          isSigner: false,
-        },
-        {
-          name: "ataProgram",
-          isMut: false,
-          isSigner: false,
-        },
-        {
-          name: "marketProgramId",
-          isMut: false,
-          isSigner: false,
-        },
-        {
-          name: "tokenProgram",
-          isMut: false,
           isSigner: false,
         },
         {
@@ -2498,8 +2627,37 @@ export const IDL: MemechanSol = {
       ],
       args: [
         {
-          name: "nonce",
-          type: "u8",
+          name: "newPriceNum",
+          type: "u64",
+        },
+        {
+          name: "newPriceDenom",
+          type: "u64",
+        },
+      ],
+    },
+    {
+      name: "changeChanPrice",
+      accounts: [
+        {
+          name: "sender",
+          isMut: false,
+          isSigner: true,
+        },
+        {
+          name: "chanSwap",
+          isMut: true,
+          isSigner: false,
+        },
+      ],
+      args: [
+        {
+          name: "newPriceNum",
+          type: "u64",
+        },
+        {
+          name: "newPriceDenom",
+          type: "u64",
         },
       ],
     },
@@ -2517,7 +2675,27 @@ export const IDL: MemechanSol = {
           isSigner: false,
         },
         {
+          name: "memeMint",
+          isMut: false,
+          isSigner: false,
+        },
+        {
           name: "quoteVault",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "quoteMint",
+          isMut: false,
+          isSigner: false,
+        },
+        {
+          name: "memeFeeVault",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "quoteFeeVault",
           isMut: true,
           isSigner: false,
         },
@@ -2527,7 +2705,67 @@ export const IDL: MemechanSol = {
           isSigner: false,
         },
         {
-          name: "stakingLpWallet",
+          name: "ammPool",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "lpMint",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "aTokenVault",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "aVault",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "aVaultLp",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "aVaultLpMint",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "bTokenVault",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "bVault",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "bVaultLp",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "bVaultLpMint",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "lockEscrow",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "escrowVault",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "sourceTokens",
           isMut: true,
           isSigner: false,
         },
@@ -2537,87 +2775,22 @@ export const IDL: MemechanSol = {
           isSigner: true,
         },
         {
-          name: "raydiumAmm",
-          isMut: true,
-          isSigner: false,
-        },
-        {
-          name: "raydiumAmmAuthority",
-          isMut: false,
-          isSigner: false,
-        },
-        {
-          name: "raydiumMemeVault",
-          isMut: true,
-          isSigner: false,
-        },
-        {
-          name: "raydiumQuoteVault",
-          isMut: true,
-          isSigner: false,
-        },
-        {
-          name: "raydiumLpMint",
-          isMut: true,
-          isSigner: false,
-        },
-        {
-          name: "openOrders",
-          isMut: true,
-          isSigner: false,
-        },
-        {
-          name: "targetOrders",
-          isMut: true,
-          isSigner: false,
-        },
-        {
-          name: "marketAccount",
-          isMut: true,
-          isSigner: false,
-        },
-        {
-          name: "marketEventQueue",
-          isMut: true,
-          isSigner: false,
-        },
-        {
-          name: "marketCoinVault",
-          isMut: true,
-          isSigner: false,
-        },
-        {
-          name: "marketPcVault",
-          isMut: true,
-          isSigner: false,
-        },
-        {
-          name: "marketVaultSigner",
-          isMut: false,
-          isSigner: false,
-        },
-        {
-          name: "marketBids",
-          isMut: true,
-          isSigner: false,
-        },
-        {
-          name: "marketAsks",
-          isMut: true,
-          isSigner: false,
-        },
-        {
           name: "tokenProgram",
           isMut: false,
           isSigner: false,
         },
         {
-          name: "raydiumProgram",
+          name: "ammProgram",
           isMut: false,
           isSigner: false,
         },
         {
-          name: "marketProgramId",
+          name: "vaultProgram",
+          isMut: false,
+          isSigner: false,
+        },
+        {
+          name: "memoProgram",
           isMut: false,
           isSigner: false,
         },
@@ -2648,12 +2821,22 @@ export const IDL: MemechanSol = {
           isSigner: false,
         },
         {
+          name: "userChan",
+          isMut: true,
+          isSigner: false,
+        },
+        {
           name: "memeVault",
           isMut: true,
           isSigner: false,
         },
         {
           name: "quoteVault",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "chanVault",
           isMut: true,
           isSigner: false,
         },
@@ -2704,12 +2887,22 @@ export const IDL: MemechanSol = {
           isSigner: false,
         },
         {
+          name: "userChan",
+          isMut: true,
+          isSigner: false,
+        },
+        {
           name: "memeVault",
           isMut: true,
           isSigner: false,
         },
         {
           name: "quoteVault",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "chanVault",
           isMut: true,
           isSigner: false,
         },
@@ -2796,6 +2989,11 @@ export const IDL: MemechanSol = {
           isMut: true,
           isSigner: true,
         },
+        {
+          name: "systemProgram",
+          isMut: false,
+          isSigner: false,
+        },
       ],
       args: [],
     },
@@ -2836,6 +3034,27 @@ export const IDL: MemechanSol = {
         },
       ],
       args: [],
+    },
+    {
+      name: "increaseVesting",
+      accounts: [
+        {
+          name: "sender",
+          isMut: false,
+          isSigner: true,
+        },
+        {
+          name: "staking",
+          isMut: true,
+          isSigner: false,
+        },
+      ],
+      args: [
+        {
+          name: "vestingTsIncrease",
+          type: "u64",
+        },
+      ],
     },
   ],
   accounts: [
@@ -2892,6 +3111,26 @@ export const IDL: MemechanSol = {
       },
     },
     {
+      name: "chanSwap",
+      type: {
+        kind: "struct",
+        fields: [
+          {
+            name: "chanSolPriceNum",
+            type: "u64",
+          },
+          {
+            name: "chanSolPriceDenom",
+            type: "u64",
+          },
+          {
+            name: "chanVault",
+            type: "publicKey",
+          },
+        ],
+      },
+    },
+    {
       name: "memeTicket",
       type: {
         kind: "struct",
@@ -2914,6 +3153,10 @@ export const IDL: MemechanSol = {
           },
           {
             name: "withdrawsQuote",
+            type: "u64",
+          },
+          {
+            name: "withdrawsChan",
             type: "u64",
           },
           {
@@ -2947,31 +3190,29 @@ export const IDL: MemechanSol = {
             type: "publicKey",
           },
           {
-            name: "lpVault",
-            type: "publicKey",
-          },
-          {
-            name: "lpMint",
-            type: "publicKey",
-          },
-          {
             name: "quoteVault",
             type: "publicKey",
           },
           {
-            name: "raydiumAmm",
+            name: "quoteMint",
+            type: "publicKey",
+          },
+          {
+            name: "chanVault",
+            type: "publicKey",
+          },
+          {
+            name: "quoteAmmPool",
+            type: "publicKey",
+          },
+          {
+            name: "chanAmmPool",
             type: "publicKey",
           },
           {
             name: "vestingConfig",
             type: {
               defined: "VestingConfig",
-            },
-          },
-          {
-            name: "raydiumFees",
-            type: {
-              defined: "RaydiumAmmFees",
             },
           },
           {
@@ -2985,6 +3226,14 @@ export const IDL: MemechanSol = {
           {
             name: "feesYTotal",
             type: "u64",
+          },
+          {
+            name: "feesZTotal",
+            type: "u64",
+          },
+          {
+            name: "isActive",
+            type: "bool",
           },
         ],
       },
@@ -3001,347 +3250,6 @@ export const IDL: MemechanSol = {
           {
             name: "tokenMint",
             type: "publicKey",
-          },
-        ],
-      },
-    },
-    {
-      name: "ammConfig",
-      type: {
-        kind: "struct",
-        fields: [
-          {
-            name: "pnlOwner",
-            docs: ["withdraw pnl owner"],
-            type: "publicKey",
-          },
-          {
-            name: "cancelOwner",
-            docs: ["admin amm order owner"],
-            type: "publicKey",
-          },
-          {
-            name: "pending1",
-            docs: ["pending"],
-            type: {
-              array: ["u64", 28],
-            },
-          },
-          {
-            name: "pending2",
-            docs: ["pending"],
-            type: {
-              array: ["u64", 31],
-            },
-          },
-          {
-            name: "createPoolFee",
-            docs: ["init amm pool fee amount"],
-            type: "u64",
-          },
-        ],
-      },
-    },
-    {
-      name: "targetOrders",
-      type: {
-        kind: "struct",
-        fields: [
-          {
-            name: "owner",
-            type: {
-              array: ["u64", 4],
-            },
-          },
-          {
-            name: "buyOrders",
-            type: {
-              array: [
-                {
-                  defined: "TargetOrder",
-                },
-                50,
-              ],
-            },
-          },
-          {
-            name: "padding1",
-            type: {
-              array: ["u64", 8],
-            },
-          },
-          {
-            name: "targetX",
-            type: "u128",
-          },
-          {
-            name: "targetY",
-            type: "u128",
-          },
-          {
-            name: "planXBuy",
-            type: "u128",
-          },
-          {
-            name: "planYBuy",
-            type: "u128",
-          },
-          {
-            name: "planXSell",
-            type: "u128",
-          },
-          {
-            name: "planYSell",
-            type: "u128",
-          },
-          {
-            name: "placedX",
-            type: "u128",
-          },
-          {
-            name: "placedY",
-            type: "u128",
-          },
-          {
-            name: "calcPnlX",
-            type: "u128",
-          },
-          {
-            name: "calcPnlY",
-            type: "u128",
-          },
-          {
-            name: "sellOrders",
-            type: {
-              array: [
-                {
-                  defined: "TargetOrder",
-                },
-                50,
-              ],
-            },
-          },
-          {
-            name: "padding2",
-            type: {
-              array: ["u64", 6],
-            },
-          },
-          {
-            name: "replaceBuyClientId",
-            type: {
-              array: ["u64", 10],
-            },
-          },
-          {
-            name: "replaceSellClientId",
-            type: {
-              array: ["u64", 10],
-            },
-          },
-          {
-            name: "lastOrderNumerator",
-            type: "u64",
-          },
-          {
-            name: "lastOrderDenominator",
-            type: "u64",
-          },
-          {
-            name: "planOrdersCur",
-            type: "u64",
-          },
-          {
-            name: "placeOrdersCur",
-            type: "u64",
-          },
-          {
-            name: "validBuyOrderNum",
-            type: "u64",
-          },
-          {
-            name: "validSellOrderNum",
-            type: "u64",
-          },
-          {
-            name: "padding3",
-            type: {
-              array: ["u64", 10],
-            },
-          },
-          {
-            name: "freeSlotBits",
-            type: "u128",
-          },
-        ],
-      },
-    },
-    {
-      name: "openOrders",
-      type: {
-        kind: "struct",
-        fields: [
-          {
-            name: "accountFlags",
-            type: "u64",
-          },
-          {
-            name: "market",
-            type: {
-              array: ["u64", 4],
-            },
-          },
-          {
-            name: "owner",
-            type: {
-              array: ["u64", 4],
-            },
-          },
-          {
-            name: "nativeCoinFree",
-            type: "u64",
-          },
-          {
-            name: "nativeCoinTotal",
-            type: "u64",
-          },
-          {
-            name: "nativePcFree",
-            type: "u64",
-          },
-          {
-            name: "nativePcTotal",
-            type: "u64",
-          },
-          {
-            name: "freeSlotBits",
-            type: "u128",
-          },
-          {
-            name: "isBidBits",
-            type: "u128",
-          },
-          {
-            name: "orders",
-            type: {
-              array: ["u128", 128],
-            },
-          },
-          {
-            name: "clientOrderIds",
-            type: {
-              array: ["u64", 128],
-            },
-          },
-          {
-            name: "referrerRebatesAccrued",
-            type: "u64",
-          },
-        ],
-      },
-    },
-    {
-      name: "marketState",
-      type: {
-        kind: "struct",
-        fields: [
-          {
-            name: "accountFlags",
-            type: "u64",
-          },
-          {
-            name: "ownAddress",
-            type: {
-              array: ["u64", 4],
-            },
-          },
-          {
-            name: "vaultSignerNonce",
-            type: "u64",
-          },
-          {
-            name: "coinMint",
-            type: {
-              array: ["u64", 4],
-            },
-          },
-          {
-            name: "pcMint",
-            type: {
-              array: ["u64", 4],
-            },
-          },
-          {
-            name: "coinVault",
-            type: {
-              array: ["u64", 4],
-            },
-          },
-          {
-            name: "coinDepositsTotal",
-            type: "u64",
-          },
-          {
-            name: "coinFeesAccrued",
-            type: "u64",
-          },
-          {
-            name: "pcVault",
-            type: {
-              array: ["u64", 4],
-            },
-          },
-          {
-            name: "pcDepositsTotal",
-            type: "u64",
-          },
-          {
-            name: "pcFeesAccrued",
-            type: "u64",
-          },
-          {
-            name: "pcDustThreshold",
-            type: "u64",
-          },
-          {
-            name: "reqQ",
-            type: {
-              array: ["u64", 4],
-            },
-          },
-          {
-            name: "eventQ",
-            type: {
-              array: ["u64", 4],
-            },
-          },
-          {
-            name: "bids",
-            type: {
-              array: ["u64", 4],
-            },
-          },
-          {
-            name: "asks",
-            type: {
-              array: ["u64", 4],
-            },
-          },
-          {
-            name: "coinLotSize",
-            type: "u64",
-          },
-          {
-            name: "pcLotSize",
-            type: "u64",
-          },
-          {
-            name: "feeRateBps",
-            type: "u64",
-          },
-          {
-            name: "referrerRebatesAccrued",
-            type: "u64",
           },
         ],
       },
@@ -3382,7 +3290,11 @@ export const IDL: MemechanSol = {
             type: "u128",
           },
           {
-            name: "priceFactor",
+            name: "priceFactorNum",
+            type: "u64",
+          },
+          {
+            name: "priceFactorDenom",
             type: "u64",
           },
           {
@@ -3417,22 +3329,6 @@ export const IDL: MemechanSol = {
           },
           {
             name: "feeOutPercent",
-            type: "u64",
-          },
-        ],
-      },
-    },
-    {
-      name: "RaydiumAmmFees",
-      type: {
-        kind: "struct",
-        fields: [
-          {
-            name: "lastCumQuoteFees",
-            type: "u64",
-          },
-          {
-            name: "lastCumMemeFees",
             type: "u64",
           },
         ],
@@ -3484,145 +3380,6 @@ export const IDL: MemechanSol = {
           {
             name: "vault",
             type: "publicKey",
-          },
-        ],
-      },
-    },
-    {
-      name: "RaydiumFees",
-      type: {
-        kind: "struct",
-        fields: [
-          {
-            name: "minSeparateNumerator",
-            docs: ["numerator of the min_separate"],
-            type: "u64",
-          },
-          {
-            name: "minSeparateDenominator",
-            docs: ["denominator of the min_separate"],
-            type: "u64",
-          },
-          {
-            name: "tradeFeeNumerator",
-            docs: ["numerator of the fee"],
-            type: "u64",
-          },
-          {
-            name: "tradeFeeDenominator",
-            docs: ["denominator of the fee", "and 'trade_fee_denominator' must be equal to 'min_separate_denominator'"],
-            type: "u64",
-          },
-          {
-            name: "pnlNumerator",
-            docs: ["numerator of the pnl"],
-            type: "u64",
-          },
-          {
-            name: "pnlDenominator",
-            docs: ["denominator of the pnl"],
-            type: "u64",
-          },
-          {
-            name: "swapFeeNumerator",
-            docs: ["numerator of the swap_fee"],
-            type: "u64",
-          },
-          {
-            name: "swapFeeDenominator",
-            docs: ["denominator of the swap_fee"],
-            type: "u64",
-          },
-        ],
-      },
-    },
-    {
-      name: "StateData",
-      type: {
-        kind: "struct",
-        fields: [
-          {
-            name: "needTakePnlCoin",
-            docs: ["delay to take pnl coin"],
-            type: "u64",
-          },
-          {
-            name: "needTakePnlPc",
-            docs: ["delay to take pnl pc"],
-            type: "u64",
-          },
-          {
-            name: "totalPnlPc",
-            docs: ["total pnl pc"],
-            type: "u64",
-          },
-          {
-            name: "totalPnlCoin",
-            docs: ["total pnl coin"],
-            type: "u64",
-          },
-          {
-            name: "poolOpenTime",
-            docs: ["ido pool open time"],
-            type: "u64",
-          },
-          {
-            name: "padding",
-            docs: ["padding for future updates"],
-            type: {
-              array: ["u64", 2],
-            },
-          },
-          {
-            name: "orderbookToInitTime",
-            docs: ["switch from orderbookonly to init"],
-            type: "u64",
-          },
-          {
-            name: "swapCoinInAmount",
-            docs: ["swap coin in amount"],
-            type: "u128",
-          },
-          {
-            name: "swapPcOutAmount",
-            docs: ["swap pc out amount"],
-            type: "u128",
-          },
-          {
-            name: "swapAccPcFee",
-            docs: ["charge pc as swap fee while swap pc to coin"],
-            type: "u64",
-          },
-          {
-            name: "swapPcInAmount",
-            docs: ["swap pc in amount"],
-            type: "u128",
-          },
-          {
-            name: "swapCoinOutAmount",
-            docs: ["swap coin out amount"],
-            type: "u128",
-          },
-          {
-            name: "swapAccCoinFee",
-            docs: ["charge coin as swap fee while swap coin to pc"],
-            type: "u64",
-          },
-        ],
-      },
-    },
-    {
-      name: "TargetOrder",
-      type: {
-        kind: "struct",
-        fields: [
-          {
-            name: "price",
-            type: "u64",
-          },
-          {
-            name: "vol",
-            type: "u64",
           },
         ],
       },
@@ -3794,6 +3551,11 @@ export const IDL: MemechanSol = {
     {
       code: 6026,
       name: "NoFeesToAdd",
+    },
+    {
+      code: 6027,
+      name: "StakingIsNotActive",
+      msg: "Staking should be fully initialized before it can be interacted with",
     },
   ],
 };

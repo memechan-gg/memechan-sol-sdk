@@ -11,6 +11,7 @@ export * from "./vesting/VestingClient";
 export * from "./bound-pool/types";
 export * from "./live-pool/types";
 export * from "./memeticket/types";
+export * as memeTicketTypesV2 from "./memeticket/typesV2";
 export * from "./staking-pool/types";
 export * from "./targetconfig/types";
 export * from "./vesting/types";
@@ -46,12 +47,9 @@ export * from "./tx-parsing/parsers/swap-y-parser";
 export * from "./tx-parsing/parsers/create-metadata-parser";
 
 // Codegen
-export * from "./schema/codegen/accounts/BoundPool";
-export * from "./schema/codegen/accounts/MemeTicket";
-export * from "./schema/codegen/accounts/StakingPool";
-export * from "./schema/codegen/accounts/TargetConfig";
-export * from "./schema/types/memechan_sol";
 export * from "./vesting/schema/codegen/accounts/Vesting";
+export * from "./schema/v1";
+export * as codegenTypesV2 from "./schema/v2/v2";
 
 // Utils
 export * from "./common/helpers";

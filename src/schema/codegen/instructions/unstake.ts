@@ -13,10 +13,8 @@ export interface UnstakeAccounts {
   memeTicket: PublicKey;
   userMeme: PublicKey;
   userQuote: PublicKey;
-  userChan: PublicKey;
   memeVault: PublicKey;
   quoteVault: PublicKey;
-  chanVault: PublicKey;
   signer: PublicKey;
   stakingSignerPda: PublicKey;
   tokenProgram: PublicKey;
@@ -30,10 +28,8 @@ export function unstake(args: UnstakeArgs, accounts: UnstakeAccounts) {
     { pubkey: accounts.memeTicket, isSigner: false, isWritable: true },
     { pubkey: accounts.userMeme, isSigner: false, isWritable: true },
     { pubkey: accounts.userQuote, isSigner: false, isWritable: true },
-    { pubkey: accounts.userChan, isSigner: false, isWritable: true },
     { pubkey: accounts.memeVault, isSigner: false, isWritable: true },
     { pubkey: accounts.quoteVault, isSigner: false, isWritable: true },
-    { pubkey: accounts.chanVault, isSigner: false, isWritable: true },
     { pubkey: accounts.signer, isSigner: true, isWritable: false },
     { pubkey: accounts.stakingSignerPda, isSigner: false, isWritable: false },
     { pubkey: accounts.tokenProgram, isSigner: false, isWritable: false },

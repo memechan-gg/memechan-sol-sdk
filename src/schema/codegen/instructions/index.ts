@@ -5,12 +5,9 @@ export { swapX, SwapXArgs, SwapXAccounts } from "./swapX";
 export { getSwapYAmt, GetSwapYAmtArgs, GetSwapYAmtAccounts } from "./getSwapYAmt";
 export { swapY, SwapYArgs, SwapYAccounts } from "./swapY";
 export { initStakingPool, InitStakingPoolAccounts } from "./initStakingPool";
-export { initMemeAmmPool, InitMemeAmmPoolAccounts } from "./initMemeAmmPool";
-export { initChanAmmPool, InitChanAmmPoolAccounts } from "./initChanAmmPool";
 export { newTargetConfig, NewTargetConfigArgs, NewTargetConfigAccounts } from "./newTargetConfig";
 export { changeTargetConfig, ChangeTargetConfigArgs, ChangeTargetConfigAccounts } from "./changeTargetConfig";
-export { newChanSwap, NewChanSwapArgs, NewChanSwapAccounts } from "./newChanSwap";
-export { changeChanPrice, ChangeChanPriceArgs, ChangeChanPriceAccounts } from "./changeChanPrice";
+export { goLive, GoLiveArgs, GoLiveAccounts } from "./goLive";
 export { addFees, AddFeesAccounts } from "./addFees";
 export { unstake, UnstakeArgs, UnstakeAccounts } from "./unstake";
 export { withdrawFees, WithdrawFeesAccounts } from "./withdrawFees";
@@ -18,4 +15,3 @@ export { boundMergeTickets, BoundMergeTicketsAccounts } from "./boundMergeTicket
 export { stakingMergeTickets, StakingMergeTicketsAccounts } from "./stakingMergeTickets";
 export { closeTicket, CloseTicketAccounts } from "./closeTicket";
 export { withdrawAdminFee, WithdrawAdminFeeAccounts } from "./withdrawAdminFee";
-export { increaseVesting, IncreaseVestingArgs, IncreaseVestingAccounts } from "./increaseVesting";

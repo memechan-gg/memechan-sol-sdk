@@ -1,0 +1,51 @@
+import { ParsedTransactionWithMeta, PublicKey } from "@solana/web3.js";
+import { deserializeMetadata, Metadata } from "@metaplex-foundation/mpl-token-metadata";
+import { lamports, publicKey } from "@metaplex-foundation/umi";
+import { MemechanClientV2 } from "../../../MemechanClientV2";
+
+export type CreateMetadataInstructionParsed = {
+  mintAddr: PublicKey;
+  metadata: Metadata;
+  type: "create_metadata";
+};
+
+export async function parseCreateMetadataInstruction(
+  tx: ParsedTransactionWithMeta,
+  index: number,
+  memechanProgram: MemechanClientV2,
+) {
+  const ix = tx.transaction.message.instructions[index];
+
+  if (!("accounts" in ix) || ix.accounts.length < 4) {
+    return undefined;
+  }
+
+  const mintAddr = ix.accounts[2];
+  const metadataAddr = ix.accounts[3];
+
+  const metaAccountInfo = await memechanProgram.connection.getAccountInfo(metadataAddr, { commitment: "confirmed" });
+
+  if (!metaAccountInfo) {
+    return undefined;
+  }
+
+  const metadata = deserializeMetadata({
+    executable: false,
+    owner: publicKey(metaAccountInfo.owner),
+    lamports: lamports(metaAccountInfo.lamports),
+    publicKey: publicKey(metadataAddr),
+    data: metaAccountInfo.data,
+  });
+
+  if (!metadata) {
+    return undefined;
+  }
+
+  const cmParsed: CreateMetadataInstructionParsed = {
+    mintAddr,
+    metadata,
+    type: "create_metadata",
+  };
+
+  return cmParsed;
+}

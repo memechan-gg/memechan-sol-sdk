@@ -9,10 +9,8 @@ export interface WithdrawFeesAccounts {
   memeTicket: PublicKey;
   userMeme: PublicKey;
   userQuote: PublicKey;
-  userChan: PublicKey;
   memeVault: PublicKey;
   quoteVault: PublicKey;
-  chanVault: PublicKey;
   stakingSignerPda: PublicKey;
   signer: PublicKey;
   tokenProgram: PublicKey;
@@ -24,10 +22,8 @@ export function withdrawFees(accounts: WithdrawFeesAccounts) {
     { pubkey: accounts.memeTicket, isSigner: false, isWritable: true },
     { pubkey: accounts.userMeme, isSigner: false, isWritable: true },
     { pubkey: accounts.userQuote, isSigner: false, isWritable: true },
-    { pubkey: accounts.userChan, isSigner: false, isWritable: true },
     { pubkey: accounts.memeVault, isSigner: false, isWritable: true },
     { pubkey: accounts.quoteVault, isSigner: false, isWritable: true },
-    { pubkey: accounts.chanVault, isSigner: false, isWritable: true },
     { pubkey: accounts.stakingSignerPda, isSigner: false, isWritable: false },
     { pubkey: accounts.signer, isSigner: true, isWritable: false },
     { pubkey: accounts.tokenProgram, isSigner: false, isWritable: false },

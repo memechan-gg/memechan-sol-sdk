@@ -17,11 +17,11 @@ export interface InitStakingPoolAccounts {
   stakingPoolSignerPda: PublicKey;
   stakingMemeVault: PublicKey;
   stakingQuoteVault: PublicKey;
-  stakingChanVault: PublicKey;
   memeTicket: PublicKey;
   rent: PublicKey;
   clock: PublicKey;
   ataProgram: PublicKey;
+  marketProgramId: PublicKey;
   tokenProgram: PublicKey;
   systemProgram: PublicKey;
 }
@@ -44,11 +44,11 @@ export function initStakingPool(accounts: InitStakingPoolAccounts) {
     },
     { pubkey: accounts.stakingMemeVault, isSigner: false, isWritable: true },
     { pubkey: accounts.stakingQuoteVault, isSigner: false, isWritable: true },
-    { pubkey: accounts.stakingChanVault, isSigner: false, isWritable: true },
     { pubkey: accounts.memeTicket, isSigner: false, isWritable: true },
     { pubkey: accounts.rent, isSigner: false, isWritable: false },
     { pubkey: accounts.clock, isSigner: false, isWritable: false },
     { pubkey: accounts.ataProgram, isSigner: false, isWritable: false },
+    { pubkey: accounts.marketProgramId, isSigner: false, isWritable: false },
     { pubkey: accounts.tokenProgram, isSigner: false, isWritable: false },
     { pubkey: accounts.systemProgram, isSigner: false, isWritable: false },
   ];

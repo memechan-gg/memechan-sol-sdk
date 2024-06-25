@@ -10,7 +10,6 @@ export interface MemeTicketFields {
   amount: BN;
   withdrawsMeme: BN;
   withdrawsQuote: BN;
-  withdrawsChan: BN;
   untilTimestamp: BN;
   vesting: types.VestingDataFields;
 }
@@ -21,7 +20,6 @@ export interface MemeTicketJSON {
   amount: string;
   withdrawsMeme: string;
   withdrawsQuote: string;
-  withdrawsChan: string;
   untilTimestamp: string;
   vesting: types.VestingDataJSON;
 }
@@ -32,7 +30,6 @@ export class MemeTicket {
   readonly amount: BN;
   readonly withdrawsMeme: BN;
   readonly withdrawsQuote: BN;
-  readonly withdrawsChan: BN;
   readonly untilTimestamp: BN;
   readonly vesting: types.VestingData;
 
@@ -44,7 +41,6 @@ export class MemeTicket {
     borsh.u64("amount"),
     borsh.u64("withdrawsMeme"),
     borsh.u64("withdrawsQuote"),
-    borsh.u64("withdrawsChan"),
     borsh.i64("untilTimestamp"),
     types.VestingData.layout("vesting"),
   ]);
@@ -55,7 +51,6 @@ export class MemeTicket {
     this.amount = fields.amount;
     this.withdrawsMeme = fields.withdrawsMeme;
     this.withdrawsQuote = fields.withdrawsQuote;
-    this.withdrawsChan = fields.withdrawsChan;
     this.untilTimestamp = fields.untilTimestamp;
     this.vesting = new types.VestingData({ ...fields.vesting });
   }
@@ -101,7 +96,6 @@ export class MemeTicket {
       amount: dec.amount,
       withdrawsMeme: dec.withdrawsMeme,
       withdrawsQuote: dec.withdrawsQuote,
-      withdrawsChan: dec.withdrawsChan,
       untilTimestamp: dec.untilTimestamp,
       vesting: types.VestingData.fromDecoded(dec.vesting),
     });
@@ -114,7 +108,6 @@ export class MemeTicket {
       amount: this.amount.toString(),
       withdrawsMeme: this.withdrawsMeme.toString(),
       withdrawsQuote: this.withdrawsQuote.toString(),
-      withdrawsChan: this.withdrawsChan.toString(),
       untilTimestamp: this.untilTimestamp.toString(),
       vesting: this.vesting.toJSON(),
     };
@@ -127,7 +120,6 @@ export class MemeTicket {
       amount: new BN(obj.amount),
       withdrawsMeme: new BN(obj.withdrawsMeme),
       withdrawsQuote: new BN(obj.withdrawsQuote),
-      withdrawsChan: new BN(obj.withdrawsChan),
       untilTimestamp: new BN(obj.untilTimestamp),
       vesting: types.VestingData.fromJSON(obj.vesting),
     });

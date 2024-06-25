@@ -8,45 +8,51 @@ export interface StakingPoolFields {
   pool: PublicKey;
   memeVault: PublicKey;
   memeMint: PublicKey;
-  lpVault: PublicKey;
-  lpMint: PublicKey;
   quoteVault: PublicKey;
-  raydiumAmm: PublicKey;
+  quoteMint: PublicKey;
+  chanVault: PublicKey;
+  quoteAmmPool: PublicKey;
+  chanAmmPool: PublicKey;
   vestingConfig: types.VestingConfigFields;
-  raydiumFees: types.RaydiumAmmFeesFields;
   stakesTotal: BN;
   feesXTotal: BN;
   feesYTotal: BN;
+  feesZTotal: BN;
+  isActive: boolean;
 }
 
 export interface StakingPoolJSON {
   pool: string;
   memeVault: string;
   memeMint: string;
-  lpVault: string;
-  lpMint: string;
   quoteVault: string;
-  raydiumAmm: string;
+  quoteMint: string;
+  chanVault: string;
+  quoteAmmPool: string;
+  chanAmmPool: string;
   vestingConfig: types.VestingConfigJSON;
-  raydiumFees: types.RaydiumAmmFeesJSON;
   stakesTotal: string;
   feesXTotal: string;
   feesYTotal: string;
+  feesZTotal: string;
+  isActive: boolean;
 }
 
 export class StakingPool {
   readonly pool: PublicKey;
   readonly memeVault: PublicKey;
   readonly memeMint: PublicKey;
-  readonly lpVault: PublicKey;
-  readonly lpMint: PublicKey;
   readonly quoteVault: PublicKey;
-  readonly raydiumAmm: PublicKey;
+  readonly quoteMint: PublicKey;
+  readonly chanVault: PublicKey;
+  readonly quoteAmmPool: PublicKey;
+  readonly chanAmmPool: PublicKey;
   readonly vestingConfig: types.VestingConfig;
-  readonly raydiumFees: types.RaydiumAmmFees;
   readonly stakesTotal: BN;
   readonly feesXTotal: BN;
   readonly feesYTotal: BN;
+  readonly feesZTotal: BN;
+  readonly isActive: boolean;
 
   static readonly discriminator = Buffer.from([203, 19, 214, 220, 220, 154, 24, 102]);
 
@@ -54,30 +60,34 @@ export class StakingPool {
     borsh.publicKey("pool"),
     borsh.publicKey("memeVault"),
     borsh.publicKey("memeMint"),
-    borsh.publicKey("lpVault"),
-    borsh.publicKey("lpMint"),
     borsh.publicKey("quoteVault"),
-    borsh.publicKey("raydiumAmm"),
+    borsh.publicKey("quoteMint"),
+    borsh.publicKey("chanVault"),
+    borsh.publicKey("quoteAmmPool"),
+    borsh.publicKey("chanAmmPool"),
     types.VestingConfig.layout("vestingConfig"),
-    types.RaydiumAmmFees.layout("raydiumFees"),
     borsh.u64("stakesTotal"),
     borsh.u64("feesXTotal"),
     borsh.u64("feesYTotal"),
+    borsh.u64("feesZTotal"),
+    borsh.bool("isActive"),
   ]);
 
   constructor(fields: StakingPoolFields) {
     this.pool = fields.pool;
     this.memeVault = fields.memeVault;
     this.memeMint = fields.memeMint;
-    this.lpVault = fields.lpVault;
-    this.lpMint = fields.lpMint;
     this.quoteVault = fields.quoteVault;
-    this.raydiumAmm = fields.raydiumAmm;
+    this.quoteMint = fields.quoteMint;
+    this.chanVault = fields.chanVault;
+    this.quoteAmmPool = fields.quoteAmmPool;
+    this.chanAmmPool = fields.chanAmmPool;
     this.vestingConfig = new types.VestingConfig({ ...fields.vestingConfig });
-    this.raydiumFees = new types.RaydiumAmmFees({ ...fields.raydiumFees });
     this.stakesTotal = fields.stakesTotal;
     this.feesXTotal = fields.feesXTotal;
     this.feesYTotal = fields.feesYTotal;
+    this.feesZTotal = fields.feesZTotal;
+    this.isActive = fields.isActive;
   }
 
   static async fetch(c: Connection, address: PublicKey): Promise<StakingPool | null> {
@@ -119,15 +129,17 @@ export class StakingPool {
       pool: dec.pool,
       memeVault: dec.memeVault,
       memeMint: dec.memeMint,
-      lpVault: dec.lpVault,
-      lpMint: dec.lpMint,
       quoteVault: dec.quoteVault,
-      raydiumAmm: dec.raydiumAmm,
+      quoteMint: dec.quoteMint,
+      chanVault: dec.chanVault,
+      quoteAmmPool: dec.quoteAmmPool,
+      chanAmmPool: dec.chanAmmPool,
       vestingConfig: types.VestingConfig.fromDecoded(dec.vestingConfig),
-      raydiumFees: types.RaydiumAmmFees.fromDecoded(dec.raydiumFees),
       stakesTotal: dec.stakesTotal,
       feesXTotal: dec.feesXTotal,
       feesYTotal: dec.feesYTotal,
+      feesZTotal: dec.feesZTotal,
+      isActive: dec.isActive,
     });
   }
 
@@ -136,15 +148,17 @@ export class StakingPool {
       pool: this.pool.toString(),
       memeVault: this.memeVault.toString(),
       memeMint: this.memeMint.toString(),
-      lpVault: this.lpVault.toString(),
-      lpMint: this.lpMint.toString(),
       quoteVault: this.quoteVault.toString(),
-      raydiumAmm: this.raydiumAmm.toString(),
+      quoteMint: this.quoteMint.toString(),
+      chanVault: this.chanVault.toString(),
+      quoteAmmPool: this.quoteAmmPool.toString(),
+      chanAmmPool: this.chanAmmPool.toString(),
       vestingConfig: this.vestingConfig.toJSON(),
-      raydiumFees: this.raydiumFees.toJSON(),
       stakesTotal: this.stakesTotal.toString(),
       feesXTotal: this.feesXTotal.toString(),
       feesYTotal: this.feesYTotal.toString(),
+      feesZTotal: this.feesZTotal.toString(),
+      isActive: this.isActive,
     };
   }
 
@@ -153,15 +167,17 @@ export class StakingPool {
       pool: new PublicKey(obj.pool),
       memeVault: new PublicKey(obj.memeVault),
       memeMint: new PublicKey(obj.memeMint),
-      lpVault: new PublicKey(obj.lpVault),
-      lpMint: new PublicKey(obj.lpMint),
       quoteVault: new PublicKey(obj.quoteVault),
-      raydiumAmm: new PublicKey(obj.raydiumAmm),
+      quoteMint: new PublicKey(obj.quoteMint),
+      chanVault: new PublicKey(obj.chanVault),
+      quoteAmmPool: new PublicKey(obj.quoteAmmPool),
+      chanAmmPool: new PublicKey(obj.chanAmmPool),
       vestingConfig: types.VestingConfig.fromJSON(obj.vestingConfig),
-      raydiumFees: types.RaydiumAmmFees.fromJSON(obj.raydiumFees),
       stakesTotal: new BN(obj.stakesTotal),
       feesXTotal: new BN(obj.feesXTotal),
       feesYTotal: new BN(obj.feesYTotal),
+      feesZTotal: new BN(obj.feesZTotal),
+      isActive: obj.isActive,
     });
   }
 }

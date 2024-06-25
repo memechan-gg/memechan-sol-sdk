@@ -1,4 +1,3 @@
-/* eslint-disable no-multi-str */
 export type CustomError =
   | InvalidAccountInput
   | InvalidArg
@@ -26,7 +25,8 @@ export type CustomError =
   | ExpectedAccount
   | InvalidStatus
   | CantUnstakeBeforeCliff
-  | NoFeesToAdd;
+  | NoFeesToAdd
+  | StakingIsNotActive;
 
 export class InvalidAccountInput extends Error {
   readonly code = 6000;
@@ -303,6 +303,16 @@ export class NoFeesToAdd extends Error {
   }
 }
 
+export class StakingIsNotActive extends Error {
+  readonly code = 6027;
+  readonly name = "StakingIsNotActive";
+  readonly msg = "Staking should be fully initialized before it can be interacted with";
+
+  constructor() {
+    super("6027: Staking should be fully initialized before it can be interacted with");
+  }
+}
+
 export function fromCode(code: number): CustomError | null {
   switch (code) {
     case 6000:
@@ -359,6 +369,8 @@ export function fromCode(code: number): CustomError | null {
       return new CantUnstakeBeforeCliff();
     case 6026:
       return new NoFeesToAdd();
+    case 6027:
+      return new StakingIsNotActive();
   }
 
   return null;

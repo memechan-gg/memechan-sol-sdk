@@ -28,7 +28,17 @@ export const API_GATEWAY_FQDN = "waqxcrbt93.execute-api.us-east-1.amazonaws.com"
  *
  * @constant {string}
  */
-export const MEMECHAN_PROGRAM_ID = "CaR9ciDnNnE6WX35tZWrjeGdKUPaft7r4oQGF4JhwVxZ";
+export const MEMECHAN_PROGRAM_ID = "cYsHcSU42XESLPquuN1ga94jm1wVMg11wVcxqvofA3k";
+
+/**
+ * The Memechan program ID on Solana.
+ * This is the entry point of the Memechan smart contract.
+ *
+ * Be aware, that the same program address should be specified in IDL (`src/idl/memechan_sol.json`)
+ *
+ * @constant {string}
+ */
+export const MEMECHAN_PROGRAM_ID_V2 = "CaR9ciDnNnE6WX35tZWrjeGdKUPaft7r4oQGF4JhwVxZ";
 
 /**
  * The Memechan fee wallet id.
