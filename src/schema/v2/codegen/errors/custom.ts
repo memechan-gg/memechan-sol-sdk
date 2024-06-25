@@ -1,3 +1,4 @@
+/* eslint-disable no-multi-str */
 export type CustomError =
   | InvalidAccountInput
   | InvalidArg
