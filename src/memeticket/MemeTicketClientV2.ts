@@ -9,7 +9,7 @@ import {
 } from "@solana/web3.js";
 import BigNumber from "bignumber.js";
 import { MemechanClientV2 } from "../MemechanClientV2";
-import { MEMECHAN_MEME_TOKEN_DECIMALS, MEMECHAN_PROGRAM_ID } from "../config/config";
+import { MEMECHAN_MEME_TOKEN_DECIMALS, MEMECHAN_PROGRAM_ID_V2 } from "../config/config";
 import { MemeTicket, MemeTicketFields } from "../schema/v2/codegen/accounts";
 import { MemechanSol } from "../schema/v2/types/memechan_sol";
 import {
@@ -71,7 +71,7 @@ export class MemeTicketClientV2 {
     // find pda
     const pda = PublicKey.findProgramAddressSync(
       [poolId.toBytes(), userId.toBytes(), new Uint8Array(dv.buffer)],
-      new PublicKey(MEMECHAN_PROGRAM_ID),
+      new PublicKey(MEMECHAN_PROGRAM_ID_V2),
     )[0];
 
     return pda;
