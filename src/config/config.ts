@@ -28,7 +28,17 @@ export const API_GATEWAY_FQDN = "waqxcrbt93.execute-api.us-east-1.amazonaws.com"
  *
  * @constant {string}
  */
-export const MEMECHAN_PROGRAM_ID = "CaR9ciDnNnE6WX35tZWrjeGdKUPaft7r4oQGF4JhwVxZ";
+export const MEMECHAN_PROGRAM_ID = "cYsHcSU42XESLPquuN1ga94jm1wVMg11wVcxqvofA3k";
+
+/**
+ * The Memechan program ID on Solana.
+ * This is the entry point of the Memechan smart contract.
+ *
+ * Be aware, that the same program address should be specified in IDL (`src/idl/memechan_sol.json`)
+ *
+ * @constant {string}
+ */
+export const MEMECHAN_PROGRAM_ID_V2 = "CaR9ciDnNnE6WX35tZWrjeGdKUPaft7r4oQGF4JhwVxZ";
 
 /**
  * The Memechan fee wallet id.
@@ -66,41 +76,34 @@ export const PATS_MINT = new PublicKey("35fN6LMYt6cKsemgbR28nFooiJtcnvaKPCeRXyuM
 // );
 
 export const TOKEN_INFOS: { [symbol: string]: TokenInfo } = {
-  WSOL: new TokenInfo(
-    TOKEN_PROGRAM_ID,
-    NATIVE_MINT,
-    9,
-    "SOL",
-    "SOL",
-    new PublicKey("C1PwZ2gxgfk3Bzku1fvRGBXeoTVnxteLiTDq3JLxvJTP"),
-    "SOL",
-  ),
-  SLERF: new TokenInfo(
-    TOKEN_PROGRAM_ID,
-    new PublicKey("7BgBvyjrZX1YKz4oh9mjb8ZScatkkwb8DzFx7LoiVkM3"),
-    9,
-    "SLERF",
-    "SLERF",
-    new PublicKey("5g13tz8GKWySjtzPRARuzzQM7LbMCUBMPGPef5PKe4JJ"),
-  ),
-  CHAN: new TokenInfo(
-    TOKEN_PROGRAM_ID,
-    new PublicKey("ChanGGuDHboPswpTmKDfsTVGQL96VHhmvpwrE4UjWssd"),
-    9,
-    "CHAN",
-    "memechan",
-    new PublicKey("5g13tz8GKWySjtzPRARuzzQM7LbMCUBMPGPef5PKe4JJ"), // TODO?
-  ),
-  // SLERF:
-  //   // dev
-  //   new TokenInfo(
-  //     TOKEN_PROGRAM_ID,
-  //     new PublicKey("9pECN2xxLQo22bFYpsNr3T3eW1UdEDtSqPQopFrGv7n4"),
-  //     9,
-  //     "SLERF",
-  //     "SLERF",
-  //     new PublicKey("EEeLC1a7qbK2mbvfYt8owGzQcBjYguE1FWhWYuGjyABu"),
-  //   ),
+  WSOL: new TokenInfo({
+    programId: TOKEN_PROGRAM_ID,
+    mint: NATIVE_MINT,
+    decimals: 9,
+    name: "SOL",
+    symbol: "SOL",
+    targetConfig: new PublicKey("C1PwZ2gxgfk3Bzku1fvRGBXeoTVnxteLiTDq3JLxvJTP"),
+    targetConfigV2: new PublicKey("Bc4kmp2Mq7BqMpDRFNVcBzC4otPFs297URe7nPJze4RQ"),
+  }),
+  SLERF: new TokenInfo({
+    programId: TOKEN_PROGRAM_ID,
+    mint: new PublicKey("7BgBvyjrZX1YKz4oh9mjb8ZScatkkwb8DzFx7LoiVkM3"),
+    decimals: 9,
+    name: "SLERF",
+    symbol: "SLERF",
+    targetConfig: new PublicKey("5g13tz8GKWySjtzPRARuzzQM7LbMCUBMPGPef5PKe4JJ"),
+    targetConfigV2: new PublicKey("5g13tz8GKWySjtzPRARuzzQM7LbMCUBMPGPef5PKe4JJ"), // TODO
+  }),
+  CHAN: new TokenInfo({
+    programId: TOKEN_PROGRAM_ID,
+    // mint: new PublicKey("ChanGGuDHboPswpTmKDfsTVGQL96VHhmvpwrE4UjWssd"),
+    mint: new PublicKey("9pECN2xxLQo22bFYpsNr3T3eW1UdEDtSqPQopFrGv7n4"),
+    decimals: 9,
+    symbol: "CHAN",
+    name: "memechan",
+    targetConfig: new PublicKey("5g13tz8GKWySjtzPRARuzzQM7LbMCUBMPGPef5PKe4JJ"), // TODO?
+    targetConfigV2: new PublicKey("5g13tz8GKWySjtzPRARuzzQM7LbMCUBMPGPef5PKe4JJ"), // TODO?
+  }),
 };
 
 export const MEMECHAN_MEME_TOKEN_DECIMALS = 6;

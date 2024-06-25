@@ -5,6 +5,7 @@ import { MemechanClient } from "../MemechanClient";
 import { MemeTicketClient } from "../memeticket/MemeTicketClient";
 import { BoundPool } from "../schema/codegen/accounts";
 import { TokenMetadata } from "../api/types";
+import { MemechanClientV2 } from "../MemechanClientV2";
 
 export interface SwapYArgs {
   payer: Signer;
@@ -116,6 +117,10 @@ export interface BoundPoolArgs {
   tokenMetadata: TokenMetadata;
 }
 
+export type BoundPoolArgsV2 = Omit<BoundPoolArgs, "client"> & {
+  client: MemechanClientV2;
+};
+
 export interface BoundPoolWithBuyMemeArgs {
   admin: PublicKey;
   payer: Signer;
@@ -126,7 +131,17 @@ export interface BoundPoolWithBuyMemeArgs {
   targetConfig: PublicKey;
 }
 
+export type BoundPoolWithBuyMemeArgsV2 = Omit<BoundPoolWithBuyMemeArgs, "client"> & {
+  client: MemechanClientV2;
+};
+
 export type GetCreateNewBondingPoolAndTokenTransactionArgs = Omit<BoundPoolArgs, "payer"> & {
+  payer: PublicKey;
+  transaction?: Transaction;
+  feeQuoteVaultPk?: PublicKey;
+};
+
+export type GetCreateNewBondingPoolAndTokenTransactionArgsV2 = Omit<BoundPoolArgsV2, "payer"> & {
   payer: PublicKey;
   transaction?: Transaction;
   feeQuoteVaultPk?: PublicKey;
@@ -140,8 +155,17 @@ export type GetBuyMemeTransactionStaticArgs = GetBuyMemeTransactionArgs & {
   quoteMint: PublicKey;
 };
 
+export type GetBuyMemeTransactionStaticArgsV2 = Omit<GetBuyMemeTransactionStaticArgs, "client"> & {
+  client: MemechanClientV2;
+};
+
 export type GetCreateNewBondingPoolAndTokenWithBuyMemeTransactionArgs =
   GetCreateNewBondingPoolAndTokenTransactionArgs & {
+    buyMemeTransactionArgs?: GetBuyMemeTransactionArgs;
+  };
+
+export type GetCreateNewBondingPoolAndTokenWithBuyMemeTransactionArgsV2 =
+  GetCreateNewBondingPoolAndTokenTransactionArgsV2 & {
     buyMemeTransactionArgs?: GetBuyMemeTransactionArgs;
   };
 

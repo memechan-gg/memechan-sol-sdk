@@ -4,6 +4,7 @@ import { ADMIN_PUB_KEY, Auth, BE_URL, MemechanClient, TokenAPI } from "../src";
 import { HELIUS_API_KEY, HELIUS_API_URL, IS_TEST_ENV, TEST_USER_SECRET_KEY } from "./env";
 import { getRandomRpcEndpoint } from "../src/util/getRandomRpcEndpoint";
 import { HeliusApi } from "../src/helius-api/HeliusApi";
+import { MemechanClientV2 } from "../src/MemechanClientV2";
 
 export const connection = new Connection(getRandomRpcEndpoint(), {
   httpAgent: IS_TEST_ENV ? false : undefined,
@@ -16,6 +17,13 @@ export const payer = Keypair.fromSecretKey(Buffer.from(JSON.parse(TEST_USER_SECR
 export const wallet = new Wallet(payer);
 
 export const client = new MemechanClient({
+  wallet,
+  heliusApiUrl: HELIUS_API_URL,
+  connection,
+  simulationKeypair: payer,
+});
+
+export const clientV2 = new MemechanClientV2({
   wallet,
   heliusApiUrl: HELIUS_API_URL,
   connection,

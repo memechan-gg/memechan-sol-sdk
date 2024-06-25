@@ -5,6 +5,7 @@ import { MemechanClient } from "../../src/MemechanClient";
 import { ADMIN_PUB_KEY, TOKEN_INFOS } from "../../src/config/config";
 import { getRandomRpcEndpoint } from "../../src/util/getRandomRpcEndpoint";
 import { BoundPoolWithBuyMemeArgs, MemeTicketClient } from "../../src";
+import { MemechanClientV2 } from "../../src/MemechanClientV2";
 
 export const admin = ADMIN_PUB_KEY;
 export const payer = Keypair.fromSecretKey(Buffer.from(JSON.parse(TEST_USER_SECRET_KEY)));
@@ -40,6 +41,20 @@ export function createMemechanClient(): MemechanClient {
     confirmTransactionInitialTimeout: 30000,
   });
   return new MemechanClient({
+    wallet,
+    connection,
+    heliusApiUrl: HELIUS_API_URL,
+    simulationKeypair: payer,
+  });
+}
+
+export function createMemechanClientV2(): MemechanClientV2 {
+  const connection = new Connection(getRandomRpcEndpoint(), {
+    httpAgent: IS_TEST_ENV ? false : undefined,
+    commitment: "confirmed",
+    confirmTransactionInitialTimeout: 30000,
+  });
+  return new MemechanClientV2({
     wallet,
     connection,
     heliusApiUrl: HELIUS_API_URL,
