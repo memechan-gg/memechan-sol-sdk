@@ -4,6 +4,7 @@ import { Keypair, PublicKey, Signer, Transaction } from "@solana/web3.js";
 import { MemechanClient } from "../MemechanClient";
 import { MemeTicketClient } from "../memeticket/MemeTicketClient";
 import { BoundPool } from "../schema/codegen/accounts";
+import { BoundPool as BoundPoolV2 } from "../schema/v2/codegen/accounts";
 import { TokenMetadata } from "../api/types";
 import { MemechanClientV2 } from "../MemechanClientV2";
 
@@ -104,7 +105,19 @@ export interface InitStakingPoolArgs {
   boundPoolInfo: BoundPool;
 }
 
+export interface InitStakingPoolArgsV2 {
+  pool?: PublicKey;
+  user: Keypair;
+  payer: Signer;
+  boundPoolInfo: BoundPoolV2;
+}
+
 export type GetInitStakingPoolTransactionArgs = Omit<InitStakingPoolArgs, "user"> & {
+  user: PublicKey;
+  transaction?: Transaction;
+};
+
+export type GetInitStakingPoolTransactionArgsV2 = Omit<InitStakingPoolArgsV2, "user"> & {
   user: PublicKey;
   transaction?: Transaction;
 };
@@ -172,4 +185,10 @@ export type GetCreateNewBondingPoolAndTokenWithBuyMemeTransactionArgsV2 =
 export interface InitStakingPoolResult {
   stakingMemeVault: PublicKey;
   stakingQuoteVault: PublicKey;
+}
+
+export interface InitStakingPoolResultV2 {
+  stakingMemeVault: PublicKey;
+  stakingQuoteVault: PublicKey;
+  stakingChanVault: PublicKey;
 }

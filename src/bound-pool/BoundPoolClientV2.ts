@@ -32,14 +32,14 @@ import {
   GetBuyMemeTransactionOutput,
   GetBuyMemeTransactionStaticArgsV2,
   GetCreateNewBondingPoolAndTokenWithBuyMemeTransactionArgsV2,
-  GetInitStakingPoolTransactionArgs,
+  GetInitStakingPoolTransactionArgsV2,
   GetOutputAmountForBuyMeme,
   GetOutputAmountForSellMemeArgs,
   GetSellMemeTransactionArgs,
   GetSellMemeTransactionArgsLegacy,
   GetSellMemeTransactionOutput,
-  InitStakingPoolArgs,
-  InitStakingPoolResult,
+  InitStakingPoolArgsV2,
+  InitStakingPoolResultV2,
   SellMemeArgs,
   SwapXArgs,
   SwapYArgs,
@@ -86,6 +86,7 @@ export class BoundPoolClientV2 {
     public memeTokenMint: PublicKey,
     public quoteTokenMint: PublicKey = TOKEN_INFOS.WSOL.mint,
     public memeToken: Token,
+    public poolObjectData: BoundPool,
   ) {
     //
   }
@@ -107,6 +108,7 @@ export class BoundPoolClientV2 {
       poolObjectData.memeReserve.mint,
       poolObjectData.quoteReserve.mint,
       new Token(TOKEN_PROGRAM_ID, poolObjectData.memeReserve.mint, MEMECHAN_MEME_TOKEN_DECIMALS),
+      poolObjectData,
     );
 
     return boundClientInstance;
@@ -142,6 +144,7 @@ export class BoundPoolClientV2 {
       poolObjectData.memeReserve.mint,
       poolObjectData.quoteReserve.mint,
       new Token(TOKEN_PROGRAM_ID, poolObjectData.memeReserve.mint, MEMECHAN_MEME_TOKEN_DECIMALS),
+      poolObjectData,
     );
 
     return boundClientInstance;
@@ -353,6 +356,7 @@ export class BoundPoolClientV2 {
     });
 
     const id = this.findBoundPoolPda(memeMint, quoteToken.mint, memechanProgram.programId);
+    const poolObjectData = await BoundPoolClientV2.fetch2(client.connection, id);
 
     return new BoundPoolClientV2(
       id,
@@ -362,6 +366,7 @@ export class BoundPoolClientV2 {
       memeMint,
       quoteToken.mint,
       new Token(TOKEN_PROGRAM_ID, memeMint, MEMECHAN_MEME_TOKEN_DECIMALS),
+      poolObjectData,
     );
   }
 
@@ -941,9 +946,12 @@ export class BoundPoolClientV2 {
     return tx;
   }
 
-  public async getInitStakingPoolTransaction(
-    input: GetInitStakingPoolTransactionArgs,
-  ): Promise<{ transaction: Transaction; stakingQuoteVault: PublicKey; stakingMemeVault: PublicKey }> {
+  public async getInitStakingPoolTransaction(input: GetInitStakingPoolTransactionArgsV2): Promise<{
+    transaction: Transaction;
+    stakingQuoteVault: PublicKey;
+    stakingMemeVault: PublicKey;
+    stakingChanVault: PublicKey;
+  }> {
     const { user, payer, pool = this.id, boundPoolInfo } = input;
     const tx = input.transaction ?? new Transaction();
 
@@ -969,6 +977,14 @@ export class BoundPoolClientV2 {
       transaction: tx,
     });
 
+    const stakingChanVault = await ensureAssociatedTokenAccountWithIX({
+      connection: this.client.connection,
+      payer: payer.publicKey,
+      mint: TOKEN_INFOS.CHAN.mint,
+      owner: stakingSigner,
+      transaction: tx,
+    });
+
     const methodArgs = {
       pool,
       signer: user,
@@ -978,6 +994,7 @@ export class BoundPoolClientV2 {
       poolQuoteVault: boundPoolInfo.quoteReserve.vault,
       stakingMemeVault,
       stakingQuoteVault: stakingQuoteVault,
+      stakingChanVault: stakingChanVault,
       quoteMint: this.quoteTokenMint,
       staking: stakingId,
       stakingPoolSignerPda: stakingSigner,
@@ -999,14 +1016,15 @@ export class BoundPoolClientV2 {
 
     tx.add(initStakingPoolInstruction);
 
-    return { transaction: tx, stakingMemeVault, stakingQuoteVault };
+    return { transaction: tx, stakingMemeVault, stakingQuoteVault, stakingChanVault };
   }
 
-  public async initStakingPool(input: InitStakingPoolArgs): Promise<InitStakingPoolResult> {
-    const { transaction, stakingMemeVault, stakingQuoteVault } = await this.getInitStakingPoolTransaction({
-      ...input,
-      user: input.user.publicKey,
-    });
+  public async initStakingPool(input: InitStakingPoolArgsV2): Promise<InitStakingPoolResultV2> {
+    const { transaction, stakingMemeVault, stakingQuoteVault, stakingChanVault } =
+      await this.getInitStakingPoolTransaction({
+        ...input,
+        user: input.user.publicKey,
+      });
 
     const signAndConfirmInitStakingPoolTransaction = getSendAndConfirmTransactionMethod({
       connection: this.client.connection,
@@ -1019,7 +1037,7 @@ export class BoundPoolClientV2 {
       functionName: "initStakingPool",
     });
 
-    return { stakingMemeVault, stakingQuoteVault };
+    return { stakingMemeVault, stakingQuoteVault, stakingChanVault };
   }
 
   // public async getGoLiveTransaction(args: GetGoLiveTransactionArgs): Promise<{
