@@ -1,11 +1,15 @@
+import { BoundPoolClientV2 } from "../../../../src";
 import { BoundPoolClient } from "../../../../src/bound-pool/BoundPoolClient";
-import { client } from "../../../common";
+import { client, clientV2 } from "../../../common";
 
-// yarn tsx examples/bonding-pool/from/bound-pool-from-tx-signature.ts
+// yarn tsx examples/v2/bonding-pool/from/bound-pool-from-tx-signature.ts
 (async () => {
   const poolCreationSignature =
-    "pYSeWuEhRMUW1wrnUTU6VJZ77uWu9cAZUB9EVfYw9xjcfV5PERfZkV6NyVTWLi5jKVWuSfwUxB9Ad6j9wqARsrG";
-  const boundPoolInstance = await BoundPoolClient.fromPoolCreationTransaction({ client, poolCreationSignature });
+    "2WNnCruzpP7EQcaHgyFvaNkModaW4VKvjCLVarSSPDYfAKpEs2pjmq15foeuN9vPVtnwre4e7oPVbv36x7VCB7sP";
+  const boundPoolInstance = await BoundPoolClientV2.fromPoolCreationTransaction({
+    client: clientV2,
+    poolCreationSignature,
+  });
 
   console.debug("boundPoolInstance: ", boundPoolInstance.id.toString());
 })();
