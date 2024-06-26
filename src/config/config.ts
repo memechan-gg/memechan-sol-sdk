@@ -118,7 +118,8 @@ export const DEFAULT_MAX_M_LP = 200_000_000_000_000;
 export const DEFAULT_MAX_M = 800_000_000_000_000;
 
 export const MAX_TRANSACTION_SIZE = 1232;
-export const ADMIN_PUB_KEY = new PublicKey("KZbAoMgCcb2gDEn2Ucea86ux84y25y3ybbWQGQpd9D6");
+// Backend Wallet Address
+export const ADMIN_PUB_KEY = new PublicKey("2a59VXzDwcUvkTMa2eDkfKdmgeBZxEKcdzxsAGYeZGbd");
 export const FULL_MEME_AMOUNT_CONVERTED = new BigNumber(DEFAULT_MAX_M_LP)
   .plus(DEFAULT_MAX_M)
   .div(10 ** MEMECHAN_MEME_TOKEN_DECIMALS)
