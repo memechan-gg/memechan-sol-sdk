@@ -18,6 +18,7 @@ export interface StakingPoolFields {
   feesXTotal: BN;
   feesYTotal: BN;
   feesZTotal: BN;
+  toAirdrop: BN;
   isActive: boolean;
 }
 
@@ -35,6 +36,7 @@ export interface StakingPoolJSON {
   feesXTotal: string;
   feesYTotal: string;
   feesZTotal: string;
+  toAirdrop: string;
   isActive: boolean;
 }
 
@@ -52,6 +54,7 @@ export class StakingPool {
   readonly feesXTotal: BN;
   readonly feesYTotal: BN;
   readonly feesZTotal: BN;
+  readonly toAirdrop: BN;
   readonly isActive: boolean;
 
   static readonly discriminator = Buffer.from([203, 19, 214, 220, 220, 154, 24, 102]);
@@ -70,6 +73,7 @@ export class StakingPool {
     borsh.u64("feesXTotal"),
     borsh.u64("feesYTotal"),
     borsh.u64("feesZTotal"),
+    borsh.u64("toAirdrop"),
     borsh.bool("isActive"),
   ]);
 
@@ -87,6 +91,7 @@ export class StakingPool {
     this.feesXTotal = fields.feesXTotal;
     this.feesYTotal = fields.feesYTotal;
     this.feesZTotal = fields.feesZTotal;
+    this.toAirdrop = fields.toAirdrop;
     this.isActive = fields.isActive;
   }
 
@@ -139,6 +144,7 @@ export class StakingPool {
       feesXTotal: dec.feesXTotal,
       feesYTotal: dec.feesYTotal,
       feesZTotal: dec.feesZTotal,
+      toAirdrop: dec.toAirdrop,
       isActive: dec.isActive,
     });
   }
@@ -158,6 +164,7 @@ export class StakingPool {
       feesXTotal: this.feesXTotal.toString(),
       feesYTotal: this.feesYTotal.toString(),
       feesZTotal: this.feesZTotal.toString(),
+      toAirdrop: this.toAirdrop.toString(),
       isActive: this.isActive,
     };
   }
@@ -177,6 +184,7 @@ export class StakingPool {
       feesXTotal: new BN(obj.feesXTotal),
       feesYTotal: new BN(obj.feesYTotal),
       feesZTotal: new BN(obj.feesZTotal),
+      toAirdrop: new BN(obj.toAirdrop),
       isActive: obj.isActive,
     });
   }

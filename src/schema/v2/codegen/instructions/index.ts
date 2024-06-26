@@ -5,6 +5,7 @@ export { swapX, SwapXArgs, SwapXAccounts } from "./swapX";
 export { getSwapYAmt, GetSwapYAmtArgs, GetSwapYAmtAccounts } from "./getSwapYAmt";
 export { swapY, SwapYArgs, SwapYAccounts } from "./swapY";
 export { initStakingPool, InitStakingPoolAccounts } from "./initStakingPool";
+export { sendAirdropFunds, SendAirdropFundsAccounts } from "./sendAirdropFunds";
 export { initMemeAmmPool, InitMemeAmmPoolAccounts } from "./initMemeAmmPool";
 export { initChanAmmPool, InitChanAmmPoolAccounts } from "./initChanAmmPool";
 export { newTargetConfig, NewTargetConfigArgs, NewTargetConfigAccounts } from "./newTargetConfig";

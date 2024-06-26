@@ -373,16 +373,6 @@ export type MemechanSol = {
           docs: ["Bonding Pool CHAN vault"];
         },
         {
-          name: "airdropTokenVault";
-          isMut: true;
-          isSigner: false;
-        },
-        {
-          name: "airdropOwner";
-          isMut: false;
-          isSigner: false;
-        },
-        {
           name: "memeTicket";
           isMut: true;
           isSigner: false;
@@ -394,7 +384,59 @@ export type MemechanSol = {
           isSigner: false;
         },
         {
-          name: "associatedTokenProgram";
+          name: "tokenProgram";
+          isMut: false;
+          isSigner: false;
+        },
+        {
+          name: "systemProgram";
+          isMut: false;
+          isSigner: false;
+        },
+      ];
+      args: [];
+    },
+    {
+      name: "sendAirdropFunds";
+      accounts: [
+        {
+          name: "sender";
+          isMut: true;
+          isSigner: true;
+        },
+        {
+          name: "staking";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "stakingPoolSignerPda";
+          isMut: true;
+          isSigner: false;
+          docs: ["Staking Pool Signer"];
+        },
+        {
+          name: "stakingMemeVault";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "memeMint";
+          isMut: false;
+          isSigner: false;
+        },
+        {
+          name: "airdropTokenVault";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "airdropOwner";
+          isMut: false;
+          isSigner: false;
+        },
+        {
+          name: "systemProgram";
           isMut: false;
           isSigner: false;
         },
@@ -404,7 +446,7 @@ export type MemechanSol = {
           isSigner: false;
         },
         {
-          name: "systemProgram";
+          name: "associatedTokenProgram";
           isMut: false;
           isSigner: false;
         },
@@ -1465,6 +1507,10 @@ export type MemechanSol = {
             type: "u64";
           },
           {
+            name: "toAirdrop";
+            type: "u64";
+          },
+          {
             name: "isActive";
             type: "bool";
           },
@@ -2176,16 +2222,6 @@ export const IDL: MemechanSol = {
           docs: ["Bonding Pool CHAN vault"],
         },
         {
-          name: "airdropTokenVault",
-          isMut: true,
-          isSigner: false,
-        },
-        {
-          name: "airdropOwner",
-          isMut: false,
-          isSigner: false,
-        },
-        {
           name: "memeTicket",
           isMut: true,
           isSigner: false,
@@ -2197,7 +2233,59 @@ export const IDL: MemechanSol = {
           isSigner: false,
         },
         {
-          name: "associatedTokenProgram",
+          name: "tokenProgram",
+          isMut: false,
+          isSigner: false,
+        },
+        {
+          name: "systemProgram",
+          isMut: false,
+          isSigner: false,
+        },
+      ],
+      args: [],
+    },
+    {
+      name: "sendAirdropFunds",
+      accounts: [
+        {
+          name: "sender",
+          isMut: true,
+          isSigner: true,
+        },
+        {
+          name: "staking",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "stakingPoolSignerPda",
+          isMut: true,
+          isSigner: false,
+          docs: ["Staking Pool Signer"],
+        },
+        {
+          name: "stakingMemeVault",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "memeMint",
+          isMut: false,
+          isSigner: false,
+        },
+        {
+          name: "airdropTokenVault",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "airdropOwner",
+          isMut: false,
+          isSigner: false,
+        },
+        {
+          name: "systemProgram",
           isMut: false,
           isSigner: false,
         },
@@ -2207,7 +2295,7 @@ export const IDL: MemechanSol = {
           isSigner: false,
         },
         {
-          name: "systemProgram",
+          name: "associatedTokenProgram",
           isMut: false,
           isSigner: false,
         },
@@ -3265,6 +3353,10 @@ export const IDL: MemechanSol = {
           },
           {
             name: "feesZTotal",
+            type: "u64",
+          },
+          {
+            name: "toAirdrop",
             type: "u64",
           },
           {

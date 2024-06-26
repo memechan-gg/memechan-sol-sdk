@@ -399,16 +399,6 @@
           ]
         },
         {
-          "name": "airdropTokenVault",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "airdropOwner",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
           "name": "memeTicket",
           "isMut": true,
           "isSigner": false,
@@ -422,7 +412,61 @@
           "isSigner": false
         },
         {
-          "name": "associatedTokenProgram",
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "sendAirdropFunds",
+      "accounts": [
+        {
+          "name": "sender",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "staking",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "stakingPoolSignerPda",
+          "isMut": true,
+          "isSigner": false,
+          "docs": [
+            "Staking Pool Signer"
+          ]
+        },
+        {
+          "name": "stakingMemeVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "memeMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "airdropTokenVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "airdropOwner",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -432,7 +476,7 @@
           "isSigner": false
         },
         {
-          "name": "systemProgram",
+          "name": "associatedTokenProgram",
           "isMut": false,
           "isSigner": false
         }
@@ -1524,6 +1568,10 @@
           },
           {
             "name": "feesZTotal",
+            "type": "u64"
+          },
+          {
+            "name": "toAirdrop",
             "type": "u64"
           },
           {
