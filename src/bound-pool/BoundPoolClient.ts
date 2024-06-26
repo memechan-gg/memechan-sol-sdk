@@ -435,6 +435,10 @@ export class BoundPoolClient {
     return pools;
   }
 
+  public async all(program: Program<MemechanSol>): Promise<{ account: BoundPoolFields; publicKey: PublicKey }[]> {
+    return BoundPoolClient.all(program);
+  }
+
   public static async allLocked(
     program: Program<MemechanSol>,
   ): Promise<{ account: BoundPoolFields; publicKey: PublicKey }[]> {

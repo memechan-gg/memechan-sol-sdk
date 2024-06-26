@@ -61,7 +61,6 @@ import {
   MEMECHAN_MEME_TOKEN_DECIMALS,
   TOKEN_INFOS,
 } from "../config/config";
-import { MemechanSol } from "../schema/v2/types/memechan_sol";
 import { getCreateMintWithPriorityTransaction } from "../token/getCreateMintWithPriorityTransaction";
 import { NewBPInstructionParsed } from "../tx-parsing/v2/parsers/bonding-pool-creation-parser";
 import { getTxSize } from "../util/get-tx-size";
@@ -91,6 +90,7 @@ import { BoundPoolClient } from "./BoundPoolClient";
 import { TargetConfigClientV2 } from "../targetconfig/TargetConfigClientV2";
 import { ChanSwapClient } from "../chan-swap/ChanSwapClient";
 import { StakingPoolClientV2 } from "../staking-pool/StakingPoolClientV2";
+import { MemechanSol } from "../schema/v2/v2";
 
 export const LUTSLOT: number = 2;
 export const LUT2SLOT: number = 20;
@@ -442,6 +442,10 @@ export class BoundPoolClientV2 {
     const pools = rawPools.map((el) => el);
 
     return pools;
+  }
+
+  public async all(program: Program<MemechanSol>): Promise<{ account: BoundPoolFields; publicKey: PublicKey }[]> {
+    return BoundPoolClientV2.all(program);
   }
 
   public static async allLocked(
