@@ -7,6 +7,7 @@ export * from "./live-pool/LivePoolClient";
 export * from "./memeticket/MemeTicketClient";
 export * from "./memeticket/MemeTicketClientV2";
 export * from "./staking-pool/StakingPoolClient";
+export * from "./staking-pool/StakingPoolClientV2";
 export * from "./targetconfig/TargetConfigClient";
 export * from "./targetconfig/TargetConfigClientV2";
 export * from "./vesting/VestingClient";
