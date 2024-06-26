@@ -61,7 +61,12 @@ export type MemechanSol = {
           isSigner: false;
         },
       ];
-      args: [];
+      args: [
+        {
+          name: "airdroppedTokens";
+          type: "u64";
+        },
+      ];
     },
     {
       name: "createMetadata";
@@ -368,6 +373,16 @@ export type MemechanSol = {
           docs: ["Bonding Pool CHAN vault"];
         },
         {
+          name: "airdropTokenVault";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "airdropOwner";
+          isMut: false;
+          isSigner: false;
+        },
+        {
           name: "memeTicket";
           isMut: true;
           isSigner: false;
@@ -379,12 +394,7 @@ export type MemechanSol = {
           isSigner: false;
         },
         {
-          name: "clock";
-          isMut: false;
-          isSigner: false;
-        },
-        {
-          name: "ataProgram";
+          name: "associatedTokenProgram";
           isMut: false;
           isSigner: false;
         },
@@ -1323,6 +1333,10 @@ export type MemechanSol = {
             };
           },
           {
+            name: "airdroppedTokens";
+            type: "u64";
+          },
+          {
             name: "locked";
             type: "bool";
           },
@@ -1776,6 +1790,14 @@ export type MemechanSol = {
       name: "StakingIsNotActive";
       msg: "Staking should be fully initialized before it can be interacted with";
     },
+    {
+      code: 6028;
+      name: "NonZeroInitialMemeSupply";
+    },
+    {
+      code: 6029;
+      name: "AirdroppedTokensOvercap";
+    },
   ];
 };
 
@@ -1842,7 +1864,12 @@ export const IDL: MemechanSol = {
           isSigner: false,
         },
       ],
-      args: [],
+      args: [
+        {
+          name: "airdroppedTokens",
+          type: "u64",
+        },
+      ],
     },
     {
       name: "createMetadata",
@@ -2149,6 +2176,16 @@ export const IDL: MemechanSol = {
           docs: ["Bonding Pool CHAN vault"],
         },
         {
+          name: "airdropTokenVault",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "airdropOwner",
+          isMut: false,
+          isSigner: false,
+        },
+        {
           name: "memeTicket",
           isMut: true,
           isSigner: false,
@@ -2160,12 +2197,7 @@ export const IDL: MemechanSol = {
           isSigner: false,
         },
         {
-          name: "clock",
-          isMut: false,
-          isSigner: false,
-        },
-        {
-          name: "ataProgram",
+          name: "associatedTokenProgram",
           isMut: false,
           isSigner: false,
         },
@@ -3104,6 +3136,10 @@ export const IDL: MemechanSol = {
             },
           },
           {
+            name: "airdroppedTokens",
+            type: "u64",
+          },
+          {
             name: "locked",
             type: "bool",
           },
@@ -3556,6 +3592,14 @@ export const IDL: MemechanSol = {
       code: 6027,
       name: "StakingIsNotActive",
       msg: "Staking should be fully initialized before it can be interacted with",
+    },
+    {
+      code: 6028,
+      name: "NonZeroInitialMemeSupply",
+    },
+    {
+      code: 6029,
+      name: "AirdroppedTokensOvercap",
     },
   ],
 };

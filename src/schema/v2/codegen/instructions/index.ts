@@ -1,4 +1,4 @@
-export { newPool, NewPoolAccounts } from "./newPool";
+export { newPool, NewPoolArgs, NewPoolAccounts } from "./newPool";
 export { createMetadata, CreateMetadataArgs, CreateMetadataAccounts } from "./createMetadata";
 export { getSwapXAmt, GetSwapXAmtArgs, GetSwapXAmtAccounts } from "./getSwapXAmt";
 export { swapX, SwapXArgs, SwapXAccounts } from "./swapX";

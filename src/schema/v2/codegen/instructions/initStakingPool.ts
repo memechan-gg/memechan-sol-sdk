@@ -1,4 +1,4 @@
-import { TransactionInstruction, PublicKey } from "@solana/web3.js";
+import { TransactionInstruction, PublicKey } from "@solana/web3.js"; // eslint-disable-line @typescript-eslint/no-unused-vars
 import BN from "bn.js"; // eslint-disable-line @typescript-eslint/no-unused-vars
 import * as borsh from "@project-serum/borsh"; // eslint-disable-line @typescript-eslint/no-unused-vars
 import * as types from "../types"; // eslint-disable-line @typescript-eslint/no-unused-vars
@@ -18,10 +18,11 @@ export interface InitStakingPoolAccounts {
   stakingMemeVault: PublicKey;
   stakingQuoteVault: PublicKey;
   stakingChanVault: PublicKey;
+  airdropTokenVault: PublicKey;
+  airdropOwner: PublicKey;
   memeTicket: PublicKey;
   rent: PublicKey;
-  clock: PublicKey;
-  ataProgram: PublicKey;
+  associatedTokenProgram: PublicKey;
   tokenProgram: PublicKey;
   systemProgram: PublicKey;
 }
@@ -45,10 +46,15 @@ export function initStakingPool(accounts: InitStakingPoolAccounts) {
     { pubkey: accounts.stakingMemeVault, isSigner: false, isWritable: true },
     { pubkey: accounts.stakingQuoteVault, isSigner: false, isWritable: true },
     { pubkey: accounts.stakingChanVault, isSigner: false, isWritable: true },
+    { pubkey: accounts.airdropTokenVault, isSigner: false, isWritable: true },
+    { pubkey: accounts.airdropOwner, isSigner: false, isWritable: false },
     { pubkey: accounts.memeTicket, isSigner: false, isWritable: true },
     { pubkey: accounts.rent, isSigner: false, isWritable: false },
-    { pubkey: accounts.clock, isSigner: false, isWritable: false },
-    { pubkey: accounts.ataProgram, isSigner: false, isWritable: false },
+    {
+      pubkey: accounts.associatedTokenProgram,
+      isSigner: false,
+      isWritable: false,
+    },
     { pubkey: accounts.tokenProgram, isSigner: false, isWritable: false },
     { pubkey: accounts.systemProgram, isSigner: false, isWritable: false },
   ];

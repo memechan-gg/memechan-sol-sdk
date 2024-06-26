@@ -27,7 +27,9 @@ export type CustomError =
   | InvalidStatus
   | CantUnstakeBeforeCliff
   | NoFeesToAdd
-  | StakingIsNotActive;
+  | StakingIsNotActive
+  | NonZeroInitialMemeSupply
+  | AirdroppedTokensOvercap;
 
 export class InvalidAccountInput extends Error {
   readonly code = 6000;
@@ -314,6 +316,26 @@ export class StakingIsNotActive extends Error {
   }
 }
 
+export class NonZeroInitialMemeSupply extends Error {
+  readonly code = 6028;
+  readonly name = "NonZeroInitialMemeSupply";
+  readonly msg = "undefined";
+
+  constructor() {
+    super("6028: undefined");
+  }
+}
+
+export class AirdroppedTokensOvercap extends Error {
+  readonly code = 6029;
+  readonly name = "AirdroppedTokensOvercap";
+  readonly msg = "undefined";
+
+  constructor() {
+    super("6029: undefined");
+  }
+}
+
 export function fromCode(code: number): CustomError | null {
   switch (code) {
     case 6000:
@@ -372,6 +394,10 @@ export function fromCode(code: number): CustomError | null {
       return new NoFeesToAdd();
     case 6027:
       return new StakingIsNotActive();
+    case 6028:
+      return new NonZeroInitialMemeSupply();
+    case 6029:
+      return new AirdroppedTokensOvercap();
   }
 
   return null;

@@ -1,8 +1,12 @@
-import { TransactionInstruction, PublicKey } from "@solana/web3.js";
+import { TransactionInstruction, PublicKey } from "@solana/web3.js"; // eslint-disable-line @typescript-eslint/no-unused-vars
 import BN from "bn.js"; // eslint-disable-line @typescript-eslint/no-unused-vars
 import * as borsh from "@project-serum/borsh"; // eslint-disable-line @typescript-eslint/no-unused-vars
 import * as types from "../types"; // eslint-disable-line @typescript-eslint/no-unused-vars
 import { PROGRAM_ID } from "../programId";
+
+export interface NewPoolArgs {
+  airdroppedTokens: BN;
+}
 
 export interface NewPoolAccounts {
   sender: PublicKey;
@@ -18,7 +22,9 @@ export interface NewPoolAccounts {
   tokenProgram: PublicKey;
 }
 
-export function newPool(accounts: NewPoolAccounts) {
+export const layout = borsh.struct([borsh.u64("airdroppedTokens")]);
+
+export function newPool(args: NewPoolArgs, accounts: NewPoolAccounts) {
   const keys = [
     { pubkey: accounts.sender, isSigner: true, isWritable: true },
     { pubkey: accounts.pool, isSigner: false, isWritable: true },
@@ -33,7 +39,14 @@ export function newPool(accounts: NewPoolAccounts) {
     { pubkey: accounts.tokenProgram, isSigner: false, isWritable: false },
   ];
   const identifier = Buffer.from([38, 63, 210, 32, 246, 20, 239, 112]);
-  const data = identifier;
+  const buffer = Buffer.alloc(1000);
+  const len = layout.encode(
+    {
+      airdroppedTokens: args.airdroppedTokens,
+    },
+    buffer,
+  );
+  const data = Buffer.concat([identifier, buffer]).slice(0, 8 + len);
   const ix = new TransactionInstruction({ keys, programId: PROGRAM_ID, data });
   return ix;
 }

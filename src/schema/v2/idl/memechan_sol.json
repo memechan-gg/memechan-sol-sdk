@@ -61,7 +61,12 @@
           "isSigner": false
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "airdroppedTokens",
+          "type": "u64"
+        }
+      ]
     },
     {
       "name": "createMetadata",
@@ -394,6 +399,16 @@
           ]
         },
         {
+          "name": "airdropTokenVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "airdropOwner",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "memeTicket",
           "isMut": true,
           "isSigner": false,
@@ -407,12 +422,7 @@
           "isSigner": false
         },
         {
-          "name": "clock",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "ataProgram",
+          "name": "associatedTokenProgram",
           "isMut": false,
           "isSigner": false
         },
@@ -1385,6 +1395,10 @@
             }
           },
           {
+            "name": "airdroppedTokens",
+            "type": "u64"
+          },
+          {
             "name": "locked",
             "type": "bool"
           }
@@ -1837,6 +1851,14 @@
       "code": 6027,
       "name": "StakingIsNotActive",
       "msg": "Staking should be fully initialized before it can be interacted with"
+    },
+    {
+      "code": 6028,
+      "name": "NonZeroInitialMemeSupply"
+    },
+    {
+      "code": 6029,
+      "name": "AirdroppedTokensOvercap"
     }
   ],
   "metadata": {
