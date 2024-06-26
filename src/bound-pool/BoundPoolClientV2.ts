@@ -87,7 +87,6 @@ import * as utils from "@mercurial-finance/dynamic-amm-sdk/dist/cjs/src/amm/util
 import VaultImpl, { getVaultPdas } from "@mercurial-finance/vault-sdk";
 import { ASSOCIATED_PROGRAM_ID } from "@coral-xyz/anchor/dist/cjs/utils/token";
 import { FEE_OWNER, SEEDS } from "@mercurial-finance/dynamic-amm-sdk/dist/cjs/src/amm/constants";
-import { admin } from "../../examples/common";
 import { BoundPoolClient } from "./BoundPoolClient";
 import { TargetConfigClientV2 } from "../targetconfig/TargetConfigClientV2";
 import { ChanSwapClient } from "../chan-swap/ChanSwapClient";
@@ -1230,6 +1229,8 @@ export class BoundPoolClientV2 {
 
     transaction.add(goLiveInstruction);
 
+    const admin = user.publicKey;
+
     const [createLUTix, LUTaddr] = AddressLookupTableProgram.createLookupTable({
       authority: admin,
       payer: admin,
@@ -1462,6 +1463,8 @@ export class BoundPoolClientV2 {
       .instruction();
 
     transaction.add(goLiveInstruction);
+
+    const admin = user.publicKey;
 
     const [createLUTix, LUTaddr] = AddressLookupTableProgram.createLookupTable({
       authority: admin,
