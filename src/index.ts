@@ -1,5 +1,6 @@
 // Clients
 export * from "./MemechanClient";
+export * from "./MemechanClientV2";
 export * from "./bound-pool/BoundPoolClient";
 export * from "./live-pool/LivePoolClient";
 export * from "./memeticket/MemeTicketClient";
