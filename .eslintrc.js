@@ -27,7 +27,7 @@ module.exports = {
     quotes: ["error", "double"],
     "import/no-unresolved": 0,
     indent: "off",
-    "max-len": ["error", { code: 120 }],
+    "max-len": ["error", { code: 150 }],
     "prettier/prettier": 2, // Means error
     "require-jsdoc": "off",
     "valid-jsdoc": "off",
