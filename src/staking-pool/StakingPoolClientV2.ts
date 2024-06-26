@@ -24,11 +24,11 @@ import {
   GetAvailableUnstakeAmountArgs,
   GetPreparedUnstakeTransactionsArgs,
   GetPreparedWithdrawFeesTransactionsArgs,
-  GetUnstakeTransactionArgs,
-  GetWithdrawFeesTransactionArgs,
+  GetUnstakeTransactionArgsV2,
+  GetWithdrawFeesTransactionArgsV2,
   PrepareTransactionWithStakingTicketsMergeArgs,
-  UnstakeArgs,
-  WithdrawFeesArgs,
+  UnstakeArgsV2,
+  WithdrawFeesArgsV2,
   getAvailableWithdrawFeesAmountArgs,
 } from "./types";
 import { addUnwrapSOLInstructionIfNativeMint } from "../util/addUnwrapSOLInstructionIfNativeMint";
@@ -53,10 +53,11 @@ export class StakingPoolClientV2 {
     client: MemechanClientV2;
     poolAccountAddressId: PublicKey;
   }) {
-    const stakingPoolObjectData = await client.memechanProgram.account.stakingPool.fetch(
-      poolAccountAddressId,
-      "confirmed",
-    );
+    const stakingPoolObjectData = await StakingPool.fetch(client.connection, poolAccountAddressId);
+
+    if (!stakingPoolObjectData) {
+      throw new Error(`[fromStakingPoolId] Staking pool data is not found for ${poolAccountAddressId.toString()}.`);
+    }
 
     const boundClientInstance = new StakingPoolClientV2(
       poolAccountAddressId,
@@ -77,12 +78,12 @@ export class StakingPoolClientV2 {
 
   public async getAddFeesTransaction(args: GetAddFeesTransactionArgs): Promise<Transaction> {
     const tx = args.transaction ?? new Transaction();
-    const payer = args.payer;
-    const stakingInfo = await this.fetch();
+    // const payer = args.payer;
+    // const stakingInfo = await this.fetch();
 
-    //const ammPool = await formatAmmKeysById(args.ammPoolId.toBase58(), this.client.connection);
+    // const ammPool = await formatAmmKeysById(args.ammPoolId.toBase58(), this.client.connection);
 
-    const stakingSignerPda = this.findSignerPda();
+    // const stakingSignerPda = this.findSignerPda();
 
     // const addFeesInstruction = await this.client.memechanProgram.methods
     //   .addFees()
@@ -134,7 +135,7 @@ export class StakingPoolClientV2 {
     });
   }
 
-  public async getUnstakeTransaction(args: GetUnstakeTransactionArgs): Promise<Transaction> {
+  public async getUnstakeTransaction(args: GetUnstakeTransactionArgsV2): Promise<Transaction> {
     const tx = args.transaction ?? new Transaction();
     const stakingInfo = await this.fetch();
     const user = args.user;
@@ -213,7 +214,7 @@ export class StakingPoolClientV2 {
     return optimizedTransactions;
   }
 
-  public async unstake(args: UnstakeArgs): Promise<string> {
+  public async unstake(args: UnstakeArgsV2): Promise<string> {
     const transaction = await this.getUnstakeTransaction({
       ...args,
       user: args.user.publicKey,
@@ -268,7 +269,7 @@ export class StakingPoolClientV2 {
     return availableUnstakeAmount;
   }
 
-  public async getWithdrawFeesTransaction(args: GetWithdrawFeesTransactionArgs): Promise<Transaction> {
+  public async getWithdrawFeesTransaction(args: GetWithdrawFeesTransactionArgsV2): Promise<Transaction> {
     const tx = args.transaction ?? new Transaction();
     const stakingInfo = await this.fetch();
 
@@ -345,7 +346,7 @@ export class StakingPoolClientV2 {
     return optimizedTransactions;
   }
 
-  public async withdrawFees(args: WithdrawFeesArgs) {
+  public async withdrawFees(args: WithdrawFeesArgsV2) {
     const transaction = await this.getWithdrawFeesTransaction({
       ...args,
       user: args.user.publicKey,
