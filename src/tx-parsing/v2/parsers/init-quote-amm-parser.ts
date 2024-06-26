@@ -12,7 +12,7 @@ export async function parseInitQuoteAmmInstruction(tx: ParsedTransactionWithMeta
     return undefined;
   }
 
-  const meteoraPoolAddr = ix.accounts[10]; /// 11th acc - ammPool
+  const meteoraPoolAddr = ix.accounts[10]; // 11th acc - ammPool
 
   const glParsed: InitQuoteAmmInstructionParsed = {
     raydiumPoolAddr: meteoraPoolAddr,

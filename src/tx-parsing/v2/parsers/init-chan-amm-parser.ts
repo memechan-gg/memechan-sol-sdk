@@ -12,7 +12,7 @@ export async function parseInitChanAmmInstruction(tx: ParsedTransactionWithMeta,
     return undefined;
   }
 
-  const meteoraPoolAddr = ix.accounts[15]; /// 16th acc - ammPool
+  const meteoraPoolAddr = ix.accounts[15]; // 16th acc - ammPool
 
   const glParsed: InitChanAmmInstructionParsed = {
     raydiumPoolAddr: meteoraPoolAddr,
