@@ -58,6 +58,7 @@ export * from "./util/wallet/NoWalletAdapter";
 export * from "./util/signMessage";
 export * from "./util/index";
 export * from "./memeticket/utils";
+export * from "./util/getBoundPoolClientFromId";
 
 // Metadata
 export * from "./token/createMetadata";
