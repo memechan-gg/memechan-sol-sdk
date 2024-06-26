@@ -105,11 +105,10 @@ export interface InitQuoteAmmPoolTransactionArgs {
   client: MemechanClientV2;
   user: Keypair;
   payer: Signer;
-  boundPoolInfo: BoundPool;
   memeVault: PublicKey;
   feeDestinationWalletAddress: PublicKey;
   quoteVault: PublicKey;
-  tokenInfoA: TokenInfo;
+  tokenInfoA: TokenInfo; // memeMint
   tokenInfoB: TokenInfo;
 }
 
