@@ -2,10 +2,13 @@
 export * from "./MemechanClient";
 export * from "./MemechanClientV2";
 export * from "./bound-pool/BoundPoolClient";
+export * from "./bound-pool/BoundPoolClientV2";
 export * from "./live-pool/LivePoolClient";
 export * from "./memeticket/MemeTicketClient";
+export * from "./memeticket/MemeTicketClientV2";
 export * from "./staking-pool/StakingPoolClient";
 export * from "./targetconfig/TargetConfigClient";
+export * from "./targetconfig/TargetConfigClientV2";
 export * from "./vesting/VestingClient";
 
 // Client types
