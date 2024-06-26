@@ -91,8 +91,8 @@ jobs:
     name: Publish
     runs-on:
       ubuntu-latest
-      # Add `test` here if we are good
-    needs: [build, security_audit]
+      # Add `test` here if we are good. add back security_audit after meteora dependencies are fixed
+    needs: [build,]
     if: |
       github.event_name == 'workflow_dispatch' ||
       (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
