@@ -96,6 +96,7 @@ export class BoundPoolClient {
     public memeTokenMint: PublicKey,
     public quoteTokenMint: PublicKey = TOKEN_INFOS.WSOL.mint,
     public memeToken: Token,
+    public poolObjectData: BoundPool,
   ) {
     //
   }
@@ -117,6 +118,7 @@ export class BoundPoolClient {
       poolObjectData.memeReserve.mint,
       poolObjectData.quoteReserve.mint,
       new Token(TOKEN_PROGRAM_ID, poolObjectData.memeReserve.mint, MEMECHAN_MEME_TOKEN_DECIMALS),
+      poolObjectData,
     );
 
     return boundClientInstance;
@@ -152,6 +154,7 @@ export class BoundPoolClient {
       poolObjectData.memeReserve.mint,
       poolObjectData.quoteReserve.mint,
       new Token(TOKEN_PROGRAM_ID, poolObjectData.memeReserve.mint, MEMECHAN_MEME_TOKEN_DECIMALS),
+      poolObjectData,
     );
 
     return boundClientInstance;
@@ -363,6 +366,7 @@ export class BoundPoolClient {
     });
 
     const id = this.findBoundPoolPda(memeMint, quoteToken.mint, memechanProgram.programId);
+    const poolObjectData = await BoundPoolClient.fetch2(client.connection, id);
 
     return new BoundPoolClient(
       id,
@@ -372,6 +376,7 @@ export class BoundPoolClient {
       memeMint,
       quoteToken.mint,
       new Token(TOKEN_PROGRAM_ID, memeMint, MEMECHAN_MEME_TOKEN_DECIMALS),
+      poolObjectData,
     );
   }
 
