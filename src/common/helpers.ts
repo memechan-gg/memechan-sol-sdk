@@ -4,7 +4,8 @@
 // import { NATIVE_MINT, createWrappedNativeAccount } from "@solana/spl-token";
 // import { Amm } from "./types/amm";
 
-import { Connection, PublicKey } from "@solana/web3.js";
+import { AddressLookupTableProgram, Connection, PublicKey } from "@solana/web3.js";
+import * as bigintBuffer from "bigint-buffer";
 
 // export const memechan = workspace.MemechanSol as Program<MemechanSol>;
 // export const amm = workspace.Amm as Program<Amm>;
@@ -54,4 +55,12 @@ export async function sleep(ms: number) {
 export function findProgramAddress(seeds: Array<Buffer | Uint8Array>, programId: PublicKey) {
   const [publicKey, nonce] = PublicKey.findProgramAddressSync(seeds, programId);
   return { publicKey, nonce };
+}
+
+export function getLUTPDA(params: { recentSlot: number; authority: PublicKey }) {
+  const [lookupTableAddress] = PublicKey.findProgramAddressSync(
+    [params.authority.toBuffer(), bigintBuffer.toBufferLE(BigInt(params.recentSlot), 8)],
+    AddressLookupTableProgram.programId,
+  );
+  return lookupTableAddress;
 }

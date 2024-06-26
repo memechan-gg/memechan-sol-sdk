@@ -113,13 +113,15 @@ export interface InitQuoteAmmPoolTransactionArgs {
   tokenInfoB: TokenInfo;
 }
 
-export type InitChanAmmPool = GoLiveArgs & {
+export type InitChanAmmPool = InitQuoteAmmPoolTransactionArgs & {
   chanSwap: PublicKey;
 };
 
 export type GetGoLiveTransactionArgs = GoLiveArgs & {
   transaction?: Transaction;
 };
+
+export type GetGoLiveTransactionStaticArgs = GoLiveStaticArgs & { transaction?: Transaction };
 
 export type GetInitChanPoolTransactionArgs = InitChanAmmPool & {
   transaction?: Transaction;
