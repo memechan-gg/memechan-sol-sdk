@@ -1,6 +1,5 @@
 import { BoundPoolClientV2 } from "../../../../src";
-import { BoundPoolClient } from "../../../../src/bound-pool/BoundPoolClient";
-import { client, clientV2 } from "../../../common";
+import { clientV2 } from "../../../common";
 
 // yarn tsx examples/v2/bonding-pool/from/bound-pool-from-tx-signature.ts
 (async () => {
