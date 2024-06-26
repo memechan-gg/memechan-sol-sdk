@@ -7,6 +7,7 @@ import { BoundPool } from "../schema/codegen/accounts";
 import { BoundPool as BoundPoolV2 } from "../schema/v2/codegen/accounts";
 import { TokenMetadata } from "../api/types";
 import { MemechanClientV2 } from "../MemechanClientV2";
+import { TokenInfo } from "../config/types";
 
 export interface SwapYArgs {
   payer: Signer;
@@ -94,9 +95,35 @@ export type GoLiveStaticArgs = Omit<GoLiveArgs, "boundPoolInfo"> & {
   quoteMint: PublicKey;
 };
 
-export type GetGoLiveTransactionArgs = GoLiveArgs & { transaction?: Transaction };
+export type GetInitQuoteAmmPoolTransactionArgs = InitQuoteAmmPoolTransactionArgs & { transaction?: Transaction };
 
-export type GetGoLiveTransactionStaticArgs = GoLiveStaticArgs & { transaction?: Transaction };
+export type GetInitQuoteAmmPoolTransactionStaticArgs = GetInitQuoteAmmPoolTransactionArgs & {
+  transaction?: Transaction;
+};
+
+export interface InitQuoteAmmPoolTransactionArgs {
+  client: MemechanClientV2;
+  user: Keypair;
+  payer: Signer;
+  boundPoolInfo: BoundPool;
+  memeVault: PublicKey;
+  feeDestinationWalletAddress: PublicKey;
+  quoteVault: PublicKey;
+  tokenInfoA: TokenInfo;
+  tokenInfoB: TokenInfo;
+}
+
+export type InitChanAmmPool = GoLiveArgs & {
+  chanSwap: PublicKey;
+};
+
+export type GetGoLiveTransactionArgs = GoLiveArgs & {
+  transaction?: Transaction;
+};
+
+export type GetInitChanPoolTransactionArgs = InitChanAmmPool & {
+  transaction?: Transaction;
+};
 
 export interface InitStakingPoolArgs {
   pool?: PublicKey;
