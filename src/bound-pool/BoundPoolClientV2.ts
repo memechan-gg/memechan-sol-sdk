@@ -1027,15 +1027,10 @@ export class BoundPoolClientV2 {
       staking: stakingId,
       stakingPoolSignerPda: stakingSigner,
       feeVaultQuote: boundPoolInfo.feeVaultQuote,
-
-      airdropOwner: ADMIN_PUB_KEY,
-      airdropTokenVault,
-
       systemProgram: SystemProgram.programId,
       tokenProgram: TOKEN_PROGRAM_ID,
       rent: SYSVAR_RENT_PUBKEY,
       memeMint: boundPoolInfo.memeReserve.mint,
-      associatedTokenProgram: ATA_PROGRAM_ID,
     };
 
     const initStakingPoolInstruction = await this.client.memechanProgram.methods
