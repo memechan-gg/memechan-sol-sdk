@@ -54,6 +54,7 @@ import {
 
 import { findProgramAddress, getLUTPDA, sleep } from "../common/helpers";
 import {
+  ADMIN_PUB_KEY,
   COMPUTE_UNIT_PRICE,
   DEFAULT_MAX_M,
   FULL_MEME_AMOUNT_CONVERTED,
@@ -1008,6 +1009,10 @@ export class BoundPoolClientV2 {
       transaction: tx,
     });
 
+    const airdropTokenVault = (
+      await getOrCreateAssociatedTokenAccount(this.client.connection, payer, this.memeTokenMint, ADMIN_PUB_KEY, false)
+    ).address;
+
     const methodArgs = {
       pool,
       signer: user,
@@ -1022,14 +1027,15 @@ export class BoundPoolClientV2 {
       staking: stakingId,
       stakingPoolSignerPda: stakingSigner,
       feeVaultQuote: boundPoolInfo.feeVaultQuote,
-      marketProgramId: PROGRAMIDS.OPENBOOK_MARKET,
+
+      airdropOwner: ADMIN_PUB_KEY,
+      airdropTokenVault,
+
       systemProgram: SystemProgram.programId,
       tokenProgram: TOKEN_PROGRAM_ID,
-      clock: SYSVAR_CLOCK_PUBKEY,
       rent: SYSVAR_RENT_PUBKEY,
       memeMint: boundPoolInfo.memeReserve.mint,
-      ataProgram: ATA_PROGRAM_ID,
-      user,
+      associatedTokenProgram: ATA_PROGRAM_ID,
     };
 
     const initStakingPoolInstruction = await this.client.memechanProgram.methods
@@ -1099,7 +1105,7 @@ export class BoundPoolClientV2 {
     transaction.add(modifyComputeUnits);
 
     const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
-      microLamports: 5000000,
+      microLamports: COMPUTE_UNIT_PRICE,
     });
 
     transaction.add(addPriorityFee);
