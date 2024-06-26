@@ -215,6 +215,7 @@ export class BoundPoolClientV2 {
       tokenMetadata,
     } = args;
     const { connection, memechanProgram } = client;
+    const airdroppedTokens = new BN(0); // TODO: Add airdropped tokens
 
     const memeMintKeypair = Keypair.generate();
     const memeMint = memeMintKeypair.publicKey;
@@ -267,7 +268,7 @@ export class BoundPoolClientV2 {
     const quoteInfo = getTokenInfoByMint(quoteToken.mint);
 
     const createPoolInstruction = await memechanProgram.methods
-      .newPool()
+      .newPool(airdroppedTokens)
       .accounts({
         feeQuoteVault: feeQuoteVault,
         memeVault: launchVault,
