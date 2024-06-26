@@ -1,5 +1,5 @@
 import { PublicKey } from "@solana/web3.js";
-import { getBoundPoolClientFromId } from "../../../src/util/getBoundPoolClientFromId";
+import { getBoundPoolClientFromId } from "../../../src/util/poolHelpers/getBoundPoolClientFromId";
 import { client, clientV2 } from "../../common";
 
 // yarn tsx examples/v2/bonding-pool/getBoundPoolClientFromId.ts > log.txt 2>&1

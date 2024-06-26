@@ -13,6 +13,7 @@ export interface BoundPoolFields {
   creatorAddr: PublicKey;
   fees: types.FeesFields;
   config: types.ConfigFields;
+  airdroppedTokens: BN;
   locked: boolean;
 }
 
@@ -25,6 +26,7 @@ export interface BoundPoolJSON {
   creatorAddr: string;
   fees: types.FeesJSON;
   config: types.ConfigJSON;
+  airdroppedTokens: string;
   locked: boolean;
 }
 
@@ -37,6 +39,7 @@ export class BoundPool {
   readonly creatorAddr: PublicKey;
   readonly fees: types.Fees;
   readonly config: types.Config;
+  readonly airdroppedTokens: BN;
   readonly locked: boolean;
 
   static readonly discriminator = Buffer.from([191, 233, 118, 178, 14, 139, 241, 36]);
@@ -50,6 +53,7 @@ export class BoundPool {
     borsh.publicKey("creatorAddr"),
     types.Fees.layout("fees"),
     types.Config.layout("config"),
+    borsh.u64("airdroppedTokens"),
     borsh.bool("locked"),
   ]);
 
@@ -62,6 +66,7 @@ export class BoundPool {
     this.creatorAddr = fields.creatorAddr;
     this.fees = new types.Fees({ ...fields.fees });
     this.config = new types.Config({ ...fields.config });
+    this.airdroppedTokens = fields.airdroppedTokens;
     this.locked = fields.locked;
   }
 
@@ -109,6 +114,7 @@ export class BoundPool {
       creatorAddr: dec.creatorAddr,
       fees: types.Fees.fromDecoded(dec.fees),
       config: types.Config.fromDecoded(dec.config),
+      airdroppedTokens: dec.airdroppedTokens,
       locked: dec.locked,
     });
   }
@@ -123,6 +129,7 @@ export class BoundPool {
       creatorAddr: this.creatorAddr.toString(),
       fees: this.fees.toJSON(),
       config: this.config.toJSON(),
+      airdroppedTokens: this.airdroppedTokens.toString(),
       locked: this.locked,
     };
   }
@@ -137,6 +144,7 @@ export class BoundPool {
       creatorAddr: new PublicKey(obj.creatorAddr),
       fees: types.Fees.fromJSON(obj.fees),
       config: types.Config.fromJSON(obj.config),
+      airdroppedTokens: new BN(obj.airdroppedTokens),
       locked: obj.locked,
     });
   }

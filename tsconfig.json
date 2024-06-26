@@ -13,7 +13,10 @@
     "skipLibCheck": true,
     "moduleResolution": "Node",
     "resolveJsonModule": true,
-    "allowJs": true
+    "allowJs": true,
+    "paths": {
+      "@solana/spl-token": ["./node_modules/@solana/spl-token"],
+    }
   },
   "compileOnSave": true,
   "include": ["env.d.ts", "src", "examples", "test", "jest.config.js"],

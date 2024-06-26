@@ -9,13 +9,12 @@ import {
 } from "@solana/web3.js";
 import BigNumber from "bignumber.js";
 import BN from "bn.js";
-import { MemechanClient } from "../MemechanClient";
-import { BoundPoolClient } from "../bound-pool/BoundPoolClient";
+import { MemechanClientV2 } from "../MemechanClientV2";
+import { BoundPoolClientV2 } from "../bound-pool/BoundPoolClientV2";
 import { MAX_MEME_TOKENS, MEMECHAN_PROGRAM_ID, MEME_TOKEN_DECIMALS } from "../config/config";
-import { MemeTicketClient } from "../memeticket/MemeTicketClient";
+import { MemeTicketClientV2 } from "../memeticket/MemeTicketClientV2";
 import { getOptimizedTransactions } from "../memeticket/utils";
-import { formatAmmKeysById } from "../raydium/formatAmmKeysById";
-import { MemeTicketFields, StakingPool, StakingPoolFields } from "../schema/codegen/accounts";
+import { MemeTicketFields, StakingPool, StakingPoolFields } from "../schema/v2/codegen/accounts";
 import { ensureAssociatedTokenAccountWithIX } from "../util/ensureAssociatedTokenAccountWithIX";
 import { getSendAndConfirmTransactionMethod } from "../util/getSendAndConfirmTransactionMethod";
 import { retry } from "../util/retry";
@@ -25,28 +24,25 @@ import {
   GetAvailableUnstakeAmountArgs,
   GetPreparedUnstakeTransactionsArgs,
   GetPreparedWithdrawFeesTransactionsArgs,
-  GetUnstakeTransactionArgs,
-  GetWithdrawFeesTransactionArgs,
+  GetUnstakeTransactionArgsV2,
+  GetWithdrawFeesTransactionArgsV2,
   PrepareTransactionWithStakingTicketsMergeArgs,
-  UnstakeArgs,
-  WithdrawFeesArgs,
+  UnstakeArgsV2,
+  WithdrawFeesArgsV2,
   getAvailableWithdrawFeesAmountArgs,
 } from "./types";
 import { addUnwrapSOLInstructionIfNativeMint } from "../util/addUnwrapSOLInstructionIfNativeMint";
 import { getTokenInfoByMint } from "../config/helpers";
 import { TokenInfo } from "../config/types";
 
-export class StakingPoolClient {
+export class StakingPoolClientV2 {
   constructor(
     public id: PublicKey,
-    private client: MemechanClient,
+    private client: MemechanClientV2,
     public pool: PublicKey,
     public memeVault: PublicKey,
     public memeMint: PublicKey,
-    public lpVault: PublicKey,
-    public lpMint: PublicKey,
     public quoteVault: PublicKey,
-    public raydiumAmm: PublicKey,
     public pooolObjectData: StakingPool,
   ) {}
 
@@ -54,7 +50,7 @@ export class StakingPoolClient {
     client,
     poolAccountAddressId,
   }: {
-    client: MemechanClient;
+    client: MemechanClientV2;
     poolAccountAddressId: PublicKey;
   }) {
     const stakingPoolObjectData = await StakingPool.fetch(client.connection, poolAccountAddressId);
@@ -63,16 +59,13 @@ export class StakingPoolClient {
       throw new Error(`[fromStakingPoolId] Staking pool data is not found for ${poolAccountAddressId.toString()}.`);
     }
 
-    const boundClientInstance = new StakingPoolClient(
+    const boundClientInstance = new StakingPoolClientV2(
       poolAccountAddressId,
       client,
       stakingPoolObjectData.pool,
       stakingPoolObjectData.memeVault,
       stakingPoolObjectData.memeMint,
-      stakingPoolObjectData.lpVault,
-      stakingPoolObjectData.lpMint,
       stakingPoolObjectData.quoteVault,
-      stakingPoolObjectData.raydiumAmm,
       stakingPoolObjectData,
     );
 
@@ -85,43 +78,43 @@ export class StakingPoolClient {
 
   public async getAddFeesTransaction(args: GetAddFeesTransactionArgs): Promise<Transaction> {
     const tx = args.transaction ?? new Transaction();
-    const payer = args.payer;
-    const stakingInfo = await this.fetch();
+    // const payer = args.payer;
+    // const stakingInfo = await this.fetch();
 
-    const ammPool = await formatAmmKeysById(args.ammPoolId.toBase58(), this.client.connection);
+    // const ammPool = await formatAmmKeysById(args.ammPoolId.toBase58(), this.client.connection);
 
-    const stakingSignerPda = this.findSignerPda();
+    // const stakingSignerPda = this.findSignerPda();
 
-    const addFeesInstruction = await this.client.memechanProgram.methods
-      .addFees()
-      .accounts({
-        memeVault: stakingInfo.memeVault,
-        quoteVault: stakingInfo.quoteVault,
-        staking: this.id,
-        stakingSignerPda: stakingSignerPda,
-        tokenProgram: TOKEN_PROGRAM_ID,
-        marketAccount: ammPool.marketId,
-        marketAsks: ammPool.marketAsks,
-        marketBids: ammPool.marketBids,
-        marketEventQueue: ammPool.marketEventQueue,
-        marketCoinVault: ammPool.marketBaseVault,
-        marketPcVault: ammPool.marketQuoteVault,
-        marketProgramId: ammPool.marketProgramId,
-        marketVaultSigner: ammPool.marketAuthority,
-        openOrders: ammPool.openOrders,
-        raydiumAmm: ammPool.id,
-        raydiumAmmAuthority: ammPool.authority,
-        raydiumLpMint: ammPool.lpMint,
-        raydiumMemeVault: ammPool.baseVault,
-        raydiumQuoteVault: ammPool.quoteVault,
-        signer: payer,
-        targetOrders: ammPool.targetOrders,
-        stakingLpWallet: this.lpVault,
-        raydiumProgram: ammPool.programId,
-      })
-      .instruction();
+    // const addFeesInstruction = await this.client.memechanProgram.methods
+    //   .addFees()
+    //   .accounts({
+    //     memeVault: stakingInfo.memeVault,
+    //     quoteVault: stakingInfo.quoteVault,
+    //     staking: this.id,
+    //     stakingSignerPda: stakingSignerPda,
+    //     tokenProgram: TOKEN_PROGRAM_ID,
+    //     marketAccount: ammPool.marketId,
+    //     marketAsks: ammPool.marketAsks,
+    //     marketBids: ammPool.marketBids,
+    //     marketEventQueue: ammPool.marketEventQueue,
+    //     marketCoinVault: ammPool.marketBaseVault,
+    //     marketPcVault: ammPool.marketQuoteVault,
+    //     marketProgramId: ammPool.marketProgramId,
+    //     marketVaultSigner: ammPool.marketAuthority,
+    //     openOrders: ammPool.openOrders,
+    //     raydiumAmm: ammPool.id,
+    //     raydiumAmmAuthority: ammPool.authority,
+    //     raydiumLpMint: ammPool.lpMint,
+    //     raydiumMemeVault: ammPool.baseVault,
+    //     raydiumQuoteVault: ammPool.quoteVault,
+    //     signer: payer,
+    //     targetOrders: ammPool.targetOrders,
+    //     stakingLpWallet: this.lpVault,
+    //     raydiumProgram: ammPool.programId,
+    //   })
+    //   .instruction();
 
-    tx.add(addFeesInstruction);
+    // tx.add(addFeesInstruction);
 
     return tx;
   }
@@ -142,7 +135,7 @@ export class StakingPoolClient {
     });
   }
 
-  public async getUnstakeTransaction(args: GetUnstakeTransactionArgs): Promise<Transaction> {
+  public async getUnstakeTransaction(args: GetUnstakeTransactionArgsV2): Promise<Transaction> {
     const tx = args.transaction ?? new Transaction();
     const stakingInfo = await this.fetch();
     const user = args.user;
@@ -221,7 +214,7 @@ export class StakingPoolClient {
     return optimizedTransactions;
   }
 
-  public async unstake(args: UnstakeArgs): Promise<string> {
+  public async unstake(args: UnstakeArgsV2): Promise<string> {
     const transaction = await this.getUnstakeTransaction({
       ...args,
       user: args.user.publicKey,
@@ -276,7 +269,7 @@ export class StakingPoolClient {
     return availableUnstakeAmount;
   }
 
-  public async getWithdrawFeesTransaction(args: GetWithdrawFeesTransactionArgs): Promise<Transaction> {
+  public async getWithdrawFeesTransaction(args: GetWithdrawFeesTransactionArgsV2): Promise<Transaction> {
     const tx = args.transaction ?? new Transaction();
     const stakingInfo = await this.fetch();
 
@@ -353,7 +346,7 @@ export class StakingPoolClient {
     return optimizedTransactions;
   }
 
-  public async withdrawFees(args: WithdrawFeesArgs) {
+  public async withdrawFees(args: WithdrawFeesArgsV2) {
     const transaction = await this.getWithdrawFeesTransaction({
       ...args,
       user: args.user.publicKey,
@@ -415,9 +408,9 @@ export class StakingPoolClient {
     transaction,
     user,
     ticketIds,
-  }: PrepareTransactionWithStakingTicketsMergeArgs): Promise<MemeTicketClient> {
+  }: PrepareTransactionWithStakingTicketsMergeArgs): Promise<MemeTicketClientV2> {
     const [destinationTicketId, ...sourceTicketIds] = ticketIds;
-    const destinationMemeTicket = new MemeTicketClient(destinationTicketId, this.client);
+    const destinationMemeTicket = new MemeTicketClientV2(destinationTicketId, this.client);
 
     if (sourceTicketIds.length > 0) {
       const sourceMemeTickets = sourceTicketIds.map((ticketId) => ({ id: ticketId }));
@@ -439,18 +432,18 @@ export class StakingPoolClient {
   }
 
   public async getHoldersCount() {
-    return StakingPoolClient.getHoldersCount(this.pool, this.memeMint, this.client);
+    return StakingPoolClientV2.getHoldersCount(this.pool, this.memeMint, this.client);
   }
 
   public async getHoldersList() {
-    return StakingPoolClient.getHoldersList(this.pool, this.memeMint, this.client);
+    return StakingPoolClientV2.getHoldersList(this.pool, this.memeMint, this.client);
   }
 
   /**
    * Fetches all tickets for corresponding pool id
    */
   public async fetchRelatedTickets(pool = this.pool, client = this.client): Promise<MemeTicketFields[]> {
-    return MemeTicketClient.fetchRelatedTickets(pool, client);
+    return MemeTicketClientV2.fetchRelatedTickets(pool, client);
   }
 
   public async getTokenInfo(): Promise<TokenInfo> {
@@ -461,8 +454,8 @@ export class StakingPoolClient {
   /**
    * Fetches all unique token holders and memetickets owners for pool; then returns their number
    */
-  public static async getHoldersCount(pool: PublicKey, mint: PublicKey, client: MemechanClient) {
-    return (await StakingPoolClient.getHoldersList(pool, mint, client)).length;
+  public static async getHoldersCount(pool: PublicKey, mint: PublicKey, client: MemechanClientV2) {
+    return (await StakingPoolClientV2.getHoldersList(pool, mint, client)).length;
   }
 
   /**
@@ -473,7 +466,7 @@ export class StakingPoolClient {
   public static async getHoldersList(
     boundPool: PublicKey,
     mint: PublicKey,
-    client: MemechanClient,
+    client: MemechanClientV2,
   ): Promise<
     [
       { address: string; tokenAmount: BigNumber; tokenAmountInPercentage: BigNumber }[],
@@ -485,11 +478,11 @@ export class StakingPoolClient {
       throw new Error("[getHoldersList] Fetching holders is only possible if heliusApiUrl is provided and non-empty.");
     }
 
-    const stakingId = BoundPoolClient.findStakingPda(mint, client.memechanProgram.programId);
-    const stakingPDA = StakingPoolClient.findSignerPda(stakingId, client.memechanProgram.programId).toBase58();
+    const stakingId = BoundPoolClientV2.findStakingPda(mint, client.memechanProgram.programId);
+    const stakingPDA = StakingPoolClientV2.findSignerPda(stakingId, client.memechanProgram.programId).toBase58();
 
-    const ticketHolderList = await BoundPoolClient.getHoldersMap(boundPool, client);
-    const [tokenHolderList, stakingTokens] = await StakingPoolClient.getTokenHolderListHelius(
+    const ticketHolderList = await BoundPoolClientV2.getHoldersMap(boundPool, client);
+    const [tokenHolderList, stakingTokens] = await StakingPoolClientV2.getTokenHolderListHelius(
       mint,
       stakingPDA,
       client.heliusApiUrl,
@@ -574,14 +567,14 @@ export class StakingPoolClient {
     return program.account.stakingPool.fetch(this.id, "confirmed");
   }
 
-  public static async all(client: MemechanClient): Promise<{ account: StakingPoolFields; publicKey: PublicKey }[]> {
+  public static async all(client: MemechanClientV2): Promise<{ account: StakingPoolFields; publicKey: PublicKey }[]> {
     const rawPools = await client.memechanProgram.account.stakingPool.all();
     const pools = rawPools.map((el) => el);
     return pools;
   }
 
   public findSignerPda(): PublicKey {
-    return StakingPoolClient.findSignerPda(this.id, this.client.memechanProgram.programId);
+    return StakingPoolClientV2.findSignerPda(this.id, this.client.memechanProgram.programId);
   }
 
   private getAccountMeta(pubkey: PublicKey): AccountMeta {
@@ -611,7 +604,7 @@ export class StakingPoolClient {
     memeMintPubkey: PublicKey;
   }): Promise<boolean> {
     const memechanProgramPubkey = new PublicKey(MEMECHAN_PROGRAM_ID);
-    const stakingPda = BoundPoolClient.findStakingPda(memeMintPubkey, memechanProgramPubkey);
+    const stakingPda = BoundPoolClientV2.findStakingPda(memeMintPubkey, memechanProgramPubkey);
     const stakingInfo = await StakingPool.fetch(connection, stakingPda);
 
     // if there is no staking pool, than there is no amm pool obviously
@@ -623,9 +616,10 @@ export class StakingPoolClient {
       return false;
     }
 
-    const { raydiumAmm } = stakingInfo;
-    const isRaydiumAmmIsEqualToSystemProgramId = raydiumAmm.equals(SystemProgram.programId);
-    const isPoolCreated = !isRaydiumAmmIsEqualToSystemProgramId;
+    const { quoteAmmPool, chanAmmPool } = stakingInfo;
+    const isQuoteAmmIsEqualToSystemProgramId = quoteAmmPool.equals(SystemProgram.programId);
+    const isChanAmmIsEqualToSystemProgramId = chanAmmPool.equals(SystemProgram.programId);
+    const isPoolCreated = !isQuoteAmmIsEqualToSystemProgramId && !isChanAmmIsEqualToSystemProgramId;
 
     return isPoolCreated;
   }
