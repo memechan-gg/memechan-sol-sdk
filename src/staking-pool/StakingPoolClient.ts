@@ -47,6 +47,7 @@ export class StakingPoolClient {
     public lpMint: PublicKey,
     public quoteVault: PublicKey,
     public raydiumAmm: PublicKey,
+    public pooolObjectData: StakingPool,
   ) {}
 
   public static async fromStakingPoolId({
@@ -56,10 +57,11 @@ export class StakingPoolClient {
     client: MemechanClient;
     poolAccountAddressId: PublicKey;
   }) {
-    const stakingPoolObjectData = await client.memechanProgram.account.stakingPool.fetch(
-      poolAccountAddressId,
-      "confirmed",
-    );
+    const stakingPoolObjectData = await StakingPool.fetch(client.connection, poolAccountAddressId);
+
+    if (!stakingPoolObjectData) {
+      throw new Error(`[fromStakingPoolId] Staking pool data is not found for ${poolAccountAddressId.toString()}.`);
+    }
 
     const boundClientInstance = new StakingPoolClient(
       poolAccountAddressId,
@@ -71,6 +73,7 @@ export class StakingPoolClient {
       stakingPoolObjectData.lpMint,
       stakingPoolObjectData.quoteVault,
       stakingPoolObjectData.raydiumAmm,
+      stakingPoolObjectData,
     );
 
     return boundClientInstance;

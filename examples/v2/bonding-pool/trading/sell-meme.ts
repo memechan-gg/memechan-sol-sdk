@@ -1,6 +1,6 @@
 import { PublicKey } from "@solana/web3.js";
 import { client, clientV2, payer } from "../../../common";
-import { getBoundPoolClientFromId } from "../../../../src/util/getBoundPoolClientFromId";
+import { getBoundPoolClientFromId } from "../../../../src/util/poolHelpers/getBoundPoolClientFromId";
 
 // yarn tsx examples/v2/bonding-pool/trading/sell-meme.ts
 (async () => {
