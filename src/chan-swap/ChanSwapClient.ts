@@ -4,7 +4,7 @@ import { getOrCreateAssociatedTokenAccount } from "@solana/spl-token";
 import { MEMECHAN_PROGRAM_ID_V2, TOKEN_INFOS } from "../config/config";
 import { MemechanClientV2 } from "../MemechanClientV2";
 
-import { airdrop } from "../common/helpers";
+// import { airdrop } from "../common/helpers";
 
 export class ChanSwapClient {
   static chanSwapId(): PublicKey {
@@ -25,7 +25,7 @@ export class ChanSwapClient {
       return;
     }
 
-    await airdrop(payer.publicKey);
+    // await airdrop(payer.publicKey);
 
     const chanVault = await getOrCreateAssociatedTokenAccount(
       client.connection,
@@ -37,7 +37,7 @@ export class ChanSwapClient {
 
     console.log(chanVault);
 
-    await mintChan(chanVault.address, 10_000_000 * 10 ** 9);
+    // await mintChan(chanVault.address, 10_000_000 * 10 ** 9);
 
     await client.memechanProgram.methods
       .newChanSwap(new BN(num), new BN(denom))

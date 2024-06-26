@@ -2,7 +2,7 @@ import { BN } from "@coral-xyz/anchor";
 import { Keypair, PublicKey, Transaction } from "@solana/web3.js";
 import { MemeTicketClient } from "../memeticket/MemeTicketClient";
 import { MemeTicketFields } from "../schema/codegen/accounts";
-import { MemeTicketFields as MemeTicketFieldsV2} from "../schema/v2/codegen/accounts";
+import { MemeTicketFields as MemeTicketFieldsV2 } from "../schema/v2/codegen/accounts";
 import { VestingConfig } from "../schema/codegen/types";
 import { MemeTicketClientV2 } from "../memeticket/MemeTicketClientV2";
 
