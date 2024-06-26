@@ -43,7 +43,7 @@ export class StakingPoolClientV2 {
     public memeVault: PublicKey,
     public memeMint: PublicKey,
     public quoteVault: PublicKey,
-    public pooolObjectData: StakingPool,
+    public poolObjectData: StakingPool,
   ) {}
 
   public static async fromStakingPoolId({
@@ -67,6 +67,24 @@ export class StakingPoolClientV2 {
       stakingPoolObjectData.memeMint,
       stakingPoolObjectData.quoteVault,
       stakingPoolObjectData,
+    );
+
+    return boundClientInstance;
+  }
+
+  public async fromStakingPoolId() {
+    if (!this.poolObjectData) {
+      throw new Error(`[fromStakingPoolId] Staking pool data is not found for ${this.pool.toString()}.`);
+    }
+
+    const boundClientInstance = new StakingPoolClientV2(
+      this.pool,
+      this.client,
+      this.poolObjectData.pool,
+      this.poolObjectData.memeVault,
+      this.poolObjectData.memeMint,
+      this.poolObjectData.quoteVault,
+      this.poolObjectData,
     );
 
     return boundClientInstance;
