@@ -7,6 +7,8 @@ import { InitStakingPoolInstructionParsed, parseInitStakingInstruction } from ".
 import { parseSwapXInstruction, SwapXInstructionParsed } from "./parsers/swap-x-parser";
 import { parseSwapYInstruction, SwapYInstructionParsed } from "./parsers/swap-y-parser";
 import { CreateMetadataInstructionParsed, parseCreateMetadataInstruction } from "./parsers/create-metadata-parser";
+import { InitQuoteAmmInstructionParsed, parseInitQuoteAmmInstruction } from "./parsers/init-quote-amm-parser";
+import { InitChanAmmInstructionParsed, parseInitChanAmmInstruction } from "./parsers/init-chan-amm-parser";
 import { MemechanClientV2 } from "../../MemechanClientV2";
 
 export async function parseTxV2(
@@ -19,6 +21,8 @@ export async function parseTxV2(
       | SwapXInstructionParsed
       | InitStakingPoolInstructionParsed
       | CreateMetadataInstructionParsed
+      | InitQuoteAmmInstructionParsed
+      | InitChanAmmInstructionParsed
     )[]
   | undefined
 > {
@@ -36,6 +40,8 @@ export async function parseTxV2(
     | SwapXInstructionParsed
     | InitStakingPoolInstructionParsed
     | CreateMetadataInstructionParsed
+    | InitQuoteAmmInstructionParsed
+    | InitChanAmmInstructionParsed
   )[] = [];
 
   for (let i = 0; i < ixs.length; i++) {
@@ -60,19 +66,16 @@ async function ptx(
   tx: solana.ParsedTransactionWithMeta,
   index: number,
   memechanProgram: MemechanClientV2,
-): Promise<
-  | NewBPInstructionParsed
-  | SwapYInstructionParsed
-  | SwapXInstructionParsed
-  | InitStakingPoolInstructionParsed
-  | CreateMetadataInstructionParsed
-  | undefined
-> {
+) {
   const ixBytesSliced = ixBytes.subarray(0, 2);
 
   if (ixBytesSliced.equals(Buffer.from([0x26, 0x3f]))) {
     console.log("parsing ix: NewPool");
     return await parseNewBPInstruction(tx, index, memechanProgram);
+  }
+  if (ixBytesSliced.equals(Buffer.from([0x1e, 0x23]))) {
+    console.log("parsing ix: CreateMetadata");
+    return await parseCreateMetadataInstruction(tx, index, memechanProgram);
   }
   if (ixBytesSliced.equals(Buffer.from([0x41, 0x3f]))) {
     console.log("parsing ix: SwapX");
@@ -86,9 +89,13 @@ async function ptx(
     console.log("parsing ix: InitStaking");
     return await parseInitStakingInstruction(tx, index, memechanProgram);
   }
-  if (ixBytesSliced.equals(Buffer.from([0x1e, 0x23]))) {
-    console.log("parsing ix: CreateMetadata");
-    return await parseCreateMetadataInstruction(tx, index, memechanProgram);
+  if (ixBytesSliced.equals(Buffer.from([0xaf, 0x3a]))) {
+    console.log("parsing ix: InitQuoteAmm");
+    return await parseInitQuoteAmmInstruction(tx, index);
+  }
+  if (ixBytesSliced.equals(Buffer.from([0x81, 0x08]))) {
+    console.log("parsing ix: InitChanAmm");
+    return await parseInitChanAmmInstruction(tx, index);
   }
 
   return undefined;
