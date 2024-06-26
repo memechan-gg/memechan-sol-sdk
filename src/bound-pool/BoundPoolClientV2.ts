@@ -93,6 +93,10 @@ import { FEE_OWNER } from "@mercurial-finance/dynamic-amm-sdk/dist/cjs/src/amm/c
 import { SEEDS } from "@mercurial-finance/vault-sdk/dist/cjs/src/vault/constants";
 import { admin } from "../../examples/common";
 import { BoundPoolClient } from "./BoundPoolClient";
+import { TargetConfigClientV2 } from "../targetconfig/TargetConfigClientV2";
+
+export const LUTSLOT: number = 2;
+export const LUT2SLOT: number = 20;
 
 export class BoundPoolClientV2 {
   private constructor(
@@ -1167,7 +1171,7 @@ export class BoundPoolClientV2 {
       ammProgram.programId,
     );
 
-    const [mintMetadata, _mintMetadataBump] = utils.deriveMintMetadata(lpMint);
+    const [mintMetadata] = utils.deriveMintMetadata(lpMint);
 
     const [lockEscrowPK] = utils.deriveLockEscrowPda(poolPubkey, stakingSigner, ammProgram.programId);
 
@@ -1235,13 +1239,13 @@ export class BoundPoolClientV2 {
         SystemProgram.programId,
         TOKEN_PROGRAM_ID,
         ASSOCIATED_PROGRAM_ID,
-        memechan.programId,
-        TargetConfig.findTargetConfigPda(QUOTE_MINT, memechan.programId),
+        this.client.memechanProgram.programId,
+        TargetConfigClientV2.findTargetConfigPda(TOKEN_INFOS.WSOL.mint, this.client.memechanProgram.programId),
         poolPubkey,
         user.publicKey,
         FEE_OWNER,
         SYSVAR_RENT_PUBKEY,
-        QUOTE_MINT,
+        TOKEN_INFOS.WSOL.mint,
       ],
     });
 

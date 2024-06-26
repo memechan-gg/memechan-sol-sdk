@@ -1,5 +1,6 @@
 import { Token } from "@raydium-io/raydium-sdk";
 import { PublicKey } from "@solana/web3.js"; // Ensure correct import path based on your project setup
+import { TokenInfo as SplTokenInfo } from "@solana/spl-token-registry";
 
 export interface TokenInfoArgs {
   programId: PublicKey;
@@ -31,6 +32,17 @@ export class TokenInfo extends Token {
     this.targetConfig = targetConfig;
     this.targetConfigV2 = targetConfigV2;
     this.displayName = displayName;
+  }
+
+  public toSplTokenInfo(): SplTokenInfo {
+    return {
+      chainId: 900,
+      address: this.mint.toBase58(),
+      decimals: this.decimals,
+      name: this.name || "",
+      symbol: this.symbol || "",
+      logoURI: "",
+    };
   }
 }
 
