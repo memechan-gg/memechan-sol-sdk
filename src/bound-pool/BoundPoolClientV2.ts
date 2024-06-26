@@ -91,6 +91,7 @@ import { admin } from "../../examples/common";
 import { BoundPoolClient } from "./BoundPoolClient";
 import { TargetConfigClientV2 } from "../targetconfig/TargetConfigClientV2";
 import { ChanSwapClient } from "../chan-swap/ChanSwapClient";
+import { StakingPoolClientV2 } from "../staking-pool/StakingPoolClientV2";
 
 export const LUTSLOT: number = 2;
 export const LUT2SLOT: number = 20;
@@ -1491,6 +1492,7 @@ export class BoundPoolClientV2 {
 
     const tx = new Transaction().add(createLUTix, extendIxs);
     const txDig = await sendAndConfirmTransaction(connection, tx, [user]);
+    console.log(txDig);
 
     await sleep(1000);
 
@@ -1523,7 +1525,7 @@ export class BoundPoolClientV2 {
     };
   }
 
-  public async initQuoteAmmPool(args: GetInitQuoteAmmPoolTransactionArgs): Promise<StakingPoolClient> {
+  public async initQuoteAmmPool(args: GetInitQuoteAmmPoolTransactionArgs): Promise<StakingPoolClientV2> {
     console.log("initQuoteAmmPool Begin");
     // Get needed transactions
     const { goLiveTransaction, stakingId } = await this.getInitQuoteAmmPoolTransaction(args);
@@ -1551,7 +1553,7 @@ export class BoundPoolClientV2 {
       throw new Error("goLiveTxResult failed");
     }
 
-    const stakingPoolInstance = await StakingPoolClient.fromStakingPoolId({
+    const stakingPoolInstance = await StakingPoolClientV2.fromStakingPoolId({
       client: this.client,
       poolAccountAddressId: stakingId,
     });
@@ -1588,7 +1590,7 @@ export class BoundPoolClientV2 {
       throw new Error("goLiveTxResult failed");
     }
 
-    const stakingPoolInstance = await StakingPoolClient.fromStakingPoolId({
+    const stakingPoolInstance = await StakingPoolClientV2.fromStakingPoolId({
       client: this.client,
       poolAccountAddressId: stakingId,
     });

@@ -1,32 +1,36 @@
 import BN from "bn.js";
-import { adminSigner, airdrop, mintChan, payer } from "./helpers";
-import { client } from "./common";
-import { CHAN_TOKEN_INFO, memechan } from "./sol-sdk/config/config";
-import { SystemProgram } from "@solana/web3.js";
+import { PublicKey, SystemProgram, Keypair } from "@solana/web3.js";
 import { getOrCreateAssociatedTokenAccount } from "@solana/spl-token";
+import { MEMECHAN_PROGRAM_ID_V2, TOKEN_INFOS } from "../config/config";
+import { MemechanClientV2 } from "../MemechanClientV2";
+
+import { airdrop } from "../common/helpers";
 
 export class ChanSwapClient {
   static chanSwapId(): PublicKey {
-    return PublicKey.findProgramAddressSync([Buffer.from("chan_swap")], memechan.programId)[0];
+    return PublicKey.findProgramAddressSync([Buffer.from("chan_swap")], new PublicKey(MEMECHAN_PROGRAM_ID_V2))[0];
   }
 
   static chanSwapSigner(): PublicKey {
-    return PublicKey.findProgramAddressSync([Buffer.from("chan_swap_signer")], memechan.programId)[0];
+    return PublicKey.findProgramAddressSync(
+      [Buffer.from("chan_swap_signer")],
+      new PublicKey(MEMECHAN_PROGRAM_ID_V2),
+    )[0];
   }
 
-  static async new(num: number = 1, denom: number = 1000) {
-    const tcdata = await memechan.account.chanSwap.fetchNullable(ChanSwapClient.chanSwapId());
+  static async new(num: number = 1, denom: number = 1000, client: MemechanClientV2, payer: Keypair) {
+    const tcdata = await client.memechanProgram.account.chanSwap.fetchNullable(ChanSwapClient.chanSwapId());
 
     if (tcdata !== null) {
       return;
     }
 
-    await airdrop(adminSigner.publicKey);
+    await airdrop(payer.publicKey);
 
     const chanVault = await getOrCreateAssociatedTokenAccount(
       client.connection,
       payer,
-      new PublicKey(CHAN_TOKEN_INFO.address),
+      TOKEN_INFOS.CHAN.mint,
       ChanSwapClient.chanSwapSigner(),
       true,
     );
@@ -35,16 +39,16 @@ export class ChanSwapClient {
 
     await mintChan(chanVault.address, 10_000_000 * 10 ** 9);
 
-    await memechan.methods
+    await client.memechanProgram.methods
       .newChanSwap(new BN(num), new BN(denom))
       .accounts({
         chanSwap: ChanSwapClient.chanSwapId(),
         chanSwapSignerPda: ChanSwapClient.chanSwapSigner(),
         chanVault: chanVault.address,
-        sender: adminSigner.publicKey,
+        sender: payer.publicKey,
         systemProgram: SystemProgram.programId,
       })
-      .signers([adminSigner])
+      .signers([payer])
       .rpc({ skipPreflight: true });
   }
 }
