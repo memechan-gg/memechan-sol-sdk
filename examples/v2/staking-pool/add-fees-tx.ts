@@ -3,7 +3,7 @@ import { StakingPool as CodegenStakingPool } from "../../../src/schema/v2/codege
 import { BoundPoolClientV2, MEME_TOKEN_DECIMALS, StakingPoolClientV2, TOKEN_INFOS, TokenInfo } from "../../../src";
 import { PublicKey } from "@solana/web3.js";
 import { AmmPool } from "../../../src/meteora/AmmPool";
-import AmmImpl from "@mercurial-finance/dynamic-amm-sdk";
+import AmmImpl from "@0xunreal/dynamic-amm-sdk";
 import { NATIVE_MINT } from "@memechan/spl-token";
 
 // yarn tsx examples/v2/staking-pool/add-fees-tx.ts > add-fees-tx.txt 2>&1
