@@ -1,7 +1,8 @@
 {
   "name": "@avernikoz/memechan-sol-sdk",
   "description": "Typescript SDK for memechan.gg",
-  "version": "2.1.10",
+  "version": "2.1.11",
+  "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "directories": {
@@ -49,6 +50,12 @@
     "tweetnacl": "^1.0.3",
     "tweetnacl-util": "^0.15.1",
     "zod": "^3.23.8"
+  },
+  "peerDependencies": {
+    "@solana/spl-token": "^0.4.6"
+  },
+  "resolutions": {
+    "@solana/spl-token": "^0.4.6"
   },
   "devDependencies": {
     "@types/bn.js": "^5.1.5",
