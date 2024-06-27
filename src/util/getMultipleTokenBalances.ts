@@ -1,4 +1,4 @@
-import { getMultipleAccounts } from "@solana/spl-token";
+import { getMultipleAccounts } from "@memechan/spl-token";
 import { Connection, PublicKey } from "@solana/web3.js";
 
 export async function getMultipleTokenBalances(connection: Connection, addresses: PublicKey[]): Promise<bigint[]> {

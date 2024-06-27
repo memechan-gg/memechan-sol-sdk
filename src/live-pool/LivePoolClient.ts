@@ -1,5 +1,5 @@
 import { ApiPoolInfoV4, Liquidity, Percent, Token, TokenAmount, jsonInfo2PoolKeys } from "@raydium-io/raydium-sdk";
-import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
+import { TOKEN_PROGRAM_ID } from "@memechan/spl-token";
 import { Connection, PublicKey } from "@solana/web3.js";
 import BigNumber from "bignumber.js";
 import { MEMECHAN_MEME_TOKEN_DECIMALS } from "../config/config";

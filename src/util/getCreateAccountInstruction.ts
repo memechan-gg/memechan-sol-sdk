@@ -1,4 +1,4 @@
-import { TOKEN_PROGRAM_ID, createInitializeAccountInstruction } from "@solana/spl-token";
+import { TOKEN_PROGRAM_ID, createInitializeAccountInstruction } from "@memechan/spl-token";
 import {
   Commitment,
   Connection,

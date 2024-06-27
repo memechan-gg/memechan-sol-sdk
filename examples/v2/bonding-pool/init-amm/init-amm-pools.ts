@@ -3,7 +3,7 @@ import { PublicKey } from "@solana/web3.js";
 import { clientV2, payer } from "../../../common";
 import { BoundPoolClientV2 } from "../../../../src/bound-pool/BoundPoolClientV2";
 import { FEE_DESTINATION_ID, MEME_TOKEN_DECIMALS, StakingPoolClientV2, TOKEN_INFOS, TokenInfo } from "../../../../src";
-import { NATIVE_MINT } from "@solana/spl-token";
+import { NATIVE_MINT } from "@memechan/spl-token";
 import { ChanSwapClient } from "../../../../src/chan-swap/ChanSwapClient";
 import { Keypair } from "@solana/web3.js";
 

@@ -1,5 +1,5 @@
 import { Token } from "@raydium-io/raydium-sdk";
-import { TOKEN_PROGRAM_ID, getOrCreateAssociatedTokenAccount, mintTo } from "@solana/spl-token";
+import { TOKEN_PROGRAM_ID, getOrCreateAssociatedTokenAccount, mintTo } from "@memechan/spl-token";
 import {
   ComputeBudgetProgram,
   Connection,

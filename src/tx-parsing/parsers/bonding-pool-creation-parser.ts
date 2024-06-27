@@ -2,7 +2,7 @@ import { ParsedTransactionWithMeta, PublicKey } from "@solana/web3.js";
 import { IdlAccounts } from "@coral-xyz/anchor";
 import { MemechanClient } from "../../MemechanClient";
 import { MemechanSol } from "../../schema/types/memechan_sol";
-import { Mint, getMint } from "@solana/spl-token";
+import { Mint, getMint } from "@memechan/spl-token";
 
 type Pool = IdlAccounts<MemechanSol>["boundPool"];
 

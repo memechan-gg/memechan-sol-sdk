@@ -2,8 +2,8 @@ import { PublicKey } from "@solana/web3.js";
 import { AmmPool } from "../../../src/meteora/AmmPool";
 import { BoundPoolClientV2, MEME_TOKEN_DECIMALS, StakingPoolClientV2, TOKEN_INFOS, TokenInfo } from "../../../src";
 import { clientV2, payer } from "../../common";
-import AmmImpl from "@0xunreal/dynamic-amm-sdk";
-import { NATIVE_MINT } from "@solana/spl-token";
+import AmmImpl from "@mercurial-finance/dynamic-amm-sdk";
+import { NATIVE_MINT } from "@memechan/spl-token";
 
 // yarn tsx examples/v2/meteora/swap.ts
 (async () => {

@@ -1,4 +1,4 @@
-import { TOKEN_PROGRAM_ID, getAccount } from "@solana/spl-token";
+import { TOKEN_PROGRAM_ID, getAccount } from "@memechan/spl-token";
 import {
   AccountMeta,
   Connection,

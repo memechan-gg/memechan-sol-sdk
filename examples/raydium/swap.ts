@@ -1,5 +1,5 @@
 import { Percent, Token, TokenAmount } from "@raydium-io/raydium-sdk";
-import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
+import { TOKEN_PROGRAM_ID } from "@memechan/spl-token";
 import { MEMECHAN_MEME_TOKEN_DECIMALS, TOKEN_INFOS } from "../../src/config/config";
 import { swapOnlyAmm } from "../../src/raydium/swapOnlyAmm";
 import { client, connection, payer } from "../common";

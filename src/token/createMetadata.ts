@@ -1,6 +1,6 @@
 import { PublicKey, SYSVAR_RENT_PUBKEY, SystemProgram, Transaction, sendAndConfirmTransaction } from "@solana/web3.js";
 import { MemechanClient } from "../MemechanClient";
-import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
+import { TOKEN_PROGRAM_ID } from "@memechan/spl-token";
 import { CreateMetadataInfo } from "../api/types";
 import { uploadMetadataToIpfs } from "../api/uploadMetadataToIpfs";
 

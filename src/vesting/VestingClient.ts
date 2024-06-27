@@ -5,7 +5,7 @@ import {
   createAssociatedTokenAccountInstruction,
   getAssociatedTokenAddress,
   getAssociatedTokenAddressSync,
-} from "@solana/spl-token";
+} from "@memechan/spl-token";
 import { ComputeBudgetProgram, PublicKey, SystemProgram, Transaction } from "@solana/web3.js";
 import BigNumber from "bignumber.js";
 import BN from "bn.js";

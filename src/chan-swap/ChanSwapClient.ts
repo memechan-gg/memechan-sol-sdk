@@ -7,7 +7,7 @@ import {
   ComputeBudgetProgram,
   sendAndConfirmTransaction,
 } from "@solana/web3.js";
-import { getOrCreateAssociatedTokenAccount } from "@solana/spl-token";
+import { getOrCreateAssociatedTokenAccount } from "@memechan/spl-token";
 import { COMPUTE_UNIT_PRICE, MEMECHAN_PROGRAM_ID_V2, TOKEN_INFOS } from "../config/config";
 import { MemechanClientV2 } from "../MemechanClientV2";
 

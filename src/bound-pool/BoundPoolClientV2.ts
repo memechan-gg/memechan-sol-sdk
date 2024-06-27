@@ -1,5 +1,5 @@
 import { METADATA_PROGRAM_ID, Token } from "@raydium-io/raydium-sdk";
-import { TOKEN_PROGRAM_ID, getOrCreateAssociatedTokenAccount, mintTo } from "@solana/spl-token";
+import { TOKEN_PROGRAM_ID, getOrCreateAssociatedTokenAccount, mintTo } from "@memechan/spl-token";
 import {
   AddressLookupTableAccount,
   AddressLookupTableProgram,
@@ -83,10 +83,10 @@ import { MemechanClientV2 } from "../MemechanClientV2";
 import { MemeTicketClientV2 } from "../memeticket/MemeTicketClientV2";
 import { parseTxV2 } from "../tx-parsing/v2/parsingV2";
 import { getCreateMetadataTransactionV2 } from "../token/createMetadataV2";
-import * as utils from "@0xunreal/dynamic-amm-sdk/dist/cjs/src/amm/utils";
-import VaultImpl, { getVaultPdas } from "@0xunreal/vault-sdk";
-import { ASSOCIATED_PROGRAM_ID } from "@coral-xyz/anchor/dist/cjs/utils/token";
-import { FEE_OWNER, SEEDS } from "@0xunreal/dynamic-amm-sdk/dist/cjs/src/amm/constants";
+import * as utils from "@mercurial-finance/dynamic-amm-sdk/dist/esm/src/amm/utils";
+import VaultImpl, { getVaultPdas } from "@mercurial-finance/vault-sdk";
+import { ASSOCIATED_PROGRAM_ID } from "@coral-xyz/anchor/dist/esm/utils/token";
+import { FEE_OWNER, SEEDS } from "@mercurial-finance/dynamic-amm-sdk/dist/esm/src/amm/constants";
 import { BoundPoolClient } from "./BoundPoolClient";
 import { TargetConfigClientV2 } from "../targetconfig/TargetConfigClientV2";
 import { ChanSwapClient } from "../chan-swap/ChanSwapClient";

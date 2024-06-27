@@ -1,4 +1,4 @@
-import { NATIVE_MINT } from "@solana/spl-token";
+import { NATIVE_MINT } from "@memechan/spl-token";
 import { Transaction, PublicKey } from "@solana/web3.js";
 
 import { unwrapSOLInstruction } from "./unwrapSOLInstruction";
