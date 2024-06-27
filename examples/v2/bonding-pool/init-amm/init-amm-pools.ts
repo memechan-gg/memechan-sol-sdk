@@ -55,7 +55,6 @@ import { Keypair } from "@solana/web3.js";
       payer: payer,
       user: payer,
       tokenInfoA: memeTokenInfo,
-      tokenInfoB: TOKEN_INFOS.WSOL,
       tokenInfoB: TOKEN_INFOS.CHAN,
       memeVault: stakingPool.memeVault,
       quoteVault: stakingPool.quoteVault,
