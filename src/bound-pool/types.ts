@@ -126,6 +126,10 @@ export type GetInitChanPoolTransactionArgs = InitChanAmmPool & {
   transaction?: Transaction;
 };
 
+export type GetInitChanAmmPoolTransactionStaticArgs = GetInitChanPoolTransactionArgs & {
+  transaction?: Transaction;
+};
+
 export interface InitStakingPoolArgs {
   pool?: PublicKey;
   user: Keypair;

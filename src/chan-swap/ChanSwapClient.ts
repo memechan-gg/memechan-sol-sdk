@@ -1,7 +1,14 @@
 import BN from "bn.js";
-import { PublicKey, SystemProgram, Keypair } from "@solana/web3.js";
+import {
+  PublicKey,
+  SystemProgram,
+  Keypair,
+  Transaction,
+  ComputeBudgetProgram,
+  sendAndConfirmTransaction,
+} from "@solana/web3.js";
 import { getOrCreateAssociatedTokenAccount } from "@solana/spl-token";
-import { MEMECHAN_PROGRAM_ID_V2, TOKEN_INFOS } from "../config/config";
+import { COMPUTE_UNIT_PRICE, MEMECHAN_PROGRAM_ID_V2, TOKEN_INFOS } from "../config/config";
 import { MemechanClientV2 } from "../MemechanClientV2";
 
 // import { airdrop } from "../common/helpers";
@@ -18,7 +25,7 @@ export class ChanSwapClient {
     )[0];
   }
 
-  static async new(num: number = 1, denom: number = 1000, client: MemechanClientV2, payer: Keypair) {
+  static async new(num: number, denom: number, client: MemechanClientV2, payer: Keypair) {
     const tcdata = await client.memechanProgram.account.chanSwap.fetchNullable(ChanSwapClient.chanSwapId());
 
     if (tcdata !== null) {
@@ -39,7 +46,7 @@ export class ChanSwapClient {
 
     // await mintChan(chanVault.address, 10_000_000 * 10 ** 9);
 
-    await client.memechanProgram.methods
+    const newChanSwapIX = await client.memechanProgram.methods
       .newChanSwap(new BN(num), new BN(denom))
       .accounts({
         chanSwap: ChanSwapClient.chanSwapId(),
@@ -49,6 +56,18 @@ export class ChanSwapClient {
         systemProgram: SystemProgram.programId,
       })
       .signers([payer])
-      .rpc({ skipPreflight: true });
+      .instruction();
+
+    const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
+      microLamports: COMPUTE_UNIT_PRICE,
+    });
+    const tx = new Transaction().add(addPriorityFee, newChanSwapIX);
+    const initChanSwapTxResult = await sendAndConfirmTransaction(client.connection, tx, [payer], {
+      commitment: "confirmed",
+      preflightCommitment: "confirmed",
+      skipPreflight: true,
+    });
+
+    console.log("initChanSwapTxResult: ", initChanSwapTxResult);
   }
 }

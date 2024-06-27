@@ -1,6 +1,7 @@
 import { METADATA_PROGRAM_ID, Token } from "@raydium-io/raydium-sdk";
 import { TOKEN_PROGRAM_ID, getOrCreateAssociatedTokenAccount, mintTo } from "@solana/spl-token";
 import {
+  AddressLookupTableAccount,
   AddressLookupTableProgram,
   ComputeBudgetProgram,
   Connection,
@@ -35,6 +36,7 @@ import {
   GetBuyMemeTransactionOutput,
   GetBuyMemeTransactionStaticArgsV2,
   GetCreateNewBondingPoolAndTokenWithBuyMemeTransactionArgsV2,
+  GetInitChanAmmPoolTransactionStaticArgs,
   GetInitChanPoolTransactionArgs,
   GetInitQuoteAmmPoolTransactionArgs,
   GetInitQuoteAmmPoolTransactionStaticArgs,
@@ -44,7 +46,6 @@ import {
   GetSellMemeTransactionArgs,
   GetSellMemeTransactionArgsLegacy,
   GetSellMemeTransactionOutput,
-  InitChanAmmPool,
   InitStakingPoolArgsV2,
   InitStakingPoolResultV2,
   SellMemeArgs,
@@ -52,7 +53,7 @@ import {
   SwapYArgs,
 } from "./types";
 
-import { findProgramAddress, getLUTPDA } from "../common/helpers";
+import { findProgramAddress, sleep } from "../common/helpers";
 import {
   COMPUTE_UNIT_PRICE,
   DEFAULT_MAX_M,
@@ -1072,7 +1073,7 @@ export class BoundPoolClientV2 {
       SystemProgram.transfer({
         fromPubkey: user.publicKey,
         toPubkey: stakingSigner,
-        lamports: 9_000_000,
+        lamports: 40_000_000,
       }),
     );
     console.log("staking signer ", stakingSigner);
@@ -1256,7 +1257,7 @@ export class BoundPoolClientV2 {
       ],
     });
 
-    const tx = new Transaction().add(createLUTix, extendIxs);
+    const tx = new Transaction().add(addPriorityFee, createLUTix, extendIxs);
     const initMemeAmmPoolTxResult = await sendAndConfirmTransaction(connection, tx, [user], {
       commitment: "confirmed",
       preflightCommitment: "confirmed",
@@ -1266,15 +1267,18 @@ export class BoundPoolClientV2 {
     console.log("initMemeAmmPoolTxResult", initMemeAmmPoolTxResult);
 
     slot = await connection.getSlot("confirmed");
-    const lutAddr = getLUTPDA({
-      authority: admin,
-      recentSlot: slot,
-    });
+    // const lutAddr = getLUTPDA({
+    //   authority: admin,
+    //   recentSlot: slot,
+    // });
 
-    console.log(lutAddr);
+    // console.log(lutAddr);
 
     console.log("trying LUT");
-    const lookupTableAccount = (await connection.getAddressLookupTable(lutAddr)).value;
+    const lookupTableAccount = await BoundPoolClientV2.waitForLookupTableAccount(connection, LUTaddr);
+    // const lookupTableAccount = (await connection.getAddressLookupTable(lutAddr)).value;
+
+    console.log("lookupTableAccount", lookupTableAccount);
 
     const blockhash = await connection.getLatestBlockhash();
 
@@ -1295,22 +1299,39 @@ export class BoundPoolClientV2 {
     };
   }
 
-  public async getInitChanAmmPoolTransaction(args: GetInitChanPoolTransactionArgs): Promise<{
+  private static async waitForLookupTableAccount(
+    connection: Connection,
+    lutAddr: PublicKey,
+    interval: number = 2000,
+  ): Promise<AddressLookupTableAccount> {
+    let retries = 0;
+    const maxRetries = 10;
+    while (retries < maxRetries) {
+      const lookupTableAccount = (await connection.getAddressLookupTable(lutAddr)).value;
+      if (lookupTableAccount) {
+        return lookupTableAccount;
+      }
+      await sleep(interval);
+      retries++;
+    }
+    throw new Error(`Lookup table account not found after ${maxRetries} retries`);
+  }
+
+  public static async getInitChanAmmPoolTransaction(args: GetInitChanAmmPoolTransactionStaticArgs): Promise<{
     goLiveTransaction: VersionedTransaction;
     stakingId: PublicKey;
   }> {
-    const { user, memeVault, transaction = new Transaction(), tokenInfoA, tokenInfoB, chanSwap } = args;
-    const stakingId = BoundPoolClient.findStakingPda(tokenInfoA.mint, this.client.memechanProgram.programId);
-    const stakingSigner = StakingPoolClient.findSignerPda(stakingId, this.client.memechanProgram.programId);
+    const { user, memeVault, transaction = new Transaction(), tokenInfoA, tokenInfoB, chanSwap, client } = args;
+    const stakingId = BoundPoolClient.findStakingPda(tokenInfoA.mint, client.memechanProgram.programId);
+    const stakingSigner = StakingPoolClient.findSignerPda(stakingId, client.memechanProgram.programId);
 
-    // transaction.add(
-    //   SystemProgram.transfer({
-    //     fromPubkey: user.publicKey,
-    //     toPubkey: stakingSigner,
-    //     lamports: 2_000_000_000,
-    //   }),
-    // );
-    // console.log("staking signer ", stakingSigner);
+    transaction.add(
+      SystemProgram.transfer({
+        fromPubkey: user.publicKey,
+        toPubkey: stakingSigner,
+        lamports: 40_000_000,
+      }),
+    );
 
     const modifyComputeUnits = ComputeBudgetProgram.setComputeUnitLimit({
       units: 500000,
@@ -1319,13 +1340,13 @@ export class BoundPoolClientV2 {
     transaction.add(modifyComputeUnits);
 
     const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
-      microLamports: 5000000,
+      microLamports: COMPUTE_UNIT_PRICE,
     });
 
     transaction.add(addPriorityFee);
 
     const tradeFeeBps = new BN(100);
-    const { connection } = this.client;
+    const { connection } = client;
 
     const { vaultProgram, ammProgram } = utils.createProgram(connection);
 
@@ -1366,8 +1387,22 @@ export class BoundPoolClientV2 {
       bVaultLpMint = bVaultAccount.lpMint; // Old vault doesn't have lp mint pda
     }
 
-    console.log("2", preInstructions[0].programId.toBase58());
-    console.log(await sendAndConfirmTransaction(connection, new Transaction().add(...preInstructions), [user]));
+    if (preInstructions.length > 0) {
+      console.log("2", preInstructions[0].programId.toBase58());
+
+      const txResult = await sendAndConfirmTransaction(
+        client.connection,
+        new Transaction().add(...preInstructions),
+        [user],
+        {
+          commitment: "confirmed",
+          skipPreflight: true,
+          preflightCommitment: "confirmed",
+        },
+      );
+
+      console.log("2 txResult", txResult);
+    }
 
     const poolPubkey = utils.derivePoolAddress(
       connection,
@@ -1411,12 +1446,12 @@ export class BoundPoolClientV2 {
     const escrowAta = await utils.getAssociatedTokenAccount(lpMint, lockEscrowPK);
     console.log(escrowAta);
 
-    const fetchedChanSwap = await this.client.memechanProgram.account.chanSwap.fetch(chanSwap);
+    const fetchedChanSwap = await client.memechanProgram.account.chanSwap.fetch(chanSwap);
 
-    const staking = await this.client.memechanProgram.account.stakingPool.fetch(stakingId);
+    const staking = await client.memechanProgram.account.stakingPool.fetch(stakingId);
 
     console.log("7");
-    const goLiveInstruction = await this.client.memechanProgram.methods
+    const goLiveInstruction = await client.memechanProgram.methods
       .initChanAmmPool()
       .accounts({
         adminTokenAFee,
@@ -1468,9 +1503,7 @@ export class BoundPoolClientV2 {
     transaction.add(goLiveInstruction);
 
     const admin = user.publicKey;
-
-    let slot = await connection.getSlot("confirmed");
-
+    const slot = await connection.getSlot("confirmed");
     const [createLUTix, LUTaddr] = AddressLookupTableProgram.createLookupTable({
       authority: admin,
       payer: admin,
@@ -1485,8 +1518,8 @@ export class BoundPoolClientV2 {
         SystemProgram.programId,
         TOKEN_PROGRAM_ID,
         ASSOCIATED_PROGRAM_ID,
-        this.client.memechanProgram.programId,
-        TargetConfigClientV2.findTargetConfigPda(TOKEN_INFOS.WSOL.mint, this.client.memechanProgram.programId),
+        client.memechanProgram.programId,
+        TargetConfigClientV2.findTargetConfigPda(TOKEN_INFOS.WSOL.mint, client.memechanProgram.programId),
         poolPubkey,
         user.publicKey,
         FEE_OWNER,
@@ -1498,21 +1531,20 @@ export class BoundPoolClientV2 {
       ],
     });
 
-    const tx = new Transaction().add(createLUTix, extendIxs);
-    const txDig = await sendAndConfirmTransaction(connection, tx, [user]);
-    console.log(txDig);
-
-    slot = await connection.getSlot("confirmed");
-
-    const lutAddr = getLUTPDA({
-      authority: admin,
-      recentSlot: slot,
+    const tx = new Transaction().add(addPriorityFee, createLUTix, extendIxs);
+    const initChanAmmPoolTxResult = await sendAndConfirmTransaction(connection, tx, [user], {
+      commitment: "confirmed",
+      preflightCommitment: "confirmed",
+      skipPreflight: true,
     });
 
-    console.log(lutAddr);
+    console.log("initChanAmmPoolTxResult", initChanAmmPoolTxResult);
 
     console.log("trying LUT");
-    const lookupTableAccount = (await connection.getAddressLookupTable(lutAddr)).value;
+    const lookupTableAccount = await BoundPoolClientV2.waitForLookupTableAccount(connection, LUTaddr);
+    // const lookupTableAccount = (await connection.getAddressLookupTable(lutAddr)).value;
+
+    console.log("lookupTableAccount", lookupTableAccount);
 
     const blockhash = await connection.getLatestBlockhash();
 
@@ -1609,11 +1641,48 @@ export class BoundPoolClientV2 {
     return stakingPoolInstance;
   }
 
-  public async initChanAmmPool(args: InitChanAmmPool) {
+  public static async initChanAmmPool(args: GetInitChanAmmPoolTransactionStaticArgs) {
+    console.log("initChanAmmPool Begin");
+    const { client } = args;
+    // Get needed transactions
+    const { goLiveTransaction, stakingId } = await BoundPoolClientV2.getInitChanAmmPoolTransaction(args);
+
+    console.log("goLive2 1");
+    // Send transaction to go live
+    const goLiveSignature = await client.connection.sendTransaction(goLiveTransaction, { skipPreflight: true });
+
+    console.log("go live signature:", goLiveSignature);
+
+    // Check go live succeeded
+    const { blockhash: blockhash1, lastValidBlockHeight: lastValidBlockHeight1 } =
+      await client.connection.getLatestBlockhash("confirmed");
+    const goLiveTxResult = await client.connection.confirmTransaction(
+      {
+        signature: goLiveSignature,
+        blockhash: blockhash1,
+        lastValidBlockHeight: lastValidBlockHeight1,
+      },
+      "confirmed",
+    );
+
+    if (goLiveTxResult.value.err) {
+      console.error("goLiveTxResult:", goLiveTxResult);
+      throw new Error("goLiveTxResult failed");
+    }
+
+    const stakingPoolInstance = await StakingPoolClientV2.fromStakingPoolId({
+      client: client,
+      poolAccountAddressId: stakingId,
+    });
+
+    return stakingPoolInstance;
+  }
+
+  public async initChanAmmPool(args: GetInitChanPoolTransactionArgs) {
     console.log("initChanAmmPool Begin");
     // Get needed transactions
 
-    const { goLiveTransaction, stakingId } = await this.getInitChanAmmPoolTransaction(args);
+    const { goLiveTransaction, stakingId } = await BoundPoolClientV2.getInitChanAmmPoolTransaction(args);
 
     console.log("goLive2 1");
     // Send transaction to go live
