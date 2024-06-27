@@ -1,12 +1,14 @@
 import { PublicKey } from "@solana/web3.js";
 import { StakingPool as CodegenStakingPool } from "../../../src/schema/v2/codegen/accounts/StakingPool";
-import { MemeTicketClientV2, StakingPoolClientV2 } from "../../../src";
+import { BoundPoolClientV2, MemeTicketClientV2, StakingPoolClientV2 } from "../../../src";
 import { clientV2, connection, payer } from "../../common";
 
 // yarn tsx examples/v2/staking-pool/get-available-withdraw-fees-amount-tx.ts > withdraw-fees-amount-tx.txt 2>&1
 export const getAvailableWithdrawFeesAmount = async () => {
   // Get staking pool
-  const stakingPoolAddress = new PublicKey("EQUjkMoKSnSxDLmJsVP9XpaRKHd46m4yfjERjCrFoehR");
+  const memeMint = new PublicKey("G6wyDdcDn6pJuPbferviyZh6JFgxDoyasYX8MsorJPoK");
+  const stakingPoolAddress = BoundPoolClientV2.findStakingPda(memeMint, clientV2.memechanProgram.programId);
+
   console.log("Got here");
   const stakingPool = await StakingPoolClientV2.fromStakingPoolId({
     client: clientV2,
@@ -19,8 +21,16 @@ export const getAvailableWithdrawFeesAmount = async () => {
   const fetchedStakingPool = await CodegenStakingPool.fetch(connection, stakingPoolAddress);
   console.log("fetchedStakingPool:", fetchedStakingPool?.toJSON());
 
+  const tickets = await MemeTicketClientV2.fetchAvailableTicketsByUser2(
+    fetchedStakingPool!.pool,
+    clientV2,
+    payer.publicKey,
+  );
+
+  console.log("tickets:", tickets);
+
   // Get meme ticket
-  const memeTicketId = new PublicKey("wohszBLTPiqRxmSEbmqBPhmkjFfAfQTJ1v2U1pXNXkd");
+  const memeTicketId = tickets.tickets[0].id;
   const memeTicket = new MemeTicketClientV2(memeTicketId, clientV2);
 
   // call addfees to accumulate fees

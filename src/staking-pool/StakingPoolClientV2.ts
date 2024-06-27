@@ -483,6 +483,14 @@ export class StakingPoolClientV2 {
       transaction: tx,
     });
 
+    const chanAccountPublicKey = await ensureAssociatedTokenAccountWithIX({
+      connection: this.client.connection,
+      payer: args.user,
+      mint: TOKEN_INFOS.CHAN.mint,
+      owner: args.user,
+      transaction: tx,
+    });
+
     const withdrawFeesInstruction = await this.client.memechanProgram.methods
       .withdrawFees()
       .accounts({
@@ -493,6 +501,8 @@ export class StakingPoolClientV2 {
         staking: this.id,
         userMeme: memeAccountPublicKey,
         userQuote: quoteAccountPublicKey,
+        userChan: chanAccountPublicKey,
+        chanVault: stakingInfo.chanVault,
         signer: args.user,
         tokenProgram: TOKEN_PROGRAM_ID,
       })
