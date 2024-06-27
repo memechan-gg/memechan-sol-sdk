@@ -28,7 +28,7 @@ export const goLiveExact = async () => {
 
   const quoteAccount = await getAccount(client.connection, stakingPool.quoteVault);
 
-  const [a] = await BoundPoolClient.goLive({
+  await BoundPoolClient.goLive({
     payer: payer,
     user: payer,
     client,
