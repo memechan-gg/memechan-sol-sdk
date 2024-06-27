@@ -1,4 +1,4 @@
-import { TOKEN_PROGRAM_ID, getAccount, getOrCreateAssociatedTokenAccount } from "@solana/spl-token";
+import { TOKEN_PROGRAM_ID, getAccount, getOrCreateAssociatedTokenAccount } from "@memechan/spl-token";
 import {
   AccountMeta,
   Connection,
@@ -50,11 +50,11 @@ import {
   deriveLockEscrowPda,
   derivePoolAddress,
   getAssociatedTokenAccount,
-} from "@0xunreal/dynamic-amm-sdk/dist/cjs/src/amm/utils";
-import VaultImpl, { getVaultPdas } from "@0xunreal/vault-sdk";
+} from "@mercurial-finance/dynamic-amm-sdk/dist/cjs/src/amm/utils";
+import VaultImpl, { getVaultPdas } from "@mercurial-finance/vault-sdk";
 
 import { MEMO_PROGRAM_ID } from "@raydium-io/raydium-sdk";
-import { SEEDS } from "@0xunreal/dynamic-amm-sdk/dist/cjs/src/amm/constants";
+import { SEEDS } from "@mercurial-finance/dynamic-amm-sdk/dist/cjs/src/amm/constants";
 
 export class StakingPoolClientV2 {
   constructor(

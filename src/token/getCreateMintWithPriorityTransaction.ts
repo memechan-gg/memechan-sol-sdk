@@ -1,4 +1,4 @@
-import { MINT_SIZE, TOKEN_PROGRAM_ID, createInitializeMintInstruction } from "@solana/spl-token";
+import { MINT_SIZE, TOKEN_PROGRAM_ID, createInitializeMintInstruction } from "@memechan/spl-token";
 import { ComputeBudgetProgram, Connection, Keypair, PublicKey, SystemProgram, Transaction } from "@solana/web3.js";
 import { COMPUTE_UNIT_PRICE } from "../config/config";
 

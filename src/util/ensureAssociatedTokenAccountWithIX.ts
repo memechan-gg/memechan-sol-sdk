@@ -5,7 +5,7 @@ import {
   getAssociatedTokenAddressSync,
   TOKEN_PROGRAM_ID,
   ASSOCIATED_TOKEN_PROGRAM_ID,
-} from "@solana/spl-token";
+} from "@memechan/spl-token";
 
 export interface EnsureAssociatedTokenAccountWithIXArgs {
   connection: Connection;

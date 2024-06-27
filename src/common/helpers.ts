@@ -1,7 +1,7 @@
 // import { Program, AnchorProvider, setProvider, BN, workspace } from "@coral-xyz/anchor";
 // import { Connection, PublicKey } from "@solana/web3.js";
 // import { MemechanSol } from "./types/memechan_sol";
-// import { NATIVE_MINT, createWrappedNativeAccount } from "@solana/spl-token";
+// import { NATIVE_MINT, createWrappedNativeAccount } from "@memechan/spl-token";
 // import { Amm } from "./types/amm";
 
 import { AddressLookupTableProgram, Connection, PublicKey } from "@solana/web3.js";

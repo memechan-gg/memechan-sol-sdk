@@ -1,4 +1,4 @@
-import * as splToken from "@solana/spl-token";
+import * as splToken from "@memechan/spl-token";
 import { PublicKey, Connection, Keypair } from "@solana/web3.js";
 import { MEMECHAN_MEME_TOKEN_DECIMALS } from "../config/config";
 

@@ -1,4 +1,4 @@
-import { getAssociatedTokenAddressSync } from "@solana/spl-token";
+import { getAssociatedTokenAddressSync } from "@memechan/spl-token";
 import { Connection, PublicKey } from "@solana/web3.js";
 
 export async function getTokenBalanceForWallet(connection: Connection, mint: PublicKey, wallet: PublicKey) {

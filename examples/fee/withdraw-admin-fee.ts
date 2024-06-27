@@ -2,7 +2,7 @@ import { sendAndConfirmTransaction, PublicKey, Transaction, ComputeBudgetProgram
 import { withdrawAdminFee } from "../../src/schema/codegen/instructions";
 import { BoundPoolClient, COMPUTE_UNIT_PRICE } from "../../src";
 import { client, payer } from "../common";
-import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
+import { TOKEN_PROGRAM_ID } from "@memechan/spl-token";
 
 // BE AWARE! `payer` must be admin keypair for calling this endpoint
 

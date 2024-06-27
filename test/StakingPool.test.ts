@@ -7,7 +7,7 @@ import { DUMMY_TOKEN_METADATA, admin, client, payer } from "./common/common";
 import { MemeTicketClient } from "../src/memeticket/MemeTicketClient";
 import { swapOnlyAmm } from "../src/raydium/swapOnlyAmm";
 import { Percent, TokenAmount, Token } from "@raydium-io/raydium-sdk";
-import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
+import { TOKEN_PROGRAM_ID } from "@memechan/spl-token";
 import { PublicKey } from "@solana/web3.js";
 import { getWalletTokenAccount } from "../src/util";
 
