@@ -39,7 +39,7 @@ import { NATIVE_MINT } from "@solana/spl-token";
     ammImplQuote,
   );
 
-  await ammPool.swap(payer, 0.0001, 1, clientV2.connection);
+  await ammPool.swap(payer, 0.001, 1, clientV2.connection);
 
   console.debug("swap finished");
 })();
