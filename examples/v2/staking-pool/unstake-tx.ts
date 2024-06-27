@@ -1,14 +1,14 @@
 import { PublicKey, sendAndConfirmTransaction } from "@solana/web3.js";
-import { MemeTicketClientV2, StakingPoolClientV2 } from "../../../src";
+import { BoundPoolClientV2, MemeTicketClientV2, StakingPoolClientV2 } from "../../../src";
 import { clientV2, connection, payer } from "../../common";
 import { StakingPool as CodegenStakingPool } from "../../../src/schema/v2/codegen/accounts/StakingPool";
 import { BN } from "bn.js";
 
-// yarn tsx examples/staking-pool/unstake-tx.ts > unstake-tx.txt 2>&1
+// yarn tsx examples/v2/staking-pool/unstake-tx.ts > unstake-tx.txt 2>&1
 export const unstake = async () => {
   try {
-    const boundPoolAddress = new PublicKey("2paxDkj5zFR3DtMVZtmTSbkMYZwFtVZnq2Xv1WFHqgPo");
-    const stakingPoolAddress = new PublicKey("sh5hozk6bENHvG4J5zrqW2S5eKjp68DRPZodCRLSkJU");
+    const memeMint = new PublicKey("G6wyDdcDn6pJuPbferviyZh6JFgxDoyasYX8MsorJPoK");
+    const stakingPoolAddress = BoundPoolClientV2.findStakingPda(memeMint, clientV2.memechanProgram.programId);
 
     // Get staking pool
     const stakingPool = await StakingPoolClientV2.fromStakingPoolId({
@@ -24,7 +24,7 @@ export const unstake = async () => {
 
     // Get all user tickets
     const { tickets } = await MemeTicketClientV2.fetchAvailableTicketsByUser2(
-      boundPoolAddress,
+      stakingPool.pool,
       clientV2,
       payer.publicKey,
     );
@@ -72,7 +72,7 @@ export const unstake = async () => {
     });
 
     console.log("payer: " + payer.publicKey.toBase58());
-    return;
+    // return;
     const signature = await sendAndConfirmTransaction(clientV2.connection, transaction, [payer], {
       commitment: "confirmed",
       skipPreflight: true,
