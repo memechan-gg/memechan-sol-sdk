@@ -6,7 +6,7 @@ import { StakingPoolClientV2 } from "../../../src";
 export async function fetch() {
   const stakingPool = await StakingPoolClientV2.fromStakingPoolId({
     client: clientV2,
-    poolAccountAddressId: new PublicKey("EQUjkMoKSnSxDLmJsVP9XpaRKHd46m4yfjERjCrFoehR"),
+    poolAccountAddressId: new PublicKey("BdJgoZcnGVEoH9zkudujF33oXZbzFbYVQpwtVznfkV87"),
   });
   console.log("stakingPool:", stakingPool);
 }
