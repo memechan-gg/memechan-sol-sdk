@@ -1334,7 +1334,7 @@ export class BoundPoolClientV2 {
     );
 
     const modifyComputeUnits = ComputeBudgetProgram.setComputeUnitLimit({
-      units: 500000,
+      units: 600000,
     });
 
     transaction.add(modifyComputeUnits);
