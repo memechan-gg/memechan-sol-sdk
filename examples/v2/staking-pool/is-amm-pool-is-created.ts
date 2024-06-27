@@ -12,7 +12,7 @@ export async function fetch() {
   //   console.debug("isPoolCreated: ", isPoolCreated);
 
   // false
-  const memeMintPubkey = new PublicKey("wohszBLTPiqRxmSEbmqBPhmkjFfAfQTJ1v2U1pXNXkd");
+  const memeMintPubkey = new PublicKey("G6wyDdcDn6pJuPbferviyZh6JFgxDoyasYX8MsorJPoK");
   const isPoolCreated = await StakingPoolClientV2.isAmmPoolIsCreated({
     connection: clientV2.connection,
     memeMintPubkey,

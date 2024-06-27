@@ -18,7 +18,7 @@ import {
   COMPUTE_UNIT_PRICE,
   MAX_MEME_TOKENS,
   MEMECHAN_FEE_WALLET_ID,
-  MEMECHAN_PROGRAM_ID,
+  MEMECHAN_PROGRAM_ID_V2,
   MEME_TOKEN_DECIMALS,
   TOKEN_INFOS,
 } from "../config/config";
@@ -795,7 +795,7 @@ export class StakingPoolClientV2 {
     connection: Connection;
     memeMintPubkey: PublicKey;
   }): Promise<boolean> {
-    const memechanProgramPubkey = new PublicKey(MEMECHAN_PROGRAM_ID);
+    const memechanProgramPubkey = new PublicKey(MEMECHAN_PROGRAM_ID_V2);
     const stakingPda = BoundPoolClientV2.findStakingPda(memeMintPubkey, memechanProgramPubkey);
     const stakingInfo = await StakingPool.fetch(connection, stakingPda);
 
