@@ -29,24 +29,24 @@ import { Keypair } from "@solana/web3.js";
     targetConfigV2: NATIVE_MINT,
   });
 
-  try {
-    const initQuoteAmmPoolResult = await BoundPoolClientV2.initQuoteAmmPool({
-      payer: payer,
-      user: payer,
-      tokenInfoA: memeTokenInfo,
-      tokenInfoB: TOKEN_INFOS.WSOL,
-      memeVault: stakingPool.memeVault,
-      quoteVault: stakingPool.quoteVault,
-      client: clientV2,
-      feeDestinationWalletAddress: new PublicKey(FEE_DESTINATION_ID),
-    });
-    console.log("initQuoteAmmPool result: ", initQuoteAmmPoolResult);
-  } catch (e) {
-    console.error("initQuoteAmmPool error: ", e);
-  }
+  // try {
+  //   const initQuoteAmmPoolResult = await BoundPoolClientV2.initQuoteAmmPool({
+  //     payer: payer,
+  //     user: payer,
+  //     tokenInfoA: memeTokenInfo,
+  //     tokenInfoB: TOKEN_INFOS.WSOL,
+  //     memeVault: stakingPool.memeVault,
+  //     quoteVault: stakingPool.quoteVault,
+  //     client: clientV2,
+  //     feeDestinationWalletAddress: new PublicKey(FEE_DESTINATION_ID),
+  //   });
+  //   console.log("initQuoteAmmPool result: ", initQuoteAmmPoolResult);
+  // } catch (e) {
+  //   console.error("initQuoteAmmPool error: ", e);
+  // }
 
   // const adminSecretKey =
-  //   "";
+  //   "[243,209,26,170,233,220,87,246,186,249,184,131,192,150,226,199,18,71,26,246,200,191,25,134,244,44,8,42,32,11,185,194,110,166,26,137,37,31,69,91,254,102,98,209,147,249,231,211,203,50,49,57,51,108,131,241,247,65,131,158,141,92,105,228]";
   // const adminPayer = Keypair.fromSecretKey(Buffer.from(JSON.parse(adminSecretKey)));
   // await ChanSwapClient.new(45_000, 1, clientV2, adminPayer);
 
