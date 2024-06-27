@@ -3,8 +3,10 @@
     "sourceMap": false,
     "removeComments": true,
     "declaration": true,
-    "declarationDir": "dist",
-    "rootDir": "./src"
+    "declarationDir": "dist/types",
+    "rootDir": "./src",
+    "module": "ESNext",
+    "target": "ESNext"
   },
   "compileOnSave": true,
   "include": ["src", "eslint.config.js"],
