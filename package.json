@@ -1,7 +1,7 @@
 {
   "name": "@avernikoz/memechan-sol-sdk",
   "description": "Typescript SDK for memechan.gg",
-  "version": "99.1.10",
+  "version": "99.1.11",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "directories": {
@@ -13,6 +13,9 @@
   "node": "v20",
   "engines": {
     "node": "20"
+  },
+  "resolutions": {
+    "@solana/spl-token": "^0.4.6"
   },
   "scripts": {
     "test": "jest test/index.test.ts",
