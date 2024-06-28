@@ -5,18 +5,16 @@
     "outDir": "dist",
     "sourceMap": true,
     "removeComments": false,
-    "strict": true,
+    "strict": false,
     "module": "ESNext",
     "target": "ESNext",
     "checkJs": false,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "moduleResolution": "Node",
+    "moduleResolution": "Bundler",
     "resolveJsonModule": true,
     "allowJs": true,
-    "paths": {
-      "@solana/spl-token": ["./node_modules/@solana/spl-token"],
-    }
+    "typeRoots": ["./node_modules/@types", "./typings"]
   },
   "compileOnSave": true,
   "include": ["env.d.ts", "src", "examples", "test", "jest.config.js"],
