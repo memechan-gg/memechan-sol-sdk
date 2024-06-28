@@ -1,7 +1,7 @@
 {
   "name": "@avernikoz/memechan-sol-sdk",
   "description": "Typescript SDK for memechan.gg",
-  "version": "99.1.10",
+  "version": "2.3.1",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "directories": {
@@ -50,6 +50,9 @@
     "tweetnacl-util": "^0.15.1",
     "zod": "^3.23.8"
   },
+  "resolutions": {
+    "@solana/spl-token": "^0.4.6"
+  },
   "devDependencies": {
     "@types/bn.js": "^5.1.5",
     "@types/jest": "^29.5.12",
@@ -80,5 +83,6 @@
   "bugs": {
     "url": "https://github.com/memechan-gg/memechan-sol/issues"
   },
-  "homepage": "https://github.com/memechan-gg/memechan-sol#readme"
+  "homepage": "https://github.com/memechan-gg/memechan-sol#readme",
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
 }
