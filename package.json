@@ -35,7 +35,7 @@
     "@aws-crypto/sha256-browser": "^5.2.0",
     "@aws-sdk/types": "^3.577.0",
     "@coral-xyz/anchor": "0.29.0",
-    "@mercurial-finance/dynamic-amm-sdk": "^0.4.21",
+    "@mercurial-finance/dynamic-amm-sdk": "^0.4.23",
     "@mercurial-finance/vault-sdk": "^0.5.3",
     "@metaplex-foundation/mpl-token-metadata": "^3.2.1",
     "@metaplex-foundation/umi": "^0.9.1",
@@ -83,5 +83,6 @@
   "bugs": {
     "url": "https://github.com/memechan-gg/memechan-sol/issues"
   },
-  "homepage": "https://github.com/memechan-gg/memechan-sol#readme"
+  "homepage": "https://github.com/memechan-gg/memechan-sol#readme",
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
 }
