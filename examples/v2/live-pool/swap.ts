@@ -5,7 +5,7 @@ import { clientV2, payer } from "../../common";
 import AmmImpl from "@mercurial-finance/dynamic-amm-sdk";
 import { NATIVE_MINT } from "@solana/spl-token";
 
-// yarn tsx examples/v2/meteora/swap.ts
+// yarn tsx examples/v2/live-pool/swap.ts
 (async () => {
   const memeMint = new PublicKey("G6wyDdcDn6pJuPbferviyZh6JFgxDoyasYX8MsorJPoK");
   const stakingId = BoundPoolClientV2.findStakingPda(memeMint, clientV2.memechanProgram.programId);
