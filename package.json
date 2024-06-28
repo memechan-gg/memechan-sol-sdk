@@ -14,9 +14,6 @@
   "engines": {
     "node": "20"
   },
-  "resolutions": {
-    "@solana/spl-token": "^0.4.6"
-  },
   "scripts": {
     "test": "jest test/index.test.ts",
     "audit": "yarn audit --groups dependencies",
@@ -35,7 +32,7 @@
     "@aws-crypto/sha256-browser": "^5.2.0",
     "@aws-sdk/types": "^3.577.0",
     "@coral-xyz/anchor": "0.29.0",
-    "@mercurial-finance/dynamic-amm-sdk": "^0.4.23",
+    "@mercurial-finance/dynamic-amm-sdk": "^0.4.21",
     "@mercurial-finance/vault-sdk": "^0.5.3",
     "@metaplex-foundation/mpl-token-metadata": "^3.2.1",
     "@metaplex-foundation/umi": "^0.9.1",
