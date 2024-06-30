@@ -5,6 +5,5 @@
   "clean": true,
   "dts": true,
   "outDir": "dist",
-  "tsconfig": "./tsconfig.production.json",
-  "format": ["esm"]
+  "tsconfig": "./tsconfig.production.json"
 }
