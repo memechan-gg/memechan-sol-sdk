@@ -83,7 +83,7 @@ import { MemechanClientV2 } from "../MemechanClientV2";
 import { MemeTicketClientV2 } from "../memeticket/MemeTicketClientV2";
 import { parseTxV2 } from "../tx-parsing/v2/parsingV2";
 import { getCreateMetadataTransactionV2 } from "../token/createMetadataV2";
-import * as utils from "@mercurial-finance/dynamic-amm-sdk/dist/esm/src/amm/utils";
+import * as utils from "@mercurial-finance/dynamic-amm-sdk/dist/esm/src/amm/utils.js";
 import VaultImpl, { getVaultPdas } from "@mercurial-finance/vault-sdk";
 import { ASSOCIATED_PROGRAM_ID } from "@coral-xyz/anchor/dist/esm/utils/token";
 import { FEE_OWNER, SEEDS } from "@mercurial-finance/dynamic-amm-sdk/dist/esm/src/amm/constants";
