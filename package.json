@@ -1,7 +1,7 @@
 {
   "name": "@avernikoz/memechan-sol-sdk",
   "description": "Typescript SDK for memechan.gg",
-  "version": "99.1.16",
+  "version": "99.1.17",
   "main": "dist/index.js",
   "type": "module",
   "types": "dist/index.d.ts",

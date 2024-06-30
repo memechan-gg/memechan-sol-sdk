@@ -50,11 +50,11 @@ import {
   deriveLockEscrowPda,
   derivePoolAddress,
   getAssociatedTokenAccount,
-} from "@mercurial-finance/dynamic-amm-sdk/dist/esm/src/amm/utils";
+} from "@mercurial-finance/dynamic-amm-sdk/dist/esm/src/amm/utils.js";
 import VaultImpl, { getVaultPdas } from "@mercurial-finance/vault-sdk";
 
 import { MEMO_PROGRAM_ID } from "@raydium-io/raydium-sdk";
-import { SEEDS } from "@mercurial-finance/dynamic-amm-sdk/dist/esm/src/amm/constants";
+import { SEEDS } from "@mercurial-finance/dynamic-amm-sdk/dist/esm/src/amm/constants.js";
 
 export class StakingPoolClientV2 {
   constructor(
