@@ -45,13 +45,16 @@ import { addUnwrapSOLInstructionIfNativeMint } from "../util/addUnwrapSOLInstruc
 import { getTokenInfoByMint } from "../config/helpers";
 import { TokenInfo } from "../config/types";
 import { AmmPool } from "../meteora/AmmPool";
-import pkg from "@mercurial-finance/dynamic-amm-sdk/dist/esm/src/amm/utils.js";
+import {
+  getAssociatedTokenAccount,
+  derivePoolAddress,
+  createProgram,
+} from "@mercurial-finance/dynamic-amm-sdk/dist/esm/src/amm/utils.js";
 import VaultImpl, { getVaultPdas } from "@mercurial-finance/vault-sdk";
 
 import { MEMO_PROGRAM_ID } from "@raydium-io/raydium-sdk";
 import pkgs from "@mercurial-finance/dynamic-amm-sdk/dist/esm/src/amm/constants.js";
 
-const { createProgram, derivePoolAddress, getAssociatedTokenAccount } = pkg;
 const { SEEDS } = pkgs;
 export class StakingPoolClientV2 {
   constructor(

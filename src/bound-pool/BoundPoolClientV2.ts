@@ -83,7 +83,12 @@ import { MemechanClientV2 } from "../MemechanClientV2";
 import { MemeTicketClientV2 } from "../memeticket/MemeTicketClientV2";
 import { parseTxV2 } from "../tx-parsing/v2/parsingV2";
 import { getCreateMetadataTransactionV2 } from "../token/createMetadataV2";
-import * as utils from "@mercurial-finance/dynamic-amm-sdk/dist/esm/src/amm/utils.js";
+import {
+  getAssociatedTokenAccount,
+  derivePoolAddress,
+  createProgram,
+  deriveMintMetadata,
+} from "@mercurial-finance/dynamic-amm-sdk/dist/esm/src/amm/utils.js";
 import VaultImpl, { getVaultPdas } from "@mercurial-finance/vault-sdk";
 import pkg from "@coral-xyz/anchor/dist/esm/utils/token.js";
 import pkgm from "@mercurial-finance/dynamic-amm-sdk/dist/esm/src/amm/constants.js";
@@ -1095,7 +1100,7 @@ export class BoundPoolClientV2 {
 
     const tradeFeeBps = new BN(100);
 
-    const { vaultProgram, ammProgram } = utils.createProgram(connection);
+    const { vaultProgram, ammProgram } = createProgram(connection);
 
     const tokenAMint = tokenInfoA.mint;
     const tokenBMint = tokenInfoB.mint;
@@ -1150,7 +1155,7 @@ export class BoundPoolClientV2 {
 
       console.log("2 txResult", txResult);
     }
-    const poolPubkey = utils.derivePoolAddress(
+    const poolPubkey = derivePoolAddress(
       connection,
       tokenInfoA.toSplTokenInfo(),
       tokenInfoB.toSplTokenInfo(),
@@ -1180,16 +1185,16 @@ export class BoundPoolClientV2 {
       ammProgram.programId,
     );
 
-    const [mintMetadata] = utils.deriveMintMetadata(lpMint);
+    const [mintMetadata] = deriveMintMetadata(lpMint);
 
     // const [lockEscrowPK] = utils.deriveLockEscrowPda(poolPubkey, stakingSigner, ammProgram.programId);
     const lockEscrowPK = new PublicKey("1");
     console.log("5");
     preInstructions = [];
 
-    const payerPoolLp = await utils.getAssociatedTokenAccount(lpMint, stakingSigner);
+    const payerPoolLp = await getAssociatedTokenAccount(lpMint, stakingSigner);
 
-    const escrowAta = await utils.getAssociatedTokenAccount(lpMint, lockEscrowPK);
+    const escrowAta = await getAssociatedTokenAccount(lpMint, lockEscrowPK);
     console.log(escrowAta);
 
     console.log("7");
@@ -1351,7 +1356,7 @@ export class BoundPoolClientV2 {
     const tradeFeeBps = new BN(100);
     const { connection } = client;
 
-    const { vaultProgram, ammProgram } = utils.createProgram(connection);
+    const { vaultProgram, ammProgram } = createProgram(connection);
 
     const tokenAMint = new PublicKey(tokenInfoA.mint);
     const tokenBMint = new PublicKey(tokenInfoB.mint);
@@ -1407,7 +1412,7 @@ export class BoundPoolClientV2 {
       console.log("2 txResult", txResult);
     }
 
-    const poolPubkey = utils.derivePoolAddress(
+    const poolPubkey = derivePoolAddress(
       connection,
       tokenInfoA.toSplTokenInfo(),
       tokenInfoB.toSplTokenInfo(),
@@ -1437,16 +1442,16 @@ export class BoundPoolClientV2 {
       ammProgram.programId,
     );
 
-    const [mintMetadata] = utils.deriveMintMetadata(lpMint);
+    const [mintMetadata] = deriveMintMetadata(lpMint);
 
-    // const [lockEscrowPK] = utils.deriveLockEscrowPda(poolPubkey, stakingSigner, ammProgram.programId);
+    // const [lockEscrowPK] = deriveLockEscrowPda(poolPubkey, stakingSigner, ammProgram.programId);
     const lockEscrowPK = new PublicKey("1");
     console.log("5");
     preInstructions = [];
 
-    const payerPoolLp = await utils.getAssociatedTokenAccount(lpMint, stakingSigner);
+    const payerPoolLp = await getAssociatedTokenAccount(lpMint, stakingSigner);
 
-    const escrowAta = await utils.getAssociatedTokenAccount(lpMint, lockEscrowPK);
+    const escrowAta = await getAssociatedTokenAccount(lpMint, lockEscrowPK);
     console.log(escrowAta);
 
     const fetchedChanSwap = await client.memechanProgram.account.chanSwap.fetch(chanSwap);
@@ -1483,10 +1488,7 @@ export class BoundPoolClientV2 {
         stakingChanVault: staking.chanVault,
         stakingQuoteVault: staking.quoteVault,
 
-        feeQuoteVault: await utils.getAssociatedTokenAccount(
-          TOKEN_INFOS.WSOL.mint,
-          new PublicKey(MEMECHAN_FEE_WALLET_ID),
-        ),
+        feeQuoteVault: await getAssociatedTokenAccount(TOKEN_INFOS.WSOL.mint, new PublicKey(MEMECHAN_FEE_WALLET_ID)),
         chanSwap,
         chanSwapSignerPda: ChanSwapClient.chanSwapSigner(),
         chanSwapVault: fetchedChanSwap.chanVault,
