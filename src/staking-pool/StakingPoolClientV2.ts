@@ -47,7 +47,6 @@ import { TokenInfo } from "../config/types";
 import { AmmPool } from "../meteora/AmmPool";
 import {
   createProgram,
-  deriveLockEscrowPda,
   derivePoolAddress,
   getAssociatedTokenAccount,
 } from "@mercurial-finance/dynamic-amm-sdk/dist/cjs/src/amm/utils";
@@ -243,7 +242,8 @@ export class StakingPoolClientV2 {
 
     const stakingSigner = this.findSignerPda();
 
-    const [lockEscrowPK] = deriveLockEscrowPda(poolPubkey, stakingSigner, ammProgram.programId);
+    // const [lockEscrowPK] = deriveLockEscrowPda(poolPubkey, stakingSigner, ammProgram.programId);
+    const lockEscrowPK = new PublicKey("1");
 
     console.log("5");
     preInstructions = [];

@@ -1179,8 +1179,8 @@ export class BoundPoolClientV2 {
 
     const [mintMetadata] = utils.deriveMintMetadata(lpMint);
 
-    const [lockEscrowPK] = utils.deriveLockEscrowPda(poolPubkey, stakingSigner, ammProgram.programId);
-
+    // const [lockEscrowPK] = utils.deriveLockEscrowPda(poolPubkey, stakingSigner, ammProgram.programId);
+    const lockEscrowPK = new PublicKey("1");
     console.log("5");
     preInstructions = [];
 
@@ -1436,7 +1436,8 @@ export class BoundPoolClientV2 {
 
     const [mintMetadata] = utils.deriveMintMetadata(lpMint);
 
-    const [lockEscrowPK] = utils.deriveLockEscrowPda(poolPubkey, stakingSigner, ammProgram.programId);
+    // const [lockEscrowPK] = utils.deriveLockEscrowPda(poolPubkey, stakingSigner, ammProgram.programId);
+    const lockEscrowPK = new PublicKey("1");
 
     console.log("5");
     preInstructions = [];

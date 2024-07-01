@@ -1,7 +1,7 @@
 {
   "name": "@avernikoz/memechan-sol-sdk",
   "description": "Typescript SDK for memechan.gg",
-  "version": "99.2.0",
+  "version": "99.2.1",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "directories": {
@@ -33,7 +33,7 @@
     "@aws-sdk/types": "^3.577.0",
     "@coral-xyz/anchor": "0.29.0",
     "@solana/spl-token": "^0.4.6",
-    "@mercurial-finance/dynamic-amm-sdk": "^0.4.21",
+    "@mercurial-finance/dynamic-amm-sdk": "0.4.20",
     "@mercurial-finance/vault-sdk": "^0.5.3",
     "@metaplex-foundation/mpl-token-metadata": "^3.2.1",
     "@metaplex-foundation/umi": "^0.9.1",
