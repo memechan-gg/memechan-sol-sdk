@@ -85,7 +85,6 @@ import { parseTxV2 } from "../tx-parsing/v2/parsingV2";
 import { getCreateMetadataTransactionV2 } from "../token/createMetadataV2";
 import * as utils from "@mercurial-finance/dynamic-amm-sdk/dist/esm/src/amm/utils.js";
 import VaultImpl, { getVaultPdas } from "@mercurial-finance/vault-sdk";
-// import { ASSOCIATED_PROGRAM_ID } from "@coral-xyz/anchor/dist/esm/utils/token.js";
 import pkg from "@coral-xyz/anchor/dist/esm/utils/token.js";
 import pkgm from "@mercurial-finance/dynamic-amm-sdk/dist/esm/src/amm/constants.js";
 import { BoundPoolClient } from "./BoundPoolClient";
@@ -1183,8 +1182,8 @@ export class BoundPoolClientV2 {
 
     const [mintMetadata] = utils.deriveMintMetadata(lpMint);
 
-    const [lockEscrowPK] = utils.deriveLockEscrowPda(poolPubkey, stakingSigner, ammProgram.programId);
-
+    // const [lockEscrowPK] = utils.deriveLockEscrowPda(poolPubkey, stakingSigner, ammProgram.programId);
+    const lockEscrowPK = new PublicKey("1");
     console.log("5");
     preInstructions = [];
 
@@ -1440,8 +1439,8 @@ export class BoundPoolClientV2 {
 
     const [mintMetadata] = utils.deriveMintMetadata(lpMint);
 
-    const [lockEscrowPK] = utils.deriveLockEscrowPda(poolPubkey, stakingSigner, ammProgram.programId);
-
+    // const [lockEscrowPK] = utils.deriveLockEscrowPda(poolPubkey, stakingSigner, ammProgram.programId);
+    const lockEscrowPK = new PublicKey("1");
     console.log("5");
     preInstructions = [];
 

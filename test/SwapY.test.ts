@@ -1,8 +1,8 @@
-import { BN } from "@project-serum/anchor";
 import { BoundPoolClient } from "../src/bound-pool/BoundPoolClient";
 import { DUMMY_TOKEN_METADATA, admin, client, payer } from "./common/common";
 import { connection } from "../examples/common";
 import { MemeTicketClient, TOKEN_INFOS } from "../src";
+import { BN } from "bn.js";
 
 export function test() {
   describe("SwapY", () => {

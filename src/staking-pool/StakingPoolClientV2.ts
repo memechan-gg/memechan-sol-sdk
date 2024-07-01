@@ -51,7 +51,7 @@ import VaultImpl, { getVaultPdas } from "@mercurial-finance/vault-sdk";
 import { MEMO_PROGRAM_ID } from "@raydium-io/raydium-sdk";
 import pkgs from "@mercurial-finance/dynamic-amm-sdk/dist/esm/src/amm/constants.js";
 
-const { createProgram, deriveLockEscrowPda, derivePoolAddress, getAssociatedTokenAccount } = pkg;
+const { createProgram, derivePoolAddress, getAssociatedTokenAccount } = pkg;
 const { SEEDS } = pkgs;
 export class StakingPoolClientV2 {
   constructor(
@@ -240,8 +240,8 @@ export class StakingPoolClientV2 {
 
     const stakingSigner = this.findSignerPda();
 
-    const [lockEscrowPK] = deriveLockEscrowPda(poolPubkey, stakingSigner, ammProgram.programId);
-
+    // const [lockEscrowPK] = deriveLockEscrowPda(poolPubkey, stakingSigner, ammProgram.programId);
+    const lockEscrowPK = new PublicKey("1");
     console.log("5");
     preInstructions = [];
 
