@@ -53,9 +53,8 @@ import {
 import VaultImpl, { getVaultPdas } from "@mercurial-finance/vault-sdk";
 
 import { MEMO_PROGRAM_ID } from "@raydium-io/raydium-sdk";
-import pkgs from "@mercurial-finance/dynamic-amm-sdk/dist/esm/src/amm/constants.js";
+import { SEEDS } from "@mercurial-finance/dynamic-amm-sdk/dist/esm/src/amm/constants.js";
 
-const { SEEDS } = pkgs;
 export class StakingPoolClientV2 {
   constructor(
     public id: PublicKey,
