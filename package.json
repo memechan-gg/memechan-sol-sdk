@@ -1,8 +1,15 @@
 {
   "name": "@avernikoz/memechan-sol-sdk",
   "description": "Typescript SDK for memechan.gg",
-  "version": "99.1.25",
-  "main": "dist/index.js",
+  "version": "99.1.26",
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
+  "exports": {
+    ".": {
+      "require": "./dist/cjs/index.js",
+      "import": "./dist/esm/index.js"
+    }
+  },
   "type": "module",
   "types": "dist/index.d.ts",
   "directories": {
