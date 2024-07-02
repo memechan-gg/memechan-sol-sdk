@@ -1,16 +1,16 @@
-import { NATIVE_MINT } from "@solana/spl-token";
 import { Transaction, PublicKey } from "@solana/web3.js";
 
 import BN from "bn.js";
 import { wrapSOLInstruction } from "./wrapSOLInstruction";
 
-export function addWrapSOLInstructionIfNativeMint(
+export async function addWrapSOLInstructionIfNativeMint(
   quoteMint: PublicKey,
   payerPublicKey: PublicKey,
   destinationAddress: PublicKey,
   amount: BN,
   transaction: Transaction,
-): Transaction {
+): Promise<Transaction> {
+  const { NATIVE_MINT } = await import("@solana/spl-token");
   if (quoteMint.equals(NATIVE_MINT)) {
     transaction.add(...wrapSOLInstruction(payerPublicKey, destinationAddress, amount));
   }

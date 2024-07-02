@@ -1,4 +1,3 @@
-import { MINT_SIZE, TOKEN_PROGRAM_ID, createInitializeMintInstruction } from "@solana/spl-token";
 import { ComputeBudgetProgram, Connection, Keypair, PublicKey, SystemProgram, Transaction } from "@solana/web3.js";
 import { COMPUTE_UNIT_PRICE } from "../config/config";
 
@@ -31,6 +30,7 @@ export async function getCreateMintWithPriorityTransaction(
   });
 
   console.log("mintAuthority: " + mintAuthority.toBase58());
+  const { MINT_SIZE, TOKEN_PROGRAM_ID, createInitializeMintInstruction } = await import("@solana/spl-token");
 
   const createMintAccountInstruction = SystemProgram.createAccount({
     fromPubkey: payer,

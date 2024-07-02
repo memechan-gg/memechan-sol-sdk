@@ -1,6 +1,5 @@
 import { PublicKey, SYSVAR_RENT_PUBKEY, SystemProgram, Transaction, sendAndConfirmTransaction } from "@solana/web3.js";
 import { MemechanClient } from "../MemechanClient";
-import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import { CreateMetadataInfo } from "../api/types";
 import { uploadMetadataToIpfs } from "../api/uploadMetadataToIpfs";
 
@@ -32,6 +31,7 @@ export async function getCreateMetadataTransaction(
   const metadataUri = await uploadMetadataToIpfs(metadata);
   const pda = findMetadataPDA(input.mint);
 
+  const { TOKEN_PROGRAM_ID } = await import("@solana/spl-token");
   // Prepare the transaction to initialize the counter
   const tx = client.memechanProgram.methods
     .createMetadata(metadata.name, metadata.symbol, metadataUri)

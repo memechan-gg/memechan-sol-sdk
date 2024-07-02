@@ -1,6 +1,6 @@
 import { PublicKey, Keypair, sendAndConfirmTransaction, Connection, ComputeBudgetProgram } from "@solana/web3.js";
 import BN from "bn.js";
-import AmmImpl from "@mercurial-finance/dynamic-amm-sdk";
+import type AmmImpl from "@mercurial-finance/dynamic-amm-sdk";
 import { COMPUTE_UNIT_PRICE, MEMECHAN_MEME_TOKEN_DECIMALS, TOKEN_INFOS } from "../config/config";
 
 export class AmmPool {

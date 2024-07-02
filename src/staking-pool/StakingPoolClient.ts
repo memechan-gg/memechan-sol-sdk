@@ -1,4 +1,3 @@
-import { TOKEN_PROGRAM_ID, getAccount } from "@solana/spl-token";
 import {
   AccountMeta,
   Connection,
@@ -113,6 +112,8 @@ export class StakingPoolClient {
 
     const stakingSignerPda = this.findSignerPda();
 
+    const { TOKEN_PROGRAM_ID } = await import("@solana/spl-token");
+
     const addFeesInstruction = await this.client.memechanProgram.methods
       .addFees()
       .accounts({
@@ -168,6 +169,7 @@ export class StakingPoolClient {
     const stakingInfo = await this.fetch();
     const user = args.user;
 
+    const { getAccount, TOKEN_PROGRAM_ID } = await import("@solana/spl-token");
     const quoteAccount = await getAccount(this.client.connection, stakingInfo.quoteVault);
 
     const associatedMemeTokenAddress = await ensureAssociatedTokenAccountWithIX({
@@ -309,6 +311,7 @@ export class StakingPoolClient {
       transaction: tx,
     });
 
+    const { getAccount, TOKEN_PROGRAM_ID } = await import("@solana/spl-token");
     const quoteAccount = await getAccount(this.client.connection, stakingInfo.quoteVault);
 
     const quoteAccountPublicKey = await ensureAssociatedTokenAccountWithIX({
@@ -475,6 +478,7 @@ export class StakingPoolClient {
   }
 
   public async getTokenInfo(): Promise<TokenInfo> {
+    const { getAccount } = await import("@solana/spl-token");
     const quoteAccount = await getAccount(this.client.connection, this.quoteVault);
     return getTokenInfoByMint(quoteAccount.mint);
   }

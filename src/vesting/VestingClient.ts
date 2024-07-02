@@ -1,11 +1,4 @@
 import { Program } from "@coral-xyz/anchor";
-import {
-  TOKEN_PROGRAM_ID,
-  createAssociatedTokenAccountIdempotentInstruction,
-  createAssociatedTokenAccountInstruction,
-  getAssociatedTokenAddress,
-  getAssociatedTokenAddressSync,
-} from "@solana/spl-token";
 import { ComputeBudgetProgram, PublicKey, SystemProgram, Transaction } from "@solana/web3.js";
 import BigNumber from "bignumber.js";
 import BN from "bn.js";
@@ -102,7 +95,8 @@ export class VestingClient {
     transaction,
   }: GetClaimTransactionArgs) {
     const tx = transaction ?? new Transaction();
-
+    const { TOKEN_PROGRAM_ID, createAssociatedTokenAccountIdempotentInstruction, getAssociatedTokenAddressSync } =
+      await import("@solana/spl-token");
     const userTokenAccount = getAssociatedTokenAddressSync(mint, beneficiary, false);
 
     const createATAIdempotentInstruction = createAssociatedTokenAccountIdempotentInstruction(
@@ -147,6 +141,12 @@ export class VestingClient {
 
     const vesting = this.getVestingPDA({ vestingNumber: VestingClient.VESTING_NUMBER_START, user: beneficiary });
     const vestingSigner = this.getVestingSigner(vesting);
+    const {
+      TOKEN_PROGRAM_ID,
+      createAssociatedTokenAccountInstruction,
+      getAssociatedTokenAddress,
+      getAssociatedTokenAddressSync,
+    } = await import("@solana/spl-token");
     const vault = getAssociatedTokenAddressSync(mint, vestingSigner, true);
 
     const tx = new Transaction();
