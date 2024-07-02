@@ -3,15 +3,13 @@ import { PublicKey } from "@solana/web3.js";
 import { clientV2, payer } from "../../../common";
 import { BoundPoolClientV2 } from "../../../../src/bound-pool/BoundPoolClientV2";
 import { FEE_DESTINATION_ID, MEME_TOKEN_DECIMALS, StakingPoolClientV2, TOKEN_INFOS, TokenInfo } from "../../../../src";
-import { NATIVE_MINT } from "@solana/spl-token";
 import { ChanSwapClient } from "../../../../src/chan-swap/ChanSwapClient";
-import { Keypair } from "@solana/web3.js";
 
 // yarn tsx examples/v2/bonding-pool/init-amm/init-amm-pools.ts
 (async () => {
   const memeMint = new PublicKey("G6wyDdcDn6pJuPbferviyZh6JFgxDoyasYX8MsorJPoK");
   const stakingId = BoundPoolClientV2.findStakingPda(memeMint, clientV2.memechanProgram.programId);
-
+  const { NATIVE_MINT } = await import("@solana/spl-token");
   const stakingPool = await StakingPoolClientV2.fromStakingPoolId({
     client: clientV2,
     poolAccountAddressId: stakingId,

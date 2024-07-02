@@ -1,5 +1,4 @@
 import { Percent, Token, TokenAmount } from "@raydium-io/raydium-sdk";
-import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import { MEMECHAN_MEME_TOKEN_DECIMALS, TOKEN_INFOS } from "../../src/config/config";
 import { swapOnlyAmm } from "../../src/raydium/swapOnlyAmm";
 import { client, connection, payer } from "../common";
@@ -8,6 +7,7 @@ import { getWalletTokenAccount } from "../../src/util";
 // yarn tsx examples/live-pool/swap.ts > swap.txt 2>&1
 export const swap = async () => {
   const ammPoolAddress = "BevUTtVUZQ4LdwWfcq4Uom88yuj1WE2EUiZBgESUsFQT";
+  const { TOKEN_PROGRAM_ID } = await import("@solana/spl-token");
   const quoteAmountIn = new TokenAmount(TOKEN_INFOS.SLERF, 2000);
   const tokenOut = new Token(
     TOKEN_PROGRAM_ID,

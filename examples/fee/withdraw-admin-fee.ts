@@ -2,7 +2,6 @@ import { sendAndConfirmTransaction, PublicKey, Transaction, ComputeBudgetProgram
 import { withdrawAdminFee } from "../../src/schema/codegen/instructions";
 import { BoundPoolClient, COMPUTE_UNIT_PRICE } from "../../src";
 import { client, payer } from "../common";
-import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
 
 // BE AWARE! `payer` must be admin keypair for calling this endpoint
 
@@ -19,6 +18,7 @@ export const withdrawAdminFeeExample = async () => {
 
   const transaction = new Transaction();
 
+  const { TOKEN_PROGRAM_ID } = await import("@solana/spl-token");
   const withdrawFeeInstruction = withdrawAdminFee({
     boundPoolSignerPda,
     feeVaultQuote: boundPoolInfo.feeVaultQuote,

@@ -15,7 +15,7 @@
     "resolveJsonModule": true,
     "allowJs": true,
     "paths": {
-      "@solana/spl-token": ["./node_modules/@solana/spl-token"],
+      "@solana/spl-token": ["./node_modules/@solana/spl-token"]
     }
   },
   "compileOnSave": true,

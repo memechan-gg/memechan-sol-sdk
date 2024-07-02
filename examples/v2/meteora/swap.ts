@@ -2,14 +2,12 @@ import { PublicKey } from "@solana/web3.js";
 import { AmmPool } from "../../../src/meteora/AmmPool";
 import { BoundPoolClientV2, MEME_TOKEN_DECIMALS, StakingPoolClientV2, TOKEN_INFOS, TokenInfo } from "../../../src";
 import { clientV2, payer } from "../../common";
-import AmmImpl from "@mercurial-finance/dynamic-amm-sdk";
-import { NATIVE_MINT } from "@solana/spl-token";
 
 // yarn tsx examples/v2/meteora/swap.ts
 (async () => {
   const memeMint = new PublicKey("G6wyDdcDn6pJuPbferviyZh6JFgxDoyasYX8MsorJPoK");
   const stakingId = BoundPoolClientV2.findStakingPda(memeMint, clientV2.memechanProgram.programId);
-
+  const { NATIVE_MINT } = await import("@solana/spl-token");
   const stakingPool = await StakingPoolClientV2.fromStakingPoolId({
     client: clientV2,
     poolAccountAddressId: stakingId,
@@ -24,7 +22,7 @@ import { NATIVE_MINT } from "@solana/spl-token";
     targetConfig: NATIVE_MINT,
     targetConfigV2: NATIVE_MINT,
   });
-
+  const { default: AmmImpl } = await import("@mercurial-finance/dynamic-amm-sdk");
   const ammImplQuote = await AmmImpl.create(
     clientV2.connection,
     stakingPool.poolObjectData.quoteAmmPool,
