@@ -5,5 +5,7 @@
   "clean": true,
   "dts": true,
   "outDir": "dist",
-  "tsconfig": "./tsconfig.production.json"
+  "tsconfig": "./tsconfig.production.json",
+  "bundle": true,
+  "noExternal": ["@mercurial-finance/dynamic-amm-sdk", "@mercurial-finance/vault-sdk", "@solana/spl-token"]
 }
