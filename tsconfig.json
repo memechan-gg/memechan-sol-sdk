@@ -1,6 +1,8 @@
 {
   "compilerOptions": {
     "noImplicitReturns": true,
+    "declaration": true,
+    "declarationDir": "./dist/types",
     "noUnusedLocals": false,
     "outDir": "dist",
     "sourceMap": true,
@@ -11,12 +13,13 @@
     "checkJs": false,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "moduleResolution": "Bundler",
+    "moduleResolution": "node",
     "resolveJsonModule": true,
     "allowJs": true,
     "typeRoots": ["./node_modules/@types", "./typings"],
     "paths": {
-      "@solana/spl-token": ["./node_modules/@solana/spl-token"]
+      "@solana/spl-token": ["./node_modules/@solana/spl-token"],
+      "@coral-xyz/anchor": ["./node_modules/@coral-xyz/anchor/dist/esm/index"]
     }
   },
   "compileOnSave": true,
