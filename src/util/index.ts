@@ -2,7 +2,6 @@ import {
   buildSimpleTransaction,
   InnerSimpleV0Transaction,
   SPL_ACCOUNT_LAYOUT,
-  TOKEN_PROGRAM_ID,
   TokenAccount,
 } from "@raydium-io/raydium-sdk";
 
@@ -18,6 +17,8 @@ import {
 import BigNumber from "bignumber.js";
 import { findProgramAddress } from "../common/helpers";
 import { addLookupTableInfo, ATA_PROGRAM_ID, makeTxVersion } from "../raydium/config";
+
+const TOKEN_PROGRAM_ID = new PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA");
 
 export async function buildAndSendTx(
   connection: Connection,

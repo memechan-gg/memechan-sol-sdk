@@ -1,8 +1,9 @@
-import { TOKEN_PROGRAM_ID } from "@raydium-io/raydium-sdk";
 import { PublicKey } from "@solana/web3.js";
 import BigNumber from "bignumber.js";
 import { TokenInfo } from "./types";
 import { NATIVE_MINT } from "@solana/spl-token";
+
+const TOKEN_PROGRAM_ID = new PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA");
 
 export const BE_URL_DEV = "https://dmgrnigolfno6.cloudfront.net";
 
