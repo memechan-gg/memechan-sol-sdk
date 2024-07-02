@@ -90,7 +90,6 @@ import {
   deriveMintMetadata,
 } from "@mercurial-finance/dynamic-amm-sdk/dist/esm/src/amm/utils.js";
 import VaultImpl, { getVaultPdas } from "@mercurial-finance/vault-sdk";
-import { ASSOCIATED_PROGRAM_ID } from "@coral-xyz/anchor/dist/esm/utils/token.js";
 import { FEE_OWNER, SEEDS } from "@mercurial-finance/dynamic-amm-sdk/dist/esm/src/amm/constants.js";
 import { BoundPoolClient } from "./BoundPoolClient";
 import { TargetConfigClientV2 } from "../targetconfig/TargetConfigClientV2";
@@ -98,6 +97,7 @@ import { ChanSwapClient } from "../chan-swap/ChanSwapClient";
 import { StakingPoolClientV2 } from "../staking-pool/StakingPoolClientV2";
 import { MemechanSol } from "../schema/v2/v2";
 
+const ASSOCIATED_PROGRAM_ID = new PublicKey("ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL");
 export class BoundPoolClientV2 {
   private constructor(
     public id: PublicKey,
