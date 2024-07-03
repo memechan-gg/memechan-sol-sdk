@@ -5,6 +5,10 @@ import { BoundPoolClient } from "../../bound-pool/BoundPoolClient";
 import { MemechanClient } from "../../MemechanClient";
 import { MemechanClientV2 } from "../../MemechanClientV2";
 
+export type LivePoolVersioned =
+  | { version: "V1"; livePool: BoundPoolClient }
+  | { version: "V2"; livePool: BoundPoolClientV2 };
+
 export async function getBoundPoolClientFromId(
   poolAddressId: PublicKey,
   client: MemechanClient,
@@ -19,8 +23,23 @@ export async function getBoundPoolClientFromId(
   console.log("accountInfo.owner:", accountInfo.owner);
 
   if (accountInfo.owner.toBase58() == MEMECHAN_PROGRAM_ID_V2) {
-    return await BoundPoolClientV2.fromBoundPoolId({ client: clientV2, poolAccountAddressId: poolAddressId });
+    const boundPoolInstance = await BoundPoolClientV2.fromBoundPoolId({
+      client: clientV2,
+      poolAccountAddressId: poolAddressId,
+    });
+    return {
+      boundPoolInstance: boundPoolInstance,
+      version: "V2",
+    };
   }
 
-  return await BoundPoolClient.fromBoundPoolId({ client: client, poolAccountAddressId: poolAddressId });
+  const boundPoolInstance = await BoundPoolClient.fromBoundPoolId({
+    client: client,
+    poolAccountAddressId: poolAddressId,
+  });
+
+  return {
+    boundPoolInstance: boundPoolInstance,
+    version: "V1",
+  };
 }
