@@ -5,7 +5,11 @@ import { MemechanClientV2 } from "../../MemechanClientV2";
 import { LivePoolClientV2 } from "../../live-pool/LivePoolClientV2";
 import { LivePoolClient } from "../../live-pool/LivePoolClient";
 
-export async function getLivePoolClientFromId(ammId: PublicKey, client: MemechanClient, clientV2: MemechanClientV2) {
+export async function getLivePoolClientFromId(
+  ammId: PublicKey,
+  client: MemechanClient,
+  clientV2: MemechanClientV2,
+): Promise<{ livePool: LivePoolClient | LivePoolClientV2; version: "V1" | "V2" }> {
   const accountInfo = await clientV2.connection.getAccountInfo(ammId);
 
   if (!accountInfo) {
