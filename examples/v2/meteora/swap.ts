@@ -2,8 +2,6 @@ import { PublicKey } from "@solana/web3.js";
 import { AmmPool } from "../../../src/meteora/AmmPool";
 import { BoundPoolClientV2, MEME_TOKEN_DECIMALS, StakingPoolClientV2, TOKEN_INFOS, TokenInfo } from "../../../src";
 import { clientV2, payer } from "../../common";
-import AmmImpl from "@0xunreal/dynamic-amm-sdk";
-import { NATIVE_MINT } from "@memechan/spl-token";
 
 // yarn tsx examples/v2/meteora/swap.ts
 (async () => {
@@ -15,6 +13,8 @@ import { NATIVE_MINT } from "@memechan/spl-token";
     poolAccountAddressId: stakingId,
   });
 
+  const { NATIVE_MINT } = await import("@solana/spl-token");
+
   const memeTokenInfo = new TokenInfo({
     decimals: MEME_TOKEN_DECIMALS,
     mint: stakingPool.memeMint,
@@ -24,6 +24,8 @@ import { NATIVE_MINT } from "@memechan/spl-token";
     targetConfig: NATIVE_MINT,
     targetConfigV2: NATIVE_MINT,
   });
+
+  const { default: AmmImpl } = await import("@mercurial-finance/dynamic-amm-sdk");
 
   const ammImplQuote = await AmmImpl.create(
     clientV2.connection,

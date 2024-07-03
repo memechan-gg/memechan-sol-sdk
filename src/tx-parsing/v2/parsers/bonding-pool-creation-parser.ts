@@ -1,6 +1,6 @@
 import { ParsedTransactionWithMeta, PublicKey } from "@solana/web3.js";
 import { IdlAccounts } from "@coral-xyz/anchor";
-import { Mint, getMint } from "@memechan/spl-token";
+import type { Mint } from "@solana/spl-token";
 import { MemechanClientV2 } from "../../../MemechanClientV2";
 import { MemechanSol } from "../../../schema/v2/v2";
 
@@ -36,6 +36,7 @@ export async function parseNewBPInstruction(
   }
 
   const newMintAddr = ix.accounts[2];
+  const { getMint } = await import("@solana/spl-token");
   const newMint = await getMint(client.connection, newMintAddr);
 
   const bpParsed: NewBPInstructionParsed = {

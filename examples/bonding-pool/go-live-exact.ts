@@ -1,7 +1,6 @@
 import { PublicKey } from "@solana/web3.js";
 import { client, payer } from "../common";
 import { BoundPoolClient, FEE_DESTINATION_ID, StakingPoolClient } from "../../src";
-import { getAccount } from "@memechan/spl-token";
 
 // yarn tsx examples/bonding-pool/go-live-exact.ts > go-live-exact.txt 2>&1
 export const goLiveExact = async () => {
@@ -19,13 +18,14 @@ export const goLiveExact = async () => {
   // const pda =  BoundPoolClient.findStakingPda(new PublicKey("2Y3jTuAc778X9Fgh9iejxpK6zBYDSwpUdr1Kz5SdGh5x"), client.memechanProgram.programId);
   //   console.log("pda: " + pda.toString());
 
+  const { getAccount } = await import("@solana/spl-token");
+
   const stakingPool = await StakingPoolClient.fromStakingPoolId({
     client,
     poolAccountAddressId: new PublicKey("C898rurFKQ1hqcRH3a8HkzkrdrWvmaevTy4YhqbMJYeF"),
   });
   // console.log("stakingMemeVault: " + stakingMemeVault.toString());
   // console.log("stakingQuoteVault: " + stakingQuoteVault.toString());
-
   const quoteAccount = await getAccount(client.connection, stakingPool.quoteVault);
 
   await BoundPoolClient.goLive({

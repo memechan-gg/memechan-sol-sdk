@@ -1,11 +1,4 @@
 import { Program } from "@coral-xyz/anchor";
-import {
-  TOKEN_PROGRAM_ID,
-  createAssociatedTokenAccountIdempotentInstruction,
-  createAssociatedTokenAccountInstruction,
-  getAssociatedTokenAddress,
-  getAssociatedTokenAddressSync,
-} from "@memechan/spl-token";
 import { ComputeBudgetProgram, PublicKey, SystemProgram, Transaction } from "@solana/web3.js";
 import BigNumber from "bignumber.js";
 import BN from "bn.js";
@@ -102,7 +95,8 @@ export class VestingClient {
     transaction,
   }: GetClaimTransactionArgs) {
     const tx = transaction ?? new Transaction();
-
+    const { TOKEN_PROGRAM_ID, createAssociatedTokenAccountIdempotentInstruction, getAssociatedTokenAddressSync } =
+      await import("@solana/spl-token");
     const userTokenAccount = getAssociatedTokenAddressSync(mint, beneficiary, false);
 
     const createATAIdempotentInstruction = createAssociatedTokenAccountIdempotentInstruction(
@@ -141,7 +135,12 @@ export class VestingClient {
     amount,
   }: GetCreateVestingTransactionArgs) {
     const vestingProgram = new Program<Lockup>(IDL, VESTING_PROGRAM_ID);
-
+    const {
+      TOKEN_PROGRAM_ID,
+      createAssociatedTokenAccountInstruction,
+      getAssociatedTokenAddress,
+      getAssociatedTokenAddressSync,
+    } = await import("@solana/spl-token");
     const lockupTimeSeconds = new BigNumber(endTs).minus(startTs);
     const periods = Math.ceil(lockupTimeSeconds.div(60).toNumber());
 

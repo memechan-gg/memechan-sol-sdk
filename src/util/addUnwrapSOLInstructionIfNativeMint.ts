@@ -1,15 +1,15 @@
-import { NATIVE_MINT } from "@memechan/spl-token";
 import { Transaction, PublicKey } from "@solana/web3.js";
 
 import { unwrapSOLInstruction } from "./unwrapSOLInstruction";
 
-export function addUnwrapSOLInstructionIfNativeMint(
+export async function addUnwrapSOLInstructionIfNativeMint(
   quoteMint: PublicKey,
   payerPublicKey: PublicKey,
   transaction: Transaction,
 ) {
+  const { NATIVE_MINT } = await import("@solana/spl-token");
   if (quoteMint.equals(NATIVE_MINT)) {
-    const unwrapInstruction = unwrapSOLInstruction(payerPublicKey);
+    const unwrapInstruction = await unwrapSOLInstruction(payerPublicKey);
     if (unwrapInstruction) {
       transaction.add(unwrapInstruction);
     }

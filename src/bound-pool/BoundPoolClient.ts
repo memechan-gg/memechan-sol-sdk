@@ -1,5 +1,4 @@
 import { Token } from "@raydium-io/raydium-sdk";
-import { TOKEN_PROGRAM_ID, getOrCreateAssociatedTokenAccount, mintTo } from "@memechan/spl-token";
 import {
   ComputeBudgetProgram,
   Connection,
@@ -109,7 +108,7 @@ export class BoundPoolClient {
     poolAccountAddressId: PublicKey;
   }) {
     const poolObjectData = await BoundPoolClient.fetch2(client.connection, poolAccountAddressId);
-
+    const { TOKEN_PROGRAM_ID } = await import("@solana/spl-token");
     const boundClientInstance = new BoundPoolClient(
       poolAccountAddressId,
       client,
@@ -145,7 +144,7 @@ export class BoundPoolClient {
     }
 
     const poolObjectData = await BoundPoolClient.fetch2(client.connection, newPoolInstructionData.poolAddr);
-
+    const { TOKEN_PROGRAM_ID } = await import("@solana/spl-token");
     const boundClientInstance = new BoundPoolClient(
       newPoolInstructionData.poolAddr,
       client,
@@ -257,7 +256,7 @@ export class BoundPoolClient {
     });
 
     const quoteInfo = getTokenInfoByMint(quoteToken.mint);
-
+    const { TOKEN_PROGRAM_ID } = await import("@solana/spl-token");
     const createPoolInstruction = await memechanProgram.methods
       .newPool()
       .accounts({
@@ -367,7 +366,7 @@ export class BoundPoolClient {
 
     const id = this.findBoundPoolPda(memeMint, quoteToken.mint, memechanProgram.programId);
     const poolObjectData = await BoundPoolClient.fetch2(client.connection, id);
-
+    const { TOKEN_PROGRAM_ID } = await import("@solana/spl-token");
     return new BoundPoolClient(
       id,
       client,
@@ -466,6 +465,7 @@ export class BoundPoolClient {
     payer: Signer,
     amount: number = 1_000_000,
   ) {
+    const { mintTo } = await import("@solana/spl-token");
     return mintTo(provider.connection, payer, mint, wallet, authority, amount);
   }
 
@@ -485,7 +485,7 @@ export class BoundPoolClient {
       poolId: pool,
       userId: user.publicKey,
     });
-
+    const { getOrCreateAssociatedTokenAccount } = await import("@solana/spl-token");
     const userQuoteAcc =
       input.userSolAcc ??
       (
@@ -502,7 +502,7 @@ export class BoundPoolClient {
 
     console.log("solIn: ", solIn);
     console.log("memeOut: ", memeOut);
-
+    const { TOKEN_PROGRAM_ID } = await import("@solana/spl-token");
     await this.client.memechanProgram.methods
       .swapY(new BN(solIn), new BN(memeOut), new BN(memeTicketNumber))
       .accounts({
@@ -600,7 +600,7 @@ export class BoundPoolClient {
     }
 
     addWrapSOLInstructionIfNativeMint(this.quoteTokenMint, user, inputTokenAccount, inputAmountBN, transaction);
-
+    const { TOKEN_PROGRAM_ID } = await import("@solana/spl-token");
     const buyMemeInstruction = await this.client.memechanProgram.methods
       .swapY(inputAmountBN, minOutputBN, ticketNumberBN)
       .accounts({
@@ -688,7 +688,7 @@ export class BoundPoolClient {
       });
     }
     addWrapSOLInstructionIfNativeMint(quoteMint, user, inputTokenAccount, inputAmountBN, transaction);
-
+    const { TOKEN_PROGRAM_ID } = await import("@solana/spl-token");
     const buyMemeInstruction = await client.memechanProgram.methods
       .swapY(inputAmountBN, minOutputBN, ticketNumberBN)
       .accounts({
@@ -846,7 +846,7 @@ export class BoundPoolClient {
     } else {
       destinationTicket = ticketsRequiredToSell[0];
     }
-
+    const { TOKEN_PROGRAM_ID } = await import("@solana/spl-token");
     const sellMemeTransactionInstruction = await this.client.memechanProgram.methods
       .swapX(new BN(inputAmountBN), new BN(minOutputBN))
       .accounts({
@@ -941,7 +941,7 @@ export class BoundPoolClient {
 
     const memeTicket = input.userMemeTicket;
     const userSolAcc = input.userQuoteAcc;
-
+    const { TOKEN_PROGRAM_ID } = await import("@solana/spl-token");
     const sellMemeTransactionInstruction = await this.client.memechanProgram.methods
       .swapX(new BN(memeIn), new BN(minQuoteAmountOut))
       .accounts({
@@ -987,7 +987,7 @@ export class BoundPoolClient {
       owner: stakingSigner,
       transaction: tx,
     });
-
+    const { TOKEN_PROGRAM_ID } = await import("@solana/spl-token");
     const methodArgs = {
       pool,
       signer: user,
@@ -1074,6 +1074,7 @@ export class BoundPoolClient {
       transaction = new Transaction(),
       quoteMint,
     } = args;
+    const { TOKEN_PROGRAM_ID } = await import("@solana/spl-token");
     const stakingId = BoundPoolClient.findStakingPda(memeMint, client.memechanProgram.programId);
     const stakingSigner = StakingPoolClient.findSignerPda(stakingId, client.memechanProgram.programId);
     const baseTokenInfo = new Token(TOKEN_PROGRAM_ID, memeMint, MEMECHAN_MEME_TOKEN_DECIMALS);

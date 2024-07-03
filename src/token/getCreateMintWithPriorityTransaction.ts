@@ -1,4 +1,3 @@
-import { MINT_SIZE, TOKEN_PROGRAM_ID, createInitializeMintInstruction } from "@memechan/spl-token";
 import { ComputeBudgetProgram, Connection, Keypair, PublicKey, SystemProgram, Transaction } from "@solana/web3.js";
 import { COMPUTE_UNIT_PRICE } from "../config/config";
 
@@ -29,7 +28,7 @@ export async function getCreateMintWithPriorityTransaction(
   const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
     microLamports: COMPUTE_UNIT_PRICE,
   });
-
+  const { MINT_SIZE, TOKEN_PROGRAM_ID, createInitializeMintInstruction } = await import("@solana/spl-token");
   console.log("mintAuthority: " + mintAuthority.toBase58());
 
   const createMintAccountInstruction = SystemProgram.createAccount({

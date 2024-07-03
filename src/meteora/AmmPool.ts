@@ -1,7 +1,7 @@
 import { PublicKey, Keypair, sendAndConfirmTransaction, Connection, ComputeBudgetProgram } from "@solana/web3.js";
 import BN from "bn.js";
 import { COMPUTE_UNIT_PRICE, MEMECHAN_MEME_TOKEN_DECIMALS, TOKEN_INFOS } from "../config/config";
-import AmmImpl from "@0xunreal/dynamic-amm-sdk/dist/cjs/src/amm";
+import type AmmImpl from "@mercurial-finance/dynamic-amm-sdk";
 
 export class AmmPool {
   async swap(user: Keypair, amountIn: number, amountOut: number, connection: Connection) {

@@ -1,4 +1,3 @@
-import { TOKEN_PROGRAM_ID, getAccount, getOrCreateAssociatedTokenAccount } from "@memechan/spl-token";
 import {
   AccountMeta,
   Connection,
@@ -45,16 +44,7 @@ import { addUnwrapSOLInstructionIfNativeMint } from "../util/addUnwrapSOLInstruc
 import { getTokenInfoByMint } from "../config/helpers";
 import { TokenInfo } from "../config/types";
 import { AmmPool } from "../meteora/AmmPool";
-import {
-  createProgram,
-  deriveLockEscrowPda,
-  derivePoolAddress,
-  getAssociatedTokenAccount,
-} from "@0xunreal/dynamic-amm-sdk/dist/cjs/src/amm/utils";
-import VaultImpl, { getVaultPdas } from "@0xunreal/vault-sdk";
-
 import { MEMO_PROGRAM_ID } from "@raydium-io/raydium-sdk";
-import { SEEDS } from "@0xunreal/dynamic-amm-sdk/dist/cjs/src/amm/constants";
 
 export class StakingPoolClientV2 {
   constructor(
@@ -166,6 +156,10 @@ export class StakingPoolClientV2 {
     client: MemechanClientV2,
     payer: Keypair,
   ) {
+    const { createProgram, deriveLockEscrowPda, derivePoolAddress, getAssociatedTokenAccount } = await import(
+      "@mercurial-finance/dynamic-amm-sdk/dist/cjs/src/amm/utils"
+    );
+    const { default: VaultImpl, getVaultPdas } = await import("@mercurial-finance/vault-sdk");
     const tradeFeeBps = new BN(100);
     const connection = client.connection;
     const { vaultProgram, ammProgram } = createProgram(connection);
@@ -234,6 +228,7 @@ export class StakingPoolClientV2 {
     // ];
 
     console.log("4");
+    const { SEEDS } = await import("@mercurial-finance/dynamic-amm-sdk/dist/cjs/src/amm/constants");
     const [lpMint] = PublicKey.findProgramAddressSync(
       [Buffer.from(SEEDS.LP_MINT), poolPubkey.toBuffer()],
       ammProgram.programId,
@@ -252,7 +247,7 @@ export class StakingPoolClientV2 {
 
     const escrowAta = await getAssociatedTokenAccount(lpMint, lockEscrowPK);
     console.log(escrowAta);
-
+    const { TOKEN_PROGRAM_ID, getOrCreateAssociatedTokenAccount } = await import("@solana/spl-token");
     const memeFeeVault = (
       await getOrCreateAssociatedTokenAccount(connection, payer, tokenAMint, new PublicKey(MEMECHAN_FEE_WALLET_ID))
     ).address;
@@ -331,7 +326,7 @@ export class StakingPoolClientV2 {
     const tx = args.transaction ?? new Transaction();
     const stakingInfo = await this.fetch();
     const user = args.user;
-
+    const { getAccount, TOKEN_PROGRAM_ID } = await import("@solana/spl-token");
     const quoteAccount = await getAccount(this.client.connection, stakingInfo.quoteVault);
 
     const associatedMemeTokenAddress = await ensureAssociatedTokenAccountWithIX({
@@ -482,7 +477,7 @@ export class StakingPoolClientV2 {
       owner: args.user,
       transaction: tx,
     });
-
+    const { getAccount, TOKEN_PROGRAM_ID } = await import("@solana/spl-token");
     const quoteAccount = await getAccount(this.client.connection, stakingInfo.quoteVault);
 
     const quoteAccountPublicKey = await ensureAssociatedTokenAccountWithIX({
@@ -659,6 +654,7 @@ export class StakingPoolClientV2 {
   }
 
   public async getTokenInfo(): Promise<TokenInfo> {
+    const { getAccount } = await import("@solana/spl-token");
     const quoteAccount = await getAccount(this.client.connection, this.quoteVault);
     return getTokenInfoByMint(quoteAccount.mint);
   }

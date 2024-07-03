@@ -1,8 +1,10 @@
 import { ASSOCIATED_TOKEN_PROGRAM_ID, TOKEN_PROGRAM_ID } from "@raydium-io/raydium-sdk";
-import { NATIVE_MINT, createCloseAccountInstruction, getAssociatedTokenAddressSync } from "@memechan/spl-token";
 import { PublicKey } from "@solana/web3.js";
 
-export const unwrapSOLInstruction = (walletPublicKey: PublicKey) => {
+export const unwrapSOLInstruction = async (walletPublicKey: PublicKey) => {
+  const { NATIVE_MINT, createCloseAccountInstruction, getAssociatedTokenAddressSync } = await import(
+    "@solana/spl-token"
+  );
   const wSolATAAccount = getAssociatedTokenAddressSync(
     NATIVE_MINT,
     walletPublicKey,
