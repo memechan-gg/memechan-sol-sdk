@@ -276,6 +276,10 @@ export class LivePoolClient {
     const quoteToken = getTokenInfoByMint(new PublicKey(pool.ammPoolInfo.quoteMint));
     return quoteToken.displayName;
   }
+
+  public async getMemePrice(args: { poolAddress: string; quotePriceInUsd: number; connection: Connection }) {
+    return await LivePoolClient.getMemePrice(args);
+  }
 }
 
 async function getReserveBalances(connection: Connection, addresses: PublicKey[]): Promise<[BN, BN]> {
