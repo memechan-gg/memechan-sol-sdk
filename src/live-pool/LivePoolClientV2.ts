@@ -305,4 +305,12 @@ export class LivePoolClientV2 {
   public async getQuoteTokenDisplayName() {
     return await LivePoolClientV2.getQuoteTokenDisplayName(this.ammPool.id, this.client);
   }
+
+  public async getBuyMemeTransactionsByOutput(args: GetSwapMemeTransactionsByOutputArgsV2) {
+    return await LivePoolClientV2.getBuyMemeTransactionsByOutput(args);
+  }
+
+  public async getSellMemeTransactionsByOutput(args: GetSwapMemeTransactionsByOutputArgsV2) {
+    return await LivePoolClientV2.getSellMemeTransactionsByOutput(args);
+  }
 }

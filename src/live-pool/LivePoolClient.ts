@@ -280,6 +280,22 @@ export class LivePoolClient {
   public async getMemePrice(args: { poolAddress: string; quotePriceInUsd: number; connection: Connection }) {
     return await LivePoolClient.getMemePrice(args);
   }
+
+  public async getBuyMemeOutput(args: GetSwapMemeOutputArgs): Promise<SwapMemeOutput> {
+    return await LivePoolClient.getBuyMemeOutput(args);
+  }
+
+  public async getSellMemeOutput(args: GetSwapMemeOutputArgs): Promise<SwapMemeOutput> {
+    return await LivePoolClient.getSellMemeOutput(args);
+  }
+
+  public async getBuyMemeTransactionsByOutput(args: GetSwapMemeTransactionsByOutputArgs) {
+    return await LivePoolClient.getBuyMemeTransactionsByOutput(args);
+  }
+
+  public async getSellMemeTransactionsByOutput(args: GetSwapMemeTransactionsByOutputArgs) {
+    return await LivePoolClient.getSellMemeTransactionsByOutput(args);
+  }
 }
 
 async function getReserveBalances(connection: Connection, addresses: PublicKey[]): Promise<[BN, BN]> {
