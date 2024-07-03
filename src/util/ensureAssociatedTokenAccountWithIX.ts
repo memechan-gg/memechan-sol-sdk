@@ -1,11 +1,4 @@
 import { Connection, PublicKey, Transaction } from "@solana/web3.js";
-import {
-  getAccount,
-  createAssociatedTokenAccountInstruction,
-  getAssociatedTokenAddressSync,
-  TOKEN_PROGRAM_ID,
-  ASSOCIATED_TOKEN_PROGRAM_ID,
-} from "@memechan/spl-token";
 
 export interface EnsureAssociatedTokenAccountWithIXArgs {
   connection: Connection;
@@ -18,6 +11,13 @@ export interface EnsureAssociatedTokenAccountWithIXArgs {
 export async function ensureAssociatedTokenAccountWithIX(
   args: EnsureAssociatedTokenAccountWithIXArgs,
 ): Promise<PublicKey> {
+  const {
+    getAccount,
+    createAssociatedTokenAccountInstruction,
+    getAssociatedTokenAddressSync,
+    TOKEN_PROGRAM_ID,
+    ASSOCIATED_TOKEN_PROGRAM_ID,
+  } = await import("@solana/spl-token");
   const { connection, payer, owner, mint, transaction } = args;
   const associatedTokenAddress = getAssociatedTokenAddressSync(
     mint,

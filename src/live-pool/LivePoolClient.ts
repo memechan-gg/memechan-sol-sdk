@@ -1,5 +1,4 @@
 import { ApiPoolInfoV4, Liquidity, Percent, Token, TokenAmount, jsonInfo2PoolKeys } from "@raydium-io/raydium-sdk";
-import { TOKEN_PROGRAM_ID } from "@memechan/spl-token";
 import { Connection, PublicKey } from "@solana/web3.js";
 import BigNumber from "bignumber.js";
 import { MEMECHAN_MEME_TOKEN_DECIMALS } from "../config/config";
@@ -40,6 +39,7 @@ export class LivePoolClient {
     slippagePercentage,
     connection,
   }: GetSwapMemeOutputArgs): Promise<SwapMemeOutput> {
+    const { TOKEN_PROGRAM_ID } = await import("@solana/spl-token");
     const tokenOut = new Token(TOKEN_PROGRAM_ID, memeCoinMint, MEMECHAN_MEME_TOKEN_DECIMALS);
     const { numerator, denominator } = getNumeratorAndDenominator(slippagePercentage);
     const slippage = new Percent(numerator, denominator);
@@ -137,6 +137,7 @@ export class LivePoolClient {
     slippagePercentage,
     connection,
   }: GetSwapMemeOutputArgs): Promise<SwapMemeOutput> {
+    const { TOKEN_PROGRAM_ID } = await import("@solana/spl-token");
     const memeToken = new Token(TOKEN_PROGRAM_ID, memeCoinMint, MEMECHAN_MEME_TOKEN_DECIMALS);
     const memeAmountIn = new TokenAmount(memeToken, amountIn, false);
     const { numerator, denominator } = getNumeratorAndDenominator(slippagePercentage);
@@ -241,7 +242,7 @@ export class LivePoolClient {
 
     const quoteTokenInfo = getTokenInfoByMint(poolKeys.quoteMint);
     const quoteAmountIn = new TokenAmount(quoteTokenInfo, 1000, false);
-
+    const { TOKEN_PROGRAM_ID } = await import("@solana/spl-token");
     const tokenOut = new Token(TOKEN_PROGRAM_ID, poolKeys.baseMint, MEMECHAN_MEME_TOKEN_DECIMALS);
     const slippage = new Percent(1, 10000);
 

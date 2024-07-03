@@ -1,5 +1,4 @@
 import { METADATA_PROGRAM_ID, Token } from "@raydium-io/raydium-sdk";
-import { TOKEN_PROGRAM_ID, getOrCreateAssociatedTokenAccount, mintTo } from "@memechan/spl-token";
 import {
   AddressLookupTableAccount,
   AddressLookupTableProgram,
@@ -83,10 +82,7 @@ import { MemechanClientV2 } from "../MemechanClientV2";
 import { MemeTicketClientV2 } from "../memeticket/MemeTicketClientV2";
 import { parseTxV2 } from "../tx-parsing/v2/parsingV2";
 import { getCreateMetadataTransactionV2 } from "../token/createMetadataV2";
-import * as utils from "@0xunreal/dynamic-amm-sdk/dist/cjs/src/amm/utils";
-import VaultImpl, { getVaultPdas } from "@0xunreal/vault-sdk";
 import { ASSOCIATED_PROGRAM_ID } from "@coral-xyz/anchor/dist/cjs/utils/token";
-import { FEE_OWNER, SEEDS } from "@0xunreal/dynamic-amm-sdk/dist/cjs/src/amm/constants";
 import { BoundPoolClient } from "./BoundPoolClient";
 import { TargetConfigClientV2 } from "../targetconfig/TargetConfigClientV2";
 import { ChanSwapClient } from "../chan-swap/ChanSwapClient";
@@ -115,7 +111,7 @@ export class BoundPoolClientV2 {
     poolAccountAddressId: PublicKey;
   }) {
     const poolObjectData = await BoundPoolClientV2.fetch2(client.connection, poolAccountAddressId);
-
+    const { TOKEN_PROGRAM_ID } = await import("@solana/spl-token");
     const boundClientInstance = new BoundPoolClientV2(
       poolAccountAddressId,
       client,
@@ -151,7 +147,7 @@ export class BoundPoolClientV2 {
     }
 
     const poolObjectData = await BoundPoolClientV2.fetch2(client.connection, newPoolInstructionData.poolAddr);
-
+    const { TOKEN_PROGRAM_ID } = await import("@solana/spl-token");
     const boundClientInstance = new BoundPoolClientV2(
       newPoolInstructionData.poolAddr,
       client,
@@ -264,7 +260,7 @@ export class BoundPoolClientV2 {
     });
 
     const quoteInfo = getTokenInfoByMint(quoteToken.mint);
-
+    const { TOKEN_PROGRAM_ID } = await import("@solana/spl-token");
     const createPoolInstruction = await memechanProgram.methods
       .newPool(airdroppedTokens)
       .accounts({
@@ -374,7 +370,7 @@ export class BoundPoolClientV2 {
 
     const id = this.findBoundPoolPda(memeMint, quoteToken.mint, memechanProgram.programId);
     const poolObjectData = await BoundPoolClientV2.fetch2(client.connection, id);
-
+    const { TOKEN_PROGRAM_ID } = await import("@solana/spl-token");
     return new BoundPoolClientV2(
       id,
       client,
@@ -473,6 +469,7 @@ export class BoundPoolClientV2 {
     payer: Signer,
     amount: number = 1_000_000,
   ) {
+    const { mintTo } = await import("@solana/spl-token");
     return mintTo(provider.connection, payer, mint, wallet, authority, amount);
   }
 
@@ -492,7 +489,7 @@ export class BoundPoolClientV2 {
       poolId: pool,
       userId: user.publicKey,
     });
-
+    const { getOrCreateAssociatedTokenAccount } = await import("@solana/spl-token");
     const userQuoteAcc =
       input.userSolAcc ??
       (
@@ -509,7 +506,7 @@ export class BoundPoolClientV2 {
 
     console.log("solIn: ", solIn);
     console.log("memeOut: ", memeOut);
-
+    const { TOKEN_PROGRAM_ID } = await import("@solana/spl-token");
     await this.client.memechanProgram.methods
       .swapY(new BN(solIn), new BN(memeOut), new BN(memeTicketNumber))
       .accounts({
@@ -607,7 +604,7 @@ export class BoundPoolClientV2 {
     }
 
     addWrapSOLInstructionIfNativeMint(this.quoteTokenMint, user, inputTokenAccount, inputAmountBN, transaction);
-
+    const { TOKEN_PROGRAM_ID } = await import("@solana/spl-token");
     const buyMemeInstruction = await this.client.memechanProgram.methods
       .swapY(inputAmountBN, minOutputBN, ticketNumberBN)
       .accounts({
@@ -695,7 +692,7 @@ export class BoundPoolClientV2 {
       });
     }
     addWrapSOLInstructionIfNativeMint(quoteMint, user, inputTokenAccount, inputAmountBN, transaction);
-
+    const { TOKEN_PROGRAM_ID } = await import("@solana/spl-token");
     const buyMemeInstruction = await client.memechanProgram.methods
       .swapY(inputAmountBN, minOutputBN, ticketNumberBN)
       .accounts({
@@ -853,7 +850,7 @@ export class BoundPoolClientV2 {
     } else {
       destinationTicket = ticketsRequiredToSell[0];
     }
-
+    const { TOKEN_PROGRAM_ID } = await import("@solana/spl-token");
     const sellMemeTransactionInstruction = await this.client.memechanProgram.methods
       .swapX(new BN(inputAmountBN), new BN(minOutputBN))
       .accounts({
@@ -948,7 +945,7 @@ export class BoundPoolClientV2 {
 
     const memeTicket = input.userMemeTicket;
     const userSolAcc = input.userQuoteAcc;
-
+    const { TOKEN_PROGRAM_ID } = await import("@solana/spl-token");
     const sellMemeTransactionInstruction = await this.client.memechanProgram.methods
       .swapX(new BN(memeIn), new BN(minQuoteAmountOut))
       .accounts({
@@ -1005,7 +1002,7 @@ export class BoundPoolClientV2 {
       owner: stakingSigner,
       transaction: tx,
     });
-
+    const { TOKEN_PROGRAM_ID } = await import("@solana/spl-token");
     const methodArgs = {
       pool,
       signer: user,
@@ -1063,6 +1060,10 @@ export class BoundPoolClientV2 {
   }> {
     const { user, memeVault, quoteVault, transaction = new Transaction(), tokenInfoA, tokenInfoB, client } = args;
 
+    const vaultModule = await import("@mercurial-finance/vault-sdk");
+    const VaultImpl = vaultModule.default;
+    const { getVaultPdas } = vaultModule;
+
     const { connection, memechanProgram } = client;
     const memechanProgramId = memechanProgram.programId;
 
@@ -1081,6 +1082,8 @@ export class BoundPoolClientV2 {
     const modifyComputeUnits = ComputeBudgetProgram.setComputeUnitLimit({
       units: 500000,
     });
+
+    const utils = await import("@mercurial-finance/dynamic-amm-sdk/dist/cjs/src/amm/utils");
 
     transaction.add(modifyComputeUnits);
 
@@ -1159,7 +1162,7 @@ export class BoundPoolClientV2 {
       PublicKey.findProgramAddressSync([aVault.toBuffer(), poolPubkey.toBuffer()], ammProgram.programId),
       PublicKey.findProgramAddressSync([bVault.toBuffer(), poolPubkey.toBuffer()], ammProgram.programId),
     ];
-
+    const { FEE_OWNER, SEEDS } = await import("@mercurial-finance/dynamic-amm-sdk/dist/cjs/src/amm/constants");
     const [[adminTokenAFee], [adminTokenBFee]] = [
       PublicKey.findProgramAddressSync(
         [Buffer.from(SEEDS.FEE), tokenAMint.toBuffer(), poolPubkey.toBuffer()],
@@ -1188,7 +1191,7 @@ export class BoundPoolClientV2 {
 
     const escrowAta = await utils.getAssociatedTokenAccount(lpMint, lockEscrowPK);
     console.log(escrowAta);
-
+    const { TOKEN_PROGRAM_ID } = await import("@solana/spl-token");
     console.log("7");
     const goLiveInstruction = await client.memechanProgram.methods
       .initMemeAmmPool()
@@ -1348,10 +1351,15 @@ export class BoundPoolClientV2 {
     const tradeFeeBps = new BN(100);
     const { connection } = client;
 
+    const utils = await import("@mercurial-finance/dynamic-amm-sdk/dist/cjs/src/amm/utils");
+
     const { vaultProgram, ammProgram } = utils.createProgram(connection);
 
     const tokenAMint = new PublicKey(tokenInfoA.mint);
     const tokenBMint = new PublicKey(tokenInfoB.mint);
+    const vaultModule = await import("@mercurial-finance/vault-sdk");
+    const VaultImpl = vaultModule.default;
+    const { getVaultPdas } = vaultModule;
     const [
       { vaultPda: aVault, tokenVaultPda: aTokenVault, lpMintPda: aLpMintPda },
       { vaultPda: bVault, tokenVaultPda: bTokenVault, lpMintPda: bLpMintPda },
@@ -1416,7 +1424,7 @@ export class BoundPoolClientV2 {
       PublicKey.findProgramAddressSync([aVault.toBuffer(), poolPubkey.toBuffer()], ammProgram.programId),
       PublicKey.findProgramAddressSync([bVault.toBuffer(), poolPubkey.toBuffer()], ammProgram.programId),
     ];
-
+    const { FEE_OWNER, SEEDS } = await import("@mercurial-finance/dynamic-amm-sdk/dist/cjs/src/amm/constants");
     const [[adminTokenAFee], [adminTokenBFee]] = [
       PublicKey.findProgramAddressSync(
         [Buffer.from(SEEDS.FEE), tokenAMint.toBuffer(), poolPubkey.toBuffer()],
@@ -1449,6 +1457,8 @@ export class BoundPoolClientV2 {
     const fetchedChanSwap = await client.memechanProgram.account.chanSwap.fetch(chanSwap);
 
     const staking = await client.memechanProgram.account.stakingPool.fetch(stakingId);
+
+    const { TOKEN_PROGRAM_ID } = await import("@solana/spl-token");
 
     console.log("7");
     const goLiveInstruction = await client.memechanProgram.methods
@@ -1509,6 +1519,7 @@ export class BoundPoolClientV2 {
       payer: admin,
       recentSlot: slot,
     });
+
     const extendIxs = AddressLookupTableProgram.extendLookupTable({
       payer: admin,
       lookupTable: LUTaddr,

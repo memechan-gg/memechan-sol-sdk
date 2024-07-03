@@ -15,7 +15,6 @@ import {
   u32,
   u16,
 } from "@raydium-io/raydium-sdk";
-import { TOKEN_PROGRAM_ID, createInitializeAccountInstruction } from "@memechan/spl-token";
 import {
   ComputeBudgetProgram,
   Connection,
@@ -100,6 +99,7 @@ export class MarketV2 extends Base {
       fromPublicKey: wallet,
       programId: dexProgramId,
     });
+    const { TOKEN_PROGRAM_ID } = await import("@solana/spl-token");
     const requestQueue = generatePubKey({ fromPublicKey: wallet, programId: dexProgramId });
     const eventQueue = generatePubKey({ fromPublicKey: wallet, programId: dexProgramId });
     const bids = generatePubKey({ fromPublicKey: wallet, programId: dexProgramId });
@@ -208,6 +208,7 @@ export class MarketV2 extends Base {
     });
 
     ins1.push(addPriorityFee);
+    const { TOKEN_PROGRAM_ID, createInitializeAccountInstruction } = await import("@solana/spl-token");
 
     ins1.push(
       SystemProgram.createAccountWithSeed({
@@ -381,7 +382,10 @@ export class MarketV2 extends Base {
   public static generatePubKeyFromSeed({
     fromSeed,
     fromPublicKey,
-    programId = TOKEN_PROGRAM_ID,
+    // Tamas:TODO:1
+    // Here it was programId = TOKEN_PROGRAM_ID before
+    // now refactored to only programId, is this ok?
+    programId,
   }: {
     fromSeed: PublicKey;
     fromPublicKey: PublicKey;

@@ -1,4 +1,3 @@
-import * as splToken from "@memechan/spl-token";
 import { PublicKey, Connection, Keypair } from "@solana/web3.js";
 import { MEMECHAN_MEME_TOKEN_DECIMALS } from "../config/config";
 
@@ -19,6 +18,7 @@ export class MintUtils {
   }
 
   async createMint(nbDecimals = MEMECHAN_MEME_TOKEN_DECIMALS): Promise<PublicKey> {
+    const splToken = await import("@solana/spl-token");
     const kp = Keypair.generate();
     return await splToken.createMint(
       this.conn,
@@ -52,15 +52,18 @@ export class MintUtils {
   }
 
   public async createTokenAccount(mint: PublicKey, payer: Keypair, owner: PublicKey) {
+    const splToken = await import("@solana/spl-token");
     const account = Keypair.generate();
     return splToken.createAccount(this.conn, payer, mint, owner, account);
   }
 
   public async getOrCreateTokenAccount(mint: PublicKey, payer: Keypair, owner: PublicKey) {
+    const splToken = await import("@solana/spl-token");
     return await splToken.getOrCreateAssociatedTokenAccount(this.conn, payer, mint, owner, false);
   }
 
   public async mintTo(mint: PublicKey, tokenAccount: PublicKey, amount: bigint = BigInt("0x2F00000000000000")) {
+    const splToken = await import("@solana/spl-token");
     await splToken.mintTo(this.conn, this.authority, mint, tokenAccount, this.authority, amount);
   }
 }

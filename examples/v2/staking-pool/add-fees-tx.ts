@@ -3,8 +3,6 @@ import { StakingPool as CodegenStakingPool } from "../../../src/schema/v2/codege
 import { BoundPoolClientV2, MEME_TOKEN_DECIMALS, StakingPoolClientV2, TOKEN_INFOS, TokenInfo } from "../../../src";
 import { PublicKey } from "@solana/web3.js";
 import { AmmPool } from "../../../src/meteora/AmmPool";
-import AmmImpl from "@0xunreal/dynamic-amm-sdk";
-import { NATIVE_MINT } from "@memechan/spl-token";
 
 // yarn tsx examples/v2/staking-pool/add-fees-tx.ts > add-fees-tx.txt 2>&1
 export const addFeesTx = async () => {
@@ -18,6 +16,10 @@ export const addFeesTx = async () => {
   });
   const fetchedStakingPool = await CodegenStakingPool.fetch(connection, stakingPoolAddress);
   console.log("fetchedStakingPool:", fetchedStakingPool?.toJSON());
+
+  const { default: AmmImpl } = await import("@mercurial-finance/dynamic-amm-sdk");
+
+  const { NATIVE_MINT } = await import("@solana/spl-token");
 
   const memeTokenInfo = new TokenInfo({
     decimals: MEME_TOKEN_DECIMALS,

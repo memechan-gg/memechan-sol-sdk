@@ -7,7 +7,6 @@ import { DUMMY_TOKEN_METADATA, admin, client, payer } from "./common/common";
 import { MemeTicketClient } from "../src/memeticket/MemeTicketClient";
 import { swapOnlyAmm } from "../src/raydium/swapOnlyAmm";
 import { Percent, TokenAmount, Token } from "@raydium-io/raydium-sdk";
-import { TOKEN_PROGRAM_ID } from "@memechan/spl-token";
 import { PublicKey } from "@solana/web3.js";
 import { getWalletTokenAccount } from "../src/util";
 
@@ -91,7 +90,7 @@ export function test() {
 
       const ammPool = livePool.ammPoolInfo;
       console.log("ammPool: " + JSON.stringify(ammPool));
-
+      const { TOKEN_PROGRAM_ID } = await import("@solana/spl-token");
       const inputToken = TOKEN_INFOS.WSOL;
       const outputToken = new Token(TOKEN_PROGRAM_ID, ammPool.baseMint, MEMECHAN_MEME_TOKEN_DECIMALS);
       const inputTokenAmount = new TokenAmount(inputToken, 1000 * 1e9);
@@ -236,7 +235,7 @@ export function test() {
 
       const ammPool = livePool.ammPoolInfo;
       console.log("ammPool: " + JSON.stringify(ammPool));
-
+      const { TOKEN_PROGRAM_ID } = await import("@solana/spl-token");
       const inputToken = TOKEN_INFOS.WSOL;
       const outputToken = new Token(TOKEN_PROGRAM_ID, ammPool.baseMint, MEMECHAN_MEME_TOKEN_DECIMALS);
       const inputTokenAmount = new TokenAmount(inputToken, 1000 * 1e9);
@@ -325,7 +324,7 @@ export function test() {
 
       const ammPool = livePool.ammPoolInfo;
       console.log("ammPool: " + JSON.stringify(ammPool));
-
+      const { TOKEN_PROGRAM_ID } = await import("@solana/spl-token");
       const inputToken = TOKEN_INFOS.WSOL;
       const outputToken = new Token(TOKEN_PROGRAM_ID, ammPool.baseMint, MEMECHAN_MEME_TOKEN_DECIMALS);
       const inputTokenAmount = new TokenAmount(inputToken, 1000 * 1e9);
@@ -438,7 +437,7 @@ export function test() {
 
       const ammPool = livePool.ammPoolInfo;
       console.log("ammPool: " + JSON.stringify(ammPool));
-
+      const { TOKEN_PROGRAM_ID } = await import("@solana/spl-token");
       const inputToken = TOKEN_INFOS.WSOL;
       const outputToken = new Token(TOKEN_PROGRAM_ID, ammPool.baseMint, MEMECHAN_MEME_TOKEN_DECIMALS);
       const inputTokenAmount = new TokenAmount(inputToken, 1000 * 1e9);
@@ -575,7 +574,7 @@ export function test() {
 
       const ammPool = livePool.ammPoolInfo;
       console.log("ammPool: " + JSON.stringify(ammPool));
-
+      const { TOKEN_PROGRAM_ID } = await import("@solana/spl-token");
       const inputToken = TOKEN_INFOS.WSOL;
       const outputToken = new Token(TOKEN_PROGRAM_ID, ammPool.baseMint, MEMECHAN_MEME_TOKEN_DECIMALS);
       const inputTokenAmount = new TokenAmount(inputToken, 1000 * 1e9);
@@ -667,6 +666,7 @@ export function test() {
       console.log("ammPool: " + JSON.stringify(ammPool));
 
       const inputToken = TOKEN_INFOS.WSOL;
+      const { TOKEN_PROGRAM_ID } = await import("@solana/spl-token");
       const outputToken = new Token(TOKEN_PROGRAM_ID, ammPool.baseMint, MEMECHAN_MEME_TOKEN_DECIMALS);
       const inputTokenAmount = new TokenAmount(inputToken, 10000);
       const slippage = new Percent(5, 100);

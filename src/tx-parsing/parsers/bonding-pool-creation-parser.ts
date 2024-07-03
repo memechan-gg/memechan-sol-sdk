@@ -2,7 +2,7 @@ import { ParsedTransactionWithMeta, PublicKey } from "@solana/web3.js";
 import { IdlAccounts } from "@coral-xyz/anchor";
 import { MemechanClient } from "../../MemechanClient";
 import { MemechanSol } from "../../schema/types/memechan_sol";
-import { Mint, getMint } from "@memechan/spl-token";
+import type { Mint } from "@solana/spl-token";
 
 type Pool = IdlAccounts<MemechanSol>["boundPool"];
 
@@ -36,6 +36,7 @@ export async function parseNewBPInstruction(
   }
 
   const newMintAddr = ix.accounts[2];
+  const { getMint } = await import("@solana/spl-token");
   const newMint = await getMint(client.connection, newMintAddr);
 
   const bpParsed: NewBPInstructionParsed = {
