@@ -306,11 +306,43 @@ export class LivePoolClientV2 {
     return await LivePoolClientV2.getQuoteTokenDisplayName(this.ammPool.id, this.client);
   }
 
-  public async getBuyMemeTransactionsByOutput(args: GetSwapMemeTransactionsByOutputArgsV2) {
-    return await LivePoolClientV2.getBuyMemeTransactionsByOutput(args);
+  public async getBuyMemeTransactionsByOutput({
+    wrappedAmountIn,
+    inTokenMint,
+    payer,
+    minAmountOut,
+  }: GetSwapMemeTransactionsByOutputArgsV2) {
+    const inTokenInfo = getTokenInfoByMint(inTokenMint);
+    const normalizedAmountIn = normalizeInputCoinAmountBN(wrappedAmountIn.toString(), inTokenInfo.decimals);
+
+    const swapTx = await this.ammPool.ammImpl.swap(payer, inTokenMint, normalizedAmountIn, minAmountOut);
+
+    const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
+      microLamports: COMPUTE_UNIT_PRICE,
+    });
+
+    swapTx.instructions.unshift(addPriorityFee);
+
+    return swapTx;
   }
 
-  public async getSellMemeTransactionsByOutput(args: GetSwapMemeTransactionsByOutputArgsV2) {
-    return await LivePoolClientV2.getSellMemeTransactionsByOutput(args);
+  public async getSellMemeTransactionsByOutput({
+    wrappedAmountIn,
+    payer,
+    minAmountOut,
+    inTokenMint,
+  }: GetSwapMemeTransactionsByOutputArgsV2) {
+    const inTokenInfo = getTokenInfoByMint(inTokenMint);
+    const normalizedAmountIn = normalizeInputCoinAmountBN(wrappedAmountIn.toString(), inTokenInfo.decimals);
+
+    const swapTx = await this.ammPool.ammImpl.swap(payer, inTokenMint, normalizedAmountIn, minAmountOut);
+
+    const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
+      microLamports: COMPUTE_UNIT_PRICE,
+    });
+
+    swapTx.instructions.unshift(addPriorityFee);
+
+    return swapTx;
   }
 }
