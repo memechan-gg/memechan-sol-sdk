@@ -15,7 +15,6 @@ import { TokenInfo as SplTokenInfo } from "@solana/spl-token-registry";
 import type { PoolState } from "@mercurial-finance/dynamic-amm-sdk";
 import { AmmPool } from "../meteora/AmmPool";
 import { MemechanClientV2 } from "../MemechanClientV2";
-import { createProgram } from "@mercurial-finance/dynamic-amm-sdk/dist/esm/src/amm/utils";
 import { normalizeInputCoinAmountBN } from "../util/trading/normalizeInputCoinAmountBN";
 
 export class LivePoolClientV2 {
@@ -25,6 +24,7 @@ export class LivePoolClientV2 {
   ) {}
 
   public static getPoolState = async (ammId: PublicKey, connection: Connection) => {
+    const { createProgram } = await import("@mercurial-finance/dynamic-amm-sdk/dist/cjs/src/amm/utils");
     const { ammProgram } = createProgram(connection);
 
     const poolState = (await ammProgram.account.pool.fetchNullable(ammId)) as unknown as PoolState;
