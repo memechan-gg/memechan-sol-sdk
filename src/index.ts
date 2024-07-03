@@ -4,6 +4,7 @@ export * from "./MemechanClientV2";
 export * from "./bound-pool/BoundPoolClient";
 export * from "./bound-pool/BoundPoolClientV2";
 export * from "./live-pool/LivePoolClient";
+export * from "./live-pool/LivePoolClientV2";
 export * from "./memeticket/MemeTicketClient";
 export * from "./memeticket/MemeTicketClientV2";
 export * from "./staking-pool/StakingPoolClient";

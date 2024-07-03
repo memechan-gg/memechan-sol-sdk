@@ -1,5 +1,23 @@
 import { ApiPoolInfoV4, CurrencyAmount, TokenAccount, TokenAmount, jsonInfo2PoolKeys } from "@raydium-io/raydium-sdk";
 import { Connection, PublicKey } from "@solana/web3.js";
+import BN from "bn.js";
+
+import type AmmImpl from "@mercurial-finance/dynamic-amm-sdk";
+
+export type SwapMemeOutputV2 = {
+  minAmountOut: BN;
+  ammImpl: AmmImpl;
+  wrappedAmountIn: BN;
+};
+
+export type GetSwapMemeTransactionsByOutputArgsV2 = SwapMemeOutputV2 & {
+  inTokenMint: PublicKey;
+  payer: PublicKey;
+};
+
+export type GetSwapMemeTransactionsArgsV2 = GetSwapMemeOutputArgs & {
+  payer: PublicKey;
+};
 
 export type GetSwapMemeOutputArgs = {
   poolAddress: string;

@@ -5,6 +5,8 @@ import { TokenInfo } from "./types";
 
 export const NATIVE_MINT = new PublicKey("So11111111111111111111111111111111111111112");
 
+export const MERCURIAL_AMM_PROGRAM_ID = "Eo7WjKq67rjJQSZxS6z3YkapzY3eMj6Xy8X5EQVn5UaB";
+
 export const BE_URL_DEV = "https://dmgrnigolfno6.cloudfront.net";
 
 /**
