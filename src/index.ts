@@ -52,6 +52,8 @@ export * from "./tx-parsing/parsers/swap-x-parser";
 export * from "./tx-parsing/parsers/swap-y-parser";
 export * from "./tx-parsing/parsers/create-metadata-parser";
 
+export * from "./tx-parsing/v2/parsingV2";
+
 // Codegen
 export * from "./vesting/schema/codegen/accounts/Vesting";
 export * from "./schema/v1";
