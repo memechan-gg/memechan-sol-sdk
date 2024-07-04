@@ -17,7 +17,7 @@ import { clientV2, payer } from "../../common";
 
   const memeTokenInfo = new TokenInfo({
     decimals: MEME_TOKEN_DECIMALS,
-    mint: stakingPool.memeMint,
+    mint: new PublicKey(stakingPool.memeMint),
     name: "MEME",
     programId: clientV2.memechanProgram.programId,
     symbol: "MEME",
