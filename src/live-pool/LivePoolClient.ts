@@ -40,7 +40,7 @@ export class LivePoolClient {
     connection,
   }: GetSwapMemeOutputArgs): Promise<SwapMemeOutput> {
     const { TOKEN_PROGRAM_ID } = await import("@solana/spl-token");
-    const tokenOut = new Token(TOKEN_PROGRAM_ID, memeCoinMint, MEMECHAN_MEME_TOKEN_DECIMALS);
+    const tokenOut = new Token(TOKEN_PROGRAM_ID, new PublicKey(memeCoinMint), MEMECHAN_MEME_TOKEN_DECIMALS);
     const { numerator, denominator } = getNumeratorAndDenominator(slippagePercentage);
     const slippage = new Percent(numerator, denominator);
 
@@ -138,7 +138,7 @@ export class LivePoolClient {
     connection,
   }: GetSwapMemeOutputArgs): Promise<SwapMemeOutput> {
     const { TOKEN_PROGRAM_ID } = await import("@solana/spl-token");
-    const memeToken = new Token(TOKEN_PROGRAM_ID, memeCoinMint, MEMECHAN_MEME_TOKEN_DECIMALS);
+    const memeToken = new Token(TOKEN_PROGRAM_ID, new PublicKey(memeCoinMint), MEMECHAN_MEME_TOKEN_DECIMALS);
     const memeAmountIn = new TokenAmount(memeToken, amountIn, false);
     const { numerator, denominator } = getNumeratorAndDenominator(slippagePercentage);
     const slippage = new Percent(numerator, denominator);

@@ -1,0 +1,481 @@
+yarn run v1.22.19
+warning ../../../../package.json: No license field
+$ /Users/harunskender/Documents/code/Memechan/memechan-sol-sdk/node_modules/.bin/tsx examples/live-pool/swap.ts
+bigint: Failed to load bindings, pure JS will be used (try npm run rebuild?)
+MemechanClientV2 init. Program id: CaR9ciDnNnE6WX35tZWrjeGdKUPaft7r4oQGF4JhwVxZ, RPC: https://rpc1.memechan.xyz/
+targetPoolInfo: {
+  id: 'BevUTtVUZQ4LdwWfcq4Uom88yuj1WE2EUiZBgESUsFQT',
+  baseMint: '2Y3jTuAc778X9Fgh9iejxpK6zBYDSwpUdr1Kz5SdGh5x',
+  quoteMint: '9pECN2xxLQo22bFYpsNr3T3eW1UdEDtSqPQopFrGv7n4',
+  lpMint: 'AyU1ZLDe6FfxQGBjJaVM5tEdxwLXM5K3EE4LTPt2hBKd',
+  baseDecimals: 6,
+  quoteDecimals: 9,
+  lpDecimals: 6,
+  version: 4,
+  programId: '675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8',
+  authority: '5Q544fKrFoe6tsEbD7S8EmxGTJYAKtTVhAW5Q5pge4j1',
+  openOrders: 'E8S7oabVSGo1KebRjoMgw6R1KAsgPX5PUfWZmsu9PDih',
+  targetOrders: 'EF39rwwQHAgjhi3GSZR7YHSvijZ2iZUny38nA1PstQF7',
+  baseVault: 'jCqj2i36zJbuBjTg2GjoEdcwsa75hbNgu7uvHMJnKTP',
+  quoteVault: '51GhMLy4LVk4f6jReMvcfWxxVUrZtR3ePXLXkSmBATmP',
+  withdrawQueue: '11111111111111111111111111111111',
+  lpVault: '11111111111111111111111111111111',
+  marketVersion: 3,
+  marketProgramId: 'srmqPvymJeFKQ4zGQed1GFppgkRHL9kaELCbyksJtPX',
+  marketId: 'HY5Qb9WMbBMUocHALtesu8jX26xnbTmYiopRcqY7ysXe',
+  marketAuthority: 'HhuxQducQvS8yqi5durMHf2QEBgQg5MrJdYMe7uD8A8k',
+  marketBaseVault: 'FKfjhxtm1L3Ct64oawPo7LjyFJPgSVDVqQLtLJxXLd1R',
+  marketQuoteVault: 'GJP4jJnKb9jFe1vK4bSWih2SgSfQ57BqHnmFJXVxRX4S',
+  marketBids: '6BoERqCZU2TyJeXEdV6eZ5n1kuwuMXrfFY3nbKc2Frge',
+  marketAsks: 'A8siaWa81w5sfy9waNPfFyfA8XfgdW1wkDHUdKubKQTq',
+  marketEventQueue: '6mnvLXojaeysZLz97aHjFzGYrLV6WdoMWCvAKtoM8rcQ',
+  lookupTableAccount: '11111111111111111111111111111111'
+}
+poolInfo: {
+  status: <BN: 6>,
+  baseDecimals: 6,
+  quoteDecimals: 9,
+  lpDecimals: 6,
+  baseReserve: <BN: b4d6caee3f96>,
+  quoteReserve: <BN: 22be1bb5d610>,
+  lpSupply: <BN: 4f2b3b550cb7>,
+  startTime: <BN: 665a5f6a>
+}
+/Users/harunskender/Documents/code/Memechan/memechan-sol-sdk/node_modules/@raydium-io/raydium-sdk/src/common/logger.ts:213
+    const error: any = new Error(message)
+                       ^
+
+
+Error: token not match with pool (argument="poolKeys"), value={"poolKeys":{"id":"BevUTtVUZQ4LdwWfcq4Uom88yuj1WE2EUiZBgESUsFQT","baseMint":"2Y3jTuAc778X9Fgh9iejxpK6zBYDSwpUdr1Kz5SdGh5x","quoteMint":"9pECN2xxLQo22bFYpsNr3T3eW1UdEDtSqPQopFrGv7n4","lpMint":"AyU1ZLDe6FfxQGBjJaVM5tEdxwLXM5K3EE4LTPt2hBKd","baseDecimals":6,"quoteDecimals":9,"lpDecimals":6,"version":4,"programId":"675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8","authority":"5Q544fKrFoe6tsEbD7S8EmxGTJYAKtTVhAW5Q5pge4j1","openOrders":"E8S7oabVSGo1KebRjoMgw6R1KAsgPX5PUfWZmsu9PDih","targetOrders":"EF39rwwQHAgjhi3GSZR7YHSvijZ2iZUny38nA1PstQF7","baseVault":"jCqj2i36zJbuBjTg2GjoEdcwsa75hbNgu7uvHMJnKTP","quoteVault":"51GhMLy4LVk4f6jReMvcfWxxVUrZtR3ePXLXkSmBATmP","withdrawQueue":"11111111111111111111111111111111","lpVault":"11111111111111111111111111111111","marketVersion":3,"marketProgramId":"srmqPvymJeFKQ4zGQed1GFppgkRHL9kaELCbyksJtPX","marketId":"HY5Qb9WMbBMUocHALtesu8jX26xnbTmYiopRcqY7ysXe","marketAuthority":"HhuxQducQvS8yqi5durMHf2QEBgQg5MrJdYMe7uD8A8k","marketBaseVault":"FKfjhxtm1L3Ct64oawPo7LjyFJPgSVDVqQLtLJxXLd1R","marketQuoteVault":"GJP4jJnKb9jFe1vK4bSWih2SgSfQ57BqHnmFJXVxRX4S","marketBids":"6BoERqCZU2TyJeXEdV6eZ5n1kuwuMXrfFY3nbKc2Frge","marketAsks":"A8siaWa81w5sfy9waNPfFyfA8XfgdW1wkDHUdKubKQTq","marketEventQueue":"6mnvLXojaeysZLz97aHjFzGYrLV6WdoMWCvAKtoM8rcQ","lookupTableAccount":"11111111111111111111111111111111"},"tokenIn":{"decimals":9,"symbol":"SLERF","name":"SLERF","programId":"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA","mint":"7BgBvyjrZX1YKz4oh9mjb8ZScatkkwb8DzFx7LoiVkM3","targetConfig":"5g13tz8GKWySjtzPRARuzzQM7LbMCUBMPGPef5PKe4JJ","targetConfigV2":"5g13tz8GKWySjtzPRARuzzQM7LbMCUBMPGPef5PKe4JJ","displayName":"SLERF"},"tokenOut":{"decimals":6,"symbol":"UNKNOWN","name":"UNKNOWN","programId":"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA","mint":"2Y3jTuAc778X9Fgh9iejxpK6zBYDSwpUdr1Kz5SdGh5x"}}), code=INVALID_ARGUMENT, module=Liquidity, version=1.1.0-beta.6)
+    at Logger.makeError (/Users/harunskender/Documents/code/Memechan/memechan-sol-sdk/node_modules/@raydium-io/raydium-sdk/src/common/logger.ts:213:24)
+    at Logger.throwError (/Users/harunskender/Documents/code/Memechan/memechan-sol-sdk/node_modules/@raydium-io/raydium-sdk/src/common/logger.ts:225:16)
+    at Logger.throwArgumentError (/Users/harunskender/Documents/code/Memechan/memechan-sol-sdk/node_modules/@raydium-io/raydium-sdk/src/common/logger.ts:229:17)
+    at Logger.assertArgument (/Users/harunskender/Documents/code/Memechan/memechan-sol-sdk/node_modules/@raydium-io/raydium-sdk/src/common/logger.ts:246:10)
+    at Function.Liquidity.computeAmountOut (/Users/harunskender/Documents/code/Memechan/memechan-sol-sdk/node_modules/@raydium-io/raydium-sdk/src/liquidity/liquidity.ts:2301:12)
+    at swapOnlyAmm (/Users/harunskender/Documents/code/Memechan/memechan-sol-sdk/src/raydium/swapOnlyAmm.ts:48:49)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at swap (/Users/harunskender/Documents/code/Memechan/memechan-sol-sdk/examples/live-pool/swap.ts:20:17) {
+  reason: 'token not match with pool',
+  code: 'INVALID_ARGUMENT',
+  argument: 'poolKeys',
+  value: {
+    poolKeys: {
+      id: PublicKey [PublicKey(BevUTtVUZQ4LdwWfcq4Uom88yuj1WE2EUiZBgESUsFQT)] {
+        _bn: BN {
+          negative: 0,
+          words: [
+            46741288, 40137554,
+            16168038, 59778624,
+            50355462, 20526810,
+            18457450, 22905815,
+            40329145,  2593524,
+                   0
+          ],
+          length: 10,
+          red: null
+        }
+      },
+      baseMint: PublicKey [PublicKey(2Y3jTuAc778X9Fgh9iejxpK6zBYDSwpUdr1Kz5SdGh5x)] {
+        _bn: BN {
+          negative: 0,
+          words: [
+            62799735, 19305107,
+            59501755, 51537250,
+            37186915, 46200430,
+            45141682, 47643275,
+            67073014,   373745,
+                   0
+          ],
+          length: 10,
+          red: null
+        }
+      },
+      quoteMint: PublicKey [PublicKey(9pECN2xxLQo22bFYpsNr3T3eW1UdEDtSqPQopFrGv7n4)] {
+        _bn: BN {
+          negative: 0,
+          words: [
+            31677413, 57302889,
+             3730004, 59097416,
+            14059518, 44150235,
+            29315307, 53957414,
+            47128139,  2145709,
+                   0
+          ],
+          length: 10,
+          red: null
+        }
+      },
+      lpMint: PublicKey [PublicKey(AyU1ZLDe6FfxQGBjJaVM5tEdxwLXM5K3EE4LTPt2hBKd)] {
+        _bn: BN {
+          negative: 0,
+          words: [
+            29274448, 54397235,
+            31625442, 43655283,
+            55101210, 59588446,
+            24403552,  4210786,
+            56413853,  2427919,
+                   0
+          ],
+          length: 10,
+          red: null
+        }
+      },
+      baseDecimals: 6,
+      quoteDecimals: 9,
+      lpDecimals: 6,
+      version: 4,
+      programId: PublicKey [PublicKey(675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8)] {
+        _bn: BN {
+          negative: 0,
+          words: [
+            11963085, 66789246,
+            36344015, 24364166,
+            10598807, 27841683,
+            58265297, 51182721,
+            29636098,  1242706,
+                   0
+          ],
+          length: 10,
+          red: null
+        }
+      },
+      authority: PublicKey [PublicKey(5Q544fKrFoe6tsEbD7S8EmxGTJYAKtTVhAW5Q5pge4j1)] {
+        _bn: BN {
+          negative: 0,
+          words: [
+            42570504,   893768,
+            37305141, 17728018,
+            59696985, 57622133,
+            10888578, 51901329,
+             5771057,  1070572,
+                   0
+          ],
+          length: 10,
+          red: null
+        }
+      },
+      openOrders: PublicKey [PublicKey(E8S7oabVSGo1KebRjoMgw6R1KAsgPX5PUfWZmsu9PDih)] {
+        _bn: BN {
+          negative: 0,
+          words: [
+            64756754, 49278506,
+            30895162, 57958005,
+            46542122,  8438971,
+             8120162, 36417424,
+            22749211,  3195865,
+                   0
+          ],
+          length: 10,
+          red: null
+        }
+      },
+      targetOrders: PublicKey [PublicKey(EF39rwwQHAgjhi3GSZR7YHSvijZ2iZUny38nA1PstQF7)] {
+        _bn: BN {
+          negative: 0,
+          words: [
+             2771398, 21521163,
+            37982176, 67027052,
+            26158387, 14177391,
+            40738738, 39584346,
+            47885248,  3223583,
+                   0
+          ],
+          length: 10,
+          red: null
+        }
+      },
+      baseVault: PublicKey [PublicKey(jCqj2i36zJbuBjTg2GjoEdcwsa75hbNgu7uvHMJnKTP)] {
+        _bn: BN {
+          negative: 0,
+          words: [
+            53203610, 16830563,
+            32303679, 38524916,
+            32430519, 19889014,
+            30211659,  7214973,
+             1513528,   177138,
+                   0
+          ],
+          length: 10,
+          red: null
+        }
+      },
+      quoteVault: PublicKey [PublicKey(51GhMLy4LVk4f6jReMvcfWxxVUrZtR3ePXLXkSmBATmP)] {
+        _bn: BN {
+          negative: 0,
+          words: [
+            14493950, 18744371,
+             4488720,  1189456,
+             5854000, 42305686,
+             4463905,   195312,
+            45175131,   974879,
+                   0
+          ],
+          length: 10,
+          red: null
+        }
+      },
+      withdrawQueue: PublicKey [PublicKey(11111111111111111111111111111111)] {
+        _bn: BN {
+          negative: 0,
+          words: [
+            0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0,
+            0
+          ],
+          length: 1,
+          red: null
+        }
+      },
+      lpVault: PublicKey [PublicKey(11111111111111111111111111111111)] {
+        _bn: BN {
+          negative: 0,
+          words: [
+            0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0,
+            0
+          ],
+          length: 1,
+          red: null
+        }
+      },
+      marketVersion: 3,
+      marketProgramId: PublicKey [PublicKey(srmqPvymJeFKQ4zGQed1GFppgkRHL9kaELCbyksJtPX)] {
+        _bn: BN {
+          negative: 0,
+          words: [
+            34273006, 58986857,
+            53546891,  4510733,
+            25457115, 32400953,
+            65182147, 43535383,
+            27797549,   213460,
+                   0
+          ],
+          length: 10,
+          red: null
+        }
+      },
+      marketId: PublicKey [PublicKey(HY5Qb9WMbBMUocHALtesu8jX26xnbTmYiopRcqY7ysXe)] {
+        _bn: BN {
+          negative: 0,
+          words: [
+             3581689, 12569413,
+            30421451,  7972896,
+            52949221, 34351199,
+            34891176, 58789569,
+            42207417,  4025406,
+                   0
+          ],
+          length: 10,
+          red: null
+        }
+      },
+      marketAuthority: PublicKey [PublicKey(HhuxQducQvS8yqi5durMHf2QEBgQg5MrJdYMe7uD8A8k)] {
+        _bn: BN {
+          negative: 0,
+          words: [
+            46922845, 60822192,
+            55295253, 24263755,
+            63833361, 12472571,
+            46508206, 28525390,
+            26567104,  4066694,
+                   0
+          ],
+          length: 10,
+          red: null
+        }
+      },
+      marketBaseVault: PublicKey [PublicKey(FKfjhxtm1L3Ct64oawPo7LjyFJPgSVDVqQLtLJxXLd1R)] {
+        _bn: BN {
+          negative: 0,
+          words: [
+            50103840, 14897364,
+            49106244, 29299149,
+            64956451, 38466569,
+            24305123, 20788528,
+            49170029,  3486455,
+                   0
+          ],
+          length: 10,
+          red: null
+        }
+      },
+      marketQuoteVault: PublicKey [PublicKey(GJP4jJnKb9jFe1vK4bSWih2SgSfQ57BqHnmFJXVxRX4S)] {
+        _bn: BN {
+          negative: 0,
+          words: [
+             9810607, 66131292,
+             2736593,  5785633,
+            26558619, 39127015,
+            62321436, 10381165,
+             3580155,  3724488,
+                   0
+          ],
+          length: 10,
+          red: null
+        }
+      },
+      marketBids: PublicKey [PublicKey(6BoERqCZU2TyJeXEdV6eZ5n1kuwuMXrfFY3nbKc2Frge)] {
+        _bn: BN {
+          negative: 0,
+          words: [
+            46423935, 28582605,
+            59256598, 27393227,
+            37258162, 54252966,
+            11501568, 61386679,
+             5338945,  1262497,
+                   0
+          ],
+          length: 10,
+          red: null
+        }
+      },
+      marketAsks: PublicKey [PublicKey(A8siaWa81w5sfy9waNPfFyfA8XfgdW1wkDHUdKubKQTq)] {
+        _bn: BN {
+          negative: 0,
+          words: [
+            10025280,   267038,
+            35595032, 34370883,
+            21995262, 50378100,
+            17252657, 29959399,
+            67043158,  2223973,
+                   0
+          ],
+          length: 10,
+          red: null
+        }
+      },
+      marketEventQueue: PublicKey [PublicKey(6mnvLXojaeysZLz97aHjFzGYrLV6WdoMWCvAKtoM8rcQ)] {
+        _bn: BN {
+          negative: 0,
+          words: [
+             4531649, 23936696,
+            43260200,  8625481,
+            47118757, 33188000,
+            33634829,  2644584,
+            23352657,  1405178,
+                   0
+          ],
+          length: 10,
+          red: null
+        }
+      },
+      lookupTableAccount: PublicKey [PublicKey(11111111111111111111111111111111)] {
+        _bn: BN {
+          negative: 0,
+          words: [
+            0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0,
+            0
+          ],
+          length: 1,
+          red: null
+        }
+      }
+    },
+    tokenIn: TokenInfo {
+      decimals: 9,
+      symbol: 'SLERF',
+      name: 'SLERF',
+      programId: PublicKey [PublicKey(TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA)] {
+        _bn: BN {
+          negative: 0,
+          words: [
+            50266281, 54354271,
+            58266536, 62225772,
+             1881221, 62578283,
+            12457068, 42356583,
+            48355173,   112509,
+                   0
+          ],
+          length: 10,
+          red: null
+        }
+      },
+      mint: PublicKey [PublicKey(7BgBvyjrZX1YKz4oh9mjb8ZScatkkwb8DzFx7LoiVkM3)] {
+        _bn: BN {
+          negative: 0,
+          words: [
+              597254, 66033856,
+            56170372, 17448994,
+            27393955, 40677001,
+             8283630, 17918542,
+            24938526,  1505423,
+                   0
+          ],
+          length: 10,
+          red: null
+        }
+      },
+      targetConfig: PublicKey [PublicKey(5g13tz8GKWySjtzPRARuzzQM7LbMCUBMPGPef5PKe4JJ)] {
+        _bn: BN {
+          negative: 0,
+          words: [
+            60591871, 36460920,
+            44346082, 21504730,
+            32345126,  5065527,
+            11757584, 57213293,
+            11154988,  1137437,
+                   0
+          ],
+          length: 10,
+          red: null
+        }
+      },
+      targetConfigV2: PublicKey [PublicKey(5g13tz8GKWySjtzPRARuzzQM7LbMCUBMPGPef5PKe4JJ)] {
+        _bn: BN {
+          negative: 0,
+          words: [
+            60591871, 36460920,
+            44346082, 21504730,
+            32345126,  5065527,
+            11757584, 57213293,
+            11154988,  1137437,
+                   0
+          ],
+          length: 10,
+          red: null
+        }
+      },
+      displayName: 'SLERF'
+    },
+    tokenOut: Token {
+      decimals: 6,
+      symbol: 'UNKNOWN',
+      name: 'UNKNOWN',
+      programId: PublicKey [PublicKey(TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA)] {
+        _bn: BN {
+          negative: 0,
+          words: [
+            50266281, 54354271,
+            58266536, 62225772,
+             1881221, 62578283,
+            12457068, 42356583,
+            48355173,   112509,
+                   0
+          ],
+          length: 10,
+          red: null
+        }
+      },
+      mint: PublicKey [PublicKey(2Y3jTuAc778X9Fgh9iejxpK6zBYDSwpUdr1Kz5SdGh5x)] {
+        _bn: BN {
+          negative: 0,
+          words: [
+            62799735, 19305107,
+            59501755, 51537250,
+            37186915, 46200430,
+            45141682, 47643275,
+            67073014,   373745,
+                   0
+          ],
+          length: 10,
+          red: null
+        }
+      }
+    }
+  }
+}
+
+Node.js v20.0.0
+error Command failed with exit code 1.
+info Visit https://yarnpkg.com/en/docs/cli/run for documentation about this command.
