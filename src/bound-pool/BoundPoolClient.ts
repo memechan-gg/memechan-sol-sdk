@@ -109,6 +109,10 @@ export class BoundPoolClient {
   }) {
     const poolObjectData = await BoundPoolClient.fetch2(client.connection, poolAccountAddressId);
     const { TOKEN_PROGRAM_ID } = await import("@solana/spl-token");
+
+    console.log("TOKEN_PROGRAM_ID: ", TOKEN_PROGRAM_ID);
+    console.log("poolObjectData.memeReserve.mint: ", poolObjectData.memeReserve.mint);
+
     const boundClientInstance = new BoundPoolClient(
       poolAccountAddressId,
       client,
@@ -116,7 +120,7 @@ export class BoundPoolClient {
       poolObjectData.quoteReserve.vault,
       poolObjectData.memeReserve.mint,
       poolObjectData.quoteReserve.mint,
-      new Token(TOKEN_PROGRAM_ID, poolObjectData.memeReserve.mint, MEMECHAN_MEME_TOKEN_DECIMALS),
+      new Token(TOKEN_PROGRAM_ID, new PublicKey(poolObjectData.memeReserve.mint), MEMECHAN_MEME_TOKEN_DECIMALS),
       poolObjectData,
     );
 
