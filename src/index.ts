@@ -69,6 +69,7 @@ export * from "./memeticket/utils";
 export * from "./util/poolHelpers/getBoundPoolClientFromId";
 export * from "./util/poolHelpers/getStakingPoolClientFromId";
 export * from "./util/poolHelpers/getLivePoolClientFromId";
+export * from "./util/poolHelpers/getMemeTicketClientFromId";
 
 // Metadata
 export * from "./token/createMetadata";
