@@ -6,6 +6,7 @@ import {
   GetSwapMemeTransactionsArgs,
   GetSwapMemeTransactionsArgsV2,
   GetSwapMemeTransactionsByOutputArgsV2,
+  GetSwapMemeTransactionsByOutputArgsV2Instance,
   SwapMemeOutputV2,
 } from "./types";
 import { getNumeratorAndDenominator } from "./utils";
@@ -311,7 +312,7 @@ export class LivePoolClientV2 {
     inTokenMint,
     payer,
     minAmountOut,
-  }: GetSwapMemeTransactionsByOutputArgsV2) {
+  }: GetSwapMemeTransactionsByOutputArgsV2Instance) {
     const inTokenInfo = getTokenInfoByMint(inTokenMint);
     const normalizedAmountIn = normalizeInputCoinAmountBN(wrappedAmountIn.toString(), inTokenInfo.decimals);
 
@@ -331,7 +332,7 @@ export class LivePoolClientV2 {
     payer,
     minAmountOut,
     inTokenMint,
-  }: GetSwapMemeTransactionsByOutputArgsV2) {
+  }: GetSwapMemeTransactionsByOutputArgsV2Instance) {
     const inTokenInfo = getTokenInfoByMint(inTokenMint);
     const normalizedAmountIn = normalizeInputCoinAmountBN(wrappedAmountIn.toString(), inTokenInfo.decimals);
 

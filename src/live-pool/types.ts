@@ -15,6 +15,13 @@ export type GetSwapMemeTransactionsByOutputArgsV2 = SwapMemeOutputV2 & {
   payer: PublicKey;
 };
 
+export type GetSwapMemeTransactionsByOutputArgsV2Instance = {
+  inTokenMint: PublicKey;
+  payer: PublicKey;
+  wrappedAmountIn: BN;
+  minAmountOut: BN;
+};
+
 export type GetSwapMemeTransactionsArgsV2 = GetSwapMemeOutputArgs & {
   payer: PublicKey;
 };
