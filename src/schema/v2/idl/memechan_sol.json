@@ -1,5 +1,5 @@
 {
-  "version": "0.1.0",
+  "version": "0.2.0",
   "name": "memechan_sol",
   "instructions": [
     {
@@ -64,6 +64,10 @@
       "args": [
         {
           "name": "airdroppedTokens",
+          "type": "u64"
+        },
+        {
+          "name": "vestingPeriod",
           "type": "u64"
         }
       ]
@@ -1445,6 +1449,10 @@
           {
             "name": "locked",
             "type": "bool"
+          },
+          {
+            "name": "vestingPeriod",
+            "type": "i64"
           }
         ]
       }
@@ -1667,11 +1675,11 @@
         "kind": "struct",
         "fields": [
           {
-            "name": "feeInPercent",
+            "name": "feeMemePercent",
             "type": "u64"
           },
           {
-            "name": "feeOutPercent",
+            "name": "feeQuotePercent",
             "type": "u64"
           }
         ]
@@ -1789,7 +1797,7 @@
     {
       "code": 6002,
       "name": "SlippageExceeded",
-      "msg": "Given amount of tokens to swap would result in \\\n        less than minimum requested tokens to receive"
+      "msg": "Given amount of tokens to swap would result in less than minimum requested tokens to receive"
     },
     {
       "code": 6003,
@@ -1907,6 +1915,10 @@
     {
       "code": 6029,
       "name": "AirdroppedTokensOvercap"
+    },
+    {
+      "code": 6030,
+      "name": "InvalidVestingPeriod"
     }
   ],
   "metadata": {

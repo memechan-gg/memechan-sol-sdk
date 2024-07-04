@@ -1,5 +1,5 @@
 export type MemechanSol = {
-  version: "0.1.0";
+  version: "0.2.0";
   name: "memechan_sol";
   instructions: [
     {
@@ -64,6 +64,10 @@ export type MemechanSol = {
       args: [
         {
           name: "airdroppedTokens";
+          type: "u64";
+        },
+        {
+          name: "vestingPeriod";
           type: "u64";
         },
       ];
@@ -1382,6 +1386,10 @@ export type MemechanSol = {
             name: "locked";
             type: "bool";
           },
+          {
+            name: "vestingPeriod";
+            type: "i64";
+          },
         ];
       };
     },
@@ -1603,11 +1611,11 @@ export type MemechanSol = {
         kind: "struct";
         fields: [
           {
-            name: "feeInPercent";
+            name: "feeMemePercent";
             type: "u64";
           },
           {
-            name: "feeOutPercent";
+            name: "feeQuotePercent";
             type: "u64";
           },
         ];
@@ -1725,7 +1733,7 @@ export type MemechanSol = {
     {
       code: 6002;
       name: "SlippageExceeded";
-      msg: "Given amount of tokens to swap would result in \\\n        less than minimum requested tokens to receive";
+      msg: "Given amount of tokens to swap would result in less than minimum requested tokens to receive";
     },
     {
       code: 6003;
@@ -1844,11 +1852,15 @@ export type MemechanSol = {
       code: 6029;
       name: "AirdroppedTokensOvercap";
     },
+    {
+      code: 6030;
+      name: "InvalidVestingPeriod";
+    },
   ];
 };
 
 export const IDL: MemechanSol = {
-  version: "0.1.0",
+  version: "0.2.0",
   name: "memechan_sol",
   instructions: [
     {
@@ -1913,6 +1925,10 @@ export const IDL: MemechanSol = {
       args: [
         {
           name: "airdroppedTokens",
+          type: "u64",
+        },
+        {
+          name: "vestingPeriod",
           type: "u64",
         },
       ],
@@ -3231,6 +3247,10 @@ export const IDL: MemechanSol = {
             name: "locked",
             type: "bool",
           },
+          {
+            name: "vestingPeriod",
+            type: "i64",
+          },
         ],
       },
     },
@@ -3452,11 +3472,11 @@ export const IDL: MemechanSol = {
         kind: "struct",
         fields: [
           {
-            name: "feeInPercent",
+            name: "feeMemePercent",
             type: "u64",
           },
           {
-            name: "feeOutPercent",
+            name: "feeQuotePercent",
             type: "u64",
           },
         ],
@@ -3574,7 +3594,7 @@ export const IDL: MemechanSol = {
     {
       code: 6002,
       name: "SlippageExceeded",
-      msg: "Given amount of tokens to swap would result in \\\n        less than minimum requested tokens to receive",
+      msg: "Given amount of tokens to swap would result in less than minimum requested tokens to receive",
     },
     {
       code: 6003,
@@ -3692,6 +3712,10 @@ export const IDL: MemechanSol = {
     {
       code: 6029,
       name: "AirdroppedTokensOvercap",
+    },
+    {
+      code: 6030,
+      name: "InvalidVestingPeriod",
     },
   ],
 };

@@ -54,6 +54,7 @@ import {
 
 import { findProgramAddress, sleep } from "../common/helpers";
 import {
+  BOUND_POOL_VESTING_PERIOD,
   COMPUTE_UNIT_PRICE,
   DEFAULT_MAX_M,
   FULL_MEME_AMOUNT_CONVERTED,
@@ -262,7 +263,7 @@ export class BoundPoolClientV2 {
     const quoteInfo = getTokenInfoByMint(quoteToken.mint);
     const { TOKEN_PROGRAM_ID } = await import("@solana/spl-token");
     const createPoolInstruction = await memechanProgram.methods
-      .newPool(airdroppedTokens)
+      .newPool(airdroppedTokens, BOUND_POOL_VESTING_PERIOD)
       .accounts({
         feeQuoteVault: feeQuoteVault,
         memeVault: launchVault,

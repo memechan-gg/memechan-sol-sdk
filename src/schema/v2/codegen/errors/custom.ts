@@ -1,4 +1,3 @@
-/* eslint-disable no-multi-str */
 export type CustomError =
   | InvalidAccountInput
   | InvalidArg
@@ -29,7 +28,8 @@ export type CustomError =
   | NoFeesToAdd
   | StakingIsNotActive
   | NonZeroInitialMemeSupply
-  | AirdroppedTokensOvercap;
+  | AirdroppedTokensOvercap
+  | InvalidVestingPeriod;
 
 export class InvalidAccountInput extends Error {
   readonly code = 6000;
@@ -54,15 +54,10 @@ export class InvalidArg extends Error {
 export class SlippageExceeded extends Error {
   readonly code = 6002;
   readonly name = "SlippageExceeded";
-  readonly msg =
-    "Given amount of tokens to swap would result in \
-        less than minimum requested tokens to receive";
+  readonly msg = "Given amount of tokens to swap would result in less than minimum requested tokens to receive";
 
   constructor() {
-    super(
-      "6002: Given amount of tokens to swap would result in \
-        less than minimum requested tokens to receive",
-    );
+    super("6002: Given amount of tokens to swap would result in less than minimum requested tokens to receive");
   }
 }
 
@@ -336,6 +331,16 @@ export class AirdroppedTokensOvercap extends Error {
   }
 }
 
+export class InvalidVestingPeriod extends Error {
+  readonly code = 6030;
+  readonly name = "InvalidVestingPeriod";
+  readonly msg = "undefined";
+
+  constructor() {
+    super("6030: undefined");
+  }
+}
+
 export function fromCode(code: number): CustomError | null {
   switch (code) {
     case 6000:
@@ -398,6 +403,8 @@ export function fromCode(code: number): CustomError | null {
       return new NonZeroInitialMemeSupply();
     case 6029:
       return new AirdroppedTokensOvercap();
+    case 6030:
+      return new InvalidVestingPeriod();
   }
 
   return null;

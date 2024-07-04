@@ -2,6 +2,7 @@ import { TOKEN_PROGRAM_ID } from "@raydium-io/raydium-sdk";
 import { PublicKey } from "@solana/web3.js";
 import BigNumber from "bignumber.js";
 import { TokenInfo } from "./types";
+import BN from "bn.js";
 
 export const NATIVE_MINT = new PublicKey("So11111111111111111111111111111111111111112");
 
@@ -64,6 +65,8 @@ export const FEE_DESTINATION_ID = "7YttLkHDoNj9wyDur5pM1ejNaAvT9X4eqaYcHQqtj2G5"
 
 // https://explorer.solana.com/address/35fN6LMYt6cKsemgbR28nFooiJtcnvaKPCeRXyuMKfoF
 export const PATS_MINT = new PublicKey("35fN6LMYt6cKsemgbR28nFooiJtcnvaKPCeRXyuMKfoF");
+
+export const BOUND_POOL_VESTING_PERIOD = new BN(600);
 
 // export const MEMECHAN_QUOTE_MINT = new PublicKey("So11111111111111111111111111111111111111112"); // dev fake slerf
 // export const MEMECHAN_QUOTE_MINT = SLERF_MINT; // prod

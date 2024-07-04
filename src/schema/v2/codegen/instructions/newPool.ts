@@ -6,6 +6,7 @@ import { PROGRAM_ID } from "../programId";
 
 export interface NewPoolArgs {
   airdroppedTokens: BN;
+  vestingPeriod: BN;
 }
 
 export interface NewPoolAccounts {
@@ -22,7 +23,7 @@ export interface NewPoolAccounts {
   tokenProgram: PublicKey;
 }
 
-export const layout = borsh.struct([borsh.u64("airdroppedTokens")]);
+export const layout = borsh.struct([borsh.u64("airdroppedTokens"), borsh.u64("vestingPeriod")]);
 
 export function newPool(args: NewPoolArgs, accounts: NewPoolAccounts) {
   const keys = [
@@ -43,6 +44,7 @@ export function newPool(args: NewPoolArgs, accounts: NewPoolAccounts) {
   const len = layout.encode(
     {
       airdroppedTokens: args.airdroppedTokens,
+      vestingPeriod: args.vestingPeriod,
     },
     buffer,
   );

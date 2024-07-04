@@ -4,54 +4,54 @@ import * as types from "../types"; // eslint-disable-line @typescript-eslint/no-
 import * as borsh from "@project-serum/borsh";
 
 export interface FeesFields {
-  feeInPercent: BN;
-  feeOutPercent: BN;
+  feeMemePercent: BN;
+  feeQuotePercent: BN;
 }
 
 export interface FeesJSON {
-  feeInPercent: string;
-  feeOutPercent: string;
+  feeMemePercent: string;
+  feeQuotePercent: string;
 }
 
 export class Fees {
-  readonly feeInPercent: BN;
-  readonly feeOutPercent: BN;
+  readonly feeMemePercent: BN;
+  readonly feeQuotePercent: BN;
 
   constructor(fields: FeesFields) {
-    this.feeInPercent = fields.feeInPercent;
-    this.feeOutPercent = fields.feeOutPercent;
+    this.feeMemePercent = fields.feeMemePercent;
+    this.feeQuotePercent = fields.feeQuotePercent;
   }
 
   static layout(property?: string) {
-    return borsh.struct([borsh.u64("feeInPercent"), borsh.u64("feeOutPercent")], property);
+    return borsh.struct([borsh.u64("feeMemePercent"), borsh.u64("feeQuotePercent")], property);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   static fromDecoded(obj: any) {
     return new Fees({
-      feeInPercent: obj.feeInPercent,
-      feeOutPercent: obj.feeOutPercent,
+      feeMemePercent: obj.feeMemePercent,
+      feeQuotePercent: obj.feeQuotePercent,
     });
   }
 
   static toEncodable(fields: FeesFields) {
     return {
-      feeInPercent: fields.feeInPercent,
-      feeOutPercent: fields.feeOutPercent,
+      feeMemePercent: fields.feeMemePercent,
+      feeQuotePercent: fields.feeQuotePercent,
     };
   }
 
   toJSON(): FeesJSON {
     return {
-      feeInPercent: this.feeInPercent.toString(),
-      feeOutPercent: this.feeOutPercent.toString(),
+      feeMemePercent: this.feeMemePercent.toString(),
+      feeQuotePercent: this.feeQuotePercent.toString(),
     };
   }
 
   static fromJSON(obj: FeesJSON): Fees {
     return new Fees({
-      feeInPercent: new BN(obj.feeInPercent),
-      feeOutPercent: new BN(obj.feeOutPercent),
+      feeMemePercent: new BN(obj.feeMemePercent),
+      feeQuotePercent: new BN(obj.feeQuotePercent),
     });
   }
 
