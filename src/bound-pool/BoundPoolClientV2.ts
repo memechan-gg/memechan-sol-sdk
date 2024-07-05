@@ -1577,7 +1577,7 @@ export class BoundPoolClientV2 {
     };
   }
 
-  public static async initQuoteinitQuoteAmmPool(args: GetInitQuoteAmmPoolTransactionStaticArgs): Promise<StakingPoolClientV2> {
+  public static async initQuoteAmmPool(args: GetInitQuoteAmmPoolTransactionStaticArgs): Promise<StakingPoolClientV2> {
     console.log("initQuoteAmmPool static Begin");
     const { client } = args;
     // Get needed transactions
