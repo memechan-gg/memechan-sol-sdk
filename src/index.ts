@@ -12,6 +12,7 @@ export * from "./staking-pool/StakingPoolClientV2";
 export * from "./targetconfig/TargetConfigClient";
 export * from "./targetconfig/TargetConfigClientV2";
 export * from "./vesting/VestingClient";
+export * from "./chan-swap/ChanSwapClient";
 
 // Client types
 export * from "./bound-pool/types";
