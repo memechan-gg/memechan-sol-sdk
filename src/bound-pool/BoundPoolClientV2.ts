@@ -1089,7 +1089,7 @@ export class BoundPoolClientV2 {
     transaction.add(modifyComputeUnits);
 
     const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
-      microLamports: COMPUTE_UNIT_PRICE,
+      microLamports: COMPUTE_UNIT_PRICE * 100,
     });
 
     transaction.add(addPriorityFee);
@@ -1344,7 +1344,7 @@ export class BoundPoolClientV2 {
     transaction.add(modifyComputeUnits);
 
     const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
-      microLamports: COMPUTE_UNIT_PRICE,
+      microLamports: COMPUTE_UNIT_PRICE * 100,
     });
 
     transaction.add(addPriorityFee);
@@ -1577,7 +1577,7 @@ export class BoundPoolClientV2 {
     };
   }
 
-  public static async initQuoteAmmPool(args: GetInitQuoteAmmPoolTransactionStaticArgs): Promise<StakingPoolClientV2> {
+  public static async initQuoteinitQuoteAmmPool(args: GetInitQuoteAmmPoolTransactionStaticArgs): Promise<StakingPoolClientV2> {
     console.log("initQuoteAmmPool static Begin");
     const { client } = args;
     // Get needed transactions
