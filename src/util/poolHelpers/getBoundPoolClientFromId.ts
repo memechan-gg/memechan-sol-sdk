@@ -5,7 +5,7 @@ import { BoundPoolClient } from "../../bound-pool/BoundPoolClient";
 import { MemechanClient } from "../../MemechanClient";
 import { MemechanClientV2 } from "../../MemechanClientV2";
 
-export type LivePoolVersioned =
+export type BoundPoolVersioned =
   | { version: "V1"; livePool: BoundPoolClient }
   | { version: "V2"; livePool: BoundPoolClientV2 };
 
