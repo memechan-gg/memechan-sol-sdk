@@ -1,5 +1,5 @@
 import { PublicKey } from "@solana/web3.js";
-import { MEMECHAN_PROGRAM_ID_V2 } from "../../config/config";
+import { MERCURIAL_AMM_PROGRAM_ID } from "../../config/config";
 import { MemechanClient } from "../../MemechanClient";
 import { MemechanClientV2 } from "../../MemechanClientV2";
 import { LivePoolClientV2 } from "../../live-pool/LivePoolClientV2";
@@ -22,7 +22,7 @@ export async function getLivePoolClientFromId(
 
   console.log("accountInfo.owner:", accountInfo.owner);
 
-  if (accountInfo.owner.toBase58() == MEMECHAN_PROGRAM_ID_V2) {
+  if (accountInfo.owner.toBase58() == MERCURIAL_AMM_PROGRAM_ID) {
     const pool = await LivePoolClientV2.fromAmmId(ammId, clientV2);
     return { livePool: pool, version: "V2" };
   }
