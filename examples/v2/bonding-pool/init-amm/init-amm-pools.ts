@@ -2,7 +2,7 @@
 import { PublicKey } from "@solana/web3.js";
 import { clientV2, payer } from "../../../common";
 import { BoundPoolClientV2 } from "../../../../src/bound-pool/BoundPoolClientV2";
-import { FEE_DESTINATION_ID, MEMECHAN_MEME_TOKEN_DECIMALS, MEME_TOKEN_DECIMALS, StakingPoolClientV2, TOKEN_INFOS, TokenInfo, getTokenInfoByMint } from "../../../../src";
+import { FEE_DESTINATION_ID, StakingPoolClientV2, TOKEN_INFOS, getTokenInfoByMint } from "../../../../src";
 import { ChanSwapClient } from "../../../../src/chan-swap/ChanSwapClient";
 
 // yarn tsx examples/v2/bonding-pool/init-amm/init-amm-pools.ts
