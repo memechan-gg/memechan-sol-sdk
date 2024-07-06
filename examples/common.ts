@@ -1,15 +1,31 @@
 import { Wallet } from "@coral-xyz/anchor";
-import { Connection, Keypair } from "@solana/web3.js";
+import { Connection, FetchMiddleware, Keypair } from "@solana/web3.js";
 import { ADMIN_PUB_KEY, Auth, BE_URL, MemechanClient, TokenAPI } from "../src";
 import { HELIUS_API_KEY, HELIUS_API_URL, IS_TEST_ENV, TEST_USER_SECRET_KEY } from "./env";
 import { getRandomRpcEndpoint } from "../src/util/getRandomRpcEndpoint";
 import { HeliusApi } from "../src/helius-api/HeliusApi";
 import { MemechanClientV2 } from "../src/MemechanClientV2";
 
+export const connectionMiddleware = async (
+  urlAddress: Parameters<FetchMiddleware>[0],
+  optionArgs = {},
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  callback: Function,
+) => {
+  try {
+    console.log("[connectionMiddleware] urlAddress: ", urlAddress.toString());
+    await callback(urlAddress, optionArgs);
+  } catch (e) {
+    console.log("[connectionMiddleware] Error: ", e, "urlAddress: ", urlAddress.toString());
+    throw e;
+  }
+};
+
 export const connection = new Connection(getRandomRpcEndpoint(), {
   httpAgent: IS_TEST_ENV ? false : undefined,
   commitment: "confirmed",
   confirmTransactionInitialTimeout: 30000,
+  fetchMiddleware: connectionMiddleware,
 });
 
 export const admin = ADMIN_PUB_KEY;
