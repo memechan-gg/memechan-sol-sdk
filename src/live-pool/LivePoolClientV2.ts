@@ -64,7 +64,6 @@ export class LivePoolClientV2 {
 
   public static async getBuyMemeOutput({
     poolAddress,
-    memeCoinMint,
     amountIn,
     slippagePercentage,
     connection,
@@ -92,7 +91,8 @@ export class LivePoolClientV2 {
     const slippage = new BigNumber(numerator).dividedBy(new BigNumber(denominator)).toNumber();
 
     const quoteAmountIn = normalizeInputCoinAmountBN(amountIn, TOKEN_INFOS.WSOL.decimals);
-    const { minSwapOutAmount } = ammImpl.getSwapQuote(new PublicKey(memeCoinMint), quoteAmountIn, slippage);
+    console.log("quoteAmountIn:", quoteAmountIn.toString());
+    const { minSwapOutAmount } = ammImpl.getSwapQuote(TOKEN_INFOS.WSOL.mint, quoteAmountIn, slippage);
 
     return {
       minAmountOut: minSwapOutAmount,
@@ -108,10 +108,7 @@ export class LivePoolClientV2 {
     minAmountOut,
     ammImpl,
   }: GetSwapMemeTransactionsByOutputArgsV2) {
-    const inTokenInfo = getTokenInfoByMint(inTokenMint);
-    const normalizedAmountIn = normalizeInputCoinAmountBN(wrappedAmountIn.toString(), inTokenInfo.decimals);
-
-    const swapTx = await ammImpl.swap(payer, inTokenMint, normalizedAmountIn, minAmountOut);
+    const swapTx = await ammImpl.swap(payer, inTokenMint, wrappedAmountIn, minAmountOut);
 
     const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
       microLamports: COMPUTE_UNIT_PRICE,
@@ -174,11 +171,7 @@ export class LivePoolClientV2 {
     const slippage = new BigNumber(numerator).dividedBy(new BigNumber(denominator)).toNumber();
 
     const memeAmountIn = normalizeInputCoinAmountBN(amountIn, MEMECHAN_MEME_TOKEN_DECIMALS);
-    const { minSwapOutAmount } = ammImpl.getSwapQuote(
-      new PublicKey(memeCoinMint),
-      new BN(memeAmountIn.toString()),
-      slippage,
-    );
+    const { minSwapOutAmount } = ammImpl.getSwapQuote(new PublicKey(memeCoinMint), memeAmountIn, slippage);
 
     return {
       minAmountOut: minSwapOutAmount,
@@ -191,13 +184,10 @@ export class LivePoolClientV2 {
     wrappedAmountIn,
     payer,
     minAmountOut,
-    ammImpl,
     inTokenMint,
+    ammImpl,
   }: GetSwapMemeTransactionsByOutputArgsV2) {
-    const inTokenInfo = getTokenInfoByMint(inTokenMint);
-    const normalizedAmountIn = normalizeInputCoinAmountBN(wrappedAmountIn.toString(), inTokenInfo.decimals);
-
-    const swapTx = await ammImpl.swap(payer, inTokenMint, normalizedAmountIn, minAmountOut);
+    const swapTx = await ammImpl.swap(payer, inTokenMint, wrappedAmountIn, minAmountOut);
 
     const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
       microLamports: COMPUTE_UNIT_PRICE,
@@ -316,11 +306,7 @@ export class LivePoolClientV2 {
     payer,
     minAmountOut,
   }: GetSwapMemeTransactionsByOutputArgsV2Instance) {
-    const inTokenInfo = getTokenInfoByMint(inTokenMint);
-    const normalizedAmountIn = normalizeInputCoinAmountBN(wrappedAmountIn.toString(), inTokenInfo.decimals);
-
-    const swapTx = await this.ammPool.ammImpl.swap(payer, inTokenMint, normalizedAmountIn, minAmountOut);
-
+    const swapTx = await this.ammPool.ammImpl.swap(payer, inTokenMint, wrappedAmountIn, minAmountOut);
     const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
       microLamports: COMPUTE_UNIT_PRICE,
     });
@@ -336,10 +322,7 @@ export class LivePoolClientV2 {
     minAmountOut,
     inTokenMint,
   }: GetSwapMemeTransactionsByOutputArgsV2Instance) {
-    const inTokenInfo = getTokenInfoByMint(inTokenMint);
-    const normalizedAmountIn = normalizeInputCoinAmountBN(wrappedAmountIn.toString(), inTokenInfo.decimals);
-
-    const swapTx = await this.ammPool.ammImpl.swap(payer, inTokenMint, normalizedAmountIn, minAmountOut);
+    const swapTx = await this.ammPool.ammImpl.swap(payer, inTokenMint, wrappedAmountIn, minAmountOut);
 
     const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
       microLamports: COMPUTE_UNIT_PRICE,
