@@ -1,6 +1,6 @@
 import { clientV2, connection, payer } from "./../../common";
 import { StakingPool as CodegenStakingPool } from "../../../src/schema/v2/codegen/accounts/StakingPool";
-import { BoundPoolClientV2, MEME_TOKEN_DECIMALS, StakingPoolClientV2, TOKEN_INFOS, TokenInfo } from "../../../src";
+import { BoundPoolClientV2, MEME_TOKEN_DECIMALS, StakingPoolClientV2, TOKEN_INFOS, TokenInfo, getTokenInfoByMint } from "../../../src";
 import { PublicKey } from "@solana/web3.js";
 import { AmmPool } from "../../../src/meteora/AmmPool";
 
@@ -19,17 +19,7 @@ export const addFeesTx = async () => {
 
   const { default: AmmImpl } = await import("@mercurial-finance/dynamic-amm-sdk");
 
-  const { NATIVE_MINT } = await import("@solana/spl-token");
-
-  const memeTokenInfo = new TokenInfo({
-    decimals: MEME_TOKEN_DECIMALS,
-    mint: stakingPool.memeMint,
-    name: "MEME",
-    programId: clientV2.memechanProgram.programId,
-    symbol: "MEME",
-    targetConfig: NATIVE_MINT,
-    targetConfigV2: NATIVE_MINT,
-  });
+  const memeTokenInfo = getTokenInfoByMint(memeMint);
 
   const ammImplQuote = await AmmImpl.create(
     connection,

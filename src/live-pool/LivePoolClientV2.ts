@@ -1,6 +1,6 @@
 import { PublicKey, Connection, ComputeBudgetProgram, Transaction } from "@solana/web3.js";
 import BigNumber from "bignumber.js";
-import { MEMECHAN_MEME_TOKEN_DECIMALS, COMPUTE_UNIT_PRICE, TOKEN_INFOS, MEME_TOKEN_DECIMALS } from "../config/config";
+import { COMPUTE_UNIT_PRICE, TOKEN_INFOS, MEMECHAN_MEME_TOKEN_DECIMALS } from "../config/config";
 import {
   GetSwapMemeOutputArgs,
   GetSwapMemeTransactionsArgs,
@@ -45,7 +45,7 @@ export class LivePoolClientV2 {
     console.log("poolState:", poolState);
     const memeTokenInfo: SplTokenInfo = {
       address: poolState.tokenAMint.toBase58(),
-      decimals: MEME_TOKEN_DECIMALS,
+      decimals: MEMECHAN_MEME_TOKEN_DECIMALS,
       symbol: "MEME",
       name: "MEME",
       chainId: 900,
@@ -80,7 +80,7 @@ export class LivePoolClientV2 {
 
     const memeTokenInfo: SplTokenInfo = {
       address: memeMint.toBase58(),
-      decimals: MEME_TOKEN_DECIMALS,
+      decimals: MEMECHAN_MEME_TOKEN_DECIMALS,
       symbol: "MEME",
       name: "MEME",
       chainId: 900,
@@ -91,8 +91,8 @@ export class LivePoolClientV2 {
     const ammImpl = await AmmImpl.create(
       connection,
       new PublicKey(poolAddress),
-      TOKEN_INFOS.WSOL.toSplTokenInfo(),
       memeTokenInfo,
+      TOKEN_INFOS.WSOL.toSplTokenInfo(),
     );
     const { numerator, denominator } = getNumeratorAndDenominator(slippagePercentage);
     const slippage = new BigNumber(numerator).dividedBy(new BigNumber(denominator)).toNumber();
@@ -164,7 +164,7 @@ export class LivePoolClientV2 {
   }: GetSwapMemeOutputArgs): Promise<SwapMemeOutputV2> {
     const memeTokenInfo: SplTokenInfo = {
       address: memeCoinMint,
-      decimals: MEME_TOKEN_DECIMALS,
+      decimals: MEMECHAN_MEME_TOKEN_DECIMALS,
       symbol: "MEME",
       name: "MEME",
       chainId: 900,
@@ -173,8 +173,8 @@ export class LivePoolClientV2 {
     const ammImpl = await AmmImpl.create(
       connection,
       new PublicKey(poolAddress),
-      TOKEN_INFOS.WSOL.toSplTokenInfo(),
       memeTokenInfo,
+      TOKEN_INFOS.WSOL.toSplTokenInfo(),
     );
     const { numerator, denominator } = getNumeratorAndDenominator(slippagePercentage);
     const slippage = new BigNumber(numerator).dividedBy(new BigNumber(denominator)).toNumber();
@@ -251,16 +251,25 @@ export class LivePoolClientV2 {
     connection: Connection;
   }) {
     const { default: AmmImpl } = await import("@mercurial-finance/dynamic-amm-sdk");
+
+    const poolState = await LivePoolClientV2.getPoolState(new PublicKey(poolAddress), connection);
+    const memeMint = poolState.tokenAMint;
+    const tokenInfo = getTokenInfoByMint(memeMint);
+    console.log("tokenInfo:", tokenInfo);
+
+    const splMemeTokenInfo = tokenInfo.toSplTokenInfo();
+    console.log("splMemeTokenInfo:", splMemeTokenInfo);
+
     const ammImpl = await AmmImpl.create(
       connection,
       new PublicKey(poolAddress),
+      splMemeTokenInfo,
       TOKEN_INFOS.WSOL.toSplTokenInfo(),
-      TOKEN_INFOS.MEME.toSplTokenInfo(),
     );
     const quoteAmountIn = new BN(1000 * 10 ** TOKEN_INFOS.WSOL.decimals);
 
     const { swapOutAmount } = ammImpl.getSwapQuote(
-      new PublicKey(poolAddress),
+      TOKEN_INFOS.WSOL.mint,
       quoteAmountIn,
       0.0001, // 0.01% slippage
     );

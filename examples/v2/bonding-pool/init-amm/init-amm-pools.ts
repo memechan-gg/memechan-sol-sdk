@@ -2,7 +2,7 @@
 import { PublicKey } from "@solana/web3.js";
 import { clientV2, payer } from "../../../common";
 import { BoundPoolClientV2 } from "../../../../src/bound-pool/BoundPoolClientV2";
-import { FEE_DESTINATION_ID, MEME_TOKEN_DECIMALS, StakingPoolClientV2, TOKEN_INFOS, TokenInfo } from "../../../../src";
+import { FEE_DESTINATION_ID, MEMECHAN_MEME_TOKEN_DECIMALS, MEME_TOKEN_DECIMALS, StakingPoolClientV2, TOKEN_INFOS, TokenInfo, getTokenInfoByMint } from "../../../../src";
 import { ChanSwapClient } from "../../../../src/chan-swap/ChanSwapClient";
 
 // yarn tsx examples/v2/bonding-pool/init-amm/init-amm-pools.ts
@@ -17,17 +17,7 @@ import { ChanSwapClient } from "../../../../src/chan-swap/ChanSwapClient";
 
   console.debug("stakingPool: ", stakingPool);
 
-  const { NATIVE_MINT } = await import("@solana/spl-token");
-
-  const memeTokenInfo = new TokenInfo({
-    decimals: MEME_TOKEN_DECIMALS,
-    mint: memeMint,
-    name: "MEME",
-    programId: clientV2.memechanProgram.programId,
-    symbol: "MEME",
-    targetConfig: NATIVE_MINT,
-    targetConfigV2: NATIVE_MINT,
-  });
+  const memeTokenInfo = getTokenInfoByMint(memeMint);
 
   try {
     const initQuoteAmmPoolResult = await BoundPoolClientV2.initQuoteAmmPool({
