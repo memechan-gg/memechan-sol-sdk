@@ -1,6 +1,6 @@
 import { clientV2, connection, payer } from "./../../common";
 import { StakingPool as CodegenStakingPool } from "../../../src/schema/v2/codegen/accounts/StakingPool";
-import { BoundPoolClientV2, MEME_TOKEN_DECIMALS, StakingPoolClientV2, TOKEN_INFOS, TokenInfo, getTokenInfoByMint } from "../../../src";
+import { BoundPoolClientV2, StakingPoolClientV2, TOKEN_INFOS, getTokenInfoByMint } from "../../../src";
 import { PublicKey } from "@solana/web3.js";
 import { AmmPool } from "../../../src/meteora/AmmPool";
 

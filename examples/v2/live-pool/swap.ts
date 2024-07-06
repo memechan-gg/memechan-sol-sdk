@@ -34,7 +34,7 @@ import { clientV2, payer } from "../../common";
     ammImplQuote,
   );
 
- // await ammPool.swap(payer, 0.0001, 1, clientV2.connection);
+  await ammPool.swap(payer, 0.0001, 1, clientV2.connection);
 
   console.debug("swap finished");
 })();
