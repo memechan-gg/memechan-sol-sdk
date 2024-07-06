@@ -51,20 +51,14 @@ export class LivePoolClientV2 {
       chainId: 900,
     };
 
-    console.log("2:");
-
-    const quoteTokenInfo = TOKEN_INFOS.WSOL.toSplTokenInfo();
+    const quoteTokenInfo = getTokenInfoByMint(poolState.tokenBMint).toSplTokenInfo();
 
     console.log("quoteTokenInfo", quoteTokenInfo);
 
     const { default: AmmImpl } = await import("@mercurial-finance/dynamic-amm-sdk");
 
     const ammImpl = await AmmImpl.create(connection, ammId, memeTokenInfo, quoteTokenInfo);
-
-    console.log("3:");
-    const ammPool = new AmmPool(ammId, memeMint, new PublicKey(ammImpl.tokenA.address), ammImpl);
-
-    console.log("4:");
+    const ammPool = new AmmPool(ammId, memeMint, new PublicKey(ammImpl.tokenB.address), ammImpl);
     return new LivePoolClientV2(ammPool, client);
   }
 
