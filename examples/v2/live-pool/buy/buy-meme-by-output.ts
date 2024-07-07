@@ -20,12 +20,14 @@ export const buyMemeByOutput = async () => {
   console.log("\nquoteAmountIn:", wrappedAmountIn.toString());
   console.log("minAmountOut:", minAmountOut.toString());
 
+  //  tODO:FIX:ARGUMENTS
   const buyTransactions = await poolClient.getBuyMemeTransactionsByOutput({
     minAmountOut: minAmountOut,
     inTokenMint: poolClient.ammPool.quoteMint,
     payer: payer.publicKey,
     wrappedAmountIn,
-  });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } as any);
   console.log("\nbuyTransactions:", buyTransactions);
 
   const sig = await sendAndConfirmTransaction(clientV2.connection, buyTransactions, [payer], {
