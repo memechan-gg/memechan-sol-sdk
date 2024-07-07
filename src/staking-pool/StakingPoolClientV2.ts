@@ -45,6 +45,7 @@ import { getTokenInfoByMint } from "../config/helpers";
 import { TokenInfo } from "../config/types";
 import { AmmPool } from "../meteora/AmmPool";
 import { MEMO_PROGRAM_ID } from "@raydium-io/raydium-sdk";
+import { LivePoolClientV2 } from "../live-pool/LivePoolClientV2";
 
 export class StakingPoolClientV2 {
   constructor(
@@ -107,43 +108,164 @@ export class StakingPoolClientV2 {
 
   public async getAddFeesTransaction(args: GetAddFeesTransactionArgs): Promise<Transaction> {
     const tx = args.transaction ?? new Transaction();
-    // const payer = args.payer;
-    // const stakingInfo = await this.fetch();
+    const payer = args.payer;
 
-    // const ammPool = await formatAmmKeysById(args.ammPoolId.toBase58(), this.client.connection);
+    const { createProgram, deriveLockEscrowPda, derivePoolAddress, getAssociatedTokenAccount } = await import(
+      "@mercurial-finance/dynamic-amm-sdk/dist/cjs/src/amm/utils"
+    );
+    const { default: VaultImpl, getVaultPdas } = await import("@mercurial-finance/vault-sdk");
+    const tradeFeeBps = new BN(100);
+    const connection = this.client.connection;
+    const { vaultProgram, ammProgram } = createProgram(connection);
 
-    // const stakingSignerPda = this.findSignerPda();
+    const livePool = await LivePoolClientV2.fromAmmId(args.ammPoolId, this.client);
 
-    // const addFeesInstruction = await this.client.memechanProgram.methods
-    //   .addFees()
-    //   .accounts({
-    //     memeVault: stakingInfo.memeVault,
-    //     quoteVault: stakingInfo.quoteVault,
-    //     staking: this.id,
-    //     stakingSignerPda: stakingSignerPda,
-    //     tokenProgram: TOKEN_PROGRAM_ID,
-    //     marketAccount: ammPool.marketId,
-    //     marketAsks: ammPool.marketAsks,
-    //     marketBids: ammPool.marketBids,
-    //     marketEventQueue: ammPool.marketEventQueue,
-    //     marketCoinVault: ammPool.marketBaseVault,
-    //     marketPcVault: ammPool.marketQuoteVault,
-    //     marketProgramId: ammPool.marketProgramId,
-    //     marketVaultSigner: ammPool.marketAuthority,
-    //     openOrders: ammPool.openOrders,
-    //     raydiumAmm: ammPool.id,
-    //     raydiumAmmAuthority: ammPool.authority,
-    //     raydiumLpMint: ammPool.lpMint,
-    //     raydiumMemeVault: ammPool.baseVault,
-    //     raydiumQuoteVault: ammPool.quoteVault,
-    //     signer: payer,
-    //     targetOrders: ammPool.targetOrders,
-    //     stakingLpWallet: this.lpVault,
-    //     raydiumProgram: ammPool.programId,
-    //   })
-    //   .instruction();
+    const tokenAMint = new PublicKey(livePool.ammPool.ammImpl.tokenA.address);
+    const tokenBMint = new PublicKey(livePool.ammPool.ammImpl.tokenB.address);
 
-    // tx.add(addFeesInstruction);
+    const tokenInfoA = getTokenInfoByMint(tokenAMint);
+    const tokenInfoB = getTokenInfoByMint(tokenBMint);
+
+    const [
+      { vaultPda: aVault, tokenVaultPda: aTokenVault, lpMintPda: aLpMintPda },
+      { vaultPda: bVault, tokenVaultPda: bTokenVault, lpMintPda: bLpMintPda },
+    ] = [getVaultPdas(tokenAMint, vaultProgram.programId), getVaultPdas(tokenBMint, vaultProgram.programId)];
+    const [aVaultAccount, bVaultAccount] = await Promise.all([
+      vaultProgram.account.vault.fetchNullable(aVault),
+      vaultProgram.account.vault.fetchNullable(bVault),
+    ]);
+
+    console.log("1");
+    let aVaultLpMint = aLpMintPda;
+    let bVaultLpMint = bLpMintPda;
+    let preInstructions: Array<TransactionInstruction> = [];
+
+    if (!aVaultAccount) {
+      const createVaultAIx = await VaultImpl.createPermissionlessVaultInstruction(
+        connection,
+        payer,
+        tokenInfoA.toSplTokenInfo(),
+      );
+      createVaultAIx && preInstructions.push(createVaultAIx);
+    } else {
+      aVaultLpMint = aVaultAccount.lpMint; // Old vault doesn't have lp mint pda
+    }
+    if (!bVaultAccount) {
+      const createVaultBIx = await VaultImpl.createPermissionlessVaultInstruction(
+        connection,
+        payer,
+        tokenInfoB.toSplTokenInfo(),
+      );
+      createVaultBIx && preInstructions.push(createVaultBIx);
+    } else {
+      bVaultLpMint = bVaultAccount.lpMint; // Old vault doesn't have lp mint pda
+    }
+
+    console.log("2");
+
+    const poolPubkey = derivePoolAddress(
+      connection,
+      tokenInfoA.toSplTokenInfo(),
+      tokenInfoB.toSplTokenInfo(),
+      false,
+      tradeFeeBps,
+    );
+    console.log("3");
+    const [[aVaultLp], [bVaultLp]] = [
+      PublicKey.findProgramAddressSync([aVault.toBuffer(), poolPubkey.toBuffer()], ammProgram.programId),
+      PublicKey.findProgramAddressSync([bVault.toBuffer(), poolPubkey.toBuffer()], ammProgram.programId),
+    ];
+
+    // const [[adminTokenAFee], [adminTokenBFee]] = [
+    //   PublicKey.findProgramAddressSync(
+    //     [Buffer.from(SEEDS.FEE), tokenAMint.toBuffer(), poolPubkey.toBuffer()],
+    //     ammProgram.programId,
+    //   ),
+    //   PublicKey.findProgramAddressSync(
+    //     [Buffer.from(SEEDS.FEE), tokenBMint.toBuffer(), poolPubkey.toBuffer()],
+    //     ammProgram.programId,
+    //   ),
+    // ];
+
+    console.log("4");
+    const { SEEDS } = await import("@mercurial-finance/dynamic-amm-sdk/dist/cjs/src/amm/constants");
+    const [lpMint] = PublicKey.findProgramAddressSync(
+      [Buffer.from(SEEDS.LP_MINT), poolPubkey.toBuffer()],
+      ammProgram.programId,
+    );
+
+    // const [mintMetadata, _mintMetadataBump] = deriveMintMetadata(lpMint);
+
+    const stakingSigner = this.findSignerPda();
+
+    const [lockEscrowPK] = deriveLockEscrowPda(poolPubkey, stakingSigner, ammProgram.programId);
+
+    console.log("5");
+    preInstructions = [];
+
+    const payerPoolLp = await getAssociatedTokenAccount(lpMint, stakingSigner);
+
+    const escrowAta = await getAssociatedTokenAccount(lpMint, lockEscrowPK);
+    console.log(escrowAta);
+    const { TOKEN_PROGRAM_ID } = await import("@solana/spl-token");
+
+    const memeFeeVault = await ensureAssociatedTokenAccountWithIX({
+      connection: this.client.connection,
+      payer: payer,
+      mint: this.memeMint,
+      owner: new PublicKey(MEMECHAN_FEE_WALLET_ID),
+      transaction: tx,
+    });
+
+    const quoteFeeVault = await ensureAssociatedTokenAccountWithIX({
+      connection: this.client.connection,
+      payer: payer,
+      mint: tokenBMint,
+      owner: new PublicKey(MEMECHAN_FEE_WALLET_ID),
+      transaction: tx,
+    });
+
+    const quoteVault =
+      tokenInfoB.mint === TOKEN_INFOS.CHAN.mint ? this.poolObjectData.chanVault : this.poolObjectData.quoteVault;
+
+    console.log("7");
+
+    const addFeesIx = await this.client.memechanProgram.methods
+      .addFees()
+      .accounts({
+        memeFeeVault,
+        quoteFeeVault,
+        ammPool: args.ammPoolId,
+        aTokenVault,
+        aVault,
+        aVaultLp,
+        aVaultLpMint,
+        bTokenVault,
+        bVault,
+        bVaultLp,
+        bVaultLpMint,
+        escrowVault: escrowAta,
+        lockEscrow: lockEscrowPK,
+        lpMint,
+        memeMint: this.memeMint,
+        memeVault: this.memeVault,
+        quoteMint: tokenBMint,
+        quoteVault,
+        signer: payer,
+        sourceTokens: payerPoolLp,
+        staking: this.id,
+        stakingSignerPda: stakingSigner,
+        ammProgram: ammProgram.programId,
+        vaultProgram: vaultProgram.programId,
+        tokenProgram: TOKEN_PROGRAM_ID,
+        memoProgram: MEMO_PROGRAM_ID,
+      })
+      .instruction();
+
+    const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
+      microLamports: COMPUTE_UNIT_PRICE,
+    });
+    tx.add(addPriorityFee, addFeesIx);
 
     return tx;
   }

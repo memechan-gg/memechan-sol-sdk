@@ -6,7 +6,7 @@ import { clientV2, connection, payer } from "../../common";
 // yarn tsx examples/v2/staking-pool/get-available-withdraw-fees-amount-tx.ts > withdraw-fees-amount-tx.txt 2>&1
 export const getAvailableWithdrawFeesAmount = async () => {
   // Get staking pool
-  const memeMint = new PublicKey("G6wyDdcDn6pJuPbferviyZh6JFgxDoyasYX8MsorJPoK");
+  const memeMint = new PublicKey("8NmKFkMehRoF9BLSajM9xioitxKWSfXTxw2qrtPtyE2z");
   const stakingPoolAddress = BoundPoolClientV2.findStakingPda(memeMint, clientV2.memechanProgram.programId);
 
   console.log("Got here");
