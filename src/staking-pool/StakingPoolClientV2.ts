@@ -642,7 +642,6 @@ export class StakingPoolClientV2 {
   }
 
   public async getPreparedWithdrawFeesTransactions({
-    ammPoolId,
     ticketIds,
     user,
     transaction,
@@ -653,7 +652,7 @@ export class StakingPoolClientV2 {
      * Adding add fees instructions.
      * WARNING: `tx` mutation below.
      */
-    await this.getAddFeesTransaction({ ammPoolId, payer: user, transaction: tx });
+    // await this.getAddFeesTransaction({ ammPoolId, payer: user, transaction: tx });
 
     // WARNING: `tx` mutation below
     const destinationMemeTicket = await this.prepareTransactionWithStakingTicketsMerge({
