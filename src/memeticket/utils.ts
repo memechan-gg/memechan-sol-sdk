@@ -1,5 +1,5 @@
-import { ComputeBudgetProgram, PublicKey, Transaction, TransactionInstruction } from "@solana/web3.js";
-import { COMPUTE_UNIT_PRICE, MAX_TRANSACTION_SIZE } from "../config/config";
+import { PublicKey, Transaction, TransactionInstruction } from "@solana/web3.js";
+import { MAX_TRANSACTION_SIZE } from "../config/config";
 import { getTxSize } from "../util/get-tx-size";
 
 /**
