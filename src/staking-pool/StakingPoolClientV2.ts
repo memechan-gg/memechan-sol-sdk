@@ -263,7 +263,7 @@ export class StakingPoolClientV2 {
       .instruction();
 
     const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
-      microLamports: COMPUTE_UNIT_PRICE * 50,
+      microLamports: COMPUTE_UNIT_PRICE,
     });
     tx.add(addPriorityFee, addFeesIx);
 

@@ -22,12 +22,17 @@ export const addFeesTx = async () => {
   });
 
   console.log("payer: " + payer.publicKey.toBase58());
-  const signature = await sendAndConfirmTransaction(connection, quoteFeesTx, [payer], {
-    commitment: "confirmed",
-    skipPreflight: true,
-    preflightCommitment: "confirmed",
-  });
-  console.log("addfees quoteFeesTx signature:", signature);
+
+  try {
+    const signature = await sendAndConfirmTransaction(connection, quoteFeesTx, [payer], {
+      commitment: "confirmed",
+      skipPreflight: true,
+      preflightCommitment: "confirmed",
+    });
+    console.log("addfees quoteFeesTx signature:", signature);
+  } catch (e) {
+    console.error("addfees quoteFeesTx error:", e);
+  }
 
   // CHAN
   const chanFeesTx = await stakingPool.getAddFeesTransaction({
@@ -36,12 +41,16 @@ export const addFeesTx = async () => {
   });
 
   console.log("payer: " + payer.publicKey.toBase58());
-  const signature2 = await sendAndConfirmTransaction(connection, chanFeesTx, [payer], {
-    commitment: "confirmed",
-    skipPreflight: true,
-    preflightCommitment: "confirmed",
-  });
-  console.log("addfees chanFeesTx signature:", signature2);
+  try {
+    const signature2 = await sendAndConfirmTransaction(connection, chanFeesTx, [payer], {
+      commitment: "confirmed",
+      skipPreflight: true,
+      preflightCommitment: "confirmed",
+    });
+    console.log("addfees chanFeesTx signature:", signature2);
+  } catch (e) {
+    console.error("addfees chanFeesTx error:", e);
+  }
 };
 
 addFeesTx();
