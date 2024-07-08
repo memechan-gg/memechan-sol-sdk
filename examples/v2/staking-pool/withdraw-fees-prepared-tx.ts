@@ -43,13 +43,14 @@ export const withdrawFees = async () => {
     user: payer.publicKey,
   });
 
+  console.log("transaction.length:", transaction.length);
   for (const tx of transaction) {
     const signature2 = await sendAndConfirmTransaction(connection, tx, [payer], {
       commitment: "confirmed",
       skipPreflight: true,
       preflightCommitment: "confirmed",
     });
-    console.log("addfees chanFeesTx signature:", signature2);
+    console.log("withdraw fees signature:", signature2);
   }
 };
 
