@@ -38,7 +38,7 @@ import {
   PrepareTransactionWithStakingTicketsMergeArgs,
   UnstakeArgsV2,
   WithdrawFeesArgsV2,
-  getAvailableWithdrawFeesAmountArgs,
+  getAvailableWithdrawFeesAmountArgsV2,
 } from "./types";
 import { addUnwrapSOLInstructionIfNativeMint } from "../util/addUnwrapSOLInstructionIfNativeMint";
 import { getTokenInfoByMint } from "../config/helpers";
@@ -693,7 +693,7 @@ export class StakingPoolClientV2 {
 
   public async getAvailableWithdrawFeesAmount({
     tickets,
-  }: getAvailableWithdrawFeesAmountArgs): Promise<{ memeFees: string; slerfFees: string }> {
+  }: getAvailableWithdrawFeesAmountArgsV2): Promise<{ memeFees: string; quoteFees: string; chanFees: string }> {
     const stakedAmount = tickets.reduce((staked, { vesting: { notional, released } }) => {
       const notionalString = notional.toString();
       const releasedString = released.toString();
@@ -711,21 +711,27 @@ export class StakingPoolClientV2 {
     const totalStaked = stakingPoolData.stakesTotal.toString();
     const userStakePart = new BigNumber(stakedAmount).div(totalStaked);
     const fullMemeFeesPart = new BigNumber(stakingPoolData.feesXTotal.toString()).multipliedBy(userStakePart);
-    const fullSlerfFeesPart = new BigNumber(stakingPoolData.feesYTotal.toString()).multipliedBy(userStakePart);
+    const fullQuoteFeesPart = new BigNumber(stakingPoolData.feesYTotal.toString()).multipliedBy(userStakePart);
+    const fullChanFeesPart = new BigNumber(stakingPoolData.feesZTotal.toString()).multipliedBy(userStakePart);
 
-    const { memeFees, slerfFees } = tickets.reduce(
-      ({ memeFees, slerfFees }, ticket) => {
-        const { withdrawsMeme, withdrawsQuote } = ticket;
+    const { memeFees, quoteFees, chanFees } = tickets.reduce(
+      ({ memeFees, quoteFees, chanFees }, ticket) => {
+        const { withdrawsMeme, withdrawsQuote, withdrawsChan } = ticket;
 
         memeFees = memeFees.minus(withdrawsMeme.toString());
-        slerfFees = slerfFees.minus(withdrawsQuote.toString());
+        quoteFees = quoteFees.minus(withdrawsQuote.toString());
+        chanFees = chanFees.minus(withdrawsChan.toString());
 
-        return { memeFees, slerfFees };
+        return { memeFees, quoteFees, chanFees };
       },
-      { memeFees: fullMemeFeesPart, slerfFees: fullSlerfFeesPart },
+      { memeFees: fullMemeFeesPart, quoteFees: fullQuoteFeesPart, chanFees: fullChanFeesPart },
     );
 
-    return { memeFees: memeFees.multipliedBy(0.9999).toFixed(0), slerfFees: slerfFees.multipliedBy(0.9999).toFixed(0) };
+    return {
+      memeFees: memeFees.multipliedBy(0.9999).toFixed(0),
+      quoteFees: quoteFees.multipliedBy(0.9999).toFixed(0),
+      chanFees: chanFees.multipliedBy(0.9999).toFixed(0),
+    };
   }
 
   /**
