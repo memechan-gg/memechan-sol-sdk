@@ -4,7 +4,7 @@ import { getBoundPoolClientFromId } from "../../../../src/util/poolHelpers/getBo
 
 // yarn tsx examples/v2/bonding-pool/trading/sell-meme.ts
 (async () => {
-  const poolAccountAddressId = new PublicKey("2xF1NGbLi4o9y8N1r6nReQXVfCVqThDTWNoraSbahevx");
+  const poolAccountAddressId = new PublicKey("3t4JciTpGQbUWSGjx3rJnt9q2xJZHvFQFDiH6oRF3Zid");
   const { boundPoolInstance } = await getBoundPoolClientFromId(poolAccountAddressId, client, clientV2);
 
   const inputAmount = "59401500";
