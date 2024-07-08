@@ -54,12 +54,13 @@ import {
 
 import { findProgramAddress, sleep } from "../common/helpers";
 import {
+  BOUND_POOL_FEE_WALLET,
   BOUND_POOL_VESTING_PERIOD,
   COMPUTE_UNIT_PRICE,
   DEFAULT_MAX_M,
   FULL_MEME_AMOUNT_CONVERTED,
-  MEMECHAN_FEE_WALLET_ID,
   MEMECHAN_MEME_TOKEN_DECIMALS,
+  SWAP_FEE_WALLET,
   TOKEN_INFOS,
 } from "../config/config";
 import { getCreateMintWithPriorityTransaction } from "../token/getCreateMintWithPriorityTransaction";
@@ -239,7 +240,7 @@ export class BoundPoolClientV2 {
         connection,
         payer,
         mint: quoteToken.mint,
-        owner: new PublicKey(MEMECHAN_FEE_WALLET_ID),
+        owner: new PublicKey(BOUND_POOL_FEE_WALLET),
         transaction: createPoolTransaction,
       });
     }
@@ -1459,6 +1460,14 @@ export class BoundPoolClientV2 {
 
     const staking = await client.memechanProgram.account.stakingPool.fetch(stakingId);
 
+    const feeQuoteVault = await ensureAssociatedTokenAccountWithIX({
+      connection: connection,
+      payer: user.publicKey,
+      mint: TOKEN_INFOS.WSOL.mint,
+      owner: new PublicKey(SWAP_FEE_WALLET),
+      transaction: transaction,
+    });
+
     const { TOKEN_PROGRAM_ID } = await import("@solana/spl-token");
 
     console.log("7");
@@ -1491,10 +1500,7 @@ export class BoundPoolClientV2 {
         stakingChanVault: staking.chanVault,
         stakingQuoteVault: staking.quoteVault,
 
-        feeQuoteVault: await utils.getAssociatedTokenAccount(
-          TOKEN_INFOS.WSOL.mint,
-          new PublicKey(MEMECHAN_FEE_WALLET_ID),
-        ),
+        feeQuoteVault: feeQuoteVault,
         chanSwap,
         chanSwapSignerPda: ChanSwapClient.chanSwapSigner(),
         chanSwapVault: fetchedChanSwap.chanVault,
@@ -1510,6 +1516,8 @@ export class BoundPoolClientV2 {
         vaultProgram: vaultProgram.programId,
       })
       .instruction();
+
+    // transfer creator CHAN bonus IX
 
     transaction.add(goLiveInstruction);
 
@@ -1771,13 +1779,13 @@ export class BoundPoolClientV2 {
 
     if (pool) {
       // add bound pool as holder
-      if (!uniqueHolders.has(MEMECHAN_FEE_WALLET_ID)) {
+      if (!uniqueHolders.has(BOUND_POOL_FEE_WALLET)) {
         const adminTicket = {
           amount: pool.adminFeesMeme,
-          owner: new PublicKey(MEMECHAN_FEE_WALLET_ID),
+          owner: new PublicKey(BOUND_POOL_FEE_WALLET),
           pool: poolId,
         } as MemeTicketFields;
-        uniqueHolders.set(MEMECHAN_FEE_WALLET_ID, [adminTicket]);
+        uniqueHolders.set(BOUND_POOL_FEE_WALLET, [adminTicket]);
       }
     }
 

@@ -52,6 +52,10 @@ export const MEMECHAN_PROGRAM_ID_V2 = "CaR9ciDnNnE6WX35tZWrjeGdKUPaft7r4oQGF4Jhw
  */
 export const MEMECHAN_FEE_WALLET_ID = "feeLPZEfzJFwDR11cdMWE3nSa4nr7sPPM4u6tmDTw3Y";
 
+export const BOUND_POOL_FEE_WALLET = "6YNJG9KDex3eNAmh1i64KUDbfKBiESkew3AWmnf6FiCy";
+export const LP_FEE_WALLET = "HQ1wVLaBcnuoUozegyX7r45yn6ogHvQjdPNj53iweC5V";
+export const SWAP_FEE_WALLET = "xqzvZzKFCjvPuRqkyg5rxA95avrvJxesZ41rCLfYwUM";
+
 // export const RAYDIUM_PROTOCOL_FEE = 1_000_000_000; // 1 SOL on Devnet. TODO on Mainnet, it's only 0.4 SOL
 export const RAYDIUM_PROTOCOL_FEE = 400_000_000; // 0.4 SOL on Mainnet.
 

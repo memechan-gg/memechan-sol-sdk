@@ -57,11 +57,11 @@ import {
   COMPUTE_UNIT_PRICE,
   DEFAULT_MAX_M,
   FULL_MEME_AMOUNT_CONVERTED,
-  MEMECHAN_FEE_WALLET_ID,
   MEMECHAN_MEME_TOKEN_DECIMALS,
   TOKEN_INFOS,
   RAYDIUM_PROTOCOL_FEE,
   TRANSFER_FEE,
+  BOUND_POOL_FEE_WALLET,
 } from "../config/config";
 import { LivePoolClient } from "../live-pool/LivePoolClient";
 import { MemechanSol } from "../schema/types/memechan_sol";
@@ -238,7 +238,7 @@ export class BoundPoolClient {
         connection,
         payer,
         mint: quoteToken.mint,
-        owner: new PublicKey(MEMECHAN_FEE_WALLET_ID),
+        owner: new PublicKey(BOUND_POOL_FEE_WALLET),
         transaction: createPoolTransaction,
       });
     }
@@ -1328,13 +1328,13 @@ export class BoundPoolClient {
 
     if (pool) {
       // add bound pool as holder
-      if (!uniqueHolders.has(MEMECHAN_FEE_WALLET_ID)) {
+      if (!uniqueHolders.has(BOUND_POOL_FEE_WALLET)) {
         const adminTicket = {
           amount: pool.adminFeesMeme,
-          owner: new PublicKey(MEMECHAN_FEE_WALLET_ID),
+          owner: new PublicKey(BOUND_POOL_FEE_WALLET),
           pool: poolId,
         } as MemeTicketFields;
-        uniqueHolders.set(MEMECHAN_FEE_WALLET_ID, [adminTicket]);
+        uniqueHolders.set(BOUND_POOL_FEE_WALLET, [adminTicket]);
       }
     }
 

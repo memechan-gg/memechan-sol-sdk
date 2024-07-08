@@ -15,8 +15,8 @@ import { MemechanClientV2 } from "../MemechanClientV2";
 import { BoundPoolClientV2 } from "../bound-pool/BoundPoolClientV2";
 import {
   COMPUTE_UNIT_PRICE,
+  LP_FEE_WALLET,
   MAX_MEME_TOKENS,
-  MEMECHAN_FEE_WALLET_ID,
   MEMECHAN_PROGRAM_ID_V2,
   MEME_TOKEN_DECIMALS,
   TOKEN_INFOS,
@@ -213,7 +213,7 @@ export class StakingPoolClientV2 {
       connection: this.client.connection,
       payer: payer,
       mint: this.memeMint,
-      owner: new PublicKey(MEMECHAN_FEE_WALLET_ID),
+      owner: new PublicKey(LP_FEE_WALLET),
       transaction: tx,
     });
 
@@ -221,7 +221,7 @@ export class StakingPoolClientV2 {
       connection: this.client.connection,
       payer: payer,
       mint: tokenBMint,
-      owner: new PublicKey(MEMECHAN_FEE_WALLET_ID),
+      owner: new PublicKey(LP_FEE_WALLET),
       transaction: tx,
     });
 
@@ -371,10 +371,10 @@ export class StakingPoolClientV2 {
     console.log(escrowAta);
     const { TOKEN_PROGRAM_ID, getOrCreateAssociatedTokenAccount } = await import("@solana/spl-token");
     const memeFeeVault = (
-      await getOrCreateAssociatedTokenAccount(connection, payer, tokenAMint, new PublicKey(MEMECHAN_FEE_WALLET_ID))
+      await getOrCreateAssociatedTokenAccount(connection, payer, tokenAMint, new PublicKey(LP_FEE_WALLET))
     ).address;
     const quoteFeeVault = (
-      await getOrCreateAssociatedTokenAccount(connection, payer, tokenBMint, new PublicKey(MEMECHAN_FEE_WALLET_ID))
+      await getOrCreateAssociatedTokenAccount(connection, payer, tokenBMint, new PublicKey(LP_FEE_WALLET))
     ).address;
 
     const quoteVault =
