@@ -2,7 +2,7 @@
 import { PublicKey } from "@solana/web3.js";
 import { clientV2, payer } from "../../../common";
 import { BoundPoolClientV2 } from "../../../../src/bound-pool/BoundPoolClientV2";
-import { FEE_DESTINATION_ID, StakingPoolClientV2, TOKEN_INFOS, getTokenInfoByMint } from "../../../../src";
+import { StakingPoolClientV2, TOKEN_INFOS, getTokenInfoByMint } from "../../../../src";
 import { ChanSwapClient } from "../../../../src/chan-swap/ChanSwapClient";
 
 // yarn tsx examples/v2/bonding-pool/init-amm/init-amm-pools.ts
@@ -28,7 +28,6 @@ import { ChanSwapClient } from "../../../../src/chan-swap/ChanSwapClient";
       memeVault: stakingPool.memeVault,
       quoteVault: stakingPool.quoteVault,
       client: clientV2,
-      feeDestinationWalletAddress: new PublicKey(FEE_DESTINATION_ID),
     });
     console.log("initQuoteAmmPool result: ", initQuoteAmmPoolResult);
   } catch (e) {
@@ -49,7 +48,6 @@ import { ChanSwapClient } from "../../../../src/chan-swap/ChanSwapClient";
       memeVault: stakingPool.memeVault,
       quoteVault: stakingPool.quoteVault,
       client: clientV2,
-      feeDestinationWalletAddress: new PublicKey(FEE_DESTINATION_ID),
       chanSwap: ChanSwapClient.chanSwapId(),
     });
 

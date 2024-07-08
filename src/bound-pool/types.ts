@@ -106,7 +106,6 @@ export interface InitQuoteAmmPoolTransactionArgs {
   user: Keypair;
   payer: Signer;
   memeVault: PublicKey;
-  feeDestinationWalletAddress: PublicKey;
   quoteVault: PublicKey;
   tokenInfoA: TokenInfo; // memeMint
   tokenInfoB: TokenInfo;
