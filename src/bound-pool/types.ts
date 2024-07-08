@@ -1,6 +1,6 @@
 import { BN } from "@coral-xyz/anchor";
 import { Token } from "@raydium-io/raydium-sdk";
-import { Keypair, PublicKey, Signer, Transaction } from "@solana/web3.js";
+import { Connection, Keypair, PublicKey, Signer, Transaction } from "@solana/web3.js";
 import { MemechanClient } from "../MemechanClient";
 import { MemeTicketClient } from "../memeticket/MemeTicketClient";
 import { BoundPool } from "../schema/codegen/accounts";
@@ -223,4 +223,12 @@ export interface InitStakingPoolResultV2 {
   stakingMemeVault: PublicKey;
   stakingQuoteVault: PublicKey;
   stakingChanVault: PublicKey;
+}
+
+export interface TransferCreatorBonusChanFundsArgs {
+  creator: PublicKey;
+  payer: Keypair;
+  connection: Connection;
+  amount: bigint;
+  transaction?: Transaction;
 }

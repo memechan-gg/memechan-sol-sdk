@@ -50,6 +50,7 @@ import {
   SellMemeArgs,
   SwapXArgs,
   SwapYArgs,
+  TransferCreatorBonusChanFundsArgs,
 } from "./types";
 
 import { findProgramAddress, sleep } from "../common/helpers";
@@ -1517,8 +1518,6 @@ export class BoundPoolClientV2 {
       })
       .instruction();
 
-    // transfer creator CHAN bonus IX
-
     transaction.add(goLiveInstruction);
 
     const admin = user.publicKey;
@@ -1861,6 +1860,42 @@ export class BoundPoolClientV2 {
     const marketCap = new BigNumber(FULL_MEME_AMOUNT_CONVERTED).multipliedBy(memePriceInUsd).toString();
 
     return marketCap;
+  }
+
+  public static async transferCreatorBonusChanFunds(args: TransferCreatorBonusChanFundsArgs): Promise<string> {
+    const { creator, payer, connection, amount, transaction = new Transaction() } = args;
+    const fromTokenAccount = await ensureAssociatedTokenAccountWithIX({
+      connection: connection,
+      payer: payer.publicKey,
+      mint: TOKEN_INFOS.CHAN.mint,
+      owner: payer.publicKey,
+      transaction: transaction,
+    });
+
+    const toTokenAccount = await ensureAssociatedTokenAccountWithIX({
+      connection: connection,
+      payer: payer.publicKey,
+      mint: TOKEN_INFOS.CHAN.mint,
+      owner: creator,
+      transaction: transaction,
+    });
+
+    const { createTransferInstruction } = await import("@solana/spl-token");
+    transaction.add(createTransferInstruction(fromTokenAccount, toTokenAccount, payer.publicKey, amount));
+
+    const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
+      microLamports: COMPUTE_UNIT_PRICE,
+    });
+
+    transaction.add(addPriorityFee);
+
+    const signature = await sendAndConfirmTransaction(connection, transaction, [payer], {
+      commitment: "confirmed",
+      skipPreflight: true,
+      preflightCommitment: "confirmed",
+    });
+
+    return signature;
   }
 
   static getATAAddress(owner: PublicKey, mint: PublicKey, programId: PublicKey) {
