@@ -1461,13 +1461,25 @@ export class BoundPoolClientV2 {
 
     const staking = await client.memechanProgram.account.stakingPool.fetch(stakingId);
 
+    const swapFeeTokenAccountTx = new Transaction();
     const feeQuoteVault = await ensureAssociatedTokenAccountWithIX({
       connection: connection,
       payer: user.publicKey,
       mint: TOKEN_INFOS.WSOL.mint,
       owner: new PublicKey(SWAP_FEE_WALLET),
-      transaction: transaction,
+      transaction: swapFeeTokenAccountTx,
     });
+
+    if (swapFeeTokenAccountTx.instructions.length > 0) {
+      swapFeeTokenAccountTx.add(addPriorityFee);
+      console.log("6 - creating token account for SWAP_FEE_WALLET");
+      const txResult = await sendAndConfirmTransaction(connection, swapFeeTokenAccountTx, [user], {
+        commitment: "confirmed",
+        skipPreflight: true,
+        preflightCommitment: "confirmed",
+      });
+      console.log("6 txResult", txResult);
+    }
 
     const { TOKEN_PROGRAM_ID } = await import("@solana/spl-token");
 
@@ -1520,8 +1532,19 @@ export class BoundPoolClientV2 {
 
     transaction.add(goLiveInstruction);
 
-    // it also mutates the TX
-    await this.getTransferCreatorBonusChanFundsTx(args.transferCreatorBonusArgs);
+    // send creator funds, cant include in the same transaction
+    // const transferCreatorFundSignature = await this.transferCreatorBonusChanFunds({
+    //   ...args.transferCreatorBonusArgs,
+    //   transaction: new Transaction(),
+    // });
+    // console.log("transferCreatorFundSignature", transferCreatorFundSignature);
+
+    // okay, seems like we could fit in.
+    const transferCreatorFundTx = await this.getTransferCreatorBonusChanFundsTx({
+      ...args.transferCreatorBonusArgs,
+      transaction: args.transaction,
+    });
+    console.log("transferCreatorFundSignature", transferCreatorFundTx);
 
     const admin = user.publicKey;
     const slot = await connection.getSlot("confirmed");
