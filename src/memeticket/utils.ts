@@ -28,10 +28,10 @@ export function getOptimizedTransactions(instructions: TransactionInstruction[],
     }
 
     const transaction = new Transaction();
-    const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
-      microLamports: COMPUTE_UNIT_PRICE,
-    });
-    transaction.add(addPriorityFee);
+    // const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
+    //   microLamports: COMPUTE_UNIT_PRICE,
+    // });
+    // transaction.add(addPriorityFee);
 
     transaction.add(...inst);
 
