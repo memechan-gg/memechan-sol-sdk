@@ -1862,7 +1862,9 @@ export class BoundPoolClientV2 {
     return marketCap;
   }
 
-  public static async transferCreatorBonusChanFunds(args: TransferCreatorBonusChanFundsArgs): Promise<string> {
+  public static async getTransferCreatorBonusChanFundsTx(
+    args: TransferCreatorBonusChanFundsArgs,
+  ): Promise<Transaction> {
     const { creator, payer, connection, amount, transaction = new Transaction() } = args;
     const fromTokenAccount = await ensureAssociatedTokenAccountWithIX({
       connection: connection,
@@ -1888,6 +1890,12 @@ export class BoundPoolClientV2 {
     });
 
     transaction.add(addPriorityFee);
+    return transaction;
+  }
+
+  public static async transferCreatorBonusChanFunds(args: TransferCreatorBonusChanFundsArgs): Promise<string> {
+    const { payer, connection } = args;
+    const transaction = await BoundPoolClientV2.getTransferCreatorBonusChanFundsTx(args);
 
     const signature = await sendAndConfirmTransaction(connection, transaction, [payer], {
       commitment: "confirmed",
