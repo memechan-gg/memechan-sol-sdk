@@ -1520,6 +1520,9 @@ export class BoundPoolClientV2 {
 
     transaction.add(goLiveInstruction);
 
+    // it also mutates the TX
+    await this.getTransferCreatorBonusChanFundsTx(args.transferCreatorBonusArgs);
+
     const admin = user.publicKey;
     const slot = await connection.getSlot("confirmed");
     const [createLUTix, LUTaddr] = AddressLookupTableProgram.createLookupTable({
@@ -1885,11 +1888,11 @@ export class BoundPoolClientV2 {
     const { createTransferInstruction } = await import("@solana/spl-token");
     transaction.add(createTransferInstruction(fromTokenAccount, toTokenAccount, payer.publicKey, amount));
 
-    const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
-      microLamports: COMPUTE_UNIT_PRICE,
-    });
+    // const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
+    //   microLamports: COMPUTE_UNIT_PRICE,
+    // });
 
-    transaction.add(addPriorityFee);
+    // transaction.add(addPriorityFee);
     return transaction;
   }
 

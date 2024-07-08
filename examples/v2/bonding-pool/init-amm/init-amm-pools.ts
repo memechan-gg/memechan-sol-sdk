@@ -49,6 +49,12 @@ import { ChanSwapClient } from "../../../../src/chan-swap/ChanSwapClient";
       quoteVault: stakingPool.quoteVault,
       client: clientV2,
       chanSwap: ChanSwapClient.chanSwapId(),
+      transferCreatorBonusArgs: {
+        amount: BigInt(1000),
+        connection: clientV2.connection,
+        creator: payer.publicKey,
+        payer: payer,
+      },
     });
 
     console.log("initChanAmmPoolResult: ", initChanAmmPoolResult);

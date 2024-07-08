@@ -113,6 +113,7 @@ export interface InitQuoteAmmPoolTransactionArgs {
 
 export type InitChanAmmPool = InitQuoteAmmPoolTransactionArgs & {
   chanSwap: PublicKey;
+  transferCreatorBonusArgs: TransferCreatorBonusChanFundsArgs;
 };
 
 export type GetGoLiveTransactionArgs = GoLiveArgs & {
