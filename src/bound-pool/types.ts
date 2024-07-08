@@ -109,11 +109,11 @@ export interface InitQuoteAmmPoolTransactionArgs {
   quoteVault: PublicKey;
   tokenInfoA: TokenInfo; // memeMint
   tokenInfoB: TokenInfo;
+  transferCreatorBonusArgs: TransferCreatorBonusChanFundsArgs;
 }
 
-export type InitChanAmmPool = InitQuoteAmmPoolTransactionArgs & {
+export type InitChanAmmPool = Omit<InitQuoteAmmPoolTransactionArgs, "transferCreatorBonusArgs"> & {
   chanSwap: PublicKey;
-  transferCreatorBonusArgs: TransferCreatorBonusChanFundsArgs;
 };
 
 export type GetGoLiveTransactionArgs = GoLiveArgs & {

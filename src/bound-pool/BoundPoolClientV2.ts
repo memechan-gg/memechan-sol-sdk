@@ -1237,6 +1237,13 @@ export class BoundPoolClientV2 {
 
     transaction.add(goLiveInstruction);
 
+    // seems like we could fit in here
+    const transferCreatorFundTx = await this.getTransferCreatorBonusChanFundsTx({
+      ...args.transferCreatorBonusArgs,
+      transaction: transaction,
+    });
+    console.log("transferCreatorFundSignature", transferCreatorFundTx);
+
     const admin = user.publicKey;
     let slot = await connection.getSlot("confirmed");
     const [createLUTix, LUTaddr] = AddressLookupTableProgram.createLookupTable({
@@ -1532,20 +1539,6 @@ export class BoundPoolClientV2 {
 
     transaction.add(goLiveInstruction);
 
-    // send creator funds, cant include in the same transaction
-    // const transferCreatorFundSignature = await this.transferCreatorBonusChanFunds({
-    //   ...args.transferCreatorBonusArgs,
-    //   transaction: new Transaction(),
-    // });
-    // console.log("transferCreatorFundSignature", transferCreatorFundSignature);
-
-    // okay, seems like we could fit in.
-    const transferCreatorFundTx = await this.getTransferCreatorBonusChanFundsTx({
-      ...args.transferCreatorBonusArgs,
-      transaction: args.transaction,
-    });
-    console.log("transferCreatorFundSignature", transferCreatorFundTx);
-
     const admin = user.publicKey;
     const slot = await connection.getSlot("confirmed");
     const [createLUTix, LUTaddr] = AddressLookupTableProgram.createLookupTable({
@@ -1616,6 +1609,11 @@ export class BoundPoolClientV2 {
     // Get needed transactions
     const { goLiveTransaction, stakingId } = await BoundPoolClientV2.getInitQuoteAmmPoolTransaction(args);
 
+    const serializedTransaction = goLiveTransaction.serialize();
+    // Calculate the transaction size in bytes
+    const transactionSize = serializedTransaction.length;
+    console.log(`Transaction size: ${transactionSize} bytes`);
+
     console.log("goLive2 1");
     // Send transaction to go live
     const goLiveSignature = await client.connection.sendTransaction(goLiveTransaction, { skipPreflight: true });
@@ -1655,6 +1653,11 @@ export class BoundPoolClientV2 {
       client: this.client,
     });
 
+    const serializedTransaction = goLiveTransaction.serialize();
+    // Calculate the transaction size in bytes
+    const transactionSize = serializedTransaction.length;
+    console.log(`Transaction size: ${transactionSize} bytes`);
+
     console.log("goLive2 1");
     // Send transaction to go live
     const goLiveSignature = await this.client.connection.sendTransaction(goLiveTransaction, { skipPreflight: true });
@@ -1691,6 +1694,11 @@ export class BoundPoolClientV2 {
     const { client } = args;
     // Get needed transactions
     const { goLiveTransaction, stakingId } = await BoundPoolClientV2.getInitChanAmmPoolTransaction(args);
+
+    const serializedTransaction = goLiveTransaction.serialize();
+    // Calculate the transaction size in bytes
+    const transactionSize = serializedTransaction.length;
+    console.log(`Transaction size: ${transactionSize} bytes`);
 
     console.log("goLive2 1");
     // Send transaction to go live
@@ -1892,28 +1900,47 @@ export class BoundPoolClientV2 {
     args: TransferCreatorBonusChanFundsArgs,
   ): Promise<Transaction> {
     const { creator, payer, connection, amount, transaction = new Transaction() } = args;
-    const fromTokenAccount = await ensureAssociatedTokenAccountWithIX({
-      connection: connection,
-      payer: payer.publicKey,
-      mint: TOKEN_INFOS.CHAN.mint,
-      owner: payer.publicKey,
-      transaction: transaction,
-    });
 
+    const { TOKEN_PROGRAM_ID, getAssociatedTokenAddressSync, ASSOCIATED_TOKEN_PROGRAM_ID } = await import(
+      "@solana/spl-token"
+    );
+
+    // this should already exist, no need to create
+    const fromTokenAccount = getAssociatedTokenAddressSync(
+      TOKEN_INFOS.CHAN.mint,
+      payer.publicKey,
+      true,
+      TOKEN_PROGRAM_ID,
+      ASSOCIATED_TOKEN_PROGRAM_ID,
+    );
+
+    const toTokenAccountTx = new Transaction();
     const toTokenAccount = await ensureAssociatedTokenAccountWithIX({
       connection: connection,
       payer: payer.publicKey,
       mint: TOKEN_INFOS.CHAN.mint,
       owner: creator,
-      transaction: transaction,
+      transaction: toTokenAccountTx,
     });
+
+    const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
+      microLamports: COMPUTE_UNIT_PRICE,
+    });
+
+    // we create it instantly, to not overload the main Tx
+    if (toTokenAccountTx.instructions.length > 0) {
+      toTokenAccountTx.add(addPriorityFee);
+      console.log("6 - creating token account for creator");
+      const txResult = await sendAndConfirmTransaction(connection, toTokenAccountTx, [payer], {
+        commitment: "confirmed",
+        skipPreflight: true,
+        preflightCommitment: "confirmed",
+      });
+      console.log("6 txResult", txResult);
+    }
 
     const { createTransferInstruction } = await import("@solana/spl-token");
     transaction.add(createTransferInstruction(fromTokenAccount, toTokenAccount, payer.publicKey, amount));
-
-    // const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
-    //   microLamports: COMPUTE_UNIT_PRICE,
-    // });
 
     // transaction.add(addPriorityFee);
     return transaction;

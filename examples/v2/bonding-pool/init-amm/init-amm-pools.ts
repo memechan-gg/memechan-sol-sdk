@@ -19,21 +19,26 @@ import { ChanSwapClient } from "../../../../src/chan-swap/ChanSwapClient";
 
   const memeTokenInfo = getTokenInfoByMint(memeMint);
 
-  // try {
-  //   const initQuoteAmmPoolResult = await BoundPoolClientV2.initQuoteAmmPool({
-  //     payer: payer,
-  //     user: payer,
-  //     tokenInfoA: memeTokenInfo,
-  //     tokenInfoB: TOKEN_INFOS.WSOL,
-  //     memeVault: stakingPool.memeVault,
-  //     quoteVault: stakingPool.quoteVault,
-  //     client: clientV2,
-  //   });
-  //   console.log("initQuoteAmmPool result: ", initQuoteAmmPoolResult);
-  // } catch (e) {
-  //   console.error("initQuoteAmmPool error: ", e);
-  // }
-
+  try {
+    const initQuoteAmmPoolResult = await BoundPoolClientV2.initQuoteAmmPool({
+      payer: payer,
+      user: payer,
+      tokenInfoA: memeTokenInfo,
+      tokenInfoB: TOKEN_INFOS.WSOL,
+      memeVault: stakingPool.memeVault,
+      quoteVault: stakingPool.quoteVault,
+      client: clientV2,
+      transferCreatorBonusArgs: {
+        amount: BigInt(1000),
+        connection: clientV2.connection,
+        creator: payer.publicKey,
+        payer: payer,
+      },
+    });
+    console.log("initQuoteAmmPool result: ", initQuoteAmmPoolResult);
+  } catch (e) {
+    console.error("initQuoteAmmPool error: ", e);
+  }
   // const adminSecretKey =
   //   "[243,209,26,170,233,220,87,246,186,249,184,131,192,150,226,199,18,71,26,246,200,191,25,134,244,44,8,42,32,11,185,194,110,166,26,137,37,31,69,91,254,102,98,209,147,249,231,211,203,50,49,57,51,108,131,241,247,65,131,158,141,92,105,228]";
   // const adminPayer = Keypair.fromSecretKey(Buffer.from(JSON.parse(adminSecretKey)));
@@ -49,12 +54,6 @@ import { ChanSwapClient } from "../../../../src/chan-swap/ChanSwapClient";
       quoteVault: stakingPool.quoteVault,
       client: clientV2,
       chanSwap: ChanSwapClient.chanSwapId(),
-      transferCreatorBonusArgs: {
-        amount: BigInt(1000),
-        connection: clientV2.connection,
-        creator: payer.publicKey,
-        payer: payer,
-      },
     });
 
     console.log("initChanAmmPoolResult: ", initChanAmmPoolResult);

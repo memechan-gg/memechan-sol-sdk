@@ -6,7 +6,7 @@ import { PublicKey, sendAndConfirmTransaction } from "@solana/web3.js";
 // yarn tsx examples/v2/staking-pool/add-fees-tx.ts > add-fees-tx.txt 2>&1
 export const addFeesTx = async () => {
   // Get staking pool
-  const memeMint = new PublicKey("8NmKFkMehRoF9BLSajM9xioitxKWSfXTxw2qrtPtyE2z");
+  const memeMint = new PublicKey("HZUAFBsoVPb2u1paMmiNjc6QvRioXTYNvC3zXtu3HxMX");
   const stakingPoolAddress = BoundPoolClientV2.findStakingPda(memeMint, clientV2.memechanProgram.programId);
 
   const stakingPool = await StakingPoolClientV2.fromStakingPoolId({
