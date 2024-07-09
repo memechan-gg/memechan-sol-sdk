@@ -23,9 +23,10 @@ export async function getBoundPoolClientFromId(
   console.log("accountInfo.owner:", accountInfo.owner);
 
   if (accountInfo.owner.toBase58() == MEMECHAN_PROGRAM_ID_V2) {
-    const boundPoolInstance = await BoundPoolClientV2.fromBoundPoolId({
+    const boundPoolInstance = BoundPoolClientV2.fromAccountInfo({
       client: clientV2,
       poolAccountAddressId: poolAddressId,
+      accountInfo,
     });
     return {
       boundPoolInstance: boundPoolInstance,
@@ -33,9 +34,10 @@ export async function getBoundPoolClientFromId(
     };
   }
 
-  const boundPoolInstance = await BoundPoolClient.fromBoundPoolId({
+  const boundPoolInstance = BoundPoolClient.fromAccountInfo({
     client: client,
     poolAccountAddressId: poolAddressId,
+    accountInfo,
   });
 
   return {

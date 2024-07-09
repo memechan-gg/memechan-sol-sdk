@@ -1,5 +1,6 @@
 import { Token } from "@raydium-io/raydium-sdk";
 import {
+  AccountInfo,
   ComputeBudgetProgram,
   Connection,
   GetProgramAccountsFilter,
@@ -113,6 +114,31 @@ export class BoundPoolClient {
     console.log("TOKEN_PROGRAM_ID: ", TOKEN_PROGRAM_ID);
     console.log("poolObjectData.memeReserve.mint: ", poolObjectData.memeReserve.mint);
 
+    const boundClientInstance = new BoundPoolClient(
+      poolAccountAddressId,
+      client,
+      poolObjectData.memeReserve.vault,
+      poolObjectData.quoteReserve.vault,
+      poolObjectData.memeReserve.mint,
+      poolObjectData.quoteReserve.mint,
+      new Token(TOKEN_PROGRAM_ID, new PublicKey(poolObjectData.memeReserve.mint), MEMECHAN_MEME_TOKEN_DECIMALS),
+      poolObjectData,
+    );
+
+    return boundClientInstance;
+  }
+
+  public static fromAccountInfo({
+    client,
+    poolAccountAddressId,
+    accountInfo,
+  }: {
+    client: MemechanClient;
+    poolAccountAddressId: PublicKey;
+    accountInfo: AccountInfo<Buffer>;
+  }) {
+    const poolObjectData = CodegenBoundPool.decode(accountInfo.data);
+    const TOKEN_PROGRAM_ID = new PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA");
     const boundClientInstance = new BoundPoolClient(
       poolAccountAddressId,
       client,

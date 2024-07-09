@@ -91,6 +91,7 @@ import { TargetConfigClientV2 } from "../targetconfig/TargetConfigClientV2";
 import { ChanSwapClient } from "../chan-swap/ChanSwapClient";
 import { StakingPoolClientV2 } from "../staking-pool/StakingPoolClientV2";
 import { MemechanSol } from "../schema/v2/v2";
+import { AccountInfo } from "@solana/web3.js";
 
 export class BoundPoolClientV2 {
   private constructor(
@@ -115,6 +116,31 @@ export class BoundPoolClientV2 {
   }) {
     const poolObjectData = await BoundPoolClientV2.fetch2(client.connection, poolAccountAddressId);
     const { TOKEN_PROGRAM_ID } = await import("@solana/spl-token");
+    const boundClientInstance = new BoundPoolClientV2(
+      poolAccountAddressId,
+      client,
+      poolObjectData.memeReserve.vault,
+      poolObjectData.quoteReserve.vault,
+      poolObjectData.memeReserve.mint,
+      poolObjectData.quoteReserve.mint,
+      new Token(TOKEN_PROGRAM_ID, new PublicKey(poolObjectData.memeReserve.mint), MEMECHAN_MEME_TOKEN_DECIMALS),
+      poolObjectData,
+    );
+
+    return boundClientInstance;
+  }
+
+  public static fromAccountInfo({
+    client,
+    poolAccountAddressId,
+    accountInfo,
+  }: {
+    client: MemechanClientV2;
+    poolAccountAddressId: PublicKey;
+    accountInfo: AccountInfo<Buffer>;
+  }) {
+    const poolObjectData = CodegenBoundPool.decode(accountInfo.data);
+    const TOKEN_PROGRAM_ID = new PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA");
     const boundClientInstance = new BoundPoolClientV2(
       poolAccountAddressId,
       client,
