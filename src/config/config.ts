@@ -152,3 +152,5 @@ export const CHAN_TOKEN = new PublicKey("ChanGGuDHboPswpTmKDfsTVGQL96VHhmvpwrE4U
 export const CHAN_TOKEN_DECIMALS = 9;
 export const PRESALE_AMOUNT_IN_CHAN = new BigNumber(380_000_000);
 export const PRESALE_AMOUNT_IN_CHAN_RAW = PRESALE_AMOUNT_IN_CHAN.multipliedBy(10 ** CHAN_TOKEN_DECIMALS);
+
+export const DEFAULT_ON_CHAIN_ADDRESS = new PublicKey("11111111111111111111111111111111");
