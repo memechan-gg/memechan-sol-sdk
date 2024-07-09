@@ -23,10 +23,10 @@ export async function getLivePoolClientFromId(
   console.log("accountInfo.owner:", accountInfo.owner);
 
   if (accountInfo.owner.toBase58() == MERCURIAL_AMM_PROGRAM_ID) {
-    const pool = await LivePoolClientV2.fromAmmId(ammId, clientV2);
+    const pool = await LivePoolClientV2.fromAccountInfo(ammId, accountInfo, clientV2);
     return { livePool: pool, version: "V2" };
   }
 
-  const pool = await LivePoolClient.fromAmmId(ammId, client);
+  const pool = await LivePoolClient.fromAccountInfo(ammId, accountInfo, client);
   return { livePool: pool, version: "V1" };
 }

@@ -1,4 +1,4 @@
-import { PublicKey, Connection, ComputeBudgetProgram, Transaction } from "@solana/web3.js";
+import { PublicKey, Connection, ComputeBudgetProgram, Transaction, AccountInfo } from "@solana/web3.js";
 import BigNumber from "bignumber.js";
 import { COMPUTE_UNIT_PRICE, TOKEN_INFOS, MEMECHAN_MEME_TOKEN_DECIMALS } from "../config/config";
 import {
@@ -37,9 +37,55 @@ export class LivePoolClientV2 {
     return poolState;
   };
 
+  public static getPoolStateFromAccountInfo = async (
+    ammId: PublicKey,
+    accountInfo: AccountInfo<Buffer>,
+    connection: Connection,
+  ) => {
+    const { createProgram } = await import("@mercurial-finance/dynamic-amm-sdk/dist/cjs/src/amm/utils");
+    const { ammProgram } = createProgram(connection);
+
+    const poolState = ammProgram.account.pool.coder.accounts.decode<PoolState>("amm", accountInfo.data);
+
+    if (!poolState) {
+      throw new Error(`Pool ${ammId.toBase58()} not found`);
+    }
+
+    return poolState;
+  };
+
   public static async fromAmmId(ammId: PublicKey, client: MemechanClientV2): Promise<LivePoolClientV2> {
     const connection = client.connection;
     const poolState = await LivePoolClientV2.getPoolState(ammId, connection);
+    const memeMint = poolState.tokenAMint;
+
+    console.log("poolState:", poolState);
+    const memeTokenInfo: SplTokenInfo = {
+      address: poolState.tokenAMint.toBase58(),
+      decimals: MEMECHAN_MEME_TOKEN_DECIMALS,
+      symbol: "MEME",
+      name: "MEME",
+      chainId: 900,
+    };
+
+    const quoteTokenInfo = getTokenInfoByMint(poolState.tokenBMint).toSplTokenInfo();
+
+    console.log("quoteTokenInfo", quoteTokenInfo);
+
+    const { default: AmmImpl } = await import("@mercurial-finance/dynamic-amm-sdk");
+
+    const ammImpl = await AmmImpl.create(connection, ammId, memeTokenInfo, quoteTokenInfo);
+    const ammPool = new AmmPool(ammId, memeMint, new PublicKey(ammImpl.tokenB.address), ammImpl);
+    return new LivePoolClientV2(ammPool, client);
+  }
+
+  public static async fromAccountInfo(
+    ammId: PublicKey,
+    accountInfo: AccountInfo<Buffer>,
+    client: MemechanClientV2,
+  ): Promise<LivePoolClientV2> {
+    const connection = client.connection;
+    const poolState = await LivePoolClientV2.getPoolStateFromAccountInfo(ammId, accountInfo, connection);
     const memeMint = poolState.tokenAMint;
 
     console.log("poolState:", poolState);

@@ -1,5 +1,5 @@
 import { ApiPoolInfoV4, Liquidity, Percent, Token, TokenAmount, jsonInfo2PoolKeys } from "@raydium-io/raydium-sdk";
-import { Connection, PublicKey } from "@solana/web3.js";
+import { AccountInfo, Connection, PublicKey } from "@solana/web3.js";
 import BigNumber from "bignumber.js";
 import { MEMECHAN_MEME_TOKEN_DECIMALS } from "../config/config";
 import { makeTxVersion } from "../raydium/config";
@@ -16,6 +16,7 @@ import BN from "bn.js";
 import { getMultipleTokenBalances } from "../util/getMultipleTokenBalances";
 import { getTokenInfoByMint } from "../config/helpers";
 import { TokenInfo } from "../config/types";
+import { formatAmmKeysByAccountInfo } from "../raydium/formatAmmKeysByAccountInfo";
 
 export class LivePoolClient {
   private constructor(
@@ -30,6 +31,18 @@ export class LivePoolClient {
 
   public static async fromAmmId(ammId: PublicKey, client: MemechanClient): Promise<LivePoolClient> {
     return new LivePoolClient(ammId, await formatAmmKeysById(ammId.toBase58(), client.connection), client);
+  }
+
+  public static async fromAccountInfo(
+    ammId: PublicKey,
+    accountInfo: AccountInfo<Buffer>,
+    client: MemechanClient,
+  ): Promise<LivePoolClient> {
+    return new LivePoolClient(
+      ammId,
+      await formatAmmKeysByAccountInfo(ammId.toBase58(), accountInfo, client.connection),
+      client,
+    );
   }
 
   public static async getBuyMemeOutput({
