@@ -1,7 +1,7 @@
 {
   "name": "@avernikoz/memechan-sol-sdk",
   "description": "Typescript SDK for memechan.gg",
-  "version": "2.1.29",
+  "version": "2.1.69",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "directories": {
@@ -23,7 +23,7 @@
     "build:watch": "tsc --watch",
     "prettier-format": "prettier --config .prettierrc 'src/**/*.ts' --write",
     "codegen": "yarn run rimraf src/schema/v2/codegen/ && yarn run anchor-client-gen src/schema/v2/idl/memechan_sol.json src/schema/v2/codegen/ && yarn run fix:generated",
-    "fix:generated": "yarn run eslint src/schema/v2/codegen/ --fix && yarn run prettier --write src/schema/v2/codegen/**/*.ts",
+    "fix:generated": "yarn run eslint src/schema/v2/ --fix && yarn run prettier --write src/schema/v2/**/*.ts",
     "codegen:vesting": "yarn run rimraf src/vesting/schema/codegen/ && yarn run anchor-client-gen src/vesting/schema/idl/lockup.json src/vesting/schema/codegen/ && yarn run fix:generated:vesting",
     "fix:generated:vesting": "ESLINT_USE_FLAT_CONFIG=false yarn run eslint src/vesting/schema/codegen/ --fix && yarn run prettier --write src/vesting/schema/codegen/**/*.ts",
     "deploy": "yarn lint && yarn build && yarn publish --access restricted"
@@ -68,7 +68,8 @@
     "ts-jest": "^29.1.2",
     "tsup": "^8.0.2",
     "tsx": "^4.10.5",
-    "typescript": "^5.4.5"
+    "typescript": "^5.4.5",
+    "@saberhq/anchor-contrib": "1.13.32"
   },
   "keywords": [],
   "author": "0xunreal",
@@ -80,5 +81,6 @@
   "bugs": {
     "url": "https://github.com/memechan-gg/memechan-sol/issues"
   },
-  "homepage": "https://github.com/memechan-gg/memechan-sol#readme"
+  "homepage": "https://github.com/memechan-gg/memechan-sol#readme",
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
 }

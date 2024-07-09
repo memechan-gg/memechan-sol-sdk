@@ -50,15 +50,18 @@ import {
   SellMemeArgs,
   SwapXArgs,
   SwapYArgs,
+  TransferCreatorBonusChanFundsArgs,
 } from "./types";
 
 import { findProgramAddress, sleep } from "../common/helpers";
 import {
+  BOUND_POOL_FEE_WALLET,
+  BOUND_POOL_VESTING_PERIOD,
   COMPUTE_UNIT_PRICE,
   DEFAULT_MAX_M,
   FULL_MEME_AMOUNT_CONVERTED,
-  MEMECHAN_FEE_WALLET_ID,
   MEMECHAN_MEME_TOKEN_DECIMALS,
+  SWAP_FEE_WALLET,
   TOKEN_INFOS,
 } from "../config/config";
 import { getCreateMintWithPriorityTransaction } from "../token/getCreateMintWithPriorityTransaction";
@@ -119,7 +122,7 @@ export class BoundPoolClientV2 {
       poolObjectData.quoteReserve.vault,
       poolObjectData.memeReserve.mint,
       poolObjectData.quoteReserve.mint,
-      new Token(TOKEN_PROGRAM_ID, poolObjectData.memeReserve.mint, MEMECHAN_MEME_TOKEN_DECIMALS),
+      new Token(TOKEN_PROGRAM_ID, new PublicKey(poolObjectData.memeReserve.mint), MEMECHAN_MEME_TOKEN_DECIMALS),
       poolObjectData,
     );
 
@@ -238,7 +241,7 @@ export class BoundPoolClientV2 {
         connection,
         payer,
         mint: quoteToken.mint,
-        owner: new PublicKey(MEMECHAN_FEE_WALLET_ID),
+        owner: new PublicKey(BOUND_POOL_FEE_WALLET),
         transaction: createPoolTransaction,
       });
     }
@@ -262,7 +265,7 @@ export class BoundPoolClientV2 {
     const quoteInfo = getTokenInfoByMint(quoteToken.mint);
     const { TOKEN_PROGRAM_ID } = await import("@solana/spl-token");
     const createPoolInstruction = await memechanProgram.methods
-      .newPool(airdroppedTokens)
+      .newPool(airdroppedTokens, BOUND_POOL_VESTING_PERIOD)
       .accounts({
         feeQuoteVault: feeQuoteVault,
         memeVault: launchVault,
@@ -1088,7 +1091,7 @@ export class BoundPoolClientV2 {
     transaction.add(modifyComputeUnits);
 
     const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
-      microLamports: COMPUTE_UNIT_PRICE,
+      microLamports: COMPUTE_UNIT_PRICE * 200,
     });
 
     transaction.add(addPriorityFee);
@@ -1234,6 +1237,13 @@ export class BoundPoolClientV2 {
 
     transaction.add(goLiveInstruction);
 
+    // seems like we could fit in here
+    const transferCreatorFundTx = await this.getTransferCreatorBonusChanFundsTx({
+      ...args.transferCreatorBonusArgs,
+      transaction: transaction,
+    });
+    console.log("transferCreatorFundSignature", transferCreatorFundTx);
+
     const admin = user.publicKey;
     let slot = await connection.getSlot("confirmed");
     const [createLUTix, LUTaddr] = AddressLookupTableProgram.createLookupTable({
@@ -1343,7 +1353,7 @@ export class BoundPoolClientV2 {
     transaction.add(modifyComputeUnits);
 
     const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
-      microLamports: COMPUTE_UNIT_PRICE,
+      microLamports: COMPUTE_UNIT_PRICE * 200,
     });
 
     transaction.add(addPriorityFee);
@@ -1458,6 +1468,26 @@ export class BoundPoolClientV2 {
 
     const staking = await client.memechanProgram.account.stakingPool.fetch(stakingId);
 
+    const swapFeeTokenAccountTx = new Transaction();
+    const feeQuoteVault = await ensureAssociatedTokenAccountWithIX({
+      connection: connection,
+      payer: user.publicKey,
+      mint: TOKEN_INFOS.WSOL.mint,
+      owner: new PublicKey(SWAP_FEE_WALLET),
+      transaction: swapFeeTokenAccountTx,
+    });
+
+    if (swapFeeTokenAccountTx.instructions.length > 0) {
+      swapFeeTokenAccountTx.add(addPriorityFee);
+      console.log("6 - creating token account for SWAP_FEE_WALLET");
+      const txResult = await sendAndConfirmTransaction(connection, swapFeeTokenAccountTx, [user], {
+        commitment: "confirmed",
+        skipPreflight: true,
+        preflightCommitment: "confirmed",
+      });
+      console.log("6 txResult", txResult);
+    }
+
     const { TOKEN_PROGRAM_ID } = await import("@solana/spl-token");
 
     console.log("7");
@@ -1490,10 +1520,7 @@ export class BoundPoolClientV2 {
         stakingChanVault: staking.chanVault,
         stakingQuoteVault: staking.quoteVault,
 
-        feeQuoteVault: await utils.getAssociatedTokenAccount(
-          TOKEN_INFOS.WSOL.mint,
-          new PublicKey(MEMECHAN_FEE_WALLET_ID),
-        ),
+        feeQuoteVault: feeQuoteVault,
         chanSwap,
         chanSwapSignerPda: ChanSwapClient.chanSwapSigner(),
         chanSwapVault: fetchedChanSwap.chanVault,
@@ -1582,6 +1609,11 @@ export class BoundPoolClientV2 {
     // Get needed transactions
     const { goLiveTransaction, stakingId } = await BoundPoolClientV2.getInitQuoteAmmPoolTransaction(args);
 
+    const serializedTransaction = goLiveTransaction.serialize();
+    // Calculate the transaction size in bytes
+    const transactionSize = serializedTransaction.length;
+    console.log(`Transaction size: ${transactionSize} bytes`);
+
     console.log("goLive2 1");
     // Send transaction to go live
     const goLiveSignature = await client.connection.sendTransaction(goLiveTransaction, { skipPreflight: true });
@@ -1621,6 +1653,11 @@ export class BoundPoolClientV2 {
       client: this.client,
     });
 
+    const serializedTransaction = goLiveTransaction.serialize();
+    // Calculate the transaction size in bytes
+    const transactionSize = serializedTransaction.length;
+    console.log(`Transaction size: ${transactionSize} bytes`);
+
     console.log("goLive2 1");
     // Send transaction to go live
     const goLiveSignature = await this.client.connection.sendTransaction(goLiveTransaction, { skipPreflight: true });
@@ -1657,6 +1694,11 @@ export class BoundPoolClientV2 {
     const { client } = args;
     // Get needed transactions
     const { goLiveTransaction, stakingId } = await BoundPoolClientV2.getInitChanAmmPoolTransaction(args);
+
+    const serializedTransaction = goLiveTransaction.serialize();
+    // Calculate the transaction size in bytes
+    const transactionSize = serializedTransaction.length;
+    console.log(`Transaction size: ${transactionSize} bytes`);
 
     console.log("goLive2 1");
     // Send transaction to go live
@@ -1726,244 +1768,6 @@ export class BoundPoolClientV2 {
     return stakingPoolInstance;
   }
 
-  // public async getGoLiveTransaction(args: GetGoLiveTransactionArgs): Promise<{
-  //   createMarketTransactions: (Transaction | VersionedTransaction)[];
-  //   goLiveTransaction: Transaction;
-  //   stakingId: PublicKey;
-  //   ammId: PublicKey;
-  // }> {
-  //   return await BoundPoolClientV2.getGoLiveTransaction({
-  //     ...args,
-  //     client: this.client,
-  //     memeMint: args.boundPoolInfo.memeReserve.mint,
-  //     transaction: new Transaction(),
-  //     payer: args.user,
-  //     quoteMint: args.boundPoolInfo.quoteReserve.mint,
-  //   });
-  // }
-
-  // public static async getGoLiveTransaction(args: GetGoLiveTransactionStaticArgs): Promise<{
-  //   createMarketTransactions: (Transaction | VersionedTransaction)[];
-  //   goLiveTransaction: Transaction;
-  //   stakingId: PublicKey;
-  //   marketId: PublicKey;
-  //   ammId: PublicKey;
-  // }> {
-  //   const {
-  //     client,
-  //     memeMint,
-  //     user,
-  //     // feeDestinationWalletAddress,
-  //     // memeVault,
-  //     // quoteVault,
-  //     transaction = new Transaction(),
-  //     quoteMint,
-  //   } = args;
-  //   const stakingId = BoundPoolClientV2.findStakingPda(memeMint, client.memechanProgram.programId);
-  //   // const stakingSigner = StakingPoolClient.findSignerPda(stakingId, client.memechanProgram.programId);
-  //   const baseTokenInfo = new Token(TOKEN_PROGRAM_ID, memeMint, MEMECHAN_MEME_TOKEN_DECIMALS);
-
-  //   const quoteTokenInfo = getTokenInfoByMint(quoteMint);
-
-  //   // TODO: Put all the transactions into one (now they exceed trx size limit)
-  //   const { marketId, transactions: createMarketTransactions } = await getCreateMarketTransactions({
-  //     baseToken: baseTokenInfo,
-  //     quoteToken: quoteTokenInfo,
-  //     marketIdSeed: stakingId,
-  //     wallet: user.publicKey,
-  //     signer: user,
-  //     connection: client.connection,
-  //   });
-
-  //   // console.log("stakingId: ", stakingId.toBase58());
-  //   // console.log("createMarketTransaction marketId 0: ", marketId);
-
-  //   // // const createMarketInstructions = getCreateMarketInstructions(transactions);
-  //   // // createMarketTransaction.add(...createMarketInstructions);
-
-  //   // transaction.add(
-  //   //   SystemProgram.transfer({
-  //   //     fromPubkey: user.publicKey,
-  //   //     toPubkey: stakingSigner,
-  //   //     lamports: RAYDIUM_PROTOCOL_FEE + TRANSFER_FEE,
-  //   //   }),
-  //   // );
-
-  //   // console.log("setComputeUnitLimit");
-
-  //   // const modifyComputeUnits = ComputeBudgetProgram.setComputeUnitLimit({
-  //   //   units: 250000,
-  //   // });
-
-  //   // transaction.add(modifyComputeUnits);
-
-  //   // console.log("setComputeUnitPrice");
-
-  //   // const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
-  //   //   microLamports: COMPUTE_UNIT_PRICE * 100, // we need high priority, we can always optimize later
-  //   // });
-
-  //   // transaction.add(addPriorityFee);
-
-  //   // const feeDestination = new PublicKey(feeDestinationWalletAddress);
-  //   // console.log("feeDestination: ", feeDestination.toBase58());
-  //   const ammId = BoundPoolClientV2.getAssociatedId({ programId: PROGRAMIDS.AmmV4, marketId });
-  //   // console.log("ammId: ", ammId.toBase58());
-  //   // const raydiumAmmAuthority = BoundPoolClientV2.getAssociatedAuthority({ programId: PROGRAMIDS.AmmV4 });
-  //   // console.log("raydiumAmmAuthority: ", raydiumAmmAuthority.publicKey.toBase58());
-  //   // const openOrders = BoundPoolClientV2.getAssociatedOpenOrders({ programId: PROGRAMIDS.AmmV4, marketId });
-  //   // console.log("openOrders: ", openOrders.toBase58());
-  //   // const targetOrders = BoundPoolClientV2.getAssociatedTargetOrders({ programId: PROGRAMIDS.AmmV4, marketId });
-  //   // console.log("targetOrders: ", targetOrders.toBase58());
-  //   // const ammConfig = BoundPoolClientV2.getAssociatedConfigId({ programId: PROGRAMIDS.AmmV4 });
-  //   // console.log("ammConfig: ", ammConfig.toBase58());
-  //   // const raydiumLpMint = BoundPoolClientV2.getAssociatedLpMint({ programId: PROGRAMIDS.AmmV4, marketId });
-  //   // console.log("raydiumLpMint: ", raydiumLpMint.toBase58());
-  //   // const raydiumMemeVault = BoundPoolClientV2.getAssociatedBaseVault({ programId: PROGRAMIDS.AmmV4, marketId });
-  //   // console.log("raydiumMemeVault: ", raydiumMemeVault.toBase58());
-  //   // const raydiumWsolVault = BoundPoolClientV2.getAssociatedQuoteVault({ programId: PROGRAMIDS.AmmV4, marketId });
-  //   // console.log("raydiumWsolVault: ", raydiumWsolVault.toBase58());
-
-  //   // const userDestinationLpTokenAta = BoundPoolClientV2.getATAAddress(
-  //   //   stakingSigner,
-  //   //   raydiumLpMint,
-  //   //   TOKEN_PROGRAM_ID,
-  //   // ).publicKey;
-
-  //   // console.log("userDestinationLpTokenAta. : " + userDestinationLpTokenAta.toBase58());
-
-  //   // const goLiveInstruction = await client.memechanProgram.methods
-  //   //   .goLive(raydiumAmmAuthority.nonce)
-  //   //   .accounts({
-  //   //     signer: user.publicKey,
-  //   //     poolMemeVault: memeVault,
-  //   //     poolQuoteVault: quoteVault,
-  //   //     quoteMint: quoteMint,
-  //   //     staking: stakingId,
-  //   //     stakingPoolSignerPda: stakingSigner,
-  //   //     raydiumLpMint: raydiumLpMint,
-  //   //     raydiumAmm: ammId,
-  //   //     raydiumAmmAuthority: raydiumAmmAuthority.publicKey,
-  //   //     raydiumMemeVault: raydiumMemeVault,
-  //   //     raydiumQuoteVault: raydiumWsolVault,
-  //   //     marketProgramId: PROGRAMIDS.OPENBOOK_MARKET,
-  //   //     systemProgram: SystemProgram.programId,
-  //   //     tokenProgram: TOKEN_PROGRAM_ID,
-  //   //     marketAccount: marketId,
-  //   //     clock: SYSVAR_CLOCK_PUBKEY,
-  //   //     rent: SYSVAR_RENT_PUBKEY,
-  //   //     openOrders: openOrders,
-  //   //     targetOrders: targetOrders,
-  //   //     memeMint: memeMint,
-  //   //     ammConfig: ammConfig,
-  //   //     ataProgram: ATA_PROGRAM_ID,
-  //   //     feeDestinationInfo: feeDestination,
-  //   //     userDestinationLpTokenAta: userDestinationLpTokenAta,
-  //   //     raydiumProgram: PROGRAMIDS.AmmV4,
-  //   //   })
-  //   //   .instruction();
-
-  //   // console.log("goLiveInstruction: ", goLiveInstruction);
-
-  //   // transaction.add(goLiveInstruction);
-
-  //   return { createMarketTransactions, goLiveTransaction: transaction, stakingId, ammId, marketId };
-  // }
-
-  // public async goLive(args: GoLiveArgs): Promise<[StakingPoolClient, LivePoolClient]> {
-  //   return await BoundPoolClientV2.goLive({
-  //     ...args,
-  //     client: this.client,
-  //     memeMint: this.memeTokenMint,
-  //     quoteMint: this.quoteTokenMint,
-  //   });
-  // }
-
-  // public static async goLive(args: GoLiveStaticArgs): Promise<[StakingPoolClient, LivePoolClient]> {
-  //   return await retry({
-  //     fn: () => BoundPoolClientV2.goLiveInternal(args),
-  //     functionName: "goLiveStatic",
-  //     retries: 3,
-  //   });
-  // }
-
-  // private static async goLiveInternal(args: GoLiveStaticArgs): Promise<[StakingPoolClient, LivePoolClient]> {
-  //   const client = args.client;
-  //   // Get needed transactions
-  //   const { createMarketTransactions, goLiveTransaction, stakingId, ammId, marketId } =
-  //     await BoundPoolClientV2.getGoLiveTransaction(args);
-
-  //   // check if market already exists
-  //   console.log("marketId we try fetch: ", marketId.toBase58());
-  //   const marketAccount = await client.connection.getAccountInfo(marketId, {
-  //     commitment: "confirmed",
-  //     dataSlice: { length: 0, offset: 0 },
-  //   });
-  //   console.log("marketAccount: ", marketAccount);
-
-  //   // Send transaction to create market if not
-  //   if (!marketAccount) {
-  //     console.log("no market account exists yet, creating sending create market transactions");
-  //     const createMarketSignatures = await sendTx(client.connection, args.user, createMarketTransactions, {
-  //       skipPreflight: true,
-  //       preflightCommitment: "confirmed",
-  //     });
-  //     console.log("create market signatures:", JSON.stringify(createMarketSignatures));
-
-  //     // TODO we migh need this
-  //     // Check market is created successfully
-  //     const { blockhash, lastValidBlockHeight } = await client.connection.getLatestBlockhash("confirmed");
-  //     const createMarketTxResult = await client.connection.confirmTransaction(
-  //       {
-  //         signature: createMarketSignatures[2], // wait for 3rd tx
-  //         blockhash: blockhash,
-  //         lastValidBlockHeight: lastValidBlockHeight,
-  //       },
-  //       "confirmed",
-  //     );
-
-  //     if (createMarketTxResult.value.err) {
-  //       console.error("createMarketTxResult:", createMarketTxResult);
-  //       throw new Error("createMarketTxResult failed");
-  //     }
-  //   }
-
-  //   console.log("send go live transaction");
-  //   // Send transaction to go live
-  //   const goLiveSignature = await sendAndConfirmTransaction(client.connection, goLiveTransaction, [args.user], {
-  //     skipPreflight: true,
-  //     preflightCommitment: "confirmed",
-  //     commitment: "confirmed",
-  //   });
-  //   console.log("go live signature:", goLiveSignature);
-
-  //   // Check go live succeeded
-  //   const { blockhash: blockhash1, lastValidBlockHeight: lastValidBlockHeight1 } =
-  //     await client.connection.getLatestBlockhash("confirmed");
-  //   const goLiveTxResult = await client.connection.confirmTransaction(
-  //     {
-  //       signature: goLiveSignature,
-  //       blockhash: blockhash1,
-  //       lastValidBlockHeight: lastValidBlockHeight1,
-  //     },
-  //     "confirmed",
-  //   );
-
-  //   if (goLiveTxResult.value.err) {
-  //     console.error("goLiveTxResult:", goLiveTxResult);
-  //     throw new Error("goLiveTxResult failed");
-  //   }
-
-  //   const stakingPoolInstance = await StakingPoolClient.fromStakingPoolId({
-  //     client: client,
-  //     poolAccountAddressId: stakingId,
-  //   });
-
-  //   const livePool = await LivePoolClient.fromAmmId(ammId, client);
-
-  //   return [stakingPoolInstance, livePool];
-  // }
-
   public async fetchRelatedTickets() {
     return MemeTicketClientV2.fetchRelatedTickets(this.id, this.client);
   }
@@ -2008,13 +1812,13 @@ export class BoundPoolClientV2 {
 
     if (pool) {
       // add bound pool as holder
-      if (!uniqueHolders.has(MEMECHAN_FEE_WALLET_ID)) {
+      if (!uniqueHolders.has(BOUND_POOL_FEE_WALLET)) {
         const adminTicket = {
           amount: pool.adminFeesMeme,
-          owner: new PublicKey(MEMECHAN_FEE_WALLET_ID),
+          owner: new PublicKey(BOUND_POOL_FEE_WALLET),
           pool: poolId,
         } as MemeTicketFields;
-        uniqueHolders.set(MEMECHAN_FEE_WALLET_ID, [adminTicket]);
+        uniqueHolders.set(BOUND_POOL_FEE_WALLET, [adminTicket]);
       }
     }
 
@@ -2090,6 +1894,69 @@ export class BoundPoolClientV2 {
     const marketCap = new BigNumber(FULL_MEME_AMOUNT_CONVERTED).multipliedBy(memePriceInUsd).toString();
 
     return marketCap;
+  }
+
+  public static async getTransferCreatorBonusChanFundsTx(
+    args: TransferCreatorBonusChanFundsArgs,
+  ): Promise<Transaction> {
+    const { creator, payer, connection, amount, transaction = new Transaction() } = args;
+
+    const { TOKEN_PROGRAM_ID, getAssociatedTokenAddressSync, ASSOCIATED_TOKEN_PROGRAM_ID } = await import(
+      "@solana/spl-token"
+    );
+
+    // this should already exist, no need to create
+    const fromTokenAccount = getAssociatedTokenAddressSync(
+      TOKEN_INFOS.CHAN.mint,
+      payer.publicKey,
+      true,
+      TOKEN_PROGRAM_ID,
+      ASSOCIATED_TOKEN_PROGRAM_ID,
+    );
+
+    const toTokenAccountTx = new Transaction();
+    const toTokenAccount = await ensureAssociatedTokenAccountWithIX({
+      connection: connection,
+      payer: payer.publicKey,
+      mint: TOKEN_INFOS.CHAN.mint,
+      owner: creator,
+      transaction: toTokenAccountTx,
+    });
+
+    const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
+      microLamports: COMPUTE_UNIT_PRICE,
+    });
+
+    // we create it instantly, to not overload the main Tx
+    if (toTokenAccountTx.instructions.length > 0) {
+      toTokenAccountTx.add(addPriorityFee);
+      console.log("6 - creating token account for creator");
+      const txResult = await sendAndConfirmTransaction(connection, toTokenAccountTx, [payer], {
+        commitment: "confirmed",
+        skipPreflight: true,
+        preflightCommitment: "confirmed",
+      });
+      console.log("6 txResult", txResult);
+    }
+
+    const { createTransferInstruction } = await import("@solana/spl-token");
+    transaction.add(createTransferInstruction(fromTokenAccount, toTokenAccount, payer.publicKey, amount));
+
+    // transaction.add(addPriorityFee);
+    return transaction;
+  }
+
+  public static async transferCreatorBonusChanFunds(args: TransferCreatorBonusChanFundsArgs): Promise<string> {
+    const { payer, connection } = args;
+    const transaction = await BoundPoolClientV2.getTransferCreatorBonusChanFundsTx(args);
+
+    const signature = await sendAndConfirmTransaction(connection, transaction, [payer], {
+      commitment: "confirmed",
+      skipPreflight: true,
+      preflightCommitment: "confirmed",
+    });
+
+    return signature;
   }
 
   static getATAAddress(owner: PublicKey, mint: PublicKey, programId: PublicKey) {

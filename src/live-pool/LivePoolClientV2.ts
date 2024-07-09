@@ -1,11 +1,12 @@
 import { PublicKey, Connection, ComputeBudgetProgram, Transaction } from "@solana/web3.js";
 import BigNumber from "bignumber.js";
-import { MEMECHAN_MEME_TOKEN_DECIMALS, COMPUTE_UNIT_PRICE, TOKEN_INFOS, MEME_TOKEN_DECIMALS } from "../config/config";
+import { COMPUTE_UNIT_PRICE, TOKEN_INFOS, MEMECHAN_MEME_TOKEN_DECIMALS } from "../config/config";
 import {
   GetSwapMemeOutputArgs,
   GetSwapMemeTransactionsArgs,
   GetSwapMemeTransactionsArgsV2,
   GetSwapMemeTransactionsByOutputArgsV2,
+  GetSwapMemeTransactionsByOutputArgsV2Instance,
   SwapMemeOutputV2,
 } from "./types";
 import { getNumeratorAndDenominator } from "./utils";
@@ -44,32 +45,25 @@ export class LivePoolClientV2 {
     console.log("poolState:", poolState);
     const memeTokenInfo: SplTokenInfo = {
       address: poolState.tokenAMint.toBase58(),
-      decimals: MEME_TOKEN_DECIMALS,
+      decimals: MEMECHAN_MEME_TOKEN_DECIMALS,
       symbol: "MEME",
       name: "MEME",
       chainId: 900,
     };
 
-    console.log("2:");
-
-    const quoteTokenInfo = TOKEN_INFOS.WSOL.toSplTokenInfo();
+    const quoteTokenInfo = getTokenInfoByMint(poolState.tokenBMint).toSplTokenInfo();
 
     console.log("quoteTokenInfo", quoteTokenInfo);
 
     const { default: AmmImpl } = await import("@mercurial-finance/dynamic-amm-sdk");
 
     const ammImpl = await AmmImpl.create(connection, ammId, memeTokenInfo, quoteTokenInfo);
-
-    console.log("3:");
-    const ammPool = new AmmPool(ammId, memeMint, new PublicKey(ammImpl.tokenA.address), ammImpl);
-
-    console.log("4:");
+    const ammPool = new AmmPool(ammId, memeMint, new PublicKey(ammImpl.tokenB.address), ammImpl);
     return new LivePoolClientV2(ammPool, client);
   }
 
   public static async getBuyMemeOutput({
     poolAddress,
-    memeCoinMint,
     amountIn,
     slippagePercentage,
     connection,
@@ -79,7 +73,7 @@ export class LivePoolClientV2 {
 
     const memeTokenInfo: SplTokenInfo = {
       address: memeMint.toBase58(),
-      decimals: MEME_TOKEN_DECIMALS,
+      decimals: MEMECHAN_MEME_TOKEN_DECIMALS,
       symbol: "MEME",
       name: "MEME",
       chainId: 900,
@@ -90,14 +84,15 @@ export class LivePoolClientV2 {
     const ammImpl = await AmmImpl.create(
       connection,
       new PublicKey(poolAddress),
-      TOKEN_INFOS.WSOL.toSplTokenInfo(),
       memeTokenInfo,
+      TOKEN_INFOS.WSOL.toSplTokenInfo(),
     );
     const { numerator, denominator } = getNumeratorAndDenominator(slippagePercentage);
     const slippage = new BigNumber(numerator).dividedBy(new BigNumber(denominator)).toNumber();
 
     const quoteAmountIn = normalizeInputCoinAmountBN(amountIn, TOKEN_INFOS.WSOL.decimals);
-    const { minSwapOutAmount } = ammImpl.getSwapQuote(new PublicKey(memeCoinMint), quoteAmountIn, slippage);
+    console.log("quoteAmountIn:", quoteAmountIn.toString());
+    const { minSwapOutAmount } = ammImpl.getSwapQuote(TOKEN_INFOS.WSOL.mint, quoteAmountIn, slippage);
 
     return {
       minAmountOut: minSwapOutAmount,
@@ -113,10 +108,7 @@ export class LivePoolClientV2 {
     minAmountOut,
     ammImpl,
   }: GetSwapMemeTransactionsByOutputArgsV2) {
-    const inTokenInfo = getTokenInfoByMint(inTokenMint);
-    const normalizedAmountIn = normalizeInputCoinAmountBN(wrappedAmountIn.toString(), inTokenInfo.decimals);
-
-    const swapTx = await ammImpl.swap(payer, inTokenMint, normalizedAmountIn, minAmountOut);
+    const swapTx = await ammImpl.swap(payer, inTokenMint, wrappedAmountIn, minAmountOut);
 
     const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
       microLamports: COMPUTE_UNIT_PRICE,
@@ -163,7 +155,7 @@ export class LivePoolClientV2 {
   }: GetSwapMemeOutputArgs): Promise<SwapMemeOutputV2> {
     const memeTokenInfo: SplTokenInfo = {
       address: memeCoinMint,
-      decimals: MEME_TOKEN_DECIMALS,
+      decimals: MEMECHAN_MEME_TOKEN_DECIMALS,
       symbol: "MEME",
       name: "MEME",
       chainId: 900,
@@ -172,18 +164,14 @@ export class LivePoolClientV2 {
     const ammImpl = await AmmImpl.create(
       connection,
       new PublicKey(poolAddress),
-      TOKEN_INFOS.WSOL.toSplTokenInfo(),
       memeTokenInfo,
+      TOKEN_INFOS.WSOL.toSplTokenInfo(),
     );
     const { numerator, denominator } = getNumeratorAndDenominator(slippagePercentage);
     const slippage = new BigNumber(numerator).dividedBy(new BigNumber(denominator)).toNumber();
 
     const memeAmountIn = normalizeInputCoinAmountBN(amountIn, MEMECHAN_MEME_TOKEN_DECIMALS);
-    const { minSwapOutAmount } = ammImpl.getSwapQuote(
-      new PublicKey(memeCoinMint),
-      new BN(memeAmountIn.toString()),
-      slippage,
-    );
+    const { minSwapOutAmount } = ammImpl.getSwapQuote(new PublicKey(memeCoinMint), memeAmountIn, slippage);
 
     return {
       minAmountOut: minSwapOutAmount,
@@ -196,13 +184,10 @@ export class LivePoolClientV2 {
     wrappedAmountIn,
     payer,
     minAmountOut,
-    ammImpl,
     inTokenMint,
+    ammImpl,
   }: GetSwapMemeTransactionsByOutputArgsV2) {
-    const inTokenInfo = getTokenInfoByMint(inTokenMint);
-    const normalizedAmountIn = normalizeInputCoinAmountBN(wrappedAmountIn.toString(), inTokenInfo.decimals);
-
-    const swapTx = await ammImpl.swap(payer, inTokenMint, normalizedAmountIn, minAmountOut);
+    const swapTx = await ammImpl.swap(payer, inTokenMint, wrappedAmountIn, minAmountOut);
 
     const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
       microLamports: COMPUTE_UNIT_PRICE,
@@ -250,16 +235,25 @@ export class LivePoolClientV2 {
     connection: Connection;
   }) {
     const { default: AmmImpl } = await import("@mercurial-finance/dynamic-amm-sdk");
+
+    const poolState = await LivePoolClientV2.getPoolState(new PublicKey(poolAddress), connection);
+    const memeMint = poolState.tokenAMint;
+    const tokenInfo = getTokenInfoByMint(memeMint);
+    console.log("tokenInfo:", tokenInfo);
+
+    const splMemeTokenInfo = tokenInfo.toSplTokenInfo();
+    console.log("splMemeTokenInfo:", splMemeTokenInfo);
+
     const ammImpl = await AmmImpl.create(
       connection,
       new PublicKey(poolAddress),
+      splMemeTokenInfo,
       TOKEN_INFOS.WSOL.toSplTokenInfo(),
-      TOKEN_INFOS.MEME.toSplTokenInfo(),
     );
     const quoteAmountIn = new BN(1000 * 10 ** TOKEN_INFOS.WSOL.decimals);
 
     const { swapOutAmount } = ammImpl.getSwapQuote(
-      new PublicKey(poolAddress),
+      TOKEN_INFOS.WSOL.mint,
       quoteAmountIn,
       0.0001, // 0.01% slippage
     );
@@ -304,5 +298,38 @@ export class LivePoolClientV2 {
 
   public async getQuoteTokenDisplayName() {
     return await LivePoolClientV2.getQuoteTokenDisplayName(this.ammPool.id, this.client);
+  }
+
+  public async getBuyMemeTransactionsByOutput({
+    wrappedAmountIn,
+    inTokenMint,
+    payer,
+    minAmountOut,
+  }: GetSwapMemeTransactionsByOutputArgsV2Instance) {
+    const swapTx = await this.ammPool.ammImpl.swap(payer, inTokenMint, wrappedAmountIn, minAmountOut);
+    const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
+      microLamports: COMPUTE_UNIT_PRICE,
+    });
+
+    swapTx.instructions.unshift(addPriorityFee);
+
+    return swapTx;
+  }
+
+  public async getSellMemeTransactionsByOutput({
+    wrappedAmountIn,
+    payer,
+    minAmountOut,
+    inTokenMint,
+  }: GetSwapMemeTransactionsByOutputArgsV2Instance) {
+    const swapTx = await this.ammPool.ammImpl.swap(payer, inTokenMint, wrappedAmountIn, minAmountOut);
+
+    const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
+      microLamports: COMPUTE_UNIT_PRICE,
+    });
+
+    swapTx.instructions.unshift(addPriorityFee);
+
+    return swapTx;
   }
 }

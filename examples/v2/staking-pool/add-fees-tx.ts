@@ -1,13 +1,12 @@
 import { clientV2, connection, payer } from "./../../common";
 import { StakingPool as CodegenStakingPool } from "../../../src/schema/v2/codegen/accounts/StakingPool";
-import { BoundPoolClientV2, MEME_TOKEN_DECIMALS, StakingPoolClientV2, TOKEN_INFOS, TokenInfo } from "../../../src";
-import { PublicKey } from "@solana/web3.js";
-import { AmmPool } from "../../../src/meteora/AmmPool";
+import { BoundPoolClientV2, StakingPoolClientV2 } from "../../../src";
+import { PublicKey, sendAndConfirmTransaction } from "@solana/web3.js";
 
 // yarn tsx examples/v2/staking-pool/add-fees-tx.ts > add-fees-tx.txt 2>&1
 export const addFeesTx = async () => {
   // Get staking pool
-  const memeMint = new PublicKey("G6wyDdcDn6pJuPbferviyZh6JFgxDoyasYX8MsorJPoK");
+  const memeMint = new PublicKey("HZUAFBsoVPb2u1paMmiNjc6QvRioXTYNvC3zXtu3HxMX");
   const stakingPoolAddress = BoundPoolClientV2.findStakingPda(memeMint, clientV2.memechanProgram.programId);
 
   const stakingPool = await StakingPoolClientV2.fromStakingPoolId({
@@ -17,52 +16,41 @@ export const addFeesTx = async () => {
   const fetchedStakingPool = await CodegenStakingPool.fetch(connection, stakingPoolAddress);
   console.log("fetchedStakingPool:", fetchedStakingPool?.toJSON());
 
-  const { default: AmmImpl } = await import("@mercurial-finance/dynamic-amm-sdk");
-
-  const { NATIVE_MINT } = await import("@solana/spl-token");
-
-  const memeTokenInfo = new TokenInfo({
-    decimals: MEME_TOKEN_DECIMALS,
-    mint: stakingPool.memeMint,
-    name: "MEME",
-    programId: clientV2.memechanProgram.programId,
-    symbol: "MEME",
-    targetConfig: NATIVE_MINT,
-    targetConfigV2: NATIVE_MINT,
+  const quoteFeesTx = await stakingPool.getAddFeesTransaction({
+    payer: payer.publicKey,
+    ammPoolId: stakingPool.poolObjectData.quoteAmmPool,
   });
 
-  const ammImplQuote = await AmmImpl.create(
-    connection,
-    stakingPool.poolObjectData.quoteAmmPool,
-    memeTokenInfo.toSplTokenInfo(),
-    TOKEN_INFOS.WSOL.toSplTokenInfo(),
-  );
+  console.log("payer: " + payer.publicKey.toBase58());
 
-  const quoteAmmPool = new AmmPool(
-    stakingPool.poolObjectData.quoteAmmPool,
-    stakingPool.poolObjectData.memeMint,
-    stakingPool.poolObjectData.quoteMint,
-    ammImplQuote,
-  );
-
-  await stakingPool.addFeesToAmmPool(quoteAmmPool, stakingPool, memeTokenInfo, TOKEN_INFOS.WSOL, clientV2, payer);
+  try {
+    const signature = await sendAndConfirmTransaction(connection, quoteFeesTx, [payer], {
+      commitment: "confirmed",
+      skipPreflight: true,
+      preflightCommitment: "confirmed",
+    });
+    console.log("addfees quoteFeesTx signature:", signature);
+  } catch (e) {
+    console.error("addfees quoteFeesTx error:", e);
+  }
 
   // CHAN
-  const ammImplChan = await AmmImpl.create(
-    connection,
-    stakingPool.poolObjectData.chanAmmPool,
-    memeTokenInfo.toSplTokenInfo(),
-    TOKEN_INFOS.CHAN.toSplTokenInfo(),
-  );
+  const chanFeesTx = await stakingPool.getAddFeesTransaction({
+    payer: payer.publicKey,
+    ammPoolId: stakingPool.poolObjectData.chanAmmPool,
+  });
 
-  const chanAmmPool = new AmmPool(
-    stakingPool.poolObjectData.chanAmmPool,
-    stakingPool.poolObjectData.memeMint,
-    TOKEN_INFOS.CHAN.mint,
-    ammImplChan,
-  );
-
-  await stakingPool.addFeesToAmmPool(chanAmmPool, stakingPool, memeTokenInfo, TOKEN_INFOS.CHAN, clientV2, payer);
+  console.log("payer: " + payer.publicKey.toBase58());
+  try {
+    const signature2 = await sendAndConfirmTransaction(connection, chanFeesTx, [payer], {
+      commitment: "confirmed",
+      skipPreflight: true,
+      preflightCommitment: "confirmed",
+    });
+    console.log("addfees chanFeesTx signature:", signature2);
+  } catch (e) {
+    console.error("addfees chanFeesTx error:", e);
+  }
 };
 
 addFeesTx();

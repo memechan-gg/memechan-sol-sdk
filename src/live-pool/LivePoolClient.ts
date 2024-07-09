@@ -40,7 +40,7 @@ export class LivePoolClient {
     connection,
   }: GetSwapMemeOutputArgs): Promise<SwapMemeOutput> {
     const { TOKEN_PROGRAM_ID } = await import("@solana/spl-token");
-    const tokenOut = new Token(TOKEN_PROGRAM_ID, memeCoinMint, MEMECHAN_MEME_TOKEN_DECIMALS);
+    const tokenOut = new Token(TOKEN_PROGRAM_ID, new PublicKey(memeCoinMint), MEMECHAN_MEME_TOKEN_DECIMALS);
     const { numerator, denominator } = getNumeratorAndDenominator(slippagePercentage);
     const slippage = new Percent(numerator, denominator);
 
@@ -138,7 +138,7 @@ export class LivePoolClient {
     connection,
   }: GetSwapMemeOutputArgs): Promise<SwapMemeOutput> {
     const { TOKEN_PROGRAM_ID } = await import("@solana/spl-token");
-    const memeToken = new Token(TOKEN_PROGRAM_ID, memeCoinMint, MEMECHAN_MEME_TOKEN_DECIMALS);
+    const memeToken = new Token(TOKEN_PROGRAM_ID, new PublicKey(memeCoinMint), MEMECHAN_MEME_TOKEN_DECIMALS);
     const memeAmountIn = new TokenAmount(memeToken, amountIn, false);
     const { numerator, denominator } = getNumeratorAndDenominator(slippagePercentage);
     const slippage = new Percent(numerator, denominator);
@@ -275,6 +275,26 @@ export class LivePoolClient {
     const pool = await LivePoolClient.fromAmmId(ammId, client);
     const quoteToken = getTokenInfoByMint(new PublicKey(pool.ammPoolInfo.quoteMint));
     return quoteToken.displayName;
+  }
+
+  public async getMemePrice(args: { poolAddress: string; quotePriceInUsd: number; connection: Connection }) {
+    return await LivePoolClient.getMemePrice(args);
+  }
+
+  public async getBuyMemeOutput(args: GetSwapMemeOutputArgs): Promise<SwapMemeOutput> {
+    return await LivePoolClient.getBuyMemeOutput(args);
+  }
+
+  public async getSellMemeOutput(args: GetSwapMemeOutputArgs): Promise<SwapMemeOutput> {
+    return await LivePoolClient.getSellMemeOutput(args);
+  }
+
+  public async getBuyMemeTransactionsByOutput(args: GetSwapMemeTransactionsByOutputArgs) {
+    return await LivePoolClient.getBuyMemeTransactionsByOutput(args);
+  }
+
+  public async getSellMemeTransactionsByOutput(args: GetSwapMemeTransactionsByOutputArgs) {
+    return await LivePoolClient.getSellMemeTransactionsByOutput(args);
   }
 }
 

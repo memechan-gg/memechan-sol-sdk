@@ -1,10 +1,10 @@
-import { PublicKey } from "@solana/web3.js";
+import { PublicKey, sendAndConfirmTransaction } from "@solana/web3.js";
 import { StakingPool as CodegenStakingPool } from "../../../src/schema/v2/codegen/accounts/StakingPool";
 import { BoundPoolClientV2, MemeTicketClientV2, StakingPoolClientV2 } from "../../../src";
 import { clientV2, connection, payer } from "../../common";
 
-// yarn tsx examples/v2/staking-pool/get-available-withdraw-fees-amount-tx.ts > withdraw-fees-amount-tx.txt 2>&1
-export const getAvailableWithdrawFeesAmount = async () => {
+// yarn tsx examples/v2/staking-pool/withdraw-fees-tx.ts > withdraw-fees-amount-tx.txt 2>&1
+export const withdrawFees = async () => {
   // Get staking pool
   const memeMint = new PublicKey("8NmKFkMehRoF9BLSajM9xioitxKWSfXTxw2qrtPtyE2z");
   const stakingPoolAddress = BoundPoolClientV2.findStakingPda(memeMint, clientV2.memechanProgram.programId);
@@ -41,21 +41,12 @@ export const getAvailableWithdrawFeesAmount = async () => {
   // Get available withdraw fees amount
   const transaction = await stakingPool.getWithdrawFeesTransaction({ ticket: memeTicket, user: payer.publicKey });
 
-  console.log("simulating transaction...");
-
-  const getWithdrawFeesResult = await clientV2.connection.simulateTransaction(transaction, [payer], true);
-
-  console.log("getWithdrawFeesResult:", getWithdrawFeesResult);
-
-  const feesRegex = /fees_meme: (\d+) fees_quote: (\d+)/;
-  getWithdrawFeesResult.value.logs?.forEach((log) => {
-    const match = log.match(feesRegex);
-    if (match) {
-      const feesMeme = parseInt(match[1], 10) / 1e6; // Convert to decimal with 6 places
-      const feesQuote = parseInt(match[2], 10) / 1e9; // Convert to decimal with 9 places
-      console.log(`fees_meme: ${feesMeme.toFixed(6)}, fees_quote: ${feesQuote.toFixed(9)}`);
-    }
+  const signature2 = await sendAndConfirmTransaction(connection, transaction, [payer], {
+    commitment: "confirmed",
+    skipPreflight: true,
+    preflightCommitment: "confirmed",
   });
+  console.log("addfees chanFeesTx signature:", signature2);
 };
 
-getAvailableWithdrawFeesAmount();
+withdrawFees();

@@ -4,7 +4,7 @@ import { BoundPoolClientV2 } from "../../../../src/bound-pool/BoundPoolClientV2"
 
 // yarn tsx examples/v2/bonding-pool/from/bound-pool-from-pool-id.ts
 (async () => {
-  const poolAccountAddressId = new PublicKey("CRFfpjcEdhm7Q24bnyj81jTjWgipraNkrquGdkFUmmqY");
+  const poolAccountAddressId = new PublicKey("6TkQRjeeBeFtpFyfi8ruREYWo5vJSMCHuJaozKhCTdb2");
   const boundPoolInstance = await BoundPoolClientV2.fromBoundPoolId({ client: clientV2, poolAccountAddressId });
 
   console.debug("boundPoolInstance: ", boundPoolInstance);

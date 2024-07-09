@@ -3,8 +3,8 @@ import { connection } from "../../common";
 
 // yarn tsx examples/live-pool/sell/get-sell-meme-output.ts > sell-meme-output.txt 2>&1
 export const getSellMemeOutput = async () => {
-  const poolAddress = "2rzXgHKH7NU9vGKfyBwtuEMtm1JvAJpg7xgYT53hHth7";
-  const memeMint = "5vj496NTttpUESayDt2Mpn5jRQBqvLkMwwvJTBPVR4w1";
+  const poolAddress = "5voSmHaQEKE6KrU7GNKVfS53R5Hq5PCiUYJAeZ8Q4FVS";
+  const memeMint = "CMRCZYiirTeJvLZoSJAMeSF8NQNL7fN98we3DE77W575";
   const amountIn = "1000"; // That's a formatted amount
 
   const { minAmountOut, wrappedAmountIn } = await LivePoolClient.getSellMemeOutput({

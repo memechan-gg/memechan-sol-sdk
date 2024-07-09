@@ -27,7 +27,7 @@ export async function retry<T>({ fn, retries = 3, delay = 1000, functionName }: 
         console.warn(`All retries failed for function ${functionName}`);
         throw error;
       }
-      sleepTime(delay);
+      await sleepTime(delay);
     }
   }
   // This line is unreachable, but TypeScript needs assurance that the function returns or throws.

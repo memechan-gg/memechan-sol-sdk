@@ -15,6 +15,7 @@ export interface BoundPoolFields {
   config: types.ConfigFields;
   airdroppedTokens: BN;
   locked: boolean;
+  vestingPeriod: BN;
 }
 
 export interface BoundPoolJSON {
@@ -28,6 +29,7 @@ export interface BoundPoolJSON {
   config: types.ConfigJSON;
   airdroppedTokens: string;
   locked: boolean;
+  vestingPeriod: string;
 }
 
 export class BoundPool {
@@ -41,6 +43,7 @@ export class BoundPool {
   readonly config: types.Config;
   readonly airdroppedTokens: BN;
   readonly locked: boolean;
+  readonly vestingPeriod: BN;
 
   static readonly discriminator = Buffer.from([191, 233, 118, 178, 14, 139, 241, 36]);
 
@@ -55,6 +58,7 @@ export class BoundPool {
     types.Config.layout("config"),
     borsh.u64("airdroppedTokens"),
     borsh.bool("locked"),
+    borsh.i64("vestingPeriod"),
   ]);
 
   constructor(fields: BoundPoolFields) {
@@ -68,6 +72,7 @@ export class BoundPool {
     this.config = new types.Config({ ...fields.config });
     this.airdroppedTokens = fields.airdroppedTokens;
     this.locked = fields.locked;
+    this.vestingPeriod = fields.vestingPeriod;
   }
 
   static async fetch(c: Connection, address: PublicKey): Promise<BoundPool | null> {
@@ -116,6 +121,7 @@ export class BoundPool {
       config: types.Config.fromDecoded(dec.config),
       airdroppedTokens: dec.airdroppedTokens,
       locked: dec.locked,
+      vestingPeriod: dec.vestingPeriod,
     });
   }
 
@@ -131,6 +137,7 @@ export class BoundPool {
       config: this.config.toJSON(),
       airdroppedTokens: this.airdroppedTokens.toString(),
       locked: this.locked,
+      vestingPeriod: this.vestingPeriod.toString(),
     };
   }
 
@@ -146,6 +153,7 @@ export class BoundPool {
       config: types.Config.fromJSON(obj.config),
       airdroppedTokens: new BN(obj.airdroppedTokens),
       locked: obj.locked,
+      vestingPeriod: new BN(obj.vestingPeriod),
     });
   }
 }

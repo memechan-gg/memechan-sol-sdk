@@ -57,11 +57,11 @@ import {
   COMPUTE_UNIT_PRICE,
   DEFAULT_MAX_M,
   FULL_MEME_AMOUNT_CONVERTED,
-  MEMECHAN_FEE_WALLET_ID,
   MEMECHAN_MEME_TOKEN_DECIMALS,
   TOKEN_INFOS,
   RAYDIUM_PROTOCOL_FEE,
   TRANSFER_FEE,
+  BOUND_POOL_FEE_WALLET,
 } from "../config/config";
 import { LivePoolClient } from "../live-pool/LivePoolClient";
 import { MemechanSol } from "../schema/types/memechan_sol";
@@ -109,6 +109,10 @@ export class BoundPoolClient {
   }) {
     const poolObjectData = await BoundPoolClient.fetch2(client.connection, poolAccountAddressId);
     const { TOKEN_PROGRAM_ID } = await import("@solana/spl-token");
+
+    console.log("TOKEN_PROGRAM_ID: ", TOKEN_PROGRAM_ID);
+    console.log("poolObjectData.memeReserve.mint: ", poolObjectData.memeReserve.mint);
+
     const boundClientInstance = new BoundPoolClient(
       poolAccountAddressId,
       client,
@@ -116,7 +120,7 @@ export class BoundPoolClient {
       poolObjectData.quoteReserve.vault,
       poolObjectData.memeReserve.mint,
       poolObjectData.quoteReserve.mint,
-      new Token(TOKEN_PROGRAM_ID, poolObjectData.memeReserve.mint, MEMECHAN_MEME_TOKEN_DECIMALS),
+      new Token(TOKEN_PROGRAM_ID, new PublicKey(poolObjectData.memeReserve.mint), MEMECHAN_MEME_TOKEN_DECIMALS),
       poolObjectData,
     );
 
@@ -234,7 +238,7 @@ export class BoundPoolClient {
         connection,
         payer,
         mint: quoteToken.mint,
-        owner: new PublicKey(MEMECHAN_FEE_WALLET_ID),
+        owner: new PublicKey(BOUND_POOL_FEE_WALLET),
         transaction: createPoolTransaction,
       });
     }
@@ -1324,13 +1328,13 @@ export class BoundPoolClient {
 
     if (pool) {
       // add bound pool as holder
-      if (!uniqueHolders.has(MEMECHAN_FEE_WALLET_ID)) {
+      if (!uniqueHolders.has(BOUND_POOL_FEE_WALLET)) {
         const adminTicket = {
           amount: pool.adminFeesMeme,
-          owner: new PublicKey(MEMECHAN_FEE_WALLET_ID),
+          owner: new PublicKey(BOUND_POOL_FEE_WALLET),
           pool: poolId,
         } as MemeTicketFields;
-        uniqueHolders.set(MEMECHAN_FEE_WALLET_ID, [adminTicket]);
+        uniqueHolders.set(BOUND_POOL_FEE_WALLET, [adminTicket]);
       }
     }
 

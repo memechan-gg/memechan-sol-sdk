@@ -18,7 +18,7 @@ import {
   GetBoundMergeTransactionArgs,
   GetCloseTransactionArgs,
   GetStakingMergeTransactionArgs,
-  ParsedMemeTicket,
+  ParsedMemeTicketV2,
   StakingMerge,
 } from "./types";
 import { getOptimizedTransactions } from "./utils";
@@ -273,7 +273,7 @@ export class MemeTicketClientV2 {
       [],
     );
 
-    const parsedTickets: ParsedMemeTicket[] = foundAccountsData.map(({ accountInfo, index }) => {
+    const parsedTickets: ParsedMemeTicketV2[] = foundAccountsData.map(({ accountInfo, index }) => {
       const id = new PublicKey(ticketIds[index]);
       const decodedTicket = MemeTicket.decode(accountInfo.data);
       const jsonTicket = decodedTicket.toJSON();
@@ -309,15 +309,15 @@ export class MemeTicketClientV2 {
     availableTickets,
   }: {
     amount: BigNumber;
-    availableTickets: ParsedMemeTicket[];
-  }): Promise<{ ticketsRequiredToSell: ParsedMemeTicket[]; isMoreThanOneTicket: boolean }> {
+    availableTickets: ParsedMemeTicketV2[];
+  }): Promise<{ ticketsRequiredToSell: ParsedMemeTicketV2[]; isMoreThanOneTicket: boolean }> {
     // Check if the availableTickets array is empty
     if (availableTickets.length === 0) {
       throw new Error("[getRequiredTicketsToSell] No available tickets to sell.");
     }
 
     // Initialize an array to hold the required tickets
-    const ticketsRequiredToSell: ParsedMemeTicket[] = [];
+    const ticketsRequiredToSell: ParsedMemeTicketV2[] = [];
 
     // Initialize a BigNumber to keep track of the accumulated amount
     let accumulatedAmount = new BigNumber(0);

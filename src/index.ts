@@ -12,6 +12,7 @@ export * from "./staking-pool/StakingPoolClientV2";
 export * from "./targetconfig/TargetConfigClient";
 export * from "./targetconfig/TargetConfigClientV2";
 export * from "./vesting/VestingClient";
+export * from "./chan-swap/ChanSwapClient";
 
 // Client types
 export * from "./bound-pool/types";
@@ -52,6 +53,8 @@ export * from "./tx-parsing/parsers/swap-x-parser";
 export * from "./tx-parsing/parsers/swap-y-parser";
 export * from "./tx-parsing/parsers/create-metadata-parser";
 
+export * from "./tx-parsing/v2/parsingV2";
+
 // Codegen
 export * from "./vesting/schema/codegen/accounts/Vesting";
 export * from "./schema/v1";
@@ -67,6 +70,7 @@ export * from "./memeticket/utils";
 export * from "./util/poolHelpers/getBoundPoolClientFromId";
 export * from "./util/poolHelpers/getStakingPoolClientFromId";
 export * from "./util/poolHelpers/getLivePoolClientFromId";
+export * from "./util/poolHelpers/getMemeTicketClientFromId";
 
 // Metadata
 export * from "./token/createMetadata";

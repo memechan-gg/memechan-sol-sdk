@@ -1,5 +1,9 @@
 import { Keypair, PublicKey, Transaction } from "@solana/web3.js";
 import { MemeTicketFields, MemeTicketJSON } from "../schema/codegen/accounts";
+import {
+  MemeTicketFields as MemeTicketFieldsV2,
+  MemeTicketJSON as MemeTicketJSONV2,
+} from "../schema/v2/codegen/accounts";
 
 export type GetBoundMergeTransactionArgs = {
   pool: PublicKey;
@@ -27,5 +31,12 @@ export type ParsedMemeTicket = {
   id: PublicKey;
   fields: MemeTicketFields;
   jsonFields: MemeTicketJSON;
+  amountWithDecimals: string;
+};
+
+export type ParsedMemeTicketV2 = {
+  id: PublicKey;
+  fields: MemeTicketFieldsV2;
+  jsonFields: MemeTicketJSONV2;
   amountWithDecimals: string;
 };

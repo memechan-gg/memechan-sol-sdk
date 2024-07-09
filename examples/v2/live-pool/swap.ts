@@ -1,13 +1,12 @@
 import { PublicKey } from "@solana/web3.js";
 import { AmmPool } from "../../../src/meteora/AmmPool";
-import { BoundPoolClientV2, MEME_TOKEN_DECIMALS, StakingPoolClientV2, TOKEN_INFOS, TokenInfo } from "../../../src";
+import { BoundPoolClientV2, StakingPoolClientV2, TOKEN_INFOS, getTokenInfoByMint } from "../../../src";
 import { clientV2, payer } from "../../common";
 
 // yarn tsx examples/v2/live-pool/swap.ts
 (async () => {
   const { default: AmmImpl } = await import("@mercurial-finance/dynamic-amm-sdk");
-  const { NATIVE_MINT } = await import("@solana/spl-token");
-  const memeMint = new PublicKey("G6wyDdcDn6pJuPbferviyZh6JFgxDoyasYX8MsorJPoK");
+  const memeMint = new PublicKey("8NmKFkMehRoF9BLSajM9xioitxKWSfXTxw2qrtPtyE2z");
   const stakingId = BoundPoolClientV2.findStakingPda(memeMint, clientV2.memechanProgram.programId);
 
   const stakingPool = await StakingPoolClientV2.fromStakingPoolId({
@@ -15,15 +14,11 @@ import { clientV2, payer } from "../../common";
     poolAccountAddressId: stakingId,
   });
 
-  const memeTokenInfo = new TokenInfo({
-    decimals: MEME_TOKEN_DECIMALS,
-    mint: stakingPool.memeMint,
-    name: "MEME",
-    programId: clientV2.memechanProgram.programId,
-    symbol: "MEME",
-    targetConfig: NATIVE_MINT,
-    targetConfigV2: NATIVE_MINT,
-  });
+  const memeTokenInfo = getTokenInfoByMint(memeMint);
+
+  console.log("memeTokenInfo: ", memeTokenInfo);
+  console.log("memeTokenInfo.toSplTokenInfo(): ", memeTokenInfo.toSplTokenInfo());
+  console.log(" stakingPool.poolObjectData.quoteAmmPool: ", stakingPool.poolObjectData.quoteAmmPool.toString());
 
   const ammImplQuote = await AmmImpl.create(
     clientV2.connection,
@@ -33,13 +28,13 @@ import { clientV2, payer } from "../../common";
   );
 
   const ammPool = new AmmPool(
-    stakingPool.poolObjectData.chanAmmPool,
+    stakingPool.poolObjectData.quoteAmmPool,
     memeMint,
     stakingPool.poolObjectData.quoteMint,
     ammImplQuote,
   );
 
-  await ammPool.swap(payer, 0.001, 1, clientV2.connection);
+  await ammPool.swap(payer, 0.0001, 1, clientV2.connection);
 
   console.debug("swap finished");
 })();

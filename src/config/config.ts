@@ -2,6 +2,7 @@ import { TOKEN_PROGRAM_ID } from "@raydium-io/raydium-sdk";
 import { PublicKey } from "@solana/web3.js";
 import BigNumber from "bignumber.js";
 import { TokenInfo } from "./types";
+import BN from "bn.js";
 
 export const NATIVE_MINT = new PublicKey("So11111111111111111111111111111111111111112");
 
@@ -51,6 +52,12 @@ export const MEMECHAN_PROGRAM_ID_V2 = "CaR9ciDnNnE6WX35tZWrjeGdKUPaft7r4oQGF4Jhw
  */
 export const MEMECHAN_FEE_WALLET_ID = "feeLPZEfzJFwDR11cdMWE3nSa4nr7sPPM4u6tmDTw3Y";
 
+export const BOUND_POOL_FEE_WALLET = "6YNJG9KDex3eNAmh1i64KUDbfKBiESkew3AWmnf6FiCy";
+export const LP_FEE_WALLET = "HQ1wVLaBcnuoUozegyX7r45yn6ogHvQjdPNj53iweC5V";
+export const SWAP_FEE_WALLET = "xqzvZzKFCjvPuRqkyg5rxA95avrvJxesZ41rCLfYwUM";
+
+export const CREATOR_BONUS_FUNDS_USD_VALUE = 0.1;
+
 // export const RAYDIUM_PROTOCOL_FEE = 1_000_000_000; // 1 SOL on Devnet. TODO on Mainnet, it's only 0.4 SOL
 export const RAYDIUM_PROTOCOL_FEE = 400_000_000; // 0.4 SOL on Mainnet.
 
@@ -64,6 +71,8 @@ export const FEE_DESTINATION_ID = "7YttLkHDoNj9wyDur5pM1ejNaAvT9X4eqaYcHQqtj2G5"
 
 // https://explorer.solana.com/address/35fN6LMYt6cKsemgbR28nFooiJtcnvaKPCeRXyuMKfoF
 export const PATS_MINT = new PublicKey("35fN6LMYt6cKsemgbR28nFooiJtcnvaKPCeRXyuMKfoF");
+
+export const BOUND_POOL_VESTING_PERIOD = new BN(600);
 
 // export const MEMECHAN_QUOTE_MINT = new PublicKey("So11111111111111111111111111111111111111112"); // dev fake slerf
 // export const MEMECHAN_QUOTE_MINT = SLERF_MINT; // prod
@@ -143,3 +152,5 @@ export const CHAN_TOKEN = new PublicKey("ChanGGuDHboPswpTmKDfsTVGQL96VHhmvpwrE4U
 export const CHAN_TOKEN_DECIMALS = 9;
 export const PRESALE_AMOUNT_IN_CHAN = new BigNumber(380_000_000);
 export const PRESALE_AMOUNT_IN_CHAN_RAW = PRESALE_AMOUNT_IN_CHAN.multipliedBy(10 ** CHAN_TOKEN_DECIMALS);
+
+export const DEFAULT_ON_CHAIN_ADDRESS = new PublicKey("11111111111111111111111111111111");
