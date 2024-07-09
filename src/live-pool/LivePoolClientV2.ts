@@ -45,7 +45,7 @@ export class LivePoolClientV2 {
     const { createProgram } = await import("@mercurial-finance/dynamic-amm-sdk/dist/cjs/src/amm/utils");
     const { ammProgram } = createProgram(connection);
 
-    const poolState = ammProgram.account.pool.coder.accounts.decode<PoolState>("amm", accountInfo.data);
+    const poolState = ammProgram.account.pool.coder.accounts.decode("pool", accountInfo.data) as unknown as PoolState;
 
     if (!poolState) {
       throw new Error(`Pool ${ammId.toBase58()} not found`);
