@@ -5,6 +5,10 @@ import { MemechanClientV2 } from "../../MemechanClientV2";
 import { StakingPoolClient } from "../../staking-pool/StakingPoolClient";
 import { StakingPoolClientV2 } from "../../staking-pool/StakingPoolClientV2";
 
+export type StakingPoolClientVersioned =
+  | { version: "V1"; stakingPoolClient: StakingPoolClient }
+  | { version: "V2"; stakingPoolClient: StakingPoolClientV2 };
+
 export async function getStakingPoolClientFromId(
   poolAddressId: PublicKey,
   client: MemechanClient,
@@ -19,8 +23,19 @@ export async function getStakingPoolClientFromId(
   console.log("accountInfo.owner:", accountInfo.owner);
 
   if (accountInfo.owner.toBase58() == MEMECHAN_PROGRAM_ID_V2) {
-    return await StakingPoolClientV2.fromStakingPoolId({ client: clientV2, poolAccountAddressId: poolAddressId });
+    const instance = StakingPoolClientV2.fromAccountInfo({
+      client: clientV2,
+      poolAccountAddressId: poolAddressId,
+      accountInfo,
+    });
+
+    return { stakingPoolClient: instance, version: "V2" };
   }
 
-  return await StakingPoolClient.fromStakingPoolId({ client: client, poolAccountAddressId: poolAddressId });
+  const instance = StakingPoolClient.fromAccountInfo({
+    client: client,
+    poolAccountAddressId: poolAddressId,
+    accountInfo,
+  });
+  return { stakingPoolClient: instance, version: "V1" };
 }

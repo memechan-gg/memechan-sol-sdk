@@ -1,4 +1,5 @@
 import {
+  AccountInfo,
   AccountMeta,
   Connection,
   PublicKey,
@@ -57,6 +58,37 @@ export class StakingPoolClient {
     poolAccountAddressId: PublicKey;
   }) {
     const stakingPoolObjectData = await StakingPool.fetch(client.connection, poolAccountAddressId);
+
+    if (!stakingPoolObjectData) {
+      throw new Error(`[fromStakingPoolId] Staking pool data is not found for ${poolAccountAddressId.toString()}.`);
+    }
+
+    const boundClientInstance = new StakingPoolClient(
+      poolAccountAddressId,
+      client,
+      stakingPoolObjectData.pool,
+      stakingPoolObjectData.memeVault,
+      stakingPoolObjectData.memeMint,
+      stakingPoolObjectData.lpVault,
+      stakingPoolObjectData.lpMint,
+      stakingPoolObjectData.quoteVault,
+      stakingPoolObjectData.raydiumAmm,
+      stakingPoolObjectData,
+    );
+
+    return boundClientInstance;
+  }
+
+  public static fromAccountInfo({
+    client,
+    poolAccountAddressId,
+    accountInfo,
+  }: {
+    client: MemechanClient;
+    poolAccountAddressId: PublicKey;
+    accountInfo: AccountInfo<Buffer>;
+  }) {
+    const stakingPoolObjectData = StakingPool.decode(accountInfo.data);
 
     if (!stakingPoolObjectData) {
       throw new Error(`[fromStakingPoolId] Staking pool data is not found for ${poolAccountAddressId.toString()}.`);

@@ -46,6 +46,7 @@ import { TokenInfo } from "../config/types";
 import { AmmPool } from "../meteora/AmmPool";
 import { MEMO_PROGRAM_ID } from "@raydium-io/raydium-sdk";
 import { LivePoolClientV2 } from "../live-pool/LivePoolClientV2";
+import { AccountInfo } from "@solana/web3.js";
 
 export class StakingPoolClientV2 {
   constructor(
@@ -69,6 +70,34 @@ export class StakingPoolClientV2 {
 
     if (!stakingPoolObjectData) {
       throw new Error(`[fromStakingPoolId] Staking pool data is not found for ${poolAccountAddressId.toString()}.`);
+    }
+
+    const boundClientInstance = new StakingPoolClientV2(
+      poolAccountAddressId,
+      client,
+      stakingPoolObjectData.pool,
+      stakingPoolObjectData.memeVault,
+      stakingPoolObjectData.memeMint,
+      stakingPoolObjectData.quoteVault,
+      stakingPoolObjectData,
+    );
+
+    return boundClientInstance;
+  }
+
+  public static fromAccountInfo({
+    client,
+    accountInfo,
+    poolAccountAddressId,
+  }: {
+    client: MemechanClientV2;
+    poolAccountAddressId: PublicKey;
+    accountInfo: AccountInfo<Buffer>;
+  }) {
+    const stakingPoolObjectData = StakingPool.decode(accountInfo.data);
+
+    if (!stakingPoolObjectData) {
+      throw new Error(`[fromStakingPoolId] Staking pool could not be decoded for ${poolAccountAddressId.toString()}.`);
     }
 
     const boundClientInstance = new StakingPoolClientV2(
