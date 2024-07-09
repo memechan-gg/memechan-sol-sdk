@@ -262,10 +262,14 @@ export class StakingPoolClientV2 {
       })
       .instruction();
 
+    const modifyComputeUnits = ComputeBudgetProgram.setComputeUnitLimit({
+      units: 500000,
+    });
+
     const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
       microLamports: COMPUTE_UNIT_PRICE,
     });
-    tx.add(addPriorityFee, addFeesIx);
+    tx.add(modifyComputeUnits, addPriorityFee, addFeesIx);
 
     return tx;
   }
