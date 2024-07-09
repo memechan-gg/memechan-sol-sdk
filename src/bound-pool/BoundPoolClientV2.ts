@@ -1,5 +1,6 @@
 import { METADATA_PROGRAM_ID, Token } from "@raydium-io/raydium-sdk";
 import {
+  AccountInfo,
   AddressLookupTableAccount,
   AddressLookupTableProgram,
   ComputeBudgetProgram,
@@ -91,7 +92,6 @@ import { TargetConfigClientV2 } from "../targetconfig/TargetConfigClientV2";
 import { ChanSwapClient } from "../chan-swap/ChanSwapClient";
 import { StakingPoolClientV2 } from "../staking-pool/StakingPoolClientV2";
 import { MemechanSol } from "../schema/v2/v2";
-import { AccountInfo } from "@solana/web3.js";
 
 export class BoundPoolClientV2 {
   private constructor(
