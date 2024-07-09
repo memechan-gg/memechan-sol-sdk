@@ -8,6 +8,7 @@ import {
   sendAndConfirmTransaction,
   Keypair,
   ComputeBudgetProgram,
+  AccountInfo,
 } from "@solana/web3.js";
 import BigNumber from "bignumber.js";
 import BN from "bn.js";
@@ -46,7 +47,6 @@ import { TokenInfo } from "../config/types";
 import { AmmPool } from "../meteora/AmmPool";
 import { MEMO_PROGRAM_ID } from "@raydium-io/raydium-sdk";
 import { LivePoolClientV2 } from "../live-pool/LivePoolClientV2";
-import { AccountInfo } from "@solana/web3.js";
 
 export class StakingPoolClientV2 {
   constructor(
