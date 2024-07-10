@@ -590,16 +590,21 @@ export class StakingPoolClientV2 {
     const cliffTsInMs = new BigNumber(cliffTs.toString()).multipliedBy(1_000);
     const endTsInMs = new BigNumber(endTs.toString()).multipliedBy(1_000);
 
-    // If linear unlock didn't start yet, return 0
-    if (cliffTsInMs.gt(currentTimeInMs)) {
-      return "0";
-    }
-
     const notionalTotalBN = tickets.reduce((acc: BN, curr) => acc.add(curr.vesting.notional), new BN(0));
     const releasedTotalBN = tickets.reduce((acc: BN, curr) => acc.add(curr.vesting.released), new BN(0));
 
     const notionalTotal = new BigNumber(notionalTotalBN.toString());
     const releasedTotal = new BigNumber(releasedTotalBN.toString());
+
+    // Initial 10% release
+    const initialReleasePercent = new BigNumber(0.1);
+    const initialReleaseAmount = notionalTotal.multipliedBy(initialReleasePercent);
+
+    if (currentTimeInMs < cliffTsInMs.toNumber()) {
+      // Before the cliff, only the initial 10% is available
+      const availableUnstakeAmount = initialReleaseAmount.minus(releasedTotal).toFixed(0);
+      return availableUnstakeAmount;
+    }
 
     const unlockDurationInMs = endTsInMs.minus(cliffTsInMs);
     const unlockProgressInMs = new BigNumber(currentTimeInMs).minus(cliffTsInMs);
@@ -611,11 +616,17 @@ export class StakingPoolClientV2 {
     // Calculated unlock progress can be greater than 1, when it is already over
     const unlockProgressWithUpperBound = Math.min(unlockProgressWithLowerBound, 1);
 
+    // Adjust the notional total to consider the remaining 90% for linear unlock
+    const adjustedNotionalTotal = notionalTotal.multipliedBy(new BigNumber(0.9));
+
+    // Calculate the linear unlocked amount based on the adjusted notional total
+    const linearUnlockAmount = adjustedNotionalTotal.multipliedBy(unlockProgressWithUpperBound);
+
+    // Total available amount is the initial release amount plus the linear unlocked amount
+    const totalAvailableAmount = initialReleaseAmount.plus(linearUnlockAmount);
+
     // Unstake amount must be bignumerish, so `toFixed(0)`
-    const availableUnstakeAmount = notionalTotal
-      .multipliedBy(unlockProgressWithUpperBound)
-      .minus(releasedTotal)
-      .toFixed(0);
+    const availableUnstakeAmount = totalAvailableAmount.minus(releasedTotal).toFixed(0);
 
     return availableUnstakeAmount;
   }
