@@ -56,6 +56,7 @@ import {
 
 import { findProgramAddress, sleep } from "../common/helpers";
 import {
+  ADMIN_PUB_KEY,
   BOUND_POOL_FEE_WALLET,
   BOUND_POOL_VESTING_PERIOD,
   COMPUTE_UNIT_PRICE,
@@ -1869,24 +1870,49 @@ export class BoundPoolClientV2 {
   public static async getMemePrice({
     boundPoolInfo,
     quotePriceInUsd,
+    client,
   }: {
     boundPoolInfo: BoundPool;
     quotePriceInUsd: number;
+    client: MemechanClientV2;
   }): Promise<{ priceInQuote: string; priceInUsd: string }> {
     const memeBalance = new BigNumber(boundPoolInfo.memeReserve.tokens.toString());
     const quoteBalance = new BigNumber(boundPoolInfo.quoteReserve.tokens.toString());
 
     const quoteInfo = getTokenInfoByMint(boundPoolInfo.quoteReserve.mint);
     const quoteBalanceConverted = quoteBalance.div(10 ** quoteInfo.decimals);
-    const soldMemeConverted = new BigNumber(DEFAULT_MAX_M).minus(memeBalance).div(10 ** MEMECHAN_MEME_TOKEN_DECIMALS);
+    let soldMemeConverted = new BigNumber(DEFAULT_MAX_M).minus(memeBalance).div(10 ** MEMECHAN_MEME_TOKEN_DECIMALS);
 
-    // In case no meme coins were sold, return 0-prices
+    // In case no meme coins were sold, simulate it
     if (soldMemeConverted.eq(0)) {
-      // TODO: ASAP IMPORTANT: DON'T GO WITH IT IN PROD
-      const memePriceInQuote = new BigNumber(0.0000329053);
-      const memePriceInUsd = memePriceInQuote.multipliedBy(quotePriceInUsd).toString();
+      const DUMMY_TOKEN_METADATA = {
+        name: "Best Token Ever",
+        symbol: "BTE",
+        image: "https://cf-ipfs.com/ipfs/QmVevMfxFpfgBu5kHuYUPmDMaV6pWkAn3zw5XaCXxKdaBh",
+        description: "This is the best token ever",
+        twitter: "https://twitter.com/BestTokenEver",
+        telegram: "https://t.me/BestTokenEver",
+        website: "https://besttokenever.com",
+        discord: "",
+      };
 
-      return { priceInQuote: memePriceInQuote.toString(), priceInUsd: memePriceInUsd };
+      const soldMemeSimulated = await BoundPoolClientV2.getOutputAmountForNewPoolWithBuyMemeTx({
+        admin: ADMIN_PUB_KEY,
+        client,
+        payer: client.simulationKeypair,
+        quoteToken: TOKEN_INFOS.WSOL,
+        tokenMetadata: DUMMY_TOKEN_METADATA,
+        targetConfig: TOKEN_INFOS.WSOL.targetConfigV2,
+        buyMemeTransactionArgs: {
+          inputAmount: quoteBalanceConverted.toFixed(),
+          minOutputAmount: "1",
+          slippagePercentage: 0,
+          user: client.simulationKeypair.publicKey,
+          memeTicketNumber: MemeTicketClientV2.TICKET_NUMBER_START,
+        },
+      });
+
+      soldMemeConverted = new BigNumber(soldMemeSimulated);
     }
 
     const memePriceInQuote = quoteBalanceConverted.div(soldMemeConverted);
