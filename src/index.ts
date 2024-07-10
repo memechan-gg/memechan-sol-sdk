@@ -71,6 +71,8 @@ export * from "./util/poolHelpers/getBoundPoolClientFromId";
 export * from "./util/poolHelpers/getStakingPoolClientFromId";
 export * from "./util/poolHelpers/getLivePoolClientFromId";
 export * from "./util/poolHelpers/getMemeTicketClientFromId";
+export * from "./util/poolHelpers/types";
+export * from "./util/poolHelpers/livePoolClientCache";
 
 // Metadata
 export * from "./token/createMetadata";
