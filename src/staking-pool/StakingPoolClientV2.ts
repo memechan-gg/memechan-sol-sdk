@@ -616,11 +616,9 @@ export class StakingPoolClientV2 {
     // Calculated unlock progress can be greater than 1, when it is already over
     const unlockProgressWithUpperBound = Math.min(unlockProgressWithLowerBound, 1);
 
-    // Adjust the notional total to consider the remaining 90% for linear unlock
-    const adjustedNotionalTotal = notionalTotal.multipliedBy(new BigNumber(0.9));
-
-    // Calculate the linear unlocked amount based on the adjusted notional total
-    const linearUnlockAmount = adjustedNotionalTotal.multipliedBy(unlockProgressWithUpperBound);
+    // Calculate the linear unlocked amount based on the remaining notional total after initial release
+    const remainingNotionalTotal = notionalTotal.minus(initialReleaseAmount);
+    const linearUnlockAmount = remainingNotionalTotal.multipliedBy(unlockProgressWithUpperBound);
 
     // Total available amount is the initial release amount plus the linear unlocked amount
     const totalAvailableAmount = initialReleaseAmount.plus(linearUnlockAmount);
