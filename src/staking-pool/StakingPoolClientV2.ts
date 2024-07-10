@@ -292,7 +292,7 @@ export class StakingPoolClientV2 {
       .instruction();
 
     const modifyComputeUnits = ComputeBudgetProgram.setComputeUnitLimit({
-      units: 500000,
+      units: 250_000,
     });
 
     const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
