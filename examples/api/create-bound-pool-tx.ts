@@ -27,7 +27,6 @@ export const createBoundPoolTransaction = async () => {
       memeTicketNumber: MemeTicketClientV2.TICKET_NUMBER_START,
     },
   });
-
   console.debug("res: ", res);
 };
 

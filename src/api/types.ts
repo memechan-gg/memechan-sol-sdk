@@ -57,7 +57,8 @@ export type CreateTokenResponse = {
 };
 
 export type CreateBoundPoolTransactionResponse = {
-  serializedTransaction: Uint8Array;
+  serializedTransactionBase64: string;
+  memeMint: string;
 };
 
 export const paginatedHoldersResultSchema = () => paginatedResultSchema(solanaTokenHolderSchema);

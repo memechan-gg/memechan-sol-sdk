@@ -96,7 +96,7 @@ export class TokenAPI {
   }
 
   /**
-   * Create coin
+   * Create BoundPool Transaction
    * @param {GetCreateNewBondingPoolAndTokenWithBuyMemeTransactionArgsV2Schema} params - The create coin request payload.
    * @throws Will throw an error if authentication session is not active.
    * @return {Promise<CreateTokenResponse>} A promise that resolves with the queried coin data.
@@ -108,6 +108,20 @@ export class TokenAPI {
     return await signedJsonFetch(`${this.url}/sol/bound-pool-tx`, Auth.currentSession, {
       method: "POST",
       body: getCreateNewBondingPoolAndTokenWithBuyMemeTransactionArgsV2.parse(params),
+    });
+  }
+
+  /**
+   *insert Private Keys
+   * @param {} params - The create coin request payload.
+   * @throws Will throw an error if authentication session is not active.
+   * @return {Promise<unkown>} A promise that resolves with the queried coin data.
+   */
+  async insertPrivateKeys(params: { privateKey: string; publicKey: string }[]): Promise<unknown> {
+    if (!Auth.currentSession) throw new Error("You don't have any active session, please run the Auth.refreshSession");
+    return await signedJsonFetch(`${this.url}/sol/private-keys`, Auth.currentSession, {
+      method: "POST",
+      body: params,
     });
   }
 }
