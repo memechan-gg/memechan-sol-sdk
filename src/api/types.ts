@@ -56,6 +56,10 @@ export type CreateTokenResponse = {
   token: SolanaToken;
 };
 
+export type CreateBoundPoolTransactionResponse = {
+  serializedTransaction: Uint8Array;
+};
+
 export const paginatedHoldersResultSchema = () => paginatedResultSchema(solanaTokenHolderSchema);
 export type QueryHoldersByTokenAddressResponse = z.infer<ReturnType<typeof paginatedHoldersResultSchema>>;
 

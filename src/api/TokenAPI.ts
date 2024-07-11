@@ -9,12 +9,17 @@ import {
   SolanaTokenHoldersByTokenAddressRequest,
 } from "./schemas/token-schemas";
 import {
+  CreateBoundPoolTransactionResponse,
   CreateTokenResponse,
   GetTokenResponse,
   QueryHoldersByTokenAddressResponse,
   QueryTokensResponse,
   UploadFileResponse,
 } from "./types";
+import {
+  getCreateNewBondingPoolAndTokenWithBuyMemeTransactionArgsV2,
+  GetCreateNewBondingPoolAndTokenWithBuyMemeTransactionArgsV2Schema,
+} from "./schemas/solana-create-bound-pool-tx-schema";
 
 /**
  * Service class for handling coin-related operations.
@@ -88,5 +93,21 @@ export class TokenAPI {
    */
   uploadFile(file: File): Promise<UploadFileResponse> {
     return unsignedMultipartRequest(`${this.url}/upload-image`, file);
+  }
+
+  /**
+   * Create coin
+   * @param {GetCreateNewBondingPoolAndTokenWithBuyMemeTransactionArgsV2Schema} params - The create coin request payload.
+   * @throws Will throw an error if authentication session is not active.
+   * @return {Promise<CreateTokenResponse>} A promise that resolves with the queried coin data.
+   */
+  async createBoundPoolTransaction(
+    params: GetCreateNewBondingPoolAndTokenWithBuyMemeTransactionArgsV2Schema,
+  ): Promise<CreateBoundPoolTransactionResponse> {
+    if (!Auth.currentSession) throw new Error("You don't have any active session, please run the Auth.refreshSession");
+    return await signedJsonFetch(`${this.url}/sol/bound-pool-tx`, Auth.currentSession, {
+      method: "POST",
+      body: getCreateNewBondingPoolAndTokenWithBuyMemeTransactionArgsV2.parse(params),
+    });
   }
 }
