@@ -598,7 +598,7 @@ export class StakingPoolClientV2 {
 
     // Initial 10% release
     const initialReleasePercent = new BigNumber(0.1);
-    const initialReleaseAmount = notionalTotal.multipliedBy(initialReleasePercent);
+    const initialReleaseAmount = notionalTotal.multipliedBy(initialReleasePercent).integerValue(BigNumber.ROUND_DOWN);
 
     if (currentTimeInMs < cliffTsInMs.toNumber()) {
       // Before the cliff, only the initial 10% is available
@@ -610,6 +610,12 @@ export class StakingPoolClientV2 {
     const unlockProgressInMs = new BigNumber(currentTimeInMs).minus(cliffTsInMs);
     const unlockProgressInAbsolutePercent = new BigNumber(unlockProgressInMs).div(unlockDurationInMs).toNumber();
 
+    // Linear vesting part is over
+    if (new BigNumber(currentTimeInMs).gte(endTsInMs)) {
+      const availableUnstakeAmount = notionalTotal.minus(releasedTotal).toFixed(0);
+      return availableUnstakeAmount;
+    }
+
     // Extra safety net in case unlock progress is less than zero
     const unlockProgressWithLowerBound = Math.max(unlockProgressInAbsolutePercent, 0);
 
@@ -618,7 +624,9 @@ export class StakingPoolClientV2 {
 
     // Calculate the linear unlocked amount based on the remaining notional total after initial release
     const remainingNotionalTotal = notionalTotal.minus(initialReleaseAmount);
-    const linearUnlockAmount = remainingNotionalTotal.multipliedBy(unlockProgressWithUpperBound);
+    const linearUnlockAmount = remainingNotionalTotal
+      .multipliedBy(unlockProgressWithUpperBound)
+      .integerValue(BigNumber.ROUND_DOWN);
 
     // Total available amount is the initial release amount plus the linear unlocked amount
     const totalAvailableAmount = initialReleaseAmount.plus(linearUnlockAmount);
