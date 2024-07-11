@@ -2,7 +2,6 @@ import { PublicKey } from "@solana/web3.js";
 import { StakingPool as CodegenStakingPool } from "../../src/schema/v2/codegen/accounts/StakingPool";
 import { clientV2 as client, connection } from "../common";
 import { MemeTicketClientV2, StakingPoolClientV2 } from "../../src";
-import BigNumber from "bignumber.js";
 import { BN } from "bn.js";
 
 // yarn tsx examples/staking-pool/get-available-unstake-amount-v2.ts > available-unstake-amount.txt 2>&1

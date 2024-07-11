@@ -45,7 +45,7 @@ import { addUnwrapSOLInstructionIfNativeMint } from "../util/addUnwrapSOLInstruc
 import { getTokenInfoByMint } from "../config/helpers";
 import { TokenInfo } from "../config/types";
 import { AmmPool } from "../meteora/AmmPool";
-import { MEMO_PROGRAM_ID, Rounding } from "@raydium-io/raydium-sdk";
+import { MEMO_PROGRAM_ID } from "@raydium-io/raydium-sdk";
 import { LivePoolClientV2 } from "../live-pool/LivePoolClientV2";
 
 export class StakingPoolClientV2 {
