@@ -1,3 +1,4 @@
+import { isAfter } from "date-fns";
 import { BE_URL } from "../../config/config";
 import { jsonFetch } from "../../util/fetch";
 
@@ -33,6 +34,16 @@ export class Auth {
    * @param {string} walletAddress - The wallet address to authenticate.
    * @return {Promise<string>} A promise that resolves to the message to be signed.
    */
+  static isExpired = () => {
+    if (!this.currentSession?.expiration) {
+      return true;
+    }
+    if (isAfter(this.currentSession.expiration, new Date())) {
+      return true;
+    }
+    return false;
+  };
+
   async requestMessageToSign(walletAddress: string): Promise<string> {
     const { textToSign } = await jsonFetch(`${this.url}/auth/request-token`, {
       method: "POST",
