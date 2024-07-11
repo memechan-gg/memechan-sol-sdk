@@ -241,7 +241,7 @@ export class BoundPoolClientV2 {
     const { connection, memechanProgram } = client;
     const airdroppedTokens = new BN(0); // TODO: Add airdropped tokens
 
-    const memeMintKeypair = Keypair.generate();
+    const memeMintKeypair = args.memeMintKeypair ?? Keypair.generate();
     const memeMint = memeMintKeypair.publicKey;
     const id = this.findBoundPoolPda(memeMintKeypair.publicKey, quoteToken.mint, args.client.memechanProgram.programId);
     const poolSigner = BoundPoolClientV2.findSignerPda(id, args.client.memechanProgram.programId);

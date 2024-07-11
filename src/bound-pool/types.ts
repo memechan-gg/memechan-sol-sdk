@@ -212,6 +212,7 @@ export type GetCreateNewBondingPoolAndTokenWithBuyMemeTransactionArgs =
 export type GetCreateNewBondingPoolAndTokenWithBuyMemeTransactionArgsV2 =
   GetCreateNewBondingPoolAndTokenTransactionArgsV2 & {
     buyMemeTransactionArgs?: GetBuyMemeTransactionArgs;
+    memeMintKeypair?: Keypair;
   };
 
 export interface InitStakingPoolResult {
