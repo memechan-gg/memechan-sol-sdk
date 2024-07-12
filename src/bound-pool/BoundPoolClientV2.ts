@@ -1883,8 +1883,9 @@ export class BoundPoolClientV2 {
     const quoteBalanceConverted = quoteBalance.div(10 ** quoteInfo.decimals);
     let soldMemeConverted = new BigNumber(DEFAULT_MAX_M).minus(memeBalance).div(10 ** MEMECHAN_MEME_TOKEN_DECIMALS);
 
-    // In case no meme coins were sold, simulate it
+    // In case no meme coins were sold from the pool, simulate it
     if (soldMemeConverted.eq(0)) {
+      console.log("Simulating meme sell");
       const DUMMY_TOKEN_METADATA = {
         name: "Best Token Ever",
         symbol: "BTE",
