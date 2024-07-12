@@ -1886,39 +1886,13 @@ export class BoundPoolClientV2 {
 
     const quoteInfo = getTokenInfoByMint(boundPoolInfo.quoteReserve.mint);
     const quoteBalanceConverted = quoteBalance.div(10 ** quoteInfo.decimals);
-    let soldMemeConverted = new BigNumber(DEFAULT_MAX_M).minus(memeBalance).div(10 ** MEMECHAN_MEME_TOKEN_DECIMALS);
+    const soldMemeConverted = new BigNumber(DEFAULT_MAX_M).minus(memeBalance).div(10 ** MEMECHAN_MEME_TOKEN_DECIMALS);
 
-    // In case no meme coins were sold from the pool, simulate it
+    // In case no meme coins were sold from the pool, fetch the initial meme price
     if (soldMemeConverted.eq(0)) {
-      console.log("Simulating meme sell");
-      const DUMMY_TOKEN_METADATA = {
-        name: "Best Token Ever",
-        symbol: "BTE",
-        image: "https://cf-ipfs.com/ipfs/QmVevMfxFpfgBu5kHuYUPmDMaV6pWkAn3zw5XaCXxKdaBh",
-        description: "This is the best token ever",
-        twitter: "https://twitter.com/BestTokenEver",
-        telegram: "https://t.me/BestTokenEver",
-        website: "https://besttokenever.com",
-        discord: "",
-      };
-
-      const soldMemeSimulated = await BoundPoolClientV2.getOutputAmountForNewPoolWithBuyMemeTx({
-        admin: ADMIN_PUB_KEY,
-        client,
-        payer: client.simulationKeypair,
-        quoteToken: TOKEN_INFOS.WSOL,
-        tokenMetadata: DUMMY_TOKEN_METADATA,
-        targetConfig: TOKEN_INFOS.WSOL.targetConfigV2,
-        buyMemeTransactionArgs: {
-          inputAmount: quoteBalanceConverted.toFixed(),
-          minOutputAmount: "1",
-          slippagePercentage: 0,
-          user: client.simulationKeypair.publicKey,
-          memeTicketNumber: MemeTicketClientV2.TICKET_NUMBER_START,
-        },
-      });
-
-      soldMemeConverted = new BigNumber(soldMemeSimulated);
+      console.log("Fetching initial meme price");
+      const initialMemePrice = await this.getInitialMemePrice({ boundPoolInfo, quotePriceInUsd, client });
+      return initialMemePrice;
     }
 
     const memePriceInQuote = quoteBalanceConverted.div(soldMemeConverted);
@@ -1934,15 +1908,47 @@ export class BoundPoolClientV2 {
    * @untested This method is untested and may contain bugs.
    */
   public static async getInitialMemePrice({
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     boundPoolInfo,
     quotePriceInUsd,
+    client,
   }: {
     boundPoolInfo: BoundPool;
     quotePriceInUsd: number;
+    client: MemechanClientV2;
   }): Promise<{ priceInQuote: string; priceInUsd: string }> {
-    // TODO: ASAP IMPORTANT: DON'T GO WITH IT IN PROD
-    const memePriceInQuote = new BigNumber(0.0000329053);
+    const DUMMY_TOKEN_METADATA = {
+      name: "Best Token Ever",
+      symbol: "BTE",
+      image: "https://cf-ipfs.com/ipfs/QmVevMfxFpfgBu5kHuYUPmDMaV6pWkAn3zw5XaCXxKdaBh",
+      description: "This is the best token ever",
+      twitter: "https://twitter.com/BestTokenEver",
+      telegram: "https://t.me/BestTokenEver",
+      website: "https://besttokenever.com",
+      discord: "",
+    };
+
+    const quoteInfo = getTokenInfoByMint(boundPoolInfo.quoteReserve.mint);
+    const quoteBalance = new BigNumber(boundPoolInfo.quoteReserve.tokens.toString());
+    const quoteBalanceConverted = quoteBalance.div(10 ** quoteInfo.decimals);
+
+    const soldMemeSimulated = await BoundPoolClientV2.getOutputAmountForNewPoolWithBuyMemeTx({
+      admin: ADMIN_PUB_KEY,
+      client,
+      payer: client.simulationKeypair,
+      quoteToken: TOKEN_INFOS.WSOL,
+      tokenMetadata: DUMMY_TOKEN_METADATA,
+      targetConfig: TOKEN_INFOS.WSOL.targetConfigV2,
+      buyMemeTransactionArgs: {
+        inputAmount: quoteBalanceConverted.toFixed(),
+        minOutputAmount: "1",
+        slippagePercentage: 0,
+        user: client.simulationKeypair.publicKey,
+        memeTicketNumber: MemeTicketClientV2.TICKET_NUMBER_START,
+      },
+    });
+
+    const soldMemeConverted = new BigNumber(soldMemeSimulated);
+    const memePriceInQuote = quoteBalanceConverted.div(soldMemeConverted);
     const memePriceInUsd = memePriceInQuote.multipliedBy(quotePriceInUsd).toString();
 
     return { priceInQuote: memePriceInQuote.toString(), priceInUsd: memePriceInUsd };
