@@ -16,9 +16,11 @@ export const insertPks = async () => {
   const keypair1 = new Keypair();
   const kepyair2 = new Keypair();
 
+  console.log("keypair1.secretKey.toString(), ", JSON.stringify(Array.from(keypair1.secretKey)));
+
   const res = await TokenApiInstance.insertPrivateKeys([
-    { privateKey: keypair1.secretKey.toString(), publicKey: keypair1.publicKey.toBase58() },
-    { privateKey: kepyair2.secretKey.toString(), publicKey: kepyair2.publicKey.toBase58() },
+    { privateKey: JSON.stringify(Array.from(keypair1.secretKey)), publicKey: keypair1.publicKey.toBase58() },
+    { privateKey: JSON.stringify(Array.from(kepyair2.secretKey)), publicKey: kepyair2.publicKey.toBase58() },
   ]);
   console.debug("res: ", res);
 };
