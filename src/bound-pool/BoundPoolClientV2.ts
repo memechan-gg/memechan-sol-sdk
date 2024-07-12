@@ -1929,7 +1929,8 @@ export class BoundPoolClientV2 {
     };
 
     const quoteInfo = getTokenInfoByMint(boundPoolInfo.quoteReserve.mint);
-    const quoteBalance = new BigNumber(boundPoolInfo.quoteReserve.tokens.toString());
+    const quoteBalanceString = "0.005";
+    const quoteBalance = new BigNumber(quoteBalanceString);
     const quoteBalanceConverted = quoteBalance.div(10 ** quoteInfo.decimals);
 
     console.log("quoteBalanceConverted.toFixed(): " + quoteBalanceConverted.toFixed());
@@ -1942,7 +1943,7 @@ export class BoundPoolClientV2 {
       tokenMetadata: DUMMY_TOKEN_METADATA,
       targetConfig: TOKEN_INFOS.WSOL.targetConfigV2,
       buyMemeTransactionArgs: {
-        inputAmount: quoteBalanceConverted.toFixed(),
+        inputAmount: quoteBalanceString,
         minOutputAmount: "1",
         slippagePercentage: 0,
         user: client.simulationKeypair.publicKey,
@@ -1950,8 +1951,11 @@ export class BoundPoolClientV2 {
       },
     });
 
+    console.log("soldMemeSimulated: " + soldMemeSimulated);
+
     const soldMemeConverted = new BigNumber(soldMemeSimulated);
-    const memePriceInQuote = quoteBalanceConverted.div(soldMemeConverted);
+
+    const memePriceInQuote = quoteBalance.div(soldMemeConverted);
     const memePriceInUsd = memePriceInQuote.multipliedBy(quotePriceInUsd).toString();
 
     return { priceInQuote: memePriceInQuote.toString(), priceInUsd: memePriceInUsd };
