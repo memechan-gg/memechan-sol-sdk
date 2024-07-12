@@ -26,7 +26,7 @@ export async function parseTxV2(
     )[]
   | undefined
 > {
-  const pt = await client.connection.getParsedTransaction(txSig);
+  const pt = await client.connection.getParsedTransaction(txSig, { maxSupportedTransactionVersion: 0 });
   // console.log(pt);
 
   const ixs = pt?.transaction?.message.instructions;
