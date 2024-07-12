@@ -22,7 +22,7 @@ export async function getCreateMintWithPriorityTransaction(
   keypair = Keypair.generate(),
 ): Promise<Transaction> {
   const modifyComputeUnits = ComputeBudgetProgram.setComputeUnitLimit({
-    units: 250_000,
+    units: 270_000,
   });
 
   const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
