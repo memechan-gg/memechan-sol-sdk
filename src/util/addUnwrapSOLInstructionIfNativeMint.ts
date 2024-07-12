@@ -12,6 +12,8 @@ export async function addUnwrapSOLInstructionIfNativeMint(
     const unwrapInstruction = await unwrapSOLInstruction(payerPublicKey);
     if (unwrapInstruction) {
       transaction.add(unwrapInstruction);
+    } else {
+      console.log("unwrapInstruction is null");
     }
   }
 }

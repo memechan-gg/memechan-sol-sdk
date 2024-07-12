@@ -22,6 +22,9 @@ export const unwrapSOLInstruction = async (walletPublicKey: PublicKey) => {
       TOKEN_PROGRAM_ID,
     );
     return closedWrappedSolInstruction;
+  } else {
+    console.log("wSolATAAccount is null");
   }
+
   return null;
 };
