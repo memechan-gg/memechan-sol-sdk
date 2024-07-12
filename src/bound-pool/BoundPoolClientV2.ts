@@ -93,6 +93,7 @@ import { TargetConfigClientV2 } from "../targetconfig/TargetConfigClientV2";
 import { ChanSwapClient } from "../chan-swap/ChanSwapClient";
 import { StakingPoolClientV2 } from "../staking-pool/StakingPoolClientV2";
 import { MemechanSol } from "../schema/v2/v2";
+import { AuthorityType, createSetAuthorityInstruction } from "@solana/spl-token";
 
 export class BoundPoolClientV2 {
   private constructor(
@@ -250,7 +251,7 @@ export class BoundPoolClientV2 {
       await getCreateMintWithPriorityTransaction(
         connection,
         payer,
-        poolSigner,
+        payer,
         null,
         MEMECHAN_MEME_TOKEN_DECIMALS,
         memeMintKeypair,
@@ -258,6 +259,10 @@ export class BoundPoolClientV2 {
     ).instructions;
 
     createPoolTransaction.add(...createMemeMintWithPriorityInstructions);
+
+    // change authority of meme mint to poolSigner
+    const changeAuthorityIX = createSetAuthorityInstruction(memeMint, payer, AuthorityType.MintTokens, poolSigner);
+    createPoolTransaction.add(changeAuthorityIX);
 
     let feeQuoteVault: PublicKey | undefined = feeQuoteVaultPk;
 
