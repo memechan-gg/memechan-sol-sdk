@@ -432,7 +432,8 @@ export class BoundPoolClientV2 {
 
     // If error happened (e.g. pool is locked)
     if (result.value.err) {
-      console.debug("[getOutputAmountForBuyMeme] error on simulation ", JSON.stringify(result.value));
+      console.log("[getOutputAmountForBuyMeme] error on simulation ", JSON.stringify(result.value));
+      console.log("\n==================\n");
       throw new Error("Simulation results for getOutputAmountForBuyMeme returned error");
     }
 
@@ -1930,6 +1931,8 @@ export class BoundPoolClientV2 {
     const quoteInfo = getTokenInfoByMint(boundPoolInfo.quoteReserve.mint);
     const quoteBalance = new BigNumber(boundPoolInfo.quoteReserve.tokens.toString());
     const quoteBalanceConverted = quoteBalance.div(10 ** quoteInfo.decimals);
+
+    console.log("quoteBalanceConverted.toFixed(): " + quoteBalanceConverted.toFixed());
 
     const soldMemeSimulated = await BoundPoolClientV2.getOutputAmountForNewPoolWithBuyMemeTx({
       admin: ADMIN_PUB_KEY,

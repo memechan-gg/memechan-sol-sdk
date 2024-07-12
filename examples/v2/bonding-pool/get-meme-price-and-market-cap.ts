@@ -4,7 +4,7 @@ import { clientV2, connection } from "../../common";
 
 // yarn tsx examples/v2/bonding-pool/get-meme-price-and-market-cap.ts > log.txt 2>&1
 export const getMemePriceAndMarketCap = async () => {
-  const poolAddress = new PublicKey("6NDceYNRZEZCThgeSXiDFQqVR7vYEkKQvQhMgQAchUQr");
+  const poolAddress = new PublicKey("Hw7PFpqLpKB9K1Wc9KLDPRV46BK7bUfhkGzM8dEiPX3");
   const slerfPriceInUsd = 135;
 
   const pool = await BoundPoolClientV2.fetch2(connection, poolAddress);
