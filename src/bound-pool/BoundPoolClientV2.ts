@@ -270,7 +270,7 @@ export class BoundPoolClientV2 {
     // If `feeQuoteVaultPk` is not passed in args, we need to find out, whether a quote account for an admin
     // already exists
     if (!feeQuoteVault) {
-      feeQuoteVault = await ensureAssociatedTokenAccountWithIdempotentIX({
+      feeQuoteVault = await ensureAssociatedTokenAccountWithIX({
         connection,
         payer,
         mint: quoteToken.mint,
