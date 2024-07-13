@@ -1,6 +1,5 @@
 import { createBurnInstruction, getAssociatedTokenAddressSync } from "@solana/spl-token";
-import { Transaction } from "@solana/web3.js";
-import { PublicKey } from "@solana/web3.js";
+import { Transaction, PublicKey } from "@solana/web3.js";
 
 export interface BurnTokensArgs {
   user: PublicKey;
