@@ -23,7 +23,6 @@ import {
   TOKEN_INFOS,
 } from "../config/config";
 import { MemeTicketClientV2 } from "../memeticket/MemeTicketClientV2";
-import { getOptimizedTransactions } from "../memeticket/utils";
 import { MemeTicketFields, StakingPool, StakingPoolFields } from "../schema/v2/codegen/accounts";
 import { ensureAssociatedTokenAccountWithIdempotentIX } from "../util/ensureAssociatedTokenAccountWithIdempotentIX";
 import { getSendAndConfirmTransactionMethod } from "../util/getSendAndConfirmTransactionMethod";
@@ -545,6 +544,11 @@ export class StakingPoolClientV2 {
      */
     // await this.getAddFeesTransaction({ ammPoolId, payer: user, transaction: tx });
 
+    const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
+      microLamports: COMPUTE_UNIT_PRICE,
+    });
+    tx.add(addPriorityFee);
+
     // WARNING: `tx` mutation below
     const destinationMemeTicket = await this.prepareTransactionWithStakingTicketsMerge({
       ticketIds,
@@ -560,9 +564,9 @@ export class StakingPoolClientV2 {
       transaction: tx,
     });
 
-    const optimizedTransactions = getOptimizedTransactions(tx.instructions, user);
+    // const optimizedTransactions = getOptimizedTransactions(tx.instructions, user);
 
-    return optimizedTransactions;
+    return [tx];
   }
 
   public async unstake(args: UnstakeArgsV2): Promise<string> {
@@ -704,6 +708,11 @@ export class StakingPoolClientV2 {
      */
     // await this.getAddFeesTransaction({ ammPoolId, payer: user, transaction: tx });
 
+    const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
+      microLamports: COMPUTE_UNIT_PRICE,
+    });
+    tx.add(addPriorityFee);
+
     // WARNING: `tx` mutation below
     const destinationMemeTicket = await this.prepareTransactionWithStakingTicketsMerge({
       ticketIds,
@@ -718,9 +727,9 @@ export class StakingPoolClientV2 {
       transaction: tx,
     });
 
-    const optimizedTransactions = getOptimizedTransactions(tx.instructions, user);
+    // const optimizedTransactions = getOptimizedTransactions(tx.instructions, user);
 
-    return optimizedTransactions;
+    return [tx];
   }
 
   public async withdrawFees(args: WithdrawFeesArgsV2) {
