@@ -16,7 +16,7 @@ import { MemeTicketClient } from "../memeticket/MemeTicketClient";
 import { getOptimizedTransactions } from "../memeticket/utils";
 import { formatAmmKeysById } from "../raydium/formatAmmKeysById";
 import { MemeTicketFields, StakingPool, StakingPoolFields } from "../schema/codegen/accounts";
-import { ensureAssociatedTokenAccountWithIX } from "../util/ensureAssociatedTokenAccountWithIX";
+import { ensureAssociatedTokenAccountWithIdempotentIX } from "../util/ensureAssociatedTokenAccountWithIdempotentIX";
 import { getSendAndConfirmTransactionMethod } from "../util/getSendAndConfirmTransactionMethod";
 import { retry } from "../util/retry";
 import {
@@ -201,14 +201,14 @@ export class StakingPoolClient {
     const { getAccount } = await import("@solana/spl-token");
     const quoteAccount = await getAccount(this.client.connection, stakingInfo.quoteVault);
 
-    const associatedMemeTokenAddress = await ensureAssociatedTokenAccountWithIX({
+    const associatedMemeTokenAddress = await ensureAssociatedTokenAccountWithIdempotentIX({
       connection: this.client.connection,
       payer: user,
       mint: stakingInfo.memeMint,
       owner: user,
       transaction: tx,
     });
-    const associatedQuoteTokenAddress = await ensureAssociatedTokenAccountWithIX({
+    const associatedQuoteTokenAddress = await ensureAssociatedTokenAccountWithIdempotentIX({
       connection: this.client.connection,
       payer: user,
       mint: quoteAccount.mint,
@@ -332,7 +332,7 @@ export class StakingPoolClient {
     const tx = args.transaction ?? new Transaction();
     const stakingInfo = await this.fetch();
 
-    const memeAccountPublicKey = await ensureAssociatedTokenAccountWithIX({
+    const memeAccountPublicKey = await ensureAssociatedTokenAccountWithIdempotentIX({
       connection: this.client.connection,
       payer: args.user,
       mint: stakingInfo.memeMint,
@@ -342,7 +342,7 @@ export class StakingPoolClient {
     const { TOKEN_PROGRAM_ID, getAccount } = await import("@solana/spl-token");
     const quoteAccount = await getAccount(this.client.connection, stakingInfo.quoteVault);
 
-    const quoteAccountPublicKey = await ensureAssociatedTokenAccountWithIX({
+    const quoteAccountPublicKey = await ensureAssociatedTokenAccountWithIdempotentIX({
       connection: this.client.connection,
       payer: args.user,
       mint: quoteAccount.mint,

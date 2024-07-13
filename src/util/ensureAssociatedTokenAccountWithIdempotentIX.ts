@@ -1,6 +1,6 @@
 import { Connection, PublicKey, Transaction } from "@solana/web3.js";
 
-export interface EnsureAssociatedTokenAccountWithIXArgs {
+export interface EnsureAssociatedTokenAccountWithIdempotentIXArgs {
   connection: Connection;
   payer: PublicKey;
   owner: PublicKey;
@@ -8,17 +8,16 @@ export interface EnsureAssociatedTokenAccountWithIXArgs {
   transaction: Transaction;
 }
 
-export async function ensureAssociatedTokenAccountWithIX(
-  args: EnsureAssociatedTokenAccountWithIXArgs,
+export async function ensureAssociatedTokenAccountWithIdempotentIX(
+  args: EnsureAssociatedTokenAccountWithIdempotentIXArgs,
 ): Promise<PublicKey> {
   const {
-    getAccount,
-    createAssociatedTokenAccountInstruction,
     getAssociatedTokenAddressSync,
+    createAssociatedTokenAccountIdempotentInstruction,
     TOKEN_PROGRAM_ID,
     ASSOCIATED_TOKEN_PROGRAM_ID,
   } = await import("@solana/spl-token");
-  const { connection, payer, owner, mint, transaction } = args;
+  const { payer, owner, mint, transaction } = args;
   const associatedTokenAddress = getAssociatedTokenAddressSync(
     mint,
     owner,
@@ -27,19 +26,16 @@ export async function ensureAssociatedTokenAccountWithIX(
     ASSOCIATED_TOKEN_PROGRAM_ID,
   );
 
-  try {
-    await getAccount(connection, associatedTokenAddress);
-  } catch (error) {
-    const createAssociatedTokenAccountIX = createAssociatedTokenAccountInstruction(
+  transaction.add(
+    createAssociatedTokenAccountIdempotentInstruction(
       payer,
       associatedTokenAddress,
       owner,
       mint,
       TOKEN_PROGRAM_ID,
       ASSOCIATED_TOKEN_PROGRAM_ID,
-    );
-    transaction.add(createAssociatedTokenAccountIX);
-  }
+    ),
+  );
 
   return associatedTokenAddress;
 }

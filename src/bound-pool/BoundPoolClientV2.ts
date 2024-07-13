@@ -77,7 +77,7 @@ import { getOptimizedTransactions } from "../memeticket/utils";
 import { ParsedMemeTicket } from "../memeticket/types";
 import { normalizeInputCoinAmount } from "../util/trading/normalizeInputCoinAmount";
 import base58 from "bs58";
-import { ensureAssociatedTokenAccountWithIX } from "../util/ensureAssociatedTokenAccountWithIX";
+import { ensureAssociatedTokenAccountWithIdempotentIX } from "../util/ensureAssociatedTokenAccountWithIdempotentIX";
 import { NoBoundPoolExist } from "./errors";
 import { getTokenInfoByMint } from "../config/helpers";
 import { addWrapSOLInstructionIfNativeMint } from "../util/addWrapSOLInstructionIfNativeMint";
@@ -94,6 +94,7 @@ import { ChanSwapClient } from "../chan-swap/ChanSwapClient";
 import { StakingPoolClientV2 } from "../staking-pool/StakingPoolClientV2";
 import { MemechanSol } from "../schema/v2/v2";
 import { AuthorityType, createSetAuthorityInstruction } from "@solana/spl-token";
+import { ensureAssociatedTokenAccountWithIX } from "../util/ensureAssociatedTokenAccountWithIX";
 
 export class BoundPoolClientV2 {
   private constructor(
@@ -269,7 +270,7 @@ export class BoundPoolClientV2 {
     // If `feeQuoteVaultPk` is not passed in args, we need to find out, whether a quote account for an admin
     // already exists
     if (!feeQuoteVault) {
-      feeQuoteVault = await ensureAssociatedTokenAccountWithIX({
+      feeQuoteVault = await ensureAssociatedTokenAccountWithIdempotentIX({
         connection,
         payer,
         mint: quoteToken.mint,
@@ -630,7 +631,7 @@ export class BoundPoolClientV2 {
     // If `inputTokenAccount` is not passed in args, we need to find out, whether a quote account for an admin
     // already exists
     if (!inputTokenAccount) {
-      inputTokenAccount = await ensureAssociatedTokenAccountWithIX({
+      inputTokenAccount = await ensureAssociatedTokenAccountWithIdempotentIX({
         connection: connection,
         payer: user,
         mint: this.quoteTokenMint,
@@ -719,7 +720,7 @@ export class BoundPoolClientV2 {
     // If `inputTokenAccount` is not passed in args, we need to find out, whether a quote account for an admin
     // already exists
     if (!inputTokenAccount) {
-      inputTokenAccount = await ensureAssociatedTokenAccountWithIX({
+      inputTokenAccount = await ensureAssociatedTokenAccountWithIdempotentIX({
         connection: client.connection,
         payer: user,
         mint: quoteMint,
@@ -856,7 +857,7 @@ export class BoundPoolClientV2 {
 
     // If `outputTokenAccount` is not passed in args, we need to find out, whether a outputTokenAccount exists for user
     if (!outputTokenAccount) {
-      outputTokenAccount = await ensureAssociatedTokenAccountWithIX({
+      outputTokenAccount = await ensureAssociatedTokenAccountWithIdempotentIX({
         connection: connection,
         payer: user,
         mint: this.quoteTokenMint,
@@ -1017,7 +1018,7 @@ export class BoundPoolClientV2 {
     );
     const stakingSigner = StakingPoolClient.findSignerPda(stakingId, this.client.memechanProgram.programId);
     const adminTicketId = BoundPoolClientV2.findMemeTicketPda(stakingId, this.client.memechanProgram.programId);
-    const stakingQuoteVault = await ensureAssociatedTokenAccountWithIX({
+    const stakingQuoteVault = await ensureAssociatedTokenAccountWithIdempotentIX({
       connection: this.client.connection,
       payer: payer.publicKey,
       mint: boundPoolInfo.quoteReserve.mint,
@@ -1025,7 +1026,7 @@ export class BoundPoolClientV2 {
       transaction: tx,
     });
 
-    const stakingMemeVault = await ensureAssociatedTokenAccountWithIX({
+    const stakingMemeVault = await ensureAssociatedTokenAccountWithIdempotentIX({
       connection: this.client.connection,
       payer: payer.publicKey,
       mint: boundPoolInfo.memeReserve.mint,
@@ -1033,7 +1034,7 @@ export class BoundPoolClientV2 {
       transaction: tx,
     });
 
-    const stakingChanVault = await ensureAssociatedTokenAccountWithIX({
+    const stakingChanVault = await ensureAssociatedTokenAccountWithIdempotentIX({
       connection: this.client.connection,
       payer: payer.publicKey,
       mint: TOKEN_INFOS.CHAN.mint,
@@ -1504,7 +1505,7 @@ export class BoundPoolClientV2 {
     const staking = await client.memechanProgram.account.stakingPool.fetch(stakingId);
 
     const swapFeeTokenAccountTx = new Transaction();
-    const feeQuoteVault = await ensureAssociatedTokenAccountWithIX({
+    const feeQuoteVault = await ensureAssociatedTokenAccountWithIdempotentIX({
       connection: connection,
       payer: user.publicKey,
       mint: TOKEN_INFOS.WSOL.mint,
@@ -1988,7 +1989,7 @@ export class BoundPoolClientV2 {
     );
 
     const toTokenAccountTx = new Transaction();
-    const toTokenAccount = await ensureAssociatedTokenAccountWithIX({
+    const toTokenAccount = await ensureAssociatedTokenAccountWithIdempotentIX({
       connection: connection,
       payer: payer.publicKey,
       mint: TOKEN_INFOS.CHAN.mint,
