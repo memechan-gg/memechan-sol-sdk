@@ -1932,7 +1932,6 @@ export class BoundPoolClientV2 {
     };
 
     const quoteInfo = getTokenInfoByMint(boundPoolInfo.quoteReserve.mint);
-    const quoteBalanceString = "0.005";
     const quoteBalanceString = "0.000001";
     const quoteBalance = new BigNumber(quoteBalanceString);
     const quoteBalanceConverted = quoteBalance.div(10 ** quoteInfo.decimals);
