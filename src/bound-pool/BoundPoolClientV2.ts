@@ -1957,7 +1957,7 @@ export class BoundPoolClientV2 {
 
     const soldMemeConverted = new BigNumber(soldMemeSimulated);
 
-    const memePriceInQuote = quoteBalance.div(soldMemeConverted);
+    const memePriceInQuote = quoteBalance.div(soldMemeConverted).multipliedBy(new BigNumber(0.99)); // 1% correction
     const memePriceInUsd = memePriceInQuote.multipliedBy(quotePriceInUsd).toString();
 
     return { priceInQuote: memePriceInQuote.toString(), priceInUsd: memePriceInUsd };
