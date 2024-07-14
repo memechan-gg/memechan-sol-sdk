@@ -63,6 +63,7 @@ import {
   RAYDIUM_PROTOCOL_FEE,
   TRANSFER_FEE,
   BOUND_POOL_FEE_WALLET,
+  MAX_TICKET_TOKENS,
 } from "../config/config";
 import { LivePoolClient } from "../live-pool/LivePoolClient";
 import { MemechanSol } from "../schema/types/memechan_sol";
@@ -1409,6 +1410,10 @@ export class BoundPoolClient {
     const memePriceInUsd = memePriceInQuote.multipliedBy(quotePriceInUsd).toString();
 
     return { priceInQuote: memePriceInQuote.toString(), priceInUsd: memePriceInUsd };
+  }
+
+  public getMaxTicketTokens() {
+    return MAX_TICKET_TOKENS;
   }
 
   /**

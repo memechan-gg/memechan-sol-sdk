@@ -62,6 +62,7 @@ import {
   COMPUTE_UNIT_PRICE,
   DEFAULT_MAX_M,
   FULL_MEME_AMOUNT_CONVERTED,
+  MAX_TICKET_TOKENS_V2,
   MEMECHAN_MEME_TOKEN_DECIMALS,
   SWAP_FEE_WALLET,
   TOKEN_INFOS,
@@ -1822,6 +1823,10 @@ export class BoundPoolClientV2 {
 
   public getTokenInfo(): TokenInfo {
     return getTokenInfoByMint(this.quoteTokenMint);
+  }
+
+  public getMaxTicketTokens() {
+    return MAX_TICKET_TOKENS_V2;
   }
 
   /**
