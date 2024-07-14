@@ -16,13 +16,13 @@ export const BE_URL_DEV = "https://dmgrnigolfno6.cloudfront.net";
  *
  * @constant {string}
  */
-// export const BE_URL = "https://api.memechan.gg";
-export const BE_URL = BE_URL_DEV;
+export const BE_URL = "https://api.memechan.gg";
+// export const BE_URL = BE_URL_DEV;
 
 export const BE_REGION = "us-east-1";
 
-// export const API_GATEWAY_FQDN = "h9crl8krnj.execute-api.us-east-1.amazonaws.com";
-export const API_GATEWAY_FQDN = "waqxcrbt93.execute-api.us-east-1.amazonaws.com"; // dev
+export const API_GATEWAY_FQDN = "h9crl8krnj.execute-api.us-east-1.amazonaws.com";
+// export const API_GATEWAY_FQDN = "waqxcrbt93.execute-api.us-east-1.amazonaws.com"; // dev
 
 /**
  * The Memechan program ID on Solana.
