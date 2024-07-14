@@ -1128,7 +1128,7 @@ export class BoundPoolClientV2 {
     transaction.add(modifyComputeUnits);
 
     const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
-      microLamports: COMPUTE_UNIT_PRICE * 300,
+      microLamports: COMPUTE_UNIT_PRICE * 400,
     });
 
     transaction.add(addPriorityFee);
