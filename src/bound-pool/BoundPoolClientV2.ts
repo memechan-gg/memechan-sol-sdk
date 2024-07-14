@@ -60,8 +60,8 @@ import {
   BOUND_POOL_FEE_WALLET,
   BOUND_POOL_VESTING_PERIOD,
   COMPUTE_UNIT_PRICE,
-  DEFAULT_MAX_M,
-  FULL_MEME_AMOUNT_CONVERTED,
+  DEFAULT_MAX_M_V2,
+  FULL_MEME_AMOUNT_CONVERTED_V2,
   MAX_TICKET_TOKENS_V2,
   MEMECHAN_MEME_TOKEN_DECIMALS,
   SWAP_FEE_WALLET,
@@ -1895,7 +1895,9 @@ export class BoundPoolClientV2 {
 
     const quoteInfo = getTokenInfoByMint(boundPoolInfo.quoteReserve.mint);
     const quoteBalanceConverted = quoteBalance.div(10 ** quoteInfo.decimals);
-    const soldMemeConverted = new BigNumber(DEFAULT_MAX_M).minus(memeBalance).div(10 ** MEMECHAN_MEME_TOKEN_DECIMALS);
+    const soldMemeConverted = new BigNumber(DEFAULT_MAX_M_V2)
+      .minus(memeBalance)
+      .div(10 ** MEMECHAN_MEME_TOKEN_DECIMALS);
 
     // In case no meme coins were sold from the pool, fetch the initial meme price
     if (soldMemeConverted.eq(0)) {
@@ -1970,7 +1972,7 @@ export class BoundPoolClientV2 {
   }
 
   public static getMemeMarketCap({ memePriceInUsd }: { memePriceInUsd: string }): string {
-    const marketCap = new BigNumber(FULL_MEME_AMOUNT_CONVERTED).multipliedBy(memePriceInUsd).toString();
+    const marketCap = new BigNumber(FULL_MEME_AMOUNT_CONVERTED_V2).multipliedBy(memePriceInUsd).toString();
 
     return marketCap;
   }
