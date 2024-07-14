@@ -151,14 +151,23 @@ export const MEMECHAN_MEME_TOKEN_DECIMALS = 6;
 // Contract constants
 export const MEME_TOKEN_DECIMALS = 1_000_000;
 export const WSOL_DECIMALS = 1_000_000_000;
-export const DEFAULT_MAX_M_LP = 310_000_000_000_000;
-export const DEFAULT_MAX_M = 690_000_000_000_000;
+export const DEFAULT_MAX_M_LP = 200_000_000_000_000;
+export const DEFAULT_MAX_M = 800_000_000_000_000;
 export const MAX_MEME_TOKENS = 1_000_000_000;
 export const MAX_TICKET_TOKENS = 800_000_000;
+
+// v2
+export const DEFAULT_MAX_M_LP_V2 = 310_000_000_000_000;
+export const DEFAULT_MAX_M_V2 = 690_000_000_000_000;
 export const MAX_TICKET_TOKENS_V2 = 690_000_000;
 
 export const FULL_MEME_AMOUNT_CONVERTED = new BigNumber(DEFAULT_MAX_M_LP)
   .plus(DEFAULT_MAX_M)
+  .div(10 ** MEMECHAN_MEME_TOKEN_DECIMALS)
+  .toString();
+
+export const FULL_MEME_AMOUNT_CONVERTED_V2 = new BigNumber(DEFAULT_MAX_M_LP_V2)
+  .plus(DEFAULT_MAX_M_V2)
   .div(10 ** MEMECHAN_MEME_TOKEN_DECIMALS)
   .toString();
 
