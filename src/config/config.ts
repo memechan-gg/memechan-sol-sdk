@@ -154,15 +154,17 @@ export const WSOL_DECIMALS = 1_000_000_000;
 export const DEFAULT_MAX_M_LP = 310_000_000_000_000;
 export const DEFAULT_MAX_M = 690_000_000_000_000;
 export const MAX_MEME_TOKENS = 1_000_000_000;
-export const MAX_TICKET_TOKENS = 690_000_000;
+export const MAX_TICKET_TOKENS = 800_000_000;
+export const MAX_TICKET_TOKENS_V2 = 690_000_000;
 
-export const MAX_TRANSACTION_SIZE = 1232;
-// Backend Wallet Address
-export const ADMIN_PUB_KEY = new PublicKey("2a59VXzDwcUvkTMa2eDkfKdmgeBZxEKcdzxsAGYeZGbd");
 export const FULL_MEME_AMOUNT_CONVERTED = new BigNumber(DEFAULT_MAX_M_LP)
   .plus(DEFAULT_MAX_M)
   .div(10 ** MEMECHAN_MEME_TOKEN_DECIMALS)
   .toString();
+
+export const MAX_TRANSACTION_SIZE = 1232;
+// Backend Wallet Address
+export const ADMIN_PUB_KEY = new PublicKey("2a59VXzDwcUvkTMa2eDkfKdmgeBZxEKcdzxsAGYeZGbd");
 
 export const endpoints = ["https://rpc1.memechan.xyz/"];
 
