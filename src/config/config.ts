@@ -174,7 +174,7 @@ export const FULL_MEME_AMOUNT_CONVERTED_V2 = new BigNumber(DEFAULT_MAX_M_LP_V2)
 export const MAX_TRANSACTION_SIZE = 1232;
 // Backend Wallet Address
 // export const ADMIN_PUB_KEY = new PublicKey("2a59VXzDwcUvkTMa2eDkfKdmgeBZxEKcdzxsAGYeZGbd"); // dev
-export const ADMIN_PUB_KEY = new PublicKey("KZbAoMgCcb2gDEn2Ucea86ux84y25y3ybbWQGQpd9D6");
+export const ADMIN_PUB_KEY = new PublicKey("389y4YsTxFKpz2HxVHpvDk13FSXan48LZQtGv8pD4vQA");
 
 export const endpoints = ["https://rpc1.memechan.xyz/"];
 
