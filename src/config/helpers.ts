@@ -1,6 +1,7 @@
 import { PublicKey } from "@solana/web3.js";
-import { MEMECHAN_MEME_TOKEN_DECIMALS, MEMECHAN_PROGRAM_ID_V2, TOKEN_INFOS } from "./config";
+import { MEMECHAN_MEME_TOKEN_DECIMALS, MEMECHAN_PROGRAM_ID_PK, MEMECHAN_PROGRAM_ID_V2_PK, TOKEN_INFOS } from "./config";
 import { TokenInfo, TokenSymbol } from "./types";
+import { TOKEN_PROGRAM_ID } from "./consts";
 
 export function getTokenInfoBySymbol(symbol: TokenSymbol): TokenInfo {
   return TOKEN_INFOS[symbol];
@@ -13,8 +14,10 @@ export function getTokenInfoByMint(mint: PublicKey): TokenInfo {
       decimals: MEMECHAN_MEME_TOKEN_DECIMALS,
       mint: mint,
       name: "MEME",
-      programId: new PublicKey(MEMECHAN_PROGRAM_ID_V2),
+      programId: TOKEN_PROGRAM_ID,
       symbol: "MEME",
+      memeChanProgramId: MEMECHAN_PROGRAM_ID_PK,
+      memeChanProgramIdV2: MEMECHAN_PROGRAM_ID_V2_PK,
     });
   }
   return result;

@@ -2,7 +2,6 @@ import { Wallet } from "@coral-xyz/anchor";
 import { Connection, FetchMiddleware, Keypair } from "@solana/web3.js";
 import { ADMIN_PUB_KEY, Auth, BE_URL, MemechanClient, TokenAPI } from "../src";
 import { HELIUS_API_KEY, HELIUS_API_URL, IS_TEST_ENV, TEST_USER_SECRET_KEY } from "./env";
-import { getRandomRpcEndpoint } from "../src/util/getRandomRpcEndpoint";
 import { HeliusApi } from "../src/helius-api/HeliusApi";
 import { MemechanClientV2 } from "../src/MemechanClientV2";
 
@@ -21,7 +20,7 @@ export const connectionMiddleware = async (
   }
 };
 
-export const connection = new Connection(getRandomRpcEndpoint(), {
+export const connection = new Connection("https://rpc1.memechan.xyz/", {
   httpAgent: IS_TEST_ENV ? false : undefined,
   commitment: "confirmed",
   confirmTransactionInitialTimeout: 30000,

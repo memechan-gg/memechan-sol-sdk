@@ -3,7 +3,6 @@ import { HELIUS_API_URL, IS_TEST_ENV, TEST_USER_SECRET_KEY } from "./env";
 import { Wallet } from "@coral-xyz/anchor";
 import { MemechanClient } from "../../src/MemechanClient";
 import { ADMIN_PUB_KEY, TOKEN_INFOS } from "../../src/config/config";
-import { getRandomRpcEndpoint } from "../../src/util/getRandomRpcEndpoint";
 import { BoundPoolWithBuyMemeArgs, MemeTicketClient } from "../../src";
 import { MemechanClientV2 } from "../../src/MemechanClientV2";
 
@@ -35,7 +34,7 @@ export const MARKET_ID = new PublicKey("3jSj3riY7c5HBCLAyZGRBPjk2Gq5weEMkx1sBYLw
 export const MEME_MINT = new PublicKey("HjB3RLZYCKSW5mTfxLPtoWERA7GpQg9AZ4ozKshXHrYg");
 
 export function createMemechanClient(): MemechanClient {
-  const connection = new Connection(getRandomRpcEndpoint(), {
+  const connection = new Connection("https://rpc1.memechan.xyz/", {
     httpAgent: IS_TEST_ENV ? false : undefined,
     commitment: "confirmed",
     confirmTransactionInitialTimeout: 30000,
@@ -49,7 +48,7 @@ export function createMemechanClient(): MemechanClient {
 }
 
 export function createMemechanClientV2(): MemechanClientV2 {
-  const connection = new Connection(getRandomRpcEndpoint(), {
+  const connection = new Connection("https://rpc1.memechan.xyz/", {
     httpAgent: IS_TEST_ENV ? false : undefined,
     commitment: "confirmed",
     confirmTransactionInitialTimeout: 30000,
