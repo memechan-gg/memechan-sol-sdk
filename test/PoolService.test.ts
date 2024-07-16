@@ -1,11 +1,20 @@
 import { SolanaSeedPool, solanaLivePool, solanaSeedPool, solanaStakingPool } from "../src/api/schemas/pools-schema";
-import { BE_URL } from "../src/config/config";
+import { getConfig } from "../src/config/config";
 import { PoolAPI } from "../src/api/PoolApi";
-
-const api = new PoolAPI(BE_URL);
+import { SdkConfig } from "../src/config/sdkConfig";
 
 export function test() {
   describe("PoolService", () => {
+    let config: SdkConfig;
+    let BE_URL: string;
+    let api: PoolAPI;
+
+    beforeAll(async () => {
+      config = await getConfig();
+      BE_URL = config.BE_URL;
+      api = new PoolAPI(BE_URL);
+    });
+
     let sp: SolanaSeedPool | undefined;
 
     it("get all seed pools", async () => {

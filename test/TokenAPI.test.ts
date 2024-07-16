@@ -4,12 +4,18 @@ import { isSorted } from "./utils";
 import nacl from "tweetnacl";
 import { TokenAPI } from "../src/api/TokenAPI";
 import { SolanaToken, solanaTokenSchema } from "../src/api/schemas/token-schemas";
-import { BE_URL } from "../src/config/config";
+import { getConfig } from "../src";
+import { SdkConfig } from "../src/config/sdkConfig";
 // eslint-disable-next-line max-len
 
 export function test() {
   describe("TokenService authenticated operations", () => {
+    let config: SdkConfig;
+    let BE_URL: string;
+
     beforeAll(async () => {
+      config = await getConfig();
+      BE_URL = config.BE_URL;
       const authService = new Auth(BE_URL);
       const keypair = new Keypair();
       const messageToSign = await authService.requestMessageToSign(keypair.publicKey.toBase58());
@@ -49,7 +55,15 @@ export function test() {
   });
 
   describe("CoinService unauthenticated operations", () => {
+    let config: SdkConfig;
+    let BE_URL: string;
     let token: SolanaToken;
+
+    beforeAll(async () => {
+      config = await getConfig();
+      BE_URL = config.BE_URL;
+    });
+
     it("check queryCoins retrieve successfully all coins, sorted by marketcap in asc", async () => {
       const tokenService = new TokenAPI(BE_URL);
       const { result } = await tokenService.queryTokens({

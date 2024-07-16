@@ -5,16 +5,18 @@ import { TokenAPI } from "../src/api/TokenAPI";
 import { Auth } from "../src/api/auth/Auth";
 import { SocialAPI } from "../src/api/social/SocialAPI";
 import { SolanaToken } from "../src/api/schemas/token-schemas";
-import { BE_URL } from "../src";
-
-const socialAPI = new SocialAPI(BE_URL);
+import { getConfig } from "../src";
 
 export function test() {
   describe("Threads fetching", () => {
     let token: SolanaToken | undefined;
     let threadId: string | undefined;
+    let socialAPI: SocialAPI;
 
     beforeAll(async () => {
+      const config = await getConfig();
+      const BE_URL = config.BE_URL;
+      socialAPI = new SocialAPI(BE_URL);
       const authService = new Auth(BE_URL);
       const keypair = new Keypair();
       const messageToSign = await authService.requestMessageToSign(keypair.publicKey.toBase58());
@@ -24,7 +26,7 @@ export function test() {
         walletAddress: keypair.publicKey.toBase58(),
         signedMessage: Buffer.from(signature).toString("hex"),
       });
-      const tokenApi = new TokenAPI();
+      const tokenApi = new TokenAPI(BE_URL);
       const { token: tokenFetched } = await tokenApi.createToken({
         txDigests: ["HFKiTCkDmw1ZRuhSSBmRde7Lt6GnqwbcE3wqgQ2tVf55"],
         socialLinks: {

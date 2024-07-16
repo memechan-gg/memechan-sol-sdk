@@ -1,11 +1,13 @@
 import nacl from "tweetnacl";
 import { Keypair } from "@solana/web3.js";
 import { Auth } from "../src/api/auth/Auth";
-import { BE_URL } from "../src/config/config";
+import { getConfig } from "../src";
 
 export function test() {
   describe("AuthService", () => {
     it("check that the authentication flow is working properly", async () => {
+      const config = await getConfig();
+      const BE_URL = config.BE_URL;
       const authService = new Auth(BE_URL);
       const keypair = new Keypair();
       const messageToSign = await authService.requestMessageToSign(keypair.publicKey.toBase58());

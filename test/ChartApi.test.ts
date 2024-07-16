@@ -1,8 +1,15 @@
-import { BE_URL } from "../src";
+import { getConfig } from "../src";
 import { ChartApi } from "../src/api/ChartApi";
 
 export function test() {
   describe("Charts API", () => {
+    let BE_URL: string;
+
+    beforeAll(async () => {
+      const config = await getConfig();
+      BE_URL = config.BE_URL;
+    });
+
     // Using pool address as input
     it("getChart (pool address)", async () => {
       const api = new ChartApi(BE_URL);
