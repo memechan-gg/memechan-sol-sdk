@@ -24,6 +24,7 @@ describe("sdk tests", () => {
     socialAPI.test();
     tokenApi.test();
     txParsing.test();
+    validation.test();
   });
 
   describe.skip("contract", () => {
@@ -37,6 +38,5 @@ describe("sdk tests", () => {
     swapX.test();
     swapY.test();
     targetConfig.test();
-    validation.test();
   });
 });
