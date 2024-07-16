@@ -1,9 +1,9 @@
 /* eslint-disable max-len */
 import BigNumber from "bignumber.js";
-import { CHAN_TOKEN_DECIMALS, PRESALE_ADDRESS } from "../../../src";
 import { TransactionDataByDigest } from "../../../src/helius-api/typeguards/txTypeguard";
 import { HeliusApiInstance } from "../../common";
 import { readDataFromJsonFile, saveDataToJsonFile } from "../../utils";
+import { PRESALE_ADDRESS, CHAN_TOKEN_DECIMALS } from "../../../src/config/consts";
 
 // yarn tsx examples/helius-api/from-json/get-applied-bonus-data.ts > log.txt 2>&1
 (async () => {

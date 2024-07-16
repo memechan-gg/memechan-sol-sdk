@@ -1,11 +1,12 @@
 import { PublicKey } from "@solana/web3.js";
 import { BoundPoolClient } from "../../../src/bound-pool/BoundPoolClient";
-import { client, payer } from "../../common";
+import { createMemeChanClient, payer } from "../../common";
 import { MemeTicketClient } from "../../../src";
 
 // yarn tsx examples/bonding-pool/trading/buy-meme.ts
 (async () => {
   const poolAccountAddressId = new PublicKey("7y7g19JdRaTNhSChuiXBoujAzkCCPDZeFFa4XWLU1oE1");
+  const client = await createMemeChanClient();
   const boundPoolInstance = await BoundPoolClient.fromBoundPoolId({ client, poolAccountAddressId });
 
   const inputAmount = "0.001";

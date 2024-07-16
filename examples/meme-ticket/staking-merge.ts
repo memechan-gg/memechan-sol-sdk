@@ -1,11 +1,13 @@
 import { PublicKey } from "@solana/web3.js";
 import { MemeTicketClient } from "../../src/memeticket/MemeTicketClient";
-import { client, payer } from "../common";
+import { createMemeChanClient, payer } from "../common";
 
 // yarn tsx examples/meme-ticket/staking-merge.ts > staking-merge.txt 2>&1
 export const stakingMerge = async () => {
   const boundPoolAddress = new PublicKey("2paxDkj5zFR3DtMVZtmTSbkMYZwFtVZnq2Xv1WFHqgPo");
   const stakingPoolAddress = new PublicKey("sh5hozk6bENHvG4J5zrqW2S5eKjp68DRPZodCRLSkJU");
+  const client = await createMemeChanClient();
+
   const { tickets } = await MemeTicketClient.fetchAvailableTicketsByUser2(boundPoolAddress, client, payer.publicKey);
 
   if (tickets.length > 1) {

@@ -1,14 +1,6 @@
 import { Keypair, PublicKey, VersionedTransaction } from "@solana/web3.js";
-import {
-  admin,
-  payer,
-  DUMMY_TOKEN_METADATA,
-  clientV2,
-  connection,
-  TokenApiInstance,
-  AuthApiInstance,
-} from "../../../common";
-import { TOKEN_INFOS, sleep } from "../../../../src";
+import { payer, DUMMY_TOKEN_METADATA, connection, createMemeChanClientV2 } from "../../../common";
+import { Auth, getConfig, sleep, TokenAPI } from "../../../../src";
 import { BoundPoolClientV2 } from "../../../../src/bound-pool/BoundPoolClientV2";
 import { MemeTicketClientV2 } from "../../../../src/memeticket/MemeTicketClientV2";
 import nacl from "tweetnacl";
@@ -16,15 +8,21 @@ import nacl from "tweetnacl";
 // yarn tsx examples/v2/bonding-pool/create/create-new-token-and-pool-from-be-tx.ts > log.txt 2>&1
 export const createNewTokenAndPoolFromBeTx = async () => {
   const keypair = new Keypair();
-  const messageToSign = await AuthApiInstance.requestMessageToSign(keypair.publicKey.toBase58());
+
+  const { BE_URL, TOKEN_INFOS, ADMIN_PUB_KEY: admin } = await getConfig();
+
+  const authApiInstance = new Auth(BE_URL);
+  const tokenApiInstance = new TokenAPI(BE_URL);
+
+  const messageToSign = await authApiInstance.requestMessageToSign(keypair.publicKey.toBase58());
   console.log("message to sign", messageToSign, keypair.publicKey.toBase58());
   const signature = nacl.sign.detached(Buffer.from(messageToSign), keypair.secretKey);
-  await AuthApiInstance.refreshSession({
+  await authApiInstance.refreshSession({
     walletAddress: keypair.publicKey.toBase58(),
     signedMessage: Buffer.from(signature).toString("hex"),
   });
 
-  const res = await TokenApiInstance.createBoundPoolTransaction({
+  const res = await tokenApiInstance.createBoundPoolTransaction({
     admin: admin.toBase58(),
     payer: payer.publicKey.toBase58(),
     quoteToken: TOKEN_INFOS.WSOL,
@@ -52,6 +50,8 @@ export const createNewTokenAndPoolFromBeTx = async () => {
     console.log("createPoolSignature:", createPoolSignature);
 
     sleep(15000);
+
+    const clientV2 = await createMemeChanClientV2();
 
     const id = BoundPoolClientV2.findBoundPoolPda(
       new PublicKey(res.memeMint),

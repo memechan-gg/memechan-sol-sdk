@@ -1,13 +1,15 @@
 /* eslint-disable max-len */
 import { PublicKey } from "@solana/web3.js";
-import { clientV2, payer } from "../../../common";
+import { createMemeChanClientV2, payer } from "../../../common";
 import { BoundPoolClientV2 } from "../../../../src/bound-pool/BoundPoolClientV2";
-import { StakingPoolClientV2, TOKEN_INFOS, getTokenInfoByMint } from "../../../../src";
+import { StakingPoolClientV2, getConfig, getTokenInfoByMint } from "../../../../src";
 import { ChanSwapClient } from "../../../../src/chan-swap/ChanSwapClient";
 
 // yarn tsx examples/v2/bonding-pool/init-amm/init-amm-pools.ts
 (async () => {
   const memeMint = new PublicKey("HZUAFBsoVPb2u1paMmiNjc6QvRioXTYNvC3zXtu3HxMX");
+  const clientV2 = await createMemeChanClientV2();
+
   const stakingId = BoundPoolClientV2.findStakingPda(memeMint, clientV2.memechanProgram.programId);
 
   const stakingPool = await StakingPoolClientV2.fromStakingPoolId({
@@ -17,7 +19,9 @@ import { ChanSwapClient } from "../../../../src/chan-swap/ChanSwapClient";
 
   console.debug("stakingPool: ", stakingPool);
 
-  const memeTokenInfo = getTokenInfoByMint(memeMint);
+  const memeTokenInfo = await getTokenInfoByMint(memeMint);
+
+  const { TOKEN_INFOS } = await getConfig();
 
   try {
     const initQuoteAmmPoolResult = await BoundPoolClientV2.initQuoteAmmPool({
@@ -53,7 +57,7 @@ import { ChanSwapClient } from "../../../../src/chan-swap/ChanSwapClient";
       memeVault: stakingPool.memeVault,
       quoteVault: stakingPool.quoteVault,
       client: clientV2,
-      chanSwap: ChanSwapClient.chanSwapId(),
+      chanSwap: await ChanSwapClient.chanSwapId(),
     });
 
     console.log("initChanAmmPoolResult: ", initChanAmmPoolResult);

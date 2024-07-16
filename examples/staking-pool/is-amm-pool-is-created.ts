@@ -1,6 +1,6 @@
-import { client } from "../common";
 import { StakingPoolClient } from "../../src";
 import { PublicKey } from "@solana/web3.js";
+import { createMemeChanClient } from "../common";
 
 // yarn tsx examples/staking-pool/is-amm-pool-is-created.ts
 export async function fetch() {
@@ -12,6 +12,8 @@ export async function fetch() {
 
   // false
   const memeMintPubkey = new PublicKey("B2qRE4ATifEkWSBRDBYuWcvxvXRGWvmaBrSJCgQ8etiM");
+  const client = await createMemeChanClient();
+
   const isPoolCreated = await StakingPoolClient.isAmmPoolIsCreated({ connection: client.connection, memeMintPubkey });
 
   console.debug("isPoolCreated: ", isPoolCreated);

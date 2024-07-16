@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import BN from "bn.js";
-import { sleep } from "../../../src";
-import { TOKEN_INFOS } from "../../../src/config/config";
-import { clientV2, payer } from "../../common";
+import { getConfig, sleep } from "../../../src";
+import { createMemeChanClientV2, payer } from "../../common";
 import { TargetConfigClientV2 } from "../../../src/targetconfig/TargetConfigClientV2";
 
 // yarn tsx examples/v2/target-config/create-target-config.ts > create-target-config.txt 2>&1
 export const createTargetConfig = async () => {
+  const { TOKEN_INFOS } = await getConfig();
   const mint = TOKEN_INFOS.WSOL.mint;
 
   // const targetAmountRaw = 40_000;
@@ -17,6 +17,8 @@ export const createTargetConfig = async () => {
   console.log("targetconfig mint: " + mint.toString());
 
   console.log("payer: " + payer.publicKey.toString());
+
+  const clientV2 = await createMemeChanClientV2();
 
   const targetConfig = await TargetConfigClientV2.new({
     payer: payer,

@@ -1,14 +1,17 @@
 import { PublicKey } from "@solana/web3.js";
 import { BoundPoolClient } from "../../src/bound-pool/BoundPoolClient";
-import { client } from "../common";
 import { TokenApiHelper } from "../../src/api/helpers/TokenApiHelper";
-import { BE_URL, StakingPoolClient } from "../../src";
+import { getConfig, StakingPoolClient } from "../../src";
+import { createMemeChanClient } from "../common";
 
 // yarn tsx examples/api/getHoldersMapFromBackend.ts > getHoldersMapFromBackend.txt 2>&1
 
 export async function getHoldersMapFromBackend() {
   const boundPoolAddress = new PublicKey("3KzDGG71bzzZUApLNukyqVPZs4EJBd6SpJMh6ze6SDp2");
 
+  const { BE_URL } = await getConfig();
+
+  const client = await createMemeChanClient();
   const holdersMap = await BoundPoolClient.getHoldersMap(boundPoolAddress, client);
   console.log("holdersMap:", holdersMap);
 

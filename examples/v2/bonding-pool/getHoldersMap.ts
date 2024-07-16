@@ -1,13 +1,14 @@
 import { PublicKey } from "@solana/web3.js";
 
 import { BN } from "bn.js";
-import { clientV2 } from "../../common";
 import { BoundPoolClientV2 } from "../../../src";
+import { createMemeChanClientV2 } from "../../common";
 
 // yarn tsx examples/v2/bonding-pool/getHoldersMap.ts > getHoldersMap.txt 2>&1
 
 export async function getHoldersMap() {
   const poolAddress = new PublicKey("3NdXMCCgE5KD3gUrqZoueii3yWfrMQ6AB2Ecep2y43Rt");
+  const clientV2 = await createMemeChanClientV2();
 
   const holdersMap = await BoundPoolClientV2.getHoldersMap(poolAddress, clientV2);
   console.log("holdersMap:", holdersMap);

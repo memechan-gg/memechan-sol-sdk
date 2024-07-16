@@ -1,4 +1,4 @@
-import { PRESALE_ADDRESS } from "../../../src";
+import { PRESALE_ADDRESS } from "../../../src/config/consts";
 import { TransactionDataByDigest } from "../../../src/helius-api/typeguards/txTypeguard";
 import { HeliusApiInstance } from "../../common";
 import { readDataFromJsonFile, saveDataToJsonFile } from "../../utils";
@@ -17,7 +17,7 @@ import { readDataFromJsonFile, saveDataToJsonFile } from "../../utils";
     aggregatedTxsByOwnerMap,
     notAggregatedByOwnerList,
     filteredOutTxsDataByReason,
-  } = await HeliusApiInstance.processAllParsedTransactions({
+  } = HeliusApiInstance.processAllParsedTransactions({
     parsedTransactionsList: parsedDataList,
     targetAddress: PRESALE_ADDRESS.toString(),
     // TODO: Add timestampFrom and timestampTo

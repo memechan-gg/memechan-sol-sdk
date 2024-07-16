@@ -1,13 +1,15 @@
 import { sendAndConfirmTransaction, PublicKey, Transaction, ComputeBudgetProgram } from "@solana/web3.js";
 import { withdrawAdminFee } from "../../src/schema/codegen/instructions";
-import { BoundPoolClient, COMPUTE_UNIT_PRICE } from "../../src";
-import { client, payer } from "../common";
+import { BoundPoolClient } from "../../src";
+import { createMemeChanClient, payer } from "../common";
+import { COMPUTE_UNIT_PRICE } from "../../src/config/consts";
 
 // BE AWARE! `payer` must be admin keypair for calling this endpoint
 
 // yarn tsx examples/fee/withdraw-admin-fee.ts
 export const withdrawAdminFeeExample = async () => {
   const boundPoolAddress = new PublicKey("5jPvnanTcuGHLBpvFmnxYVLShXwz6ii2veZ7o5FELdcw");
+  const client = await createMemeChanClient();
   const boundPoolInfo = await BoundPoolClient.fetch2(client.connection, boundPoolAddress);
 
   console.debug("boundPoolInfo.toJSON(): ", boundPoolInfo.toJSON());

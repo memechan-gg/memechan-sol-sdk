@@ -1,21 +1,26 @@
 import { Keypair } from "@solana/web3.js";
-import { admin, AuthApiInstance, DUMMY_TOKEN_METADATA, payer, TokenApiInstance } from "../common";
+import { DUMMY_TOKEN_METADATA, payer } from "../common";
 import nacl from "tweetnacl";
-import { TOKEN_INFOS, MemeTicketClientV2 } from "../../src";
+import { Auth, getConfig, MemeTicketClientV2, TokenAPI } from "../../src";
 
 // yarn tsx examples/api/create-bound-pool-tx.ts
 export const createBoundPoolTransaction = async () => {
   const keypair = new Keypair();
-  const messageToSign = await AuthApiInstance.requestMessageToSign(keypair.publicKey.toBase58());
+
+  const { BE_URL, ADMIN_PUB_KEY, TOKEN_INFOS } = await getConfig();
+
+  const authApiInstance = new Auth(BE_URL);
+  const tokenApiInstance = new TokenAPI(BE_URL);
+  const messageToSign = await authApiInstance.requestMessageToSign(keypair.publicKey.toBase58());
   console.log("message to sign", messageToSign, keypair.publicKey.toBase58());
   const signature = nacl.sign.detached(Buffer.from(messageToSign), keypair.secretKey);
-  await AuthApiInstance.refreshSession({
+  await authApiInstance.refreshSession({
     walletAddress: keypair.publicKey.toBase58(),
     signedMessage: Buffer.from(signature).toString("hex"),
   });
 
-  const res = await TokenApiInstance.createBoundPoolTransaction({
-    admin: admin.toBase58(),
+  const res = await tokenApiInstance.createBoundPoolTransaction({
+    admin: ADMIN_PUB_KEY.toBase58(),
     payer: payer.publicKey.toBase58(),
     quoteToken: TOKEN_INFOS.WSOL,
     tokenMetadata: DUMMY_TOKEN_METADATA,

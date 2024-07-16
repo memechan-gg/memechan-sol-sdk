@@ -1,12 +1,14 @@
 import { PublicKey } from "@solana/web3.js";
 import { StakingPool as CodegenStakingPool } from "../../src/schema/codegen/accounts";
-import { client, connection, payer } from "../common";
+import { connection, createMemeChanClient, payer } from "../common";
 import { MemeTicketClient, StakingPoolClient } from "../../src";
 
 // yarn tsx examples/staking-pool/get-available-withdraw-fees-amount-tx.ts > withdraw-fees-amount-tx.txt 2>&1
 export const getAvailableWithdrawFeesAmount = async () => {
   // Get staking pool
   const stakingPoolAddress = new PublicKey("EWuDJ1xifbipiDRm5mwgoGEwY4qFH6ApFT6PMet98Qfc");
+  const client = await createMemeChanClient();
+
   const stakingPool = await StakingPoolClient.fromStakingPoolId({ client, poolAccountAddressId: stakingPoolAddress });
   // const ammPoolAddress = new PublicKey("6HGw19h7NRSQ1kkiFGzydjq17N9CijjeqknFhiKXdiPx");
 

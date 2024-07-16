@@ -1,4 +1,4 @@
-import { PRESALE_ADDRESS } from "../../src";
+import { PRESALE_ADDRESS } from "../../src/config/consts";
 import { HeliusApiInstance, connection } from "../common";
 import { saveDataToJsonFile } from "../utils";
 

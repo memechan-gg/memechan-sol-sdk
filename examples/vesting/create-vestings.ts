@@ -1,4 +1,5 @@
-import { CHAN_TOKEN, UserVestingData, VestingClient } from "../../src";
+import { UserVestingData, VestingClient } from "../../src";
+import { CHAN_TOKEN } from "../../src/config/consts";
 import { connection, payer } from "../common";
 import { readDataFromJsonFile } from "../utils";
 

@@ -1,10 +1,12 @@
 import { PublicKey } from "@solana/web3.js";
 import BigNumber from "bignumber.js";
 import { StakingPoolClientV2 } from "../../../src";
-import { clientV2 } from "../../common";
+import { createMemeChanClientV2 } from "../../common";
 
 // yarn tsx examples/v2/staking-pool/get-holders.ts > get-holders.txt 2>&1
 export async function getHolders() {
+  const clientV2 = await createMemeChanClientV2();
+
   const stakingPool = await StakingPoolClientV2.fromStakingPoolId({
     client: clientV2,
     poolAccountAddressId: new PublicKey("EQUjkMoKSnSxDLmJsVP9XpaRKHd46m4yfjERjCrFoehR"),

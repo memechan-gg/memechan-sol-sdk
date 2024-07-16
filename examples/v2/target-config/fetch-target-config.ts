@@ -1,10 +1,11 @@
 import BigNumber from "bignumber.js";
 import { TargetConfig } from "../../../src/schema/v2/codegen/accounts";
 import { connection } from "../../common";
-import { TOKEN_INFOS } from "../../../src";
+import { getConfig } from "../../../src";
 
 // yarn tsx examples/v2/target-config/fetch-target-config.ts > fetch-target-config.txt 2>&1
 export const fetchTargetConfig = async () => {
+  const { TOKEN_INFOS } = await getConfig();
   const targetConfigId = TOKEN_INFOS.WSOL.targetConfigV2;
   console.log("Fetching targetConfigId: " + targetConfigId.toBase58());
 

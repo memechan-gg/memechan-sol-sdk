@@ -1,10 +1,11 @@
 import BigNumber from "bignumber.js";
-import { PATS_MINT } from "../../src/config/config";
 import { HeliusApiInstance } from "../common";
 import { saveDataToJsonFile } from "../utils";
+import { getConfig } from "../../src";
 
 // yarn tsx examples/helius-api/get-pats-token-holders.ts
 export const getTokenHoldersExample = async () => {
+  const { PATS_MINT } = await getConfig();
   const result = await HeliusApiInstance.getTokenHolders({ mint: PATS_MINT });
   // console.debug("result.sortedByAmountList: ", result.sortedByAmountList);
 

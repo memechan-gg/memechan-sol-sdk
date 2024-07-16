@@ -1,6 +1,6 @@
 import { PublicKey } from "@solana/web3.js";
 import { StakingPool as CodegenStakingPool } from "../../src/schema/v2/codegen/accounts/StakingPool";
-import { clientV2 as client, connection } from "../common";
+import { connection, createMemeChanClientV2 } from "../common";
 import { MemeTicketClientV2, StakingPoolClientV2 } from "../../src";
 import { BN } from "bn.js";
 
@@ -8,6 +8,8 @@ import { BN } from "bn.js";
 export const getAvailableUnstakeAmount = async () => {
   const stakingPoolAddress = new PublicKey("DsnzFrTebjHfP2LxvVf4TktsoV1ACJRiai1Du4KyAdvS");
   const user = new PublicKey("BFHEpqYNfRkHTBnqmFcfru46Fpr48s48kScZ7dXXcHzW");
+
+  const client = await createMemeChanClientV2();
 
   // Get staking pool
   const stakingPool = await StakingPoolClientV2.fromStakingPoolId({

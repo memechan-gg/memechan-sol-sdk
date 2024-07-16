@@ -1,6 +1,7 @@
 import BN from "bn.js";
-import { LivePoolClientV2, MEMECHAN_MEME_TOKEN_DECIMALS } from "../../../../src";
+import { LivePoolClientV2 } from "../../../../src";
 import { connection } from "../../../common";
+import { MEMECHAN_MEME_TOKEN_DECIMALS } from "../../../../src/config/consts";
 
 // yarn tsx examples/v2/live-pool/buy/get-buy-meme-output.ts > buy-meme-output.txt 2>&1
 export const getBuyMemeOutput = async () => {

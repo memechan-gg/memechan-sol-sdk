@@ -1,6 +1,6 @@
 import { PublicKey } from "@solana/web3.js";
 import { BoundPoolClientV2 } from "../../../src";
-import { clientV2, connection } from "../../common";
+import { connection, createMemeChanClientV2 } from "../../common";
 
 // yarn tsx examples/v2/bonding-pool/get-meme-price-and-market-cap.ts > log.txt 2>&1
 export const getMemePriceAndMarketCap = async () => {
@@ -9,6 +9,8 @@ export const getMemePriceAndMarketCap = async () => {
 
   const pool = await BoundPoolClientV2.fetch2(connection, poolAddress);
   console.log("\npool:", pool);
+
+  const clientV2 = await createMemeChanClientV2();
 
   const initialPrices = await BoundPoolClientV2.getInitialMemePrice({
     boundPoolInfo: pool,

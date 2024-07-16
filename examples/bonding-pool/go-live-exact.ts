@@ -1,6 +1,6 @@
 import { PublicKey } from "@solana/web3.js";
-import { client, payer } from "../common";
-import { BoundPoolClient, FEE_DESTINATION_ID, StakingPoolClient } from "../../src";
+import { createMemeChanClient, payer } from "../common";
+import { BoundPoolClient, getConfig, StakingPoolClient } from "../../src";
 
 // yarn tsx examples/bonding-pool/go-live-exact.ts > go-live-exact.txt 2>&1
 export const goLiveExact = async () => {
@@ -19,7 +19,8 @@ export const goLiveExact = async () => {
   //   console.log("pda: " + pda.toString());
 
   const { getAccount } = await import("@solana/spl-token");
-
+  const client = await createMemeChanClient();
+  const { FEE_DESTINATION_ID } = await getConfig();
   const stakingPool = await StakingPoolClient.fromStakingPoolId({
     client,
     poolAccountAddressId: new PublicKey("C898rurFKQ1hqcRH3a8HkzkrdrWvmaevTy4YhqbMJYeF"),

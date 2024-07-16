@@ -1,4 +1,4 @@
-import { clientV2, connection, payer } from "./../../common";
+import { connection, createMemeChanClientV2, payer } from "./../../common";
 import { StakingPool as CodegenStakingPool } from "../../../src/schema/v2/codegen/accounts/StakingPool";
 import { BoundPoolClientV2, StakingPoolClientV2 } from "../../../src";
 import { PublicKey, sendAndConfirmTransaction } from "@solana/web3.js";
@@ -7,6 +7,8 @@ import { PublicKey, sendAndConfirmTransaction } from "@solana/web3.js";
 export const addFeesTx = async () => {
   // Get staking pool
   const memeMint = new PublicKey("HZUAFBsoVPb2u1paMmiNjc6QvRioXTYNvC3zXtu3HxMX");
+
+  const clientV2 = await createMemeChanClientV2();
   const stakingPoolAddress = BoundPoolClientV2.findStakingPda(memeMint, clientV2.memechanProgram.programId);
 
   const stakingPool = await StakingPoolClientV2.fromStakingPoolId({

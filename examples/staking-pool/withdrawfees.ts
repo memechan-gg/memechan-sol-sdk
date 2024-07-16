@@ -1,6 +1,6 @@
 import { PublicKey } from "@solana/web3.js";
 import { StakingPool as CodegenStakingPool } from "../../src/schema/codegen/accounts";
-import { client, connection, payer } from "../common";
+import { connection, createMemeChanClient, payer } from "../common";
 import { MemeTicketClient, StakingPoolClient } from "../../src";
 
 // yarn tsx examples/staking-pool/withdrawfees.ts > withdrawfees.txt 2>&1
@@ -8,6 +8,7 @@ export const withdrawfees = async () => {
   try {
     const boundPoolAddress = new PublicKey("Gq3XGfsZ1Rsai9qxVeBpSNw66CtT5gMkwZupLAPGe41B");
     const stakingPoolAddress = new PublicKey("DfMYHDyncVEv62WkUy45pve8LRakBVU8Guhxrzve6QVR");
+    const client = await createMemeChanClient();
     const stakingPool = await StakingPoolClient.fromStakingPoolId({ client, poolAccountAddressId: stakingPoolAddress });
 
     const fetchedStakingPool = await CodegenStakingPool.fetch(connection, stakingPoolAddress);

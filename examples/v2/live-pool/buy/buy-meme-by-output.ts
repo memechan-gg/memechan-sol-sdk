@@ -1,6 +1,6 @@
 import { PublicKey, sendAndConfirmTransaction } from "@solana/web3.js";
 import { LivePoolClientV2 } from "../../../../src";
-import { clientV2, payer } from "../../../common";
+import { createMemeChanClientV2, payer } from "../../../common";
 
 // yarn tsx examples/v2/live-pool/buy/buy-meme-by-output.ts > buy-meme-by-output.txt 2>&1
 export const buyMemeByOutput = async () => {
@@ -8,6 +8,7 @@ export const buyMemeByOutput = async () => {
 
   const poolAddress = "69fywDppk1B9tXtGQJDiRKDcV8My6NLuyHgAmSToT6bZ";
   const memeMint = "8NmKFkMehRoF9BLSajM9xioitxKWSfXTxw2qrtPtyE2z";
+  const clientV2 = await createMemeChanClientV2();
   const poolClient = await LivePoolClientV2.fromAmmId(new PublicKey(poolAddress), clientV2);
 
   const { minAmountOut, wrappedAmountIn } = await poolClient.getBuyMemeOutput({

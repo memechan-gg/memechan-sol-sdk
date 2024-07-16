@@ -1,10 +1,9 @@
 import { Wallet } from "@coral-xyz/anchor";
 import { Connection, FetchMiddleware, Keypair } from "@solana/web3.js";
-import { ADMIN_PUB_KEY, Auth, BE_URL, MemechanClient, TokenAPI } from "../src";
 import { HELIUS_API_KEY, HELIUS_API_URL, IS_TEST_ENV, TEST_USER_SECRET_KEY } from "./env";
-import { getRandomRpcEndpoint } from "../src/util/getRandomRpcEndpoint";
 import { HeliusApi } from "../src/helius-api/HeliusApi";
 import { MemechanClientV2 } from "../src/MemechanClientV2";
+import { getConfig, MemechanClient } from "../src";
 
 export const connectionMiddleware = async (
   urlAddress: Parameters<FetchMiddleware>[0],
@@ -21,30 +20,39 @@ export const connectionMiddleware = async (
   }
 };
 
-export const connection = new Connection(getRandomRpcEndpoint(), {
+export const connection = new Connection("https://rpc1.memechan.xyz/", {
   httpAgent: IS_TEST_ENV ? false : undefined,
   commitment: "confirmed",
   confirmTransactionInitialTimeout: 30000,
   fetchMiddleware: connectionMiddleware,
 });
 
-export const admin = ADMIN_PUB_KEY;
 export const payer = Keypair.fromSecretKey(Buffer.from(JSON.parse(TEST_USER_SECRET_KEY)));
 export const wallet = new Wallet(payer);
 
-export const client = new MemechanClient({
-  wallet,
-  heliusApiUrl: HELIUS_API_URL,
-  connection,
-  simulationKeypair: payer,
-});
+export async function createMemeChanClient() {
+  const { MEMECHAN_PROGRAM_ID } = await getConfig();
 
-export const clientV2 = new MemechanClientV2({
-  wallet,
-  heliusApiUrl: HELIUS_API_URL,
-  connection,
-  simulationKeypair: payer,
-});
+  return new MemechanClient({
+    wallet,
+    heliusApiUrl: HELIUS_API_URL,
+    connection,
+    simulationKeypair: payer,
+    memeChanProgramId: MEMECHAN_PROGRAM_ID,
+  });
+}
+
+export async function createMemeChanClientV2() {
+  const { MEMECHAN_PROGRAM_ID_V2 } = await getConfig();
+
+  return new MemechanClientV2({
+    wallet,
+    heliusApiUrl: HELIUS_API_URL,
+    connection,
+    simulationKeypair: payer,
+    memeChanProgramId: MEMECHAN_PROGRAM_ID_V2,
+  });
+}
 
 export const DUMMY_TOKEN_METADATA = {
   name: "Best Token Ever",
@@ -57,6 +65,4 @@ export const DUMMY_TOKEN_METADATA = {
   discord: "",
 };
 
-export const TokenApiInstance = new TokenAPI(BE_URL);
-export const AuthApiInstance = new Auth(BE_URL);
 export const HeliusApiInstance = new HeliusApi(HELIUS_API_URL, HELIUS_API_KEY);

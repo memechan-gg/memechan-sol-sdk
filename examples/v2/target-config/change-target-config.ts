@@ -1,13 +1,15 @@
 import BN from "bn.js";
-import { clientV2, payer } from "../../common";
+import { createMemeChanClientV2, payer } from "../../common";
 import { TargetConfigClientV2 } from "../../../src/targetconfig/TargetConfigClientV2";
-import { TOKEN_INFOS } from "../../../src";
+import { getConfig } from "../../../src";
 
 // yarn tsx examples/v2/target-config/change-target-config.ts > change-target-config.txt 2>&1
 export const changeTargetConfig = async () => {
   // const targetConfigAddress = MEMECHAN_TARGET_CONFIG;
+  const { TOKEN_INFOS } = await getConfig();
   const targetConfigAddress = TOKEN_INFOS.WSOL.targetConfigV2;
-
+  const clientV2 = await createMemeChanClientV2();
+  
   const targetConfig = await TargetConfigClientV2.fromTargetConfigId({
     client: clientV2,
     accountAddressId: targetConfigAddress,

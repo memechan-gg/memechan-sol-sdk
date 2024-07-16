@@ -1,9 +1,10 @@
 /* eslint-disable max-len */
 import BigNumber from "bignumber.js";
-import { CHAN_TOKEN_DECIMALS, PatsHolderMapWithIndex, UserVestingData, VestingClient } from "../../src";
+import { PatsHolderMapWithIndex, VestingClient } from "../../src";
 import { TokenAccountRaw } from "../../src/helius-api/types";
 import { readDataFromJsonFile, saveDataToJsonFile } from "../utils";
 import { toMap } from "../../src/util/toMap";
+import { CHAN_TOKEN_DECIMALS } from "../../src/config/consts";
 
 // yarn tsx examples/vesting/get-users-vesting-data.ts
 export const getUsersVestingData = async () => {

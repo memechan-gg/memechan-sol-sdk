@@ -1,7 +1,7 @@
 import { PublicKey } from "@solana/web3.js";
 import { StakingPool as CodegenStakingPool } from "../../../src/schema/v2/codegen/accounts/StakingPool";
 import { BN } from "bn.js";
-import { clientV2, connection, payer } from "../../common";
+import { connection, createMemeChanClientV2, payer } from "../../common";
 import { MemeTicketClientV2, StakingPoolClientV2 } from "../../../src";
 
 // yarn tsx examples/staking-pool/unstake.ts > unstake.txt 2>&1
@@ -9,6 +9,7 @@ export const unstake = async () => {
   try {
     const boundPoolAddress = new PublicKey("2paxDkj5zFR3DtMVZtmTSbkMYZwFtVZnq2Xv1WFHqgPo");
     const stakingPoolAddress = new PublicKey("sh5hozk6bENHvG4J5zrqW2S5eKjp68DRPZodCRLSkJU");
+    const clientV2 = await createMemeChanClientV2();
 
     // Get staking pool
     const stakingPool = await StakingPoolClientV2.fromStakingPoolId({

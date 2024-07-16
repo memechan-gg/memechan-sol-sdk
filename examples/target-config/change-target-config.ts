@@ -1,13 +1,14 @@
 import BN from "bn.js";
-import { TOKEN_INFOS, TargetConfigClient } from "../../src";
-import { client, payer } from "../common";
+import { getConfig, TargetConfigClient } from "../../src";
+import { createMemeChanClient, payer } from "../common";
 import { PublicKey } from "@solana/web3.js";
 
 // yarn tsx examples/target-config/change-target-config.ts > change-target-config.txt 2>&1
 export const changeTargetConfig = async () => {
   // const targetConfigAddress = MEMECHAN_TARGET_CONFIG;
   const targetConfigAddress = new PublicKey("5g13tz8GKWySjtzPRARuzzQM7LbMCUBMPGPef5PKe4JJ");
-
+  const client = await createMemeChanClient();
+  const { TOKEN_INFOS } = await getConfig();
   const targetConfig = await TargetConfigClient.fromTargetConfigId({
     client,
     accountAddressId: targetConfigAddress,

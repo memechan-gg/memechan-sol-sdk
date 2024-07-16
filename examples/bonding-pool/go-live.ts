@@ -1,11 +1,12 @@
 import { BN } from "bn.js";
 import { BoundPoolClient } from "../../src/bound-pool/BoundPoolClient";
-import { FEE_DESTINATION_ID, TOKEN_INFOS } from "../../src/config/config";
-import { DUMMY_TOKEN_METADATA, admin, client, payer } from "../common";
-import { MemeTicketClient } from "../../src";
+import { createMemeChanClient, DUMMY_TOKEN_METADATA, payer } from "../common";
+import { getConfig, MemeTicketClient } from "../../src";
 
 // yarn tsx examples/bonding-pool/go-live.ts > go-live.txt 2>&1
 export const goLive = async () => {
+  const client = await createMemeChanClient();
+  const { TOKEN_INFOS, ADMIN_PUB_KEY: admin, FEE_DESTINATION_ID } = await getConfig();
   const boundPool = await BoundPoolClient.new({
     admin,
     payer,

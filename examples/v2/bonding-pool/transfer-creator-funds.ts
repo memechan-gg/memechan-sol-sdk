@@ -1,9 +1,11 @@
 /* eslint-disable max-len */
 import { BoundPoolClientV2 } from "../../../src";
-import { clientV2, payer } from "../../common";
+import { createMemeChanClientV2, payer } from "../../common";
 
 // yarn tsx examples/v2/bonding-pool/transfer-creator-funds.ts
 (async () => {
+  const clientV2 = await createMemeChanClientV2();
+
   const signature = await BoundPoolClientV2.transferCreatorBonusChanFunds({
     amount: BigInt(1000),
     connection: clientV2.connection,

@@ -1,4 +1,4 @@
-import { LivePoolClientV2, TOKEN_INFOS } from "../../../../src";
+import { getConfig, LivePoolClientV2 } from "../../../../src";
 import { connection } from "../../../common";
 import BigNumber from "bignumber.js";
 
@@ -18,6 +18,8 @@ export const getSellMemeOutput = async () => {
 
   console.log("\nquoteAmountIn:", wrappedAmountIn.toString());
   console.log("minAmountOut:", minAmountOut.toString());
+
+  const { TOKEN_INFOS } = await getConfig();
 
   const outputAmount2 = new BigNumber(minAmountOut.toString()).div(10 ** TOKEN_INFOS.WSOL.decimals);
   console.log("minAmountOut2 formatted:", outputAmount2.toString());
