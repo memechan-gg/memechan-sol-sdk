@@ -14,14 +14,6 @@ import BigNumber from "bignumber.js";
 import BN from "bn.js";
 import { MemechanClientV2 } from "../MemechanClientV2";
 import { BoundPoolClientV2 } from "../bound-pool/BoundPoolClientV2";
-import {
-  COMPUTE_UNIT_PRICE,
-  LP_FEE_WALLET,
-  MAX_MEME_TOKENS,
-  MEMECHAN_PROGRAM_ID_V2,
-  MEME_TOKEN_DECIMALS,
-  TOKEN_INFOS,
-} from "../config/config";
 import { MemeTicketClientV2 } from "../memeticket/MemeTicketClientV2";
 import { MemeTicketFields, StakingPool, StakingPoolFields } from "../schema/v2/codegen/accounts";
 import { ensureAssociatedTokenAccountWithIdempotentIX } from "../util/ensureAssociatedTokenAccountWithIdempotentIX";
@@ -46,6 +38,8 @@ import { TokenInfo } from "../config/types";
 import { AmmPool } from "../meteora/AmmPool";
 import { MEMO_PROGRAM_ID } from "@raydium-io/raydium-sdk";
 import { LivePoolClientV2 } from "../live-pool/LivePoolClientV2";
+import { getConfig } from "../config/config";
+import { COMPUTE_UNIT_PRICE, MAX_MEME_TOKENS, MEME_TOKEN_DECIMALS } from "../config/consts";
 
 export class StakingPoolClientV2 {
   constructor(
@@ -151,8 +145,8 @@ export class StakingPoolClientV2 {
     const tokenAMint = new PublicKey(livePool.ammPool.ammImpl.tokenA.address);
     const tokenBMint = new PublicKey(livePool.ammPool.ammImpl.tokenB.address);
 
-    const tokenInfoA = getTokenInfoByMint(tokenAMint);
-    const tokenInfoB = getTokenInfoByMint(tokenBMint);
+    const tokenInfoA = await getTokenInfoByMint(tokenAMint);
+    const tokenInfoB = await getTokenInfoByMint(tokenBMint);
 
     const [
       { vaultPda: aVault, tokenVaultPda: aTokenVault, lpMintPda: aLpMintPda },
@@ -236,6 +230,8 @@ export class StakingPoolClientV2 {
     const escrowAta = await getAssociatedTokenAccount(lpMint, lockEscrowPK);
     console.log(escrowAta);
     const { TOKEN_PROGRAM_ID } = await import("@solana/spl-token");
+
+    const { LP_FEE_WALLET, TOKEN_INFOS } = await getConfig();
 
     const memeFeeVault = await ensureAssociatedTokenAccountWithIdempotentIX({
       connection: this.client.connection,
@@ -398,7 +394,7 @@ export class StakingPoolClientV2 {
     preInstructions = [];
 
     const payerPoolLp = await getAssociatedTokenAccount(lpMint, stakingSigner);
-
+    const { LP_FEE_WALLET, TOKEN_INFOS } = await getConfig();
     const escrowAta = await getAssociatedTokenAccount(lpMint, lockEscrowPK);
     console.log(escrowAta);
     const { TOKEN_PROGRAM_ID, getOrCreateAssociatedTokenAccount } = await import("@solana/spl-token");
@@ -482,7 +478,7 @@ export class StakingPoolClientV2 {
     const user = args.user;
     const { getAccount, TOKEN_PROGRAM_ID } = await import("@solana/spl-token");
     const quoteAccount = await getAccount(this.client.connection, stakingInfo.quoteVault);
-
+    const { TOKEN_INFOS } = await getConfig();
     const associatedMemeTokenAddress = await ensureAssociatedTokenAccountWithIdempotentIX({
       connection: this.client.connection,
       payer: user,
@@ -662,7 +658,7 @@ export class StakingPoolClientV2 {
       owner: args.user,
       transaction: tx,
     });
-
+    const { TOKEN_INFOS } = await getConfig();
     const chanAccountPublicKey = await ensureAssociatedTokenAccountWithIdempotentIX({
       connection: this.client.connection,
       payer: args.user,
@@ -996,6 +992,7 @@ export class StakingPoolClientV2 {
     connection: Connection;
     memeMintPubkey: PublicKey;
   }): Promise<boolean> {
+    const { MEMECHAN_PROGRAM_ID_V2 } = await getConfig();
     const memechanProgramPubkey = new PublicKey(MEMECHAN_PROGRAM_ID_V2);
     const stakingPda = BoundPoolClientV2.findStakingPda(memeMintPubkey, memechanProgramPubkey);
     const stakingInfo = await StakingPool.fetch(connection, stakingPda);

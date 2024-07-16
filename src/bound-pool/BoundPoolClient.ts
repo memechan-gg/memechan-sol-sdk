@@ -54,17 +54,6 @@ import {
 } from "./types";
 
 import { findProgramAddress } from "../common/helpers";
-import {
-  COMPUTE_UNIT_PRICE,
-  DEFAULT_MAX_M,
-  FULL_MEME_AMOUNT_CONVERTED,
-  MEMECHAN_MEME_TOKEN_DECIMALS,
-  TOKEN_INFOS,
-  RAYDIUM_PROTOCOL_FEE,
-  TRANSFER_FEE,
-  BOUND_POOL_FEE_WALLET,
-  MAX_TICKET_TOKENS,
-} from "../config/config";
 import { LivePoolClient } from "../live-pool/LivePoolClient";
 import { MemechanSol } from "../schema/types/memechan_sol";
 import { getCreateMetadataTransaction } from "../token/createMetadata";
@@ -87,6 +76,16 @@ import { getTokenInfoByMint } from "../config/helpers";
 import { addWrapSOLInstructionIfNativeMint } from "../util/addWrapSOLInstructionIfNativeMint";
 import { addUnwrapSOLInstructionIfNativeMint } from "../util/addUnwrapSOLInstructionIfNativeMint";
 import { TokenInfo } from "../config/types";
+import {
+  MEMECHAN_MEME_TOKEN_DECIMALS,
+  COMPUTE_UNIT_PRICE,
+  RAYDIUM_PROTOCOL_FEE,
+  RAYDIUM_TRANSFER_FEE,
+  DEFAULT_MAX_M,
+  MAX_TICKET_TOKENS,
+  FULL_MEME_AMOUNT_CONVERTED,
+} from "../config/consts";
+import { getConfig } from "../config/config";
 
 export class BoundPoolClient {
   private constructor(
@@ -95,7 +94,7 @@ export class BoundPoolClient {
     public memeVault: PublicKey,
     public quoteVault: PublicKey,
     public memeTokenMint: PublicKey,
-    public quoteTokenMint: PublicKey = TOKEN_INFOS.WSOL.mint,
+    public quoteTokenMint: PublicKey,
     public memeToken: Token,
     public poolObjectData: BoundPool,
   ) {
@@ -258,6 +257,7 @@ export class BoundPoolClient {
 
     let feeQuoteVault: PublicKey | undefined = feeQuoteVaultPk;
 
+    const { BOUND_POOL_FEE_WALLET } = await getConfig();
     // If `feeQuoteVaultPk` is not passed in args, we need to find out, whether a quote account for an admin
     // already exists
     if (!feeQuoteVault) {
@@ -286,7 +286,7 @@ export class BoundPoolClient {
       transaction: createPoolTransaction,
     });
 
-    const quoteInfo = getTokenInfoByMint(quoteToken.mint);
+    const quoteInfo = await getTokenInfoByMint(quoteToken.mint);
     const { TOKEN_PROGRAM_ID } = await import("@solana/spl-token");
     const createPoolInstruction = await memechanProgram.methods
       .newPool()
@@ -347,7 +347,7 @@ export class BoundPoolClient {
 
   public static async new(args: BoundPoolArgs): Promise<BoundPoolClient> {
     const { payer } = args;
-    const tokenInfo = getTokenInfoByMint(args.quoteToken.mint);
+    const tokenInfo = await getTokenInfoByMint(args.quoteToken.mint);
     return await this.newWithBuyTx({
       ...args,
       targetConfig: tokenInfo.targetConfig,
@@ -511,7 +511,7 @@ export class BoundPoolClient {
     const solIn = input.quoteAmountIn;
     const memeOut = input.memeTokensOut;
 
-    const memeTicketPublicKey = MemeTicketClient.getMemeTicketPDA({
+    const memeTicketPublicKey = await MemeTicketClient.getMemeTicketPDA({
       ticketNumber: memeTicketNumber,
       poolId: pool,
       userId: user.publicKey,
@@ -596,7 +596,7 @@ export class BoundPoolClient {
     const poolSignerPda = this.findSignerPda();
     const ticketNumberBN = new BN(memeTicketNumber);
 
-    const memeTicketPublicKey = MemeTicketClient.getMemeTicketPDA({
+    const memeTicketPublicKey = await MemeTicketClient.getMemeTicketPDA({
       ticketNumber: memeTicketNumber,
       poolId: pool,
       userId: user,
@@ -604,7 +604,7 @@ export class BoundPoolClient {
     const connection = this.client.connection;
 
     // input
-    const quoteInfo = getTokenInfoByMint(this.quoteTokenMint);
+    const quoteInfo = await getTokenInfoByMint(this.quoteTokenMint);
 
     const inputAmountWithDecimals = normalizeInputCoinAmount(inputAmount, quoteInfo.decimals);
     const inputAmountBN = new BN(inputAmountWithDecimals.toString());
@@ -686,14 +686,14 @@ export class BoundPoolClient {
 
     const pool = boundPoolId;
     const ticketNumberBN = new BN(memeTicketNumber);
-    const memeTicketPublicKey = MemeTicketClient.getMemeTicketPDA({
+    const memeTicketPublicKey = await MemeTicketClient.getMemeTicketPDA({
       ticketNumber: memeTicketNumber,
       poolId: pool,
       userId: user,
     });
 
     // input
-    const quoteInfo = getTokenInfoByMint(quoteMint);
+    const quoteInfo = await getTokenInfoByMint(quoteMint);
     const inputAmountWithDecimals = normalizeInputCoinAmount(inputAmount, quoteInfo.decimals);
     const inputAmountBN = new BN(inputAmountWithDecimals.toString());
 
@@ -746,7 +746,7 @@ export class BoundPoolClient {
     const pool = this.id;
 
     // input & output
-    const quoteInfo = getTokenInfoByMint(this.quoteTokenMint);
+    const quoteInfo = await getTokenInfoByMint(this.quoteTokenMint);
     const inputAmountWithDecimals = normalizeInputCoinAmount(inputAmount, quoteInfo.decimals);
     const inputAmountBN = new BN(inputAmountWithDecimals.toString());
     const minOutputBN = new BN(0);
@@ -835,7 +835,7 @@ export class BoundPoolClient {
     const inputAmountBN = new BN(inputAmountWithDecimals.toString());
     const inputAmountBignumber = new BigNumber(inputAmountWithDecimals.toString());
 
-    const quoteInfo = getTokenInfoByMint(this.quoteTokenMint);
+    const quoteInfo = await getTokenInfoByMint(this.quoteTokenMint);
 
     // output
     // Note: Be aware, we relay on the fact that `MEMECHAN_QUOTE_TOKEN_DECIMALS`
@@ -931,7 +931,7 @@ export class BoundPoolClient {
 
     const { swapOutAmount } = extractSwapDataFromSimulation(result);
 
-    const quoteInfo = getTokenInfoByMint(this.quoteTokenMint);
+    const quoteInfo = await getTokenInfoByMint(this.quoteTokenMint);
 
     // output
     // Note: Be aware, we relay on the fact that `MEMECOIN_DECIMALS` would be always set same for all memecoins
@@ -1110,7 +1110,7 @@ export class BoundPoolClient {
     const stakingSigner = StakingPoolClient.findSignerPda(stakingId, client.memechanProgram.programId);
     const baseTokenInfo = new Token(TOKEN_PROGRAM_ID, memeMint, MEMECHAN_MEME_TOKEN_DECIMALS);
 
-    const quoteTokenInfo = getTokenInfoByMint(quoteMint);
+    const quoteTokenInfo = await getTokenInfoByMint(quoteMint);
 
     // TODO: Put all the transactions into one (now they exceed trx size limit)
     const { marketId, transactions: createMarketTransactions } = await getCreateMarketTransactions({
@@ -1132,7 +1132,7 @@ export class BoundPoolClient {
       SystemProgram.transfer({
         fromPubkey: user.publicKey,
         toPubkey: stakingSigner,
-        lamports: RAYDIUM_PROTOCOL_FEE + TRANSFER_FEE,
+        lamports: RAYDIUM_PROTOCOL_FEE + RAYDIUM_TRANSFER_FEE,
       }),
     );
 
@@ -1327,8 +1327,8 @@ export class BoundPoolClient {
     return BoundPoolClient.getHoldersList(this.id, this.client);
   }
 
-  public getTokenInfo(): TokenInfo {
-    return getTokenInfoByMint(this.quoteTokenMint);
+  public async getTokenInfo(): Promise<TokenInfo> {
+    return await getTokenInfoByMint(this.quoteTokenMint);
   }
 
   /**
@@ -1353,6 +1353,7 @@ export class BoundPoolClient {
     // can be null if called after go live
     const pool = await CodegenBoundPool.fetch(client.connection, poolId);
 
+    const { BOUND_POOL_FEE_WALLET } = await getConfig();
     if (pool) {
       // add bound pool as holder
       if (!uniqueHolders.has(BOUND_POOL_FEE_WALLET)) {
@@ -1370,7 +1371,7 @@ export class BoundPoolClient {
 
   public static async getQuoteTokenDisplayName(poolAddress: PublicKey, connection: Connection) {
     const pool = await BoundPoolClient.fetch2(connection, poolAddress);
-    const quoteToken = getTokenInfoByMint(pool.quoteReserve.mint);
+    const quoteToken = await getTokenInfoByMint(pool.quoteReserve.mint);
     return quoteToken.displayName;
   }
 
@@ -1393,7 +1394,7 @@ export class BoundPoolClient {
     const memeBalance = new BigNumber(boundPoolInfo.memeReserve.tokens.toString());
     const quoteBalance = new BigNumber(boundPoolInfo.quoteReserve.tokens.toString());
 
-    const quoteInfo = getTokenInfoByMint(boundPoolInfo.quoteReserve.mint);
+    const quoteInfo = await getTokenInfoByMint(boundPoolInfo.quoteReserve.mint);
     const quoteBalanceConverted = quoteBalance.div(10 ** quoteInfo.decimals);
     const soldMemeConverted = new BigNumber(DEFAULT_MAX_M).minus(memeBalance).div(10 ** MEMECHAN_MEME_TOKEN_DECIMALS);
 

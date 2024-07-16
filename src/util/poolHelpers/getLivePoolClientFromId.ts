@@ -1,11 +1,11 @@
 import { PublicKey } from "@solana/web3.js";
-import { MERCURIAL_AMM_PROGRAM_ID } from "../../config/config";
 import { MemechanClient } from "../../MemechanClient";
 import { MemechanClientV2 } from "../../MemechanClientV2";
 import { LivePoolClientV2 } from "../../live-pool/LivePoolClientV2";
 import { LivePoolClient } from "../../live-pool/LivePoolClient";
 import { LivePoolVersioned } from "./types";
 import { LivePoolClientCache } from "./livePoolClientCache";
+import { getConfig } from "../..";
 
 export async function getLivePoolClientFromIdInternal(
   ammId: PublicKey,
@@ -20,7 +20,8 @@ export async function getLivePoolClientFromIdInternal(
 
   console.log("accountInfo.owner:", accountInfo.owner);
 
-  if (accountInfo.owner.toBase58() == MERCURIAL_AMM_PROGRAM_ID) {
+  const config = await getConfig();
+  if (accountInfo.owner.toBase58() == config.MERCURIAL_AMM_PROGRAM_ID) {
     const pool = await LivePoolClientV2.fromAccountInfo(ammId, accountInfo, clientV2);
     return { livePool: pool, version: "V2" };
   }
@@ -46,8 +47,8 @@ export async function getLivePoolClientFromId(
   }
 
   console.log("accountInfo.owner:", accountInfo.owner);
-
-  if (accountInfo.owner.toBase58() === MERCURIAL_AMM_PROGRAM_ID) {
+  const config = await getConfig();
+  if (accountInfo.owner.toBase58() === config.MERCURIAL_AMM_PROGRAM_ID) {
     const pool = await LivePoolClientV2.fromAccountInfo(ammId, accountInfo, clientV2);
     return { livePool: pool, version: "V2" };
   }

@@ -1,9 +1,9 @@
 import { PublicKey } from "@solana/web3.js";
-import { MEMECHAN_PROGRAM_ID_V2 } from "../../config/config";
 import { MemechanClient } from "../../MemechanClient";
 import { MemechanClientV2 } from "../../MemechanClientV2";
 import { MemeTicketClientV2 } from "../../memeticket/MemeTicketClientV2";
 import { MemeTicketClient } from "../../memeticket/MemeTicketClient";
+import { getConfig } from "../..";
 
 export type MemeTicketClientVersioned =
   | { version: "V1"; memeTicketClient: MemeTicketClient }
@@ -21,8 +21,9 @@ export async function getMemeTicketClientFromId(
   }
 
   console.log("accountInfo.owner:", accountInfo.owner);
+  const config = await getConfig();
 
-  if (accountInfo.owner.toBase58() == MEMECHAN_PROGRAM_ID_V2) {
+  if (accountInfo.owner.toBase58() == config.MEMECHAN_PROGRAM_ID_V2) {
     return { memeTicketClient: new MemeTicketClientV2(ticketId, clientV2), version: "V2" };
   }
 

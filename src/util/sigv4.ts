@@ -4,7 +4,7 @@ import { HttpRequest } from "@smithy/protocol-http";
 import { SignatureV4 } from "@smithy/signature-v4";
 import { getFetchFn } from "./get-fetch";
 import { getHeaders } from "./get-headers";
-import { API_GATEWAY_FQDN } from "../config/config";
+import { getConfig } from "../config/config";
 
 export type SignedFetcherOptions = {
   service: string;
@@ -26,6 +26,7 @@ export const createSignedFetcher: CreateSignedFetcher = (opts: SignedFetcherOpti
     const url = new URL(typeof input === "string" ? input : input instanceof URL ? input.href : input.url);
 
     const sigHeaders = getHeaders(init?.headers);
+    const { API_GATEWAY_FQDN } = await getConfig();
     sigHeaders.set("host", API_GATEWAY_FQDN);
 
     const request = new HttpRequest({

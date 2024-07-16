@@ -1,5 +1,4 @@
 import { isAfter } from "date-fns";
-import { BE_URL } from "../../config/config";
 import { jsonFetch } from "../../util/fetch";
 
 export interface AuthParams {
@@ -27,7 +26,7 @@ export class Auth {
    * Create an authentication service instance.
    * @param {string} url - The base URL for the backend service.
    */
-  constructor(private url = BE_URL) {}
+  constructor(private url: string) {}
 
   /**
    * Requests a message to sign for initiating an authentication session.

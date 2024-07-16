@@ -9,10 +9,10 @@ import {
 } from "@solana/web3.js";
 import BN from "bn.js";
 import { MemechanClientV2 } from "../MemechanClientV2";
-import { COMPUTE_UNIT_PRICE } from "../config/config";
 import { TargetConfig as CodegenTargetConfig } from "../schema/v2/codegen/accounts";
 import { getSendAndConfirmTransactionMethod } from "../util/getSendAndConfirmTransactionMethod";
 import { CreateTargetConfigArgsV2 } from "./types";
+import { COMPUTE_UNIT_PRICE } from "../config/consts";
 
 export class TargetConfigClientV2 {
   public constructor(

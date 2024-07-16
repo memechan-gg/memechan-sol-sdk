@@ -1,9 +1,9 @@
 import { PublicKey } from "@solana/web3.js";
-import { MEMECHAN_PROGRAM_ID_V2 } from "../../config/config";
 import { BoundPoolClientV2 } from "../../bound-pool/BoundPoolClientV2";
 import { BoundPoolClient } from "../../bound-pool/BoundPoolClient";
 import { MemechanClient } from "../../MemechanClient";
 import { MemechanClientV2 } from "../../MemechanClientV2";
+import { getConfig } from "../..";
 
 export type BoundPoolVersioned =
   | { version: "V1"; livePool: BoundPoolClient }
@@ -22,7 +22,8 @@ export async function getBoundPoolClientFromId(
 
   console.log("accountInfo.owner:", accountInfo.owner);
 
-  if (accountInfo.owner.toBase58() == MEMECHAN_PROGRAM_ID_V2) {
+  const config = await getConfig();
+  if (accountInfo.owner.toBase58() == config.MEMECHAN_PROGRAM_ID_V2) {
     const boundPoolInstance = BoundPoolClientV2.fromAccountInfo({
       client: clientV2,
       poolAccountAddressId: poolAddressId,

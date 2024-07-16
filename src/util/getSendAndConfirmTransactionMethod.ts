@@ -6,7 +6,7 @@ import {
   Transaction,
   sendAndConfirmTransaction,
 } from "@solana/web3.js";
-import { COMPUTE_UNIT_PRICE } from "../config/config";
+import { COMPUTE_UNIT_PRICE } from "../config/consts";
 
 export function getSendAndConfirmTransactionMethod({
   connection,

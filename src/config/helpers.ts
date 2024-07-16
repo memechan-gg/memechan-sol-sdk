@@ -1,20 +1,25 @@
 import { PublicKey } from "@solana/web3.js";
-import { MEMECHAN_MEME_TOKEN_DECIMALS, MEMECHAN_PROGRAM_ID_V2, TOKEN_INFOS } from "./config";
 import { TokenInfo, TokenSymbol } from "./types";
+import { getConfig } from "./config";
+import { MEMECHAN_MEME_TOKEN_DECIMALS, TOKEN_PROGRAM_ID } from "./consts";
 
-export function getTokenInfoBySymbol(symbol: TokenSymbol): TokenInfo {
-  return TOKEN_INFOS[symbol];
+export async function getTokenInfoBySymbol(symbol: TokenSymbol): Promise<TokenInfo> {
+  const config = await getConfig();
+  return config.TOKEN_INFOS[symbol];
 }
 
-export function getTokenInfoByMint(mint: PublicKey): TokenInfo {
-  const result = Object.values(TOKEN_INFOS).find((tokenInfo) => tokenInfo.mint.equals(mint));
+export async function getTokenInfoByMint(mint: PublicKey): Promise<TokenInfo> {
+  const config = await getConfig();
+  const result = Object.values(config.TOKEN_INFOS).find((tokenInfo) => tokenInfo.mint.equals(mint));
   if (!result) {
     return new TokenInfo({
       decimals: MEMECHAN_MEME_TOKEN_DECIMALS,
       mint: mint,
       name: "MEME",
-      programId: new PublicKey(MEMECHAN_PROGRAM_ID_V2),
+      programId: TOKEN_PROGRAM_ID,
       symbol: "MEME",
+      memeChanProgramId: config.MEMECHAN_PROGRAM_ID_PK,
+      memeChanProgramIdV2: config.MEMECHAN_PROGRAM_ID_V2_PK,
     });
   }
   return result;

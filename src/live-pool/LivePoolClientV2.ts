@@ -1,6 +1,5 @@
 import { PublicKey, Connection, ComputeBudgetProgram, Transaction, AccountInfo } from "@solana/web3.js";
 import BigNumber from "bignumber.js";
-import { COMPUTE_UNIT_PRICE, TOKEN_INFOS, MEMECHAN_MEME_TOKEN_DECIMALS } from "../config/config";
 import {
   GetSwapMemeOutputArgs,
   GetSwapMemeTransactionsArgs,
@@ -17,6 +16,8 @@ import type { PoolState } from "@mercurial-finance/dynamic-amm-sdk";
 import { AmmPool } from "../meteora/AmmPool";
 import { MemechanClientV2 } from "../MemechanClientV2";
 import { normalizeInputCoinAmountBN } from "../util/trading/normalizeInputCoinAmountBN";
+import { MEMECHAN_MEME_TOKEN_DECIMALS, COMPUTE_UNIT_PRICE } from "../config/consts";
+import { getConfig } from "../config/config";
 
 export class LivePoolClientV2 {
   private constructor(
@@ -68,7 +69,7 @@ export class LivePoolClientV2 {
       chainId: 900,
     };
 
-    const quoteTokenInfo = getTokenInfoByMint(poolState.tokenBMint).toSplTokenInfo();
+    const quoteTokenInfo = (await getTokenInfoByMint(poolState.tokenBMint)).toSplTokenInfo();
 
     console.log("quoteTokenInfo", quoteTokenInfo);
 
@@ -97,7 +98,7 @@ export class LivePoolClientV2 {
       chainId: 900,
     };
 
-    const quoteTokenInfo = getTokenInfoByMint(poolState.tokenBMint).toSplTokenInfo();
+    const quoteTokenInfo = (await getTokenInfoByMint(poolState.tokenBMint)).toSplTokenInfo();
 
     console.log("quoteTokenInfo", quoteTokenInfo);
 
@@ -127,6 +128,7 @@ export class LivePoolClientV2 {
 
     const { default: AmmImpl } = await import("@mercurial-finance/dynamic-amm-sdk");
 
+    const { TOKEN_INFOS } = await getConfig();
     const ammImpl = await AmmImpl.create(
       connection,
       new PublicKey(poolAddress),
@@ -181,6 +183,8 @@ export class LivePoolClientV2 {
       slippagePercentage,
     });
 
+    const { TOKEN_INFOS } = await getConfig();
+
     const innerTransactions = await LivePoolClientV2.getBuyMemeTransactionsByOutput({
       minAmountOut,
       payer,
@@ -206,6 +210,8 @@ export class LivePoolClientV2 {
       name: "MEME",
       chainId: 900,
     };
+    const { TOKEN_INFOS } = await getConfig();
+
     const { default: AmmImpl } = await import("@mercurial-finance/dynamic-amm-sdk");
     const ammImpl = await AmmImpl.create(
       connection,
@@ -284,11 +290,13 @@ export class LivePoolClientV2 {
 
     const poolState = await LivePoolClientV2.getPoolState(new PublicKey(poolAddress), connection);
     const memeMint = poolState.tokenAMint;
-    const tokenInfo = getTokenInfoByMint(memeMint);
+    const tokenInfo = await getTokenInfoByMint(memeMint);
     console.log("tokenInfo:", tokenInfo);
 
     const splMemeTokenInfo = tokenInfo.toSplTokenInfo();
     console.log("splMemeTokenInfo:", splMemeTokenInfo);
+
+    const { TOKEN_INFOS } = await getConfig();
 
     const ammImpl = await AmmImpl.create(
       connection,
@@ -312,7 +320,7 @@ export class LivePoolClientV2 {
 
   public static async getQuoteTokenDisplayName(ammId: PublicKey, client: MemechanClientV2) {
     const pool = await LivePoolClientV2.fromAmmId(ammId, client);
-    const quoteToken = getTokenInfoByMint(pool.ammPool.quoteMint);
+    const quoteToken = await getTokenInfoByMint(pool.ammPool.quoteMint);
     return quoteToken.displayName;
   }
 

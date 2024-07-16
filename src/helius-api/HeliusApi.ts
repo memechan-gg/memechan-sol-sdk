@@ -16,8 +16,8 @@ import { splitByChunk } from "../util/splitByChunk";
 import { TransactionDataByDigest, isArrayOfTransactionDataByDigest } from "./typeguards/txTypeguard";
 import { aggregateTxsByOwner } from "./utils/aggregateAmountByOwner";
 import { printMissingTransactions } from "./utils/printMissingTransactions";
-import { PRESALE_AMOUNT_IN_CHAN_RAW } from "../config/config";
 import { VestingClient } from "../vesting/VestingClient";
+import { PRESALE_AMOUNT_IN_CHAN_RAW } from "../config/consts";
 
 /**
  * Service class for handling helius-related calls.

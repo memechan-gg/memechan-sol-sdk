@@ -1,6 +1,6 @@
 import { ComputeBudgetProgram, PublicKey, Transaction, TransactionInstruction } from "@solana/web3.js";
-import { COMPUTE_UNIT_PRICE, MAX_TRANSACTION_SIZE } from "../config/config";
 import { getTxSize } from "../util/get-tx-size";
+import { COMPUTE_UNIT_PRICE, MAX_TRANSACTION_SIZE } from "../config/consts";
 
 /**
  * Splits an array of instructions into multiple transactions, each with a size

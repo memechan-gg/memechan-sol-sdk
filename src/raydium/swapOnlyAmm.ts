@@ -12,8 +12,8 @@ import {
 import { ComputeBudgetProgram, Connection, Keypair, PublicKey } from "@solana/web3.js";
 import { formatAmmKeysById } from "./formatAmmKeysById";
 import { makeTxVersion } from "./config";
-import { COMPUTE_UNIT_PRICE } from "../config/config";
 import { buildAndSendTx, getWalletTokenAccount } from "../util";
+import { COMPUTE_UNIT_PRICE } from "../config/consts";
 
 export type WalletTokenAccounts = Awaited<ReturnType<typeof getWalletTokenAccount>>;
 export type SawpOnlyAmmInputInfo = {

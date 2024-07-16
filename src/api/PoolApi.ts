@@ -1,4 +1,3 @@
-import { BE_URL } from "../config/config";
 import { jsonFetch } from "../util/fetch";
 import { SolanaLivePool, SolanaSeedPool, SolanaStakingPoolData } from "./schemas/pools-schema";
 import { QueryAllLivePoolsResponse, QueryAllSeedPoolsResponse, QueryAllStakingPoolsResponse } from "./types";
@@ -9,9 +8,9 @@ import { QueryAllLivePoolsResponse, QueryAllSeedPoolsResponse, QueryAllStakingPo
 export class PoolAPI {
   /**
    * Constructs a new PoolAPI instance.
-   * @param {string} url - The base URL for the backend service, defaults to BE_URL.
+   * @param {string} url - The base URL for the backend service.
    */
-  constructor(private url = BE_URL) {}
+  constructor(private url: string) {}
 
   /**
    * Retrieves all seed pools with optional pagination.

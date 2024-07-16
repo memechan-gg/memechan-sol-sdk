@@ -9,7 +9,6 @@ import {
 } from "@solana/web3.js";
 import BigNumber from "bignumber.js";
 import { MemechanClient } from "../MemechanClient";
-import { MEMECHAN_MEME_TOKEN_DECIMALS, MEMECHAN_PROGRAM_ID } from "../config/config";
 import { MemeTicket, MemeTicketFields } from "../schema/codegen/accounts";
 import { MemechanSol } from "../schema/types/memechan_sol";
 import {
@@ -22,6 +21,8 @@ import {
   StakingMerge,
 } from "./types";
 import { getOptimizedTransactions } from "./utils";
+import { getConfig } from "../config/config";
+import { MEMECHAN_MEME_TOKEN_DECIMALS } from "../config/consts";
 
 export class MemeTicketClient {
   public constructor(
@@ -54,7 +55,7 @@ export class MemeTicketClient {
     return ticketsList;
   }
 
-  public static getMemeTicketPDA({
+  public static async getMemeTicketPDA({
     ticketNumber,
     poolId,
     userId,
@@ -62,12 +63,13 @@ export class MemeTicketClient {
     ticketNumber: number;
     poolId: PublicKey;
     userId: PublicKey;
-  }): PublicKey {
+  }): Promise<PublicKey> {
     // 8 bytes array
     const dv = new DataView(new ArrayBuffer(8), 0);
     // set u64 in little endian format
     dv.setBigUint64(0, BigInt(ticketNumber), true);
 
+    const { MEMECHAN_PROGRAM_ID } = await getConfig();
     // find pda
     const pda = PublicKey.findProgramAddressSync(
       [poolId.toBytes(), userId.toBytes(), new Uint8Array(dv.buffer)],

@@ -24,8 +24,8 @@ import {
   TransactionInstruction,
 } from "@solana/web3.js";
 import BN from "bn.js";
-import { COMPUTE_UNIT_PRICE } from "../config/config";
 import { sha256 } from "@noble/hashes/sha256";
+import { COMPUTE_UNIT_PRICE } from "../config/consts";
 
 function accountFlagsLayout(property = "accountFlags") {
   const ACCOUNT_FLAGS_LAYOUT = new WideBits(property);

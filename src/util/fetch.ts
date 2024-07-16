@@ -1,5 +1,5 @@
 import { IAMCredentials } from "../api/auth/Auth";
-import { BE_REGION } from "../config/config";
+import { getConfig } from "../config/config";
 import { createSignedFetcher } from "./sigv4";
 
 export const jsonFetch = async (
@@ -54,6 +54,7 @@ export const signedJsonFetch = async (
   },
 ) => {
   const { method, body } = init || {};
+  const { BE_REGION } = await getConfig();
   const signedFetch = createSignedFetcher({ service: "execute-api", region: BE_REGION, credentials });
   const r = await signedFetch(input, {
     method,

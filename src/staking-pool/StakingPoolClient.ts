@@ -11,7 +11,6 @@ import BigNumber from "bignumber.js";
 import BN from "bn.js";
 import { MemechanClient } from "../MemechanClient";
 import { BoundPoolClient } from "../bound-pool/BoundPoolClient";
-import { MAX_MEME_TOKENS, MEMECHAN_PROGRAM_ID, MEME_TOKEN_DECIMALS } from "../config/config";
 import { MemeTicketClient } from "../memeticket/MemeTicketClient";
 import { getOptimizedTransactions } from "../memeticket/utils";
 import { formatAmmKeysById } from "../raydium/formatAmmKeysById";
@@ -35,6 +34,8 @@ import {
 import { addUnwrapSOLInstructionIfNativeMint } from "../util/addUnwrapSOLInstructionIfNativeMint";
 import { getTokenInfoByMint } from "../config/helpers";
 import { TokenInfo } from "../config/types";
+import { MAX_MEME_TOKENS, MEME_TOKEN_DECIMALS } from "../config/consts";
+import { getConfig } from "../config/config";
 
 export class StakingPoolClient {
   constructor(
@@ -663,6 +664,7 @@ export class StakingPoolClient {
     connection: Connection;
     memeMintPubkey: PublicKey;
   }): Promise<boolean> {
+    const { MEMECHAN_PROGRAM_ID } = await getConfig();
     const memechanProgramPubkey = new PublicKey(MEMECHAN_PROGRAM_ID);
     const stakingPda = BoundPoolClient.findStakingPda(memeMintPubkey, memechanProgramPubkey);
     const stakingInfo = await StakingPool.fetch(connection, stakingPda);

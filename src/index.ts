@@ -62,7 +62,6 @@ export * as codegenTypesV2 from "./schema/v2/v2";
 
 // Utils
 export * from "./common/helpers";
-export * from "./util/getRandomRpcEndpoint";
 export * from "./util/wallet/NoWalletAdapter";
 export * from "./util/signMessage";
 export * from "./util/index";

@@ -9,7 +9,6 @@ import {
 } from "@solana/web3.js";
 import BigNumber from "bignumber.js";
 import { MemechanClientV2 } from "../MemechanClientV2";
-import { MEMECHAN_MEME_TOKEN_DECIMALS, MEMECHAN_PROGRAM_ID_V2 } from "../config/config";
 import { MemeTicket, MemeTicketFields } from "../schema/v2/codegen/accounts";
 import { MemechanSol } from "../schema/v2/types/memechan_sol";
 import {
@@ -22,6 +21,8 @@ import {
   StakingMerge,
 } from "./types";
 import { getOptimizedTransactions } from "./utils";
+import { getConfig } from "../config/config";
+import { MEMECHAN_MEME_TOKEN_DECIMALS } from "../config/consts";
 
 export class MemeTicketClientV2 {
   public constructor(
@@ -42,19 +43,20 @@ export class MemeTicketClientV2 {
     return await program.account.memeTicket.all();
   }
 
-  public static getFirstHunderTicketsPubkeys({ userId, poolId }: { userId: PublicKey; poolId: PublicKey }) {
-    const ticketsList = new Array(100).fill(undefined).map((el, i) =>
-      MemeTicketClientV2.getMemeTicketPDA({
-        userId,
-        poolId,
-        ticketNumber: i + MemeTicketClientV2.TICKET_NUMBER_START,
-      }),
+  public static async getFirstHunderTicketsPubkeys({ userId, poolId }: { userId: PublicKey; poolId: PublicKey }) {
+    const ticketsList = new Array(100).fill(undefined).map(
+      async (el, i) =>
+        await MemeTicketClientV2.getMemeTicketPDA({
+          userId,
+          poolId,
+          ticketNumber: i + MemeTicketClientV2.TICKET_NUMBER_START,
+        }),
     );
 
     return ticketsList;
   }
 
-  public static getMemeTicketPDA({
+  public static async getMemeTicketPDA({
     ticketNumber,
     poolId,
     userId,
@@ -62,12 +64,13 @@ export class MemeTicketClientV2 {
     ticketNumber: number;
     poolId: PublicKey;
     userId: PublicKey;
-  }): PublicKey {
+  }): Promise<PublicKey> {
     // 8 bytes array
     const dv = new DataView(new ArrayBuffer(8), 0);
     // set u64 in little endian format
     dv.setBigUint64(0, BigInt(ticketNumber), true);
 
+    const { MEMECHAN_PROGRAM_ID_V2 } = await getConfig();
     // find pda
     const pda = PublicKey.findProgramAddressSync(
       [poolId.toBytes(), userId.toBytes(), new Uint8Array(dv.buffer)],
@@ -221,7 +224,7 @@ export class MemeTicketClientV2 {
     user: PublicKey,
   ): Promise<ReturnType<typeof MemeTicketClientV2.fetchTicketsByIds>> {
     // TODO: Iterate until we'll not reach empty tickets
-    const ticketsList = MemeTicketClientV2.getFirstHunderTicketsPubkeys({ userId: user, poolId: pool });
+    const ticketsList = await MemeTicketClientV2.getFirstHunderTicketsPubkeys({ userId: user, poolId: pool });
     const ticketsIdsList = ticketsList.map((ticket) => ticket.toString());
     const fetchedTickets = await MemeTicketClientV2.fetchTicketsByIds(ticketsIdsList, client.connection);
 

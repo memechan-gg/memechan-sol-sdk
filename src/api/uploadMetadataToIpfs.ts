@@ -1,3 +1,4 @@
+import { getConfig } from "../config/config";
 import { TokenAPI } from "./TokenAPI";
 import { TokenMetadata } from "./types";
 
@@ -6,7 +7,8 @@ export async function uploadMetadataToIpfs(metadata: TokenMetadata): Promise<str
   const fileName = "metadata.json";
   const metadataFile = new File([metadataBlob], fileName);
 
-  const tokenApi = new TokenAPI();
+  const { BE_URL } = await getConfig();
+  const tokenApi = new TokenAPI(BE_URL);
   const fileUploadResult = await tokenApi.uploadFile(metadataFile);
 
   // pump.fun uses this gateway

@@ -1,7 +1,6 @@
 import { ApiPoolInfoV4, Liquidity, Percent, Token, TokenAmount, jsonInfo2PoolKeys } from "@raydium-io/raydium-sdk";
 import { AccountInfo, Connection, PublicKey } from "@solana/web3.js";
 import BigNumber from "bignumber.js";
-import { MEMECHAN_MEME_TOKEN_DECIMALS } from "../config/config";
 import { makeTxVersion } from "../raydium/config";
 import { formatAmmKeysById } from "../raydium/formatAmmKeysById";
 import {
@@ -17,6 +16,7 @@ import { getMultipleTokenBalances } from "../util/getMultipleTokenBalances";
 import { getTokenInfoByMint } from "../config/helpers";
 import { TokenInfo } from "../config/types";
 import { formatAmmKeysByAccountInfo } from "../raydium/formatAmmKeysByAccountInfo";
+import { MEMECHAN_MEME_TOKEN_DECIMALS } from "../config/consts";
 
 export class LivePoolClient {
   private constructor(
@@ -25,8 +25,8 @@ export class LivePoolClient {
     public client: MemechanClient,
   ) {}
 
-  public getTokenInfo(): TokenInfo {
-    return getTokenInfoByMint(new PublicKey(this.ammPoolInfo.quoteMint));
+  public async getTokenInfo(): Promise<TokenInfo> {
+    return await getTokenInfoByMint(new PublicKey(this.ammPoolInfo.quoteMint));
   }
 
   public static async fromAmmId(ammId: PublicKey, client: MemechanClient): Promise<LivePoolClient> {
@@ -67,7 +67,7 @@ export class LivePoolClient {
 
     const [baseReserve, quoteReserve] = await getReserveBalances(connection, [poolKeys.baseVault, poolKeys.quoteVault]);
 
-    const quoteTokenInfo = getTokenInfoByMint(poolKeys.quoteMint);
+    const quoteTokenInfo = await getTokenInfoByMint(poolKeys.quoteMint);
     const quoteAmountIn = new TokenAmount(quoteTokenInfo, amountIn, false);
 
     const { minAmountOut } = Liquidity.computeAmountOut({
@@ -166,7 +166,7 @@ export class LivePoolClient {
 
     const [baseReserve, quoteReserve] = await getReserveBalances(connection, [poolKeys.baseVault, poolKeys.quoteVault]);
 
-    const quoteTokenInfo = getTokenInfoByMint(poolKeys.quoteMint);
+    const quoteTokenInfo = await getTokenInfoByMint(poolKeys.quoteMint);
 
     const { minAmountOut } = Liquidity.computeAmountOut({
       poolKeys: poolKeys,
@@ -253,7 +253,7 @@ export class LivePoolClient {
     const targetPoolInfo = await formatAmmKeysById(poolAddress, connection);
     const poolKeys = jsonInfo2PoolKeys(targetPoolInfo);
 
-    const quoteTokenInfo = getTokenInfoByMint(poolKeys.quoteMint);
+    const quoteTokenInfo = await getTokenInfoByMint(poolKeys.quoteMint);
     const quoteAmountIn = new TokenAmount(quoteTokenInfo, 1000, false);
     const { TOKEN_PROGRAM_ID } = await import("@solana/spl-token");
     const tokenOut = new Token(TOKEN_PROGRAM_ID, poolKeys.baseMint, MEMECHAN_MEME_TOKEN_DECIMALS);
@@ -286,7 +286,7 @@ export class LivePoolClient {
 
   public static async getQuoteTokenDisplayName(ammId: PublicKey, client: MemechanClient) {
     const pool = await LivePoolClient.fromAmmId(ammId, client);
-    const quoteToken = getTokenInfoByMint(new PublicKey(pool.ammPoolInfo.quoteMint));
+    const quoteToken = await getTokenInfoByMint(new PublicKey(pool.ammPoolInfo.quoteMint));
     return quoteToken.displayName;
   }
 

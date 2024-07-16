@@ -1,5 +1,4 @@
 import { Auth } from "./auth/Auth";
-import { BE_URL } from "../config/config";
 import { jsonFetch, signedJsonFetch, unsignedMultipartRequest } from "../util/fetch";
 import {
   TokenStatus,
@@ -29,7 +28,7 @@ export class TokenAPI {
    * Constructs a new CoinService instance.
    * @param {string} url - The base URL for the backend service, defaults to BE_URL.
    */
-  constructor(private url = BE_URL) {}
+  constructor(private url: string) {}
 
   /**
    * Fetches data about a specific coin.

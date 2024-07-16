@@ -55,18 +55,6 @@ import {
 } from "./types";
 
 import { findProgramAddress, sleep } from "../common/helpers";
-import {
-  ADMIN_PUB_KEY,
-  BOUND_POOL_FEE_WALLET,
-  BOUND_POOL_VESTING_PERIOD,
-  COMPUTE_UNIT_PRICE,
-  DEFAULT_MAX_M_V2,
-  FULL_MEME_AMOUNT_CONVERTED_V2,
-  MAX_TICKET_TOKENS_V2,
-  MEMECHAN_MEME_TOKEN_DECIMALS,
-  SWAP_FEE_WALLET,
-  TOKEN_INFOS,
-} from "../config/config";
 import { getCreateMintWithPriorityTransaction } from "../token/getCreateMintWithPriorityTransaction";
 import { NewBPInstructionParsed } from "../tx-parsing/v2/parsers/bonding-pool-creation-parser";
 import { getTxSize } from "../util/get-tx-size";
@@ -96,6 +84,14 @@ import { StakingPoolClientV2 } from "../staking-pool/StakingPoolClientV2";
 import { MemechanSol } from "../schema/v2/v2";
 import { AuthorityType, createSetAuthorityInstruction } from "@solana/spl-token";
 import { ensureAssociatedTokenAccountWithIX } from "../util/ensureAssociatedTokenAccountWithIX";
+import {
+  MEMECHAN_MEME_TOKEN_DECIMALS,
+  COMPUTE_UNIT_PRICE,
+  MAX_TICKET_TOKENS_V2,
+  DEFAULT_MAX_M_V2,
+  FULL_MEME_AMOUNT_CONVERTED_V2,
+} from "../config/consts";
+import { getConfig } from "../config/config";
 
 export class BoundPoolClientV2 {
   private constructor(
@@ -104,7 +100,7 @@ export class BoundPoolClientV2 {
     public memeVault: PublicKey,
     public quoteVault: PublicKey,
     public memeTokenMint: PublicKey,
-    public quoteTokenMint: PublicKey = TOKEN_INFOS.WSOL.mint,
+    public quoteTokenMint: PublicKey,
     public memeToken: Token,
     public poolObjectData: BoundPool,
   ) {
@@ -268,6 +264,7 @@ export class BoundPoolClientV2 {
 
     let feeQuoteVault: PublicKey | undefined = feeQuoteVaultPk;
 
+    const { BOUND_POOL_FEE_WALLET, BOUND_POOL_VESTING_PERIOD } = await getConfig();
     // If `feeQuoteVaultPk` is not passed in args, we need to find out, whether a quote account for an admin
     // already exists
     if (!feeQuoteVault) {
@@ -296,7 +293,7 @@ export class BoundPoolClientV2 {
       transaction: createPoolTransaction,
     });
 
-    const quoteInfo = getTokenInfoByMint(quoteToken.mint);
+    const quoteInfo = await getTokenInfoByMint(quoteToken.mint);
     const { TOKEN_PROGRAM_ID } = await import("@solana/spl-token");
     const createPoolInstruction = await memechanProgram.methods
       .newPool(airdroppedTokens, BOUND_POOL_VESTING_PERIOD)
@@ -357,7 +354,7 @@ export class BoundPoolClientV2 {
 
   public static async new(args: BoundPoolArgsV2): Promise<BoundPoolClientV2> {
     const { payer } = args;
-    const tokenInfo = getTokenInfoByMint(args.quoteToken.mint);
+    const tokenInfo = await getTokenInfoByMint(args.quoteToken.mint);
     return await this.newWithBuyTx({
       ...args,
       targetConfig: tokenInfo.targetConfigV2,
@@ -522,7 +519,7 @@ export class BoundPoolClientV2 {
     const solIn = input.quoteAmountIn;
     const memeOut = input.memeTokensOut;
 
-    const memeTicketPublicKey = MemeTicketClientV2.getMemeTicketPDA({
+    const memeTicketPublicKey = await MemeTicketClientV2.getMemeTicketPDA({
       ticketNumber: memeTicketNumber,
       poolId: pool,
       userId: user.publicKey,
@@ -607,7 +604,7 @@ export class BoundPoolClientV2 {
     const poolSignerPda = this.findSignerPda();
     const ticketNumberBN = new BN(memeTicketNumber);
 
-    const memeTicketPublicKey = MemeTicketClientV2.getMemeTicketPDA({
+    const memeTicketPublicKey = await MemeTicketClientV2.getMemeTicketPDA({
       ticketNumber: memeTicketNumber,
       poolId: pool,
       userId: user,
@@ -615,7 +612,7 @@ export class BoundPoolClientV2 {
     const connection = this.client.connection;
 
     // input
-    const quoteInfo = getTokenInfoByMint(this.quoteTokenMint);
+    const quoteInfo = await getTokenInfoByMint(this.quoteTokenMint);
 
     const inputAmountWithDecimals = normalizeInputCoinAmount(inputAmount, quoteInfo.decimals);
     const inputAmountBN = new BN(inputAmountWithDecimals.toString());
@@ -697,14 +694,14 @@ export class BoundPoolClientV2 {
 
     const pool = boundPoolId;
     const ticketNumberBN = new BN(memeTicketNumber);
-    const memeTicketPublicKey = MemeTicketClientV2.getMemeTicketPDA({
+    const memeTicketPublicKey = await MemeTicketClientV2.getMemeTicketPDA({
       ticketNumber: memeTicketNumber,
       poolId: pool,
       userId: user,
     });
 
     // input
-    const quoteInfo = getTokenInfoByMint(quoteMint);
+    const quoteInfo = await getTokenInfoByMint(quoteMint);
     const inputAmountWithDecimals = normalizeInputCoinAmount(inputAmount, quoteInfo.decimals);
     const inputAmountBN = new BN(inputAmountWithDecimals.toString());
 
@@ -757,7 +754,7 @@ export class BoundPoolClientV2 {
     const pool = this.id;
 
     // input & output
-    const quoteInfo = getTokenInfoByMint(this.quoteTokenMint);
+    const quoteInfo = await getTokenInfoByMint(this.quoteTokenMint);
     const inputAmountWithDecimals = normalizeInputCoinAmount(inputAmount, quoteInfo.decimals);
     const inputAmountBN = new BN(inputAmountWithDecimals.toString());
     const minOutputBN = new BN(0);
@@ -846,7 +843,7 @@ export class BoundPoolClientV2 {
     const inputAmountBN = new BN(inputAmountWithDecimals.toString());
     const inputAmountBignumber = new BigNumber(inputAmountWithDecimals.toString());
 
-    const quoteInfo = getTokenInfoByMint(this.quoteTokenMint);
+    const quoteInfo = await getTokenInfoByMint(this.quoteTokenMint);
 
     // output
     // Note: Be aware, we relay on the fact that `MEMECHAN_QUOTE_TOKEN_DECIMALS`
@@ -944,7 +941,7 @@ export class BoundPoolClientV2 {
 
     const { swapOutAmount } = extractSwapDataFromSimulation(result);
 
-    const quoteInfo = getTokenInfoByMint(this.quoteTokenMint);
+    const quoteInfo = await getTokenInfoByMint(this.quoteTokenMint);
 
     // output
     // Note: Be aware, we relay on the fact that `MEMECOIN_DECIMALS` would be always set same for all memecoins
@@ -1035,6 +1032,7 @@ export class BoundPoolClientV2 {
       transaction: tx,
     });
 
+    const { TOKEN_INFOS } = await getConfig();
     const stakingChanVault = await ensureAssociatedTokenAccountWithIdempotentIX({
       connection: this.client.connection,
       payer: payer.publicKey,
@@ -1281,6 +1279,7 @@ export class BoundPoolClientV2 {
     });
     console.log("transferCreatorFundSignature", transferCreatorFundTx);
 
+    const { TOKEN_INFOS } = await getConfig();
     const admin = user.publicKey;
     let slot = await connection.getSlot("confirmed");
     const [createLUTix, LUTaddr] = AddressLookupTableProgram.createLookupTable({
@@ -1505,6 +1504,8 @@ export class BoundPoolClientV2 {
 
     const staking = await client.memechanProgram.account.stakingPool.fetch(stakingId);
 
+    const { TOKEN_INFOS, SWAP_FEE_WALLET } = await getConfig();
+
     const swapFeeTokenAccountTx = new Transaction();
     const feeQuoteVault = await ensureAssociatedTokenAccountWithIdempotentIX({
       connection: connection,
@@ -1559,7 +1560,7 @@ export class BoundPoolClientV2 {
 
         feeQuoteVault: feeQuoteVault,
         chanSwap,
-        chanSwapSignerPda: ChanSwapClient.chanSwapSigner(),
+        chanSwapSignerPda: await ChanSwapClient.chanSwapSigner(),
         chanSwapVault: fetchedChanSwap.chanVault,
 
         signer: user.publicKey,
@@ -1601,8 +1602,8 @@ export class BoundPoolClientV2 {
         SYSVAR_RENT_PUBKEY,
         TOKEN_INFOS.WSOL.mint,
         TOKEN_INFOS.CHAN.mint,
-        ChanSwapClient.chanSwapId(),
-        ChanSwapClient.chanSwapSigner(),
+        await ChanSwapClient.chanSwapId(),
+        await ChanSwapClient.chanSwapSigner(),
       ],
     });
 
@@ -1821,8 +1822,8 @@ export class BoundPoolClientV2 {
     return BoundPoolClientV2.getHoldersList(this.id, this.client);
   }
 
-  public getTokenInfo(): TokenInfo {
-    return getTokenInfoByMint(this.quoteTokenMint);
+  public async getTokenInfo(): Promise<TokenInfo> {
+    return await getTokenInfoByMint(this.quoteTokenMint);
   }
 
   public getMaxTicketTokens() {
@@ -1851,6 +1852,8 @@ export class BoundPoolClientV2 {
     // can be null if called after go live
     const pool = await CodegenBoundPool.fetch(client.connection, poolId);
 
+    const { BOUND_POOL_FEE_WALLET } = await getConfig();
+
     if (pool) {
       // add bound pool as holder
       if (!uniqueHolders.has(BOUND_POOL_FEE_WALLET)) {
@@ -1868,7 +1871,7 @@ export class BoundPoolClientV2 {
 
   public static async getQuoteTokenDisplayName(poolAddress: PublicKey, connection: Connection) {
     const pool = await BoundPoolClientV2.fetch2(connection, poolAddress);
-    const quoteToken = getTokenInfoByMint(pool.quoteReserve.mint);
+    const quoteToken = await getTokenInfoByMint(pool.quoteReserve.mint);
     return quoteToken.displayName;
   }
 
@@ -1893,7 +1896,7 @@ export class BoundPoolClientV2 {
     const memeBalance = new BigNumber(boundPoolInfo.memeReserve.tokens.toString());
     const quoteBalance = new BigNumber(boundPoolInfo.quoteReserve.tokens.toString());
 
-    const quoteInfo = getTokenInfoByMint(boundPoolInfo.quoteReserve.mint);
+    const quoteInfo = await getTokenInfoByMint(boundPoolInfo.quoteReserve.mint);
     const quoteBalanceConverted = quoteBalance.div(10 ** quoteInfo.decimals);
     const soldMemeConverted = new BigNumber(DEFAULT_MAX_M_V2)
       .minus(memeBalance)
@@ -1938,12 +1941,14 @@ export class BoundPoolClientV2 {
       discord: "",
     };
 
-    const quoteInfo = getTokenInfoByMint(boundPoolInfo.quoteReserve.mint);
+    const quoteInfo = await getTokenInfoByMint(boundPoolInfo.quoteReserve.mint);
     const quoteBalanceString = "0.000001";
     const quoteBalance = new BigNumber(quoteBalanceString);
     const quoteBalanceConverted = quoteBalance.div(10 ** quoteInfo.decimals);
 
     console.log("quoteBalanceConverted.toFixed(): " + quoteBalanceConverted.toFixed());
+
+    const { ADMIN_PUB_KEY, TOKEN_INFOS } = await getConfig();
 
     const soldMemeSimulated = await BoundPoolClientV2.getOutputAmountForNewPoolWithBuyMemeTx({
       admin: ADMIN_PUB_KEY,
@@ -1985,6 +1990,8 @@ export class BoundPoolClientV2 {
     const { TOKEN_PROGRAM_ID, getAssociatedTokenAddressSync, ASSOCIATED_TOKEN_PROGRAM_ID } = await import(
       "@solana/spl-token"
     );
+
+    const { TOKEN_INFOS } = await getConfig();
 
     // this should already exist, no need to create
     const fromTokenAccount = getAssociatedTokenAddressSync(

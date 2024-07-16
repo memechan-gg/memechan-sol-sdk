@@ -1,9 +1,8 @@
-import { BE_URL } from "../config/config";
 import { jsonFetch } from "../util/fetch";
 import { GetBarsResponse, PriceResponse, RequestChart, RequestPrice, RequestUpdatePrice } from "./schemas/chart-schema";
 
 export class ChartApi {
-  constructor(private url = BE_URL) {}
+  constructor(private url: string) {}
 
   getChart(params: RequestChart): Promise<GetBarsResponse> {
     const queryParams = new URLSearchParams(params as Record<string, string>);

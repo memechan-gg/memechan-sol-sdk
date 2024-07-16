@@ -1,6 +1,5 @@
 /* eslint-disable require-jsdoc */
 import { Auth } from "../auth/Auth";
-import { BE_URL } from "../../config/config";
 import { jsonFetch, signedJsonFetch } from "../../util/fetch";
 import {
   CreateThreadReplyBody,
@@ -23,7 +22,7 @@ import {
 } from "./schemas";
 
 export class SocialAPI {
-  constructor(private url = BE_URL) {}
+  constructor(private url: string) {}
 
   getThreads(params: QueryThreadsRequestParams): Promise<ThreadsResult> {
     const queryParams = new URLSearchParams(queryThreadsRequestParamsSchema.parse(params) as Record<string, string>);

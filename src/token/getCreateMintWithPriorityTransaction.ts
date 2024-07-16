@@ -1,5 +1,5 @@
 import { ComputeBudgetProgram, Connection, Keypair, PublicKey, SystemProgram, Transaction } from "@solana/web3.js";
-import { COMPUTE_UNIT_PRICE } from "../config/config";
+import { COMPUTE_UNIT_PRICE } from "../config/consts";
 
 /**
  * Get a transaction for creating and initializing a new mint

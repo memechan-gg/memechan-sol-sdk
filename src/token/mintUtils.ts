@@ -1,5 +1,5 @@
 import { PublicKey, Connection, Keypair } from "@solana/web3.js";
-import { MEMECHAN_MEME_TOKEN_DECIMALS } from "../config/config";
+import { MEMECHAN_MEME_TOKEN_DECIMALS } from "../config/consts";
 
 export interface TokenData {
   mint: PublicKey;

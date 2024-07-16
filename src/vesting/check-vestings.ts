@@ -1,8 +1,7 @@
 import { Program } from "@coral-xyz/anchor";
-import { VESTING_PROGRAM_ID } from "../config/config";
 import { IDL, Lockup } from "./schema/types/lockup";
-import { client } from "../../examples/common";
 import { TokenAccountRaw } from "../helius-api/types";
+import { VESTING_PROGRAM_ID } from "../config/consts";
 
 export interface UserAmount {
   user: string;
@@ -20,7 +19,6 @@ export async function checkVesting(userAmountsList: TokenAccountRaw[]): Promise<
   userAmountsList.forEach((e) => foundUsers.set(e.account, false));
 
   const vestingProgram = new Program<Lockup>(IDL, VESTING_PROGRAM_ID);
-  client.connection;
   const vestings = await vestingProgram.account.vesting.all();
 
   const vestingUserAmountList: UserAmount[] = [];

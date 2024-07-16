@@ -1,10 +1,10 @@
 import { PublicKey } from "@solana/web3.js";
 import BN from "bn.js";
 import { TokenAPI } from "../TokenAPI";
-import { BE_URL, MEME_TOKEN_DECIMALS } from "../../config/config";
 import { ConvertedHolderMap, QueryHoldersByTokenAddressResponse } from "../types";
 import BigNumber from "bignumber.js";
 import { StakingPoolClient } from "../../staking-pool/StakingPoolClient";
+import { MEME_TOKEN_DECIMALS } from "../../config/consts";
 
 export class TokenApiHelper {
   /**
@@ -14,10 +14,7 @@ export class TokenApiHelper {
    * @param beUrl The Backend API URL
    * @returns The holders map with the wallet address as the key and MemeTicketFields[] as data
    */
-  public static async getBondingPoolHoldersMap(
-    tokenAddress: PublicKey,
-    beUrl: string = BE_URL,
-  ): Promise<ConvertedHolderMap> {
+  public static async getBondingPoolHoldersMap(tokenAddress: PublicKey, beUrl: string): Promise<ConvertedHolderMap> {
     const tokenService = new TokenAPI(beUrl);
     const holdersFromApi = await tokenService.getHolders({
       tokenAddress: tokenAddress.toBase58(),
@@ -40,7 +37,7 @@ export class TokenApiHelper {
     tokenAddress: PublicKey,
     stakingPoolId: PublicKey,
     memeChanProgramId: PublicKey,
-    beUrl: string = BE_URL,
+    beUrl: string,
   ): Promise<
     [
       { address: string; tokenAmount: BigNumber; tokenAmountInPercentage: BigNumber }[],
