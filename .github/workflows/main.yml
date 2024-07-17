@@ -95,7 +95,6 @@ jobs:
       # Add `test` here if we are good. add back security_audit after meteora dependencies are fixed
     needs: [build,]
     if: |
-      github.event_name == 'workflow_dispatch' ||
       (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
       (github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true)
     steps:
