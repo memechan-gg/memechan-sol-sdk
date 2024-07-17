@@ -226,6 +226,7 @@ export class BoundPoolClientV2 {
 
   public static async getCreateNewBondingPoolAndBuyAndTokenWithBuyMemeTransaction(
     args: GetCreateNewBondingPoolAndTokenWithBuyMemeTransactionArgsV2,
+    isSimulated = false,
   ): Promise<{
     createPoolTransaction: Transaction;
     memeMintKeypair: Keypair;
@@ -335,13 +336,17 @@ export class BoundPoolClientV2 {
     }
 
     const createTokenInstructions = (
-      await getCreateMetadataTransactionV2(client, {
-        payer,
-        mint: memeMint,
-        poolSigner,
-        poolId: id,
-        metadata: tokenMetadata,
-      })
+      await getCreateMetadataTransactionV2(
+        client,
+        {
+          payer,
+          mint: memeMint,
+          poolSigner,
+          poolId: id,
+          metadata: tokenMetadata,
+        },
+        isSimulated,
+      )
     ).instructions;
 
     createPoolTransaction.add(...createTokenInstructions);
@@ -424,10 +429,13 @@ export class BoundPoolClientV2 {
     const { payer, client } = args;
 
     const { createPoolTransaction, memeMintKeypair } =
-      await this.getCreateNewBondingPoolAndBuyAndTokenWithBuyMemeTransaction({
-        ...args,
-        payer: payer.publicKey,
-      });
+      await this.getCreateNewBondingPoolAndBuyAndTokenWithBuyMemeTransaction(
+        {
+          ...args,
+          payer: payer.publicKey,
+        },
+        true,
+      );
 
     const signers = [payer, memeMintKeypair, client.simulationKeypair];
     const result = await client.connection.simulateTransaction(createPoolTransaction, signers, true);
