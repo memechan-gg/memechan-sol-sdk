@@ -8,10 +8,14 @@ import { MemechanClientV2 } from "../MemechanClientV2";
 const TOKEN_METADATA_PROGRAM_ID = new PublicKey("metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s");
 
 export async function createMetadataV2(client: MemechanClientV2, input: CreateMetadataInfo): Promise<string> {
-  const createMetadataTransaction = await getCreateMetadataTransactionV2(client, {
-    ...input,
-    payer: input.payer.publicKey,
-  });
+  const createMetadataTransaction = await getCreateMetadataTransactionV2(
+    client,
+    {
+      ...input,
+      payer: input.payer.publicKey,
+    },
+    false,
+  );
 
   const signature = await sendAndConfirmTransaction(client.connection, createMetadataTransaction, [input.payer], {
     skipPreflight: true,
@@ -26,9 +30,10 @@ export async function createMetadataV2(client: MemechanClientV2, input: CreateMe
 export async function getCreateMetadataTransactionV2(
   client: MemechanClientV2,
   input: Omit<CreateMetadataInfo, "payer"> & { payer: PublicKey },
+  isSimulated: boolean,
 ): Promise<Transaction> {
   const metadata = input.metadata;
-  const metadataUri = await uploadMetadataToIpfs(metadata);
+  const metadataUri = isSimulated ? "" : await uploadMetadataToIpfs(metadata);
   const pda = findMetadataPDA(input.mint);
   const { TOKEN_PROGRAM_ID } = await import("@solana/spl-token");
   // Prepare the transaction to initialize the counter
