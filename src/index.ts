@@ -13,6 +13,9 @@ export * from "./targetconfig/TargetConfigClient";
 export * from "./targetconfig/TargetConfigClientV2";
 export * from "./vesting/VestingClient";
 export * from "./chan-swap/ChanSwapClient";
+// running-line
+export * from "./running-line/runningLineClient";
+export * from "./running-line/types";
 
 // Client types
 export * from "./bound-pool/types";
