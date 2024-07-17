@@ -7,6 +7,9 @@ export class RunningLineClient extends EventEmitter {
   private ws: WebSocket | null = null;
   private pingInterval: NodeJS.Timeout | null = null;
   private seenSignatures: Set<string> = new Set();
+  private reconnectAttempts = 0;
+  private readonly maxReconnectAttempts = 5;
+  private readonly reconnectInterval = 5000;
 
   constructor(private wsUrl: string) {
     super();
@@ -15,8 +18,7 @@ export class RunningLineClient extends EventEmitter {
 
   start() {
     if (!this.ws) {
-      this.ws = new WebSocket(`${this.wsUrl}`);
-      this.setupWebSocket(this.ws);
+      this.connectWebSocket();
       console.log("RunningLineClient started");
     }
   }
@@ -33,6 +35,23 @@ export class RunningLineClient extends EventEmitter {
     }
   }
 
+  private connectWebSocket() {
+    this.ws = new WebSocket(`${this.wsUrl}`);
+    this.setupWebSocket(this.ws);
+  }
+
+  private attemptReconnect() {
+    if (this.reconnectAttempts < this.maxReconnectAttempts) {
+      this.reconnectAttempts++;
+      console.log(`Reconnection attempt ${this.reconnectAttempts}/${this.maxReconnectAttempts}...`);
+      setTimeout(() => {
+        this.connectWebSocket();
+      }, this.reconnectInterval);
+    } else {
+      console.error("Max reconnect attempts reached. Giving up.");
+    }
+  }
+
   private setupWebSocket(ws: WebSocket) {
     ws.on("open", this.handleOpen.bind(this));
     ws.on("message", this.handleMessage.bind(this));
@@ -42,6 +61,7 @@ export class RunningLineClient extends EventEmitter {
 
   private handleOpen() {
     console.log("WebSocket is open");
+    this.reconnectAttempts = 0;
     this.sendLogsSubscribeRequest();
     this.startPing();
   }
@@ -71,6 +91,7 @@ export class RunningLineClient extends EventEmitter {
       this.pingInterval = null;
     }
     this.ws = null;
+    this.attemptReconnect();
   }
 
   private sendLogsSubscribeRequest() {
