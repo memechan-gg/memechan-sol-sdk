@@ -32,7 +32,8 @@ export class MetadataClient {
       return undefined;
     }
 
-    const offchainMetadata = JSON.parse(await offChainMetadataResponse.json()) as OffchainMetadata;
+    console.log("Fetched offchain metadata for", mplMetadata.uri);
+    const offchainMetadata = (await offChainMetadataResponse.json()) as OffchainMetadata;
     if (!offchainMetadata) {
       console.log("Failed to parse offchain metadata for", mplMetadata.uri);
       return undefined;
