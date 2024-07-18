@@ -104,7 +104,7 @@ export class SolanaWsClient extends EventEmitter {
             mentions: [MEMECHAN_PROGRAM_ID_V2],
           },
           {
-            commitment: "finalized",
+            commitment: "commited",
           },
         ],
       };
