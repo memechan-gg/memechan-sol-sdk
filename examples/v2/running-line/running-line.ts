@@ -1,18 +1,19 @@
-import { parseTxV2 } from "../../../src";
-import { RunningLineClient } from "../../../src/running-line/runningLineClient";
+import { SolanaWsClient, RunningLineEventEmitter, RunningLineEventData } from "../../../src";
 import { clientV2, connection } from "../../common";
 
 // yarn tsx examples/v2/running-line/running-line.ts
 (async () => {
-  const runningLineClient = new RunningLineClient(connection.rpcEndpoint.replace("http", "ws"));
-  runningLineClient.on("swapY", async (log) => {
-    // console.log("Event swapY detected:", log);
-    console.log(await parseTxV2(log.value.signature, clientV2));
+  const wsUrl = connection.rpcEndpoint.replace("http", "ws");
+  const solanaWsClient = new SolanaWsClient(wsUrl);
+  const runningLineEventEmitter = new RunningLineEventEmitter(solanaWsClient, clientV2);
+
+  runningLineEventEmitter.on("buy", (event: RunningLineEventData) => {
+    console.log("Buy event detected:", event);
   });
 
-  runningLineClient.on("swapX", async (log) => {
-    // console.log("Event swapX detected:", log);
-    console.log(await parseTxV2(log.value.signature, clientV2));
+  runningLineEventEmitter.on("sell", (event: RunningLineEventData) => {
+    console.log("Sell event detected:", event);
   });
-  runningLineClient.start();
+
+  solanaWsClient.start();
 })();

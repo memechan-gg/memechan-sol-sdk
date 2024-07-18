@@ -13,9 +13,11 @@ export * from "./targetconfig/TargetConfigClient";
 export * from "./targetconfig/TargetConfigClientV2";
 export * from "./vesting/VestingClient";
 export * from "./chan-swap/ChanSwapClient";
+export * from "./token/MetadataClient";
 // running-line
-export * from "./running-line/runningLineClient";
+export * from "./running-line/RunningLineEventsEmitter";
 export * from "./running-line/types";
+export * from "./solana-ws-client/SolanaWsClient";
 
 // Client types
 export * from "./bound-pool/types";
@@ -25,6 +27,7 @@ export * as memeTicketTypesV2 from "./memeticket/typesV2";
 export * from "./staking-pool/types";
 export * from "./targetconfig/types";
 export * from "./vesting/types";
+export * from "./solana-ws-client/types";
 
 // Config
 export * from "./config/config";

@@ -5,7 +5,7 @@ import { MemechanClient } from "../MemechanClient";
 import { MemeTicketClient } from "../memeticket/MemeTicketClient";
 import { BoundPool } from "../schema/codegen/accounts";
 import { BoundPool as BoundPoolV2 } from "../schema/v2/codegen/accounts";
-import { TokenMetadata } from "../api/types";
+import { OffchainMetadata } from "../api/types";
 import { MemechanClientV2 } from "../MemechanClientV2";
 import { TokenInfo } from "../config/types";
 
@@ -159,7 +159,7 @@ export interface BoundPoolArgs {
   payer: Signer;
   client: MemechanClient;
   quoteToken: Token;
-  tokenMetadata: TokenMetadata;
+  tokenMetadata: OffchainMetadata;
 }
 
 export type BoundPoolArgsV2 = Omit<BoundPoolArgs, "client"> & {
@@ -171,7 +171,7 @@ export interface BoundPoolWithBuyMemeArgs {
   payer: Signer;
   client: MemechanClient;
   quoteToken: Token;
-  tokenMetadata: TokenMetadata;
+  tokenMetadata: OffchainMetadata;
   buyMemeTransactionArgs: GetBuyMemeTransactionArgs;
   targetConfig: PublicKey;
 }

@@ -4,7 +4,7 @@ import { SolanaToken, solanaTokenHolderSchema, solanaTokenSchema } from "./schem
 import { solanaLivePool, SolanaSeedPool, solanaSeedPool, solanaStakingPool } from "./schemas/pools-schema";
 import BN from "bn.js";
 
-export interface TokenMetadata {
+export interface OffchainMetadata {
   name: string;
   symbol: string;
   image: string;
@@ -16,7 +16,7 @@ export interface TokenMetadata {
 }
 
 export interface CreateMetadataInfo {
-  metadata: TokenMetadata;
+  metadata: OffchainMetadata;
   payer: Signer;
   mint: PublicKey;
   poolId: PublicKey;
