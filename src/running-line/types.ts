@@ -1,20 +1,9 @@
-export type Log = string;
-
-export interface LogNotification {
-  context: {
-    slot: number;
-  };
-  value: {
-    signature: string;
-    err: null | object;
-    logs: Log[];
-  };
-}
-
-export interface WebSocketMessage {
-  jsonrpc: string;
-  method: string;
-  params: {
-    result: LogNotification;
-  };
+export interface RunningLineEventData {
+  type: "buy" | "sell" | "claim" | "unstake";
+  tokenAddress: string;
+  tokenTicker: string;
+  tokenImage: string;
+  amount: number;
+  amountInUsd: number;
+  sender: string;
 }
