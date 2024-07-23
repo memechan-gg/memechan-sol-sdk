@@ -49,6 +49,10 @@ export class AirdropListManager {
 }
 
 function selectRandomKeys(amount: number, keys: PublicKey[]): PublicKey[] {
+  if (amount >= keys.length) {
+    return keys;
+  }
+
   shuffleArray(keys);
   return keys.slice(0, amount);
 }
