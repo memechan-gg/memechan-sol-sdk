@@ -10,6 +10,8 @@ import { CreateMetadataInstructionParsed, parseCreateMetadataInstruction } from 
 import { InitQuoteAmmInstructionParsed, parseInitQuoteAmmInstruction } from "./parsers/init-quote-amm-parser";
 import { InitChanAmmInstructionParsed, parseInitChanAmmInstruction } from "./parsers/init-chan-amm-parser";
 import { MemechanClientV2 } from "../../MemechanClientV2";
+import { parseUnstakesInstruction, UnstakeInstructionParsed } from "./parsers/unstake-parser";
+import { parseWithdrawFeesInstruction, WithdrawFeesInstructionParsed } from "./parsers/withdraw-fees-parser";
 
 export async function parseTxV2(
   txSig: TransactionSignature,
@@ -23,6 +25,8 @@ export async function parseTxV2(
       | CreateMetadataInstructionParsed
       | InitQuoteAmmInstructionParsed
       | InitChanAmmInstructionParsed
+      | WithdrawFeesInstructionParsed
+      | UnstakeInstructionParsed
     )[]
   | undefined
 > {
@@ -42,6 +46,8 @@ export async function parseTxV2(
     | CreateMetadataInstructionParsed
     | InitQuoteAmmInstructionParsed
     | InitChanAmmInstructionParsed
+    | WithdrawFeesInstructionParsed
+    | UnstakeInstructionParsed
   )[] = [];
 
   for (let i = 0; i < ixs.length; i++) {
@@ -96,6 +102,14 @@ async function ptx(
   if (ixBytesSliced.equals(Buffer.from([0x81, 0x08]))) {
     console.log("parsing ix: InitChanAmm");
     return await parseInitChanAmmInstruction(tx, index);
+  }
+  if (ixBytesSliced.equals(Buffer.from([0x5a, 0x5f]))) {
+    console.log("parsing ix: Unstake");
+    return await parseUnstakesInstruction(tx, index);
+  }
+  if (ixBytesSliced.equals(Buffer.from([0xc6, 0xd4]))) {
+    console.log("parsing ix: WithdrawFees");
+    return await parseWithdrawFeesInstruction(tx, index);
   }
 
   return undefined;

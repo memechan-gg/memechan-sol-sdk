@@ -1,62 +1,55 @@
 import { ParsedTransactionWithMeta, PublicKey } from "@solana/web3.js";
-import { IdlAccounts } from "@coral-xyz/anchor";
-import { MemechanClientV2 } from "../../../MemechanClientV2";
-import { MemechanSol } from "../../../schema/v2/v2";
+import { CHAN_TOKEN_DECIMALS, MEMECHAN_MEME_TOKEN_DECIMALS, TOKEN_INFOS } from "../../../config/config";
 
-type MemeTicket = IdlAccounts<MemechanSol>["memeTicket"];
-
-export type SwapYInstructionParsed = {
+export type UnstakeInstructionParsed = {
   sender: PublicKey;
-  poolAddr: PublicKey;
-  ticket: MemeTicket;
-  quoteAmtSwapped: number;
-  baseAmtReceived: number;
-  poolQuoteVault: number;
-  type: "swap_y";
+  stakingPoolAddress: PublicKey;
+  feesMeme: number;
+  feesQuote: number;
+  feesChan: number;
+  unstakeAmount: number;
+  type: "unstake";
 };
 
-export async function parseSwapYInstruction(
+export async function parseUnstakesInstruction(
   tx: ParsedTransactionWithMeta,
   index: number,
-  client: MemechanClientV2,
-): Promise<SwapYInstructionParsed | undefined> {
+): Promise<UnstakeInstructionParsed | undefined> {
   const ix = tx.transaction.message.instructions[index];
 
   if (!("accounts" in ix)) {
     return undefined;
   }
 
-  const poolAddr = ix.accounts[0];
+  const stakingPoolAddress = ix.accounts[0];
 
-  const preBalances = tx.meta?.preTokenBalances;
-  const postBalances = tx.meta?.postTokenBalances;
-
-  if (!preBalances || !postBalances) {
+  if (!tx.meta?.logMessages) {
     return undefined;
   }
 
-  const ticketAddr = ix.accounts[3];
-  const ticket = await client.memechanProgram.account.memeTicket.fetchNullable(ticketAddr);
+  const feesRegex = /fees_meme: (\d+) fees_quote: (\d+) fees_chan: (\d+)/;
+  for (const log of tx.meta.logMessages) {
+    const match = log.match(feesRegex);
+    if (match) {
+      const feesMeme = parseInt(match[1], 10) / 10 ** MEMECHAN_MEME_TOKEN_DECIMALS; // Convert to decimal with 6 places
+      const feesQuote = parseInt(match[2], 10) / 10 ** TOKEN_INFOS.WSOL.decimals; // Convert to decimal with 9 places // todo make it dynamic
+      const feesChan = parseInt(match[3], 10) / 10 ** CHAN_TOKEN_DECIMALS; // Convert to decimal with 9 places
+      console.log(
+        `fees_meme: ${feesMeme.toFixed(6)}, fees_quote: ${feesQuote.toFixed(9)}, chan: ${feesChan.toFixed(9)}`,
+      );
 
-  if (!ticket) {
-    throw new Error(`[parseSwapYInstruction] No ticket found with ticket address ${ticketAddr}`);
+      const withdrawFeesParsed: UnstakeInstructionParsed = {
+        stakingPoolAddress: stakingPoolAddress,
+        feesChan: feesChan,
+        feesMeme: feesMeme,
+        feesQuote: feesQuote,
+        sender: tx.transaction.message.accountKeys[0].pubkey, // In the `Message` structure, the first account is always the fee-payer
+        type: "unstake",
+      };
+
+      return withdrawFeesParsed;
+    }
   }
 
-  const poolPrevPos = Number(preBalances[0].uiTokenAmount.amount);
-  const poolQuoteVault = Number(postBalances[0].uiTokenAmount.amount);
-  const quoteAmtSwapped = poolQuoteVault - poolPrevPos;
-  const baseAmtReceived = ticket.amount.toNumber();
-
-  const swyParsed: SwapYInstructionParsed = {
-    poolAddr,
-    ticket,
-    baseAmtReceived,
-    poolQuoteVault,
-    quoteAmtSwapped,
-    // eslint-disable-next-line max-len
-    sender: tx.transaction.message.accountKeys[0].pubkey, // In the `Message` structure, the first account is always the fee-payer
-    type: "swap_y",
-  };
-
-  return swyParsed;
+  return undefined;
 }
