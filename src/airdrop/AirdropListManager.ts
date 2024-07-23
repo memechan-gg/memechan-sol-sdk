@@ -36,7 +36,7 @@ export class AirdropListManager {
   }
 
   public selectRandomSagaKeys(amount: number) {
-    return selectRandomKeys(amount, Array.from(this.chanKeys));
+    return selectRandomKeys(amount, Array.from(this.sagaKeys));
   }
 
   public getChanKeys(): PublicKey[] {
