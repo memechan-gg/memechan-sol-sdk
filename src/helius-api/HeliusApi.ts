@@ -5,6 +5,7 @@ import { sleep } from "../common/helpers";
 import {
   AggregatedTxData,
   AggregatedTxDataWithBonus,
+  DASAsset,
   FilteredOutTxsDataByReason,
   ParsedTxData,
   TokenAccountWithBNAmount,
@@ -439,5 +440,48 @@ export class HeliusApi {
       totalUserAllocationsExcludingBonus,
       userAllocations,
     };
+  }
+
+  public async getAssetsByGroup(nftAddress: PublicKey): Promise<DASAsset[]> {
+    let page = 1;
+    const assets: DASAsset[] = [];
+
+    while (true) {
+      const response = await fetch(this.heliusUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          jsonrpc: "2.0",
+          id: "generic-getAssetsByGroup",
+          method: "getAssetsByGroup",
+          params: {
+            groupKey: "collection",
+            groupValue: nftAddress.toBase58(),
+            page, // Starts at 1
+            limit: 1000,
+          },
+        }),
+      });
+      const data = await response.json();
+
+      const isErrorFromHelius = isErrorResult(data);
+      if (isErrorFromHelius) {
+        console.debug("[getAssetsByGroup] Error result from helius, data: ", data);
+        throw new Error("[getAssetsByGroup] Error result from helius api");
+      }
+
+      if (!data.result || data.result.items.length === 0) {
+        console.warn("[getAssetsByGroup] Helius API: No data present");
+        break;
+      }
+
+      assets.push(...data.result.items);
+
+      page++;
+    }
+
+    return assets;
   }
 }
