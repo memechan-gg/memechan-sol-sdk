@@ -296,15 +296,21 @@ export class LivePoolClientV2 {
       splMemeTokenInfo,
       TOKEN_INFOS.WSOL.toSplTokenInfo(),
     );
-    const quoteAmountIn = new BN(1000 * 10 ** TOKEN_INFOS.WSOL.decimals);
+    const quoteAmountIn = new BN(0.001 * 10 ** TOKEN_INFOS.WSOL.decimals);
 
-    const { swapOutAmount } = ammImpl.getSwapQuote(
+    const { swapOutAmount: swapOutAmountBN } = ammImpl.getSwapQuote(
       TOKEN_INFOS.WSOL.mint,
       quoteAmountIn,
       0.0001, // 0.01% slippage
     );
 
-    const memePriceInQuote = new BigNumber(quoteAmountIn.toString()).div(swapOutAmount.toString()).toString();
+    const swapOutAmount = new BigNumber(swapOutAmountBN.toString());
+
+    const memePriceInQuote = new BigNumber(quoteAmountIn.toString())
+      .div(10 ** TOKEN_INFOS.WSOL.decimals)
+      .div(swapOutAmount.div(new BigNumber(10 ** MEMECHAN_MEME_TOKEN_DECIMALS)).toString())
+      .toString();
+
     const memePriceInUsd = new BigNumber(memePriceInQuote).multipliedBy(quotePriceInUsd).toString();
 
     return { priceInQuote: memePriceInQuote, priceInUsd: memePriceInUsd };
