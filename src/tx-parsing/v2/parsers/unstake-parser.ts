@@ -4,10 +4,9 @@ import { CHAN_TOKEN_DECIMALS, MEMECHAN_MEME_TOKEN_DECIMALS, TOKEN_INFOS } from "
 export type UnstakeInstructionParsed = {
   sender: PublicKey;
   stakingPoolAddress: PublicKey;
-  feesMeme: number;
-  feesQuote: number;
-  feesChan: number;
-  unstakeAmount: number;
+  unstakedMeme: number;
+  unstakedQuote: number;
+  unstakedChan: number;
   type: "unstake";
 };
 
@@ -38,16 +37,16 @@ export async function parseUnstakesInstruction(
         `fees_meme: ${feesMeme.toFixed(6)}, fees_quote: ${feesQuote.toFixed(9)}, chan: ${feesChan.toFixed(9)}`,
       );
 
-      const withdrawFeesParsed: UnstakeInstructionParsed = {
+      const unstakeInstructionParsed: UnstakeInstructionParsed = {
         stakingPoolAddress: stakingPoolAddress,
-        feesChan: feesChan,
-        feesMeme: feesMeme,
-        feesQuote: feesQuote,
+        unstakedChan: feesChan,
+        unstakedMeme: feesMeme,
+        unstakedQuote: feesQuote,
         sender: tx.transaction.message.accountKeys[0].pubkey, // In the `Message` structure, the first account is always the fee-payer
         type: "unstake",
       };
 
-      return withdrawFeesParsed;
+      return unstakeInstructionParsed;
     }
   }
 
