@@ -1,7 +1,7 @@
 import { AirdropListManager } from "../../src/airdrop/AirdropListManager";
 import { connection } from "../common";
 
-//yarn tsx examples/airdrop/getFilterSagaAddresses.ts
+// yarn tsx examples/airdrop/getFilterSagaAddresses.ts
 
 async function getFilterSagaAdresses() {
   const apMan = new AirdropListManager();
