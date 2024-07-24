@@ -94,7 +94,7 @@ export interface DASFile {
 
 export type DASFiles = Array<DASFile>;
 
-export type DASLinks = Record<string, any>;
+export type DASLinks = Record<string, unknown>;
 
 export interface DASContent {
   schema: string;

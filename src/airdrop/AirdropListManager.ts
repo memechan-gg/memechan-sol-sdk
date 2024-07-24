@@ -1,8 +1,7 @@
-import { PublicKey } from "@solana/web3.js";
+import { PublicKey, Connection } from "@solana/web3.js";
 import { fetchChanKeys } from "./fetchChanKeys";
 import { fetchSagaKeys } from "./fetchSagaKeys";
 import { filterByActivity } from "./sagaFilter";
-import { Connection } from "@solana/web3.js";
 
 export class AirdropListManager {
   constructor(
@@ -57,7 +56,7 @@ function selectRandomKeys(amount: number, keys: PublicKey[]): PublicKey[] {
   return keys.slice(0, amount);
 }
 
-function shuffleArray(array: any[]) {
+function shuffleArray(array: unknown[]) {
   for (let i = array.length - 1; i > 0; i--) {
     // TODO: probably want to use better PRNG
     const j = Math.floor(Math.random() * i);

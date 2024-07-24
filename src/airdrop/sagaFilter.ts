@@ -1,6 +1,5 @@
-import { PublicKey } from "@solana/web3.js";
+import { PublicKey, Connection } from "@solana/web3.js";
 import { getSignatures } from "../helius-api/utils/getSignatures";
-import { Connection } from "@solana/web3.js";
 import { HeliusApiInstance } from "../../examples/common";
 
 export async function filterByActivity(
@@ -40,7 +39,7 @@ export async function filterByActivity(
           }
         }
       } catch (e) {
-        console.warn(`[filterByActivity] couldn't get parsed transactions`, e);
+        console.warn("[filterByActivity] couldn't get parsed transactions", e);
       }
     }
   }

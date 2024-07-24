@@ -446,7 +446,9 @@ export class HeliusApi {
     let page = 1;
     const assets: DASAsset[] = [];
 
-    while (true) {
+    let moreItemsToLoad = true;
+
+    while (moreItemsToLoad) {
       const response = await fetch(this.heliusUrl, {
         method: "POST",
         headers: {
@@ -474,12 +476,11 @@ export class HeliusApi {
 
       if (!data.result || data.result.items.length === 0) {
         console.warn("[getAssetsByGroup] Helius API: No data present");
-        break;
+        moreItemsToLoad = false; // Update the condition to stop the loop
+      } else {
+        assets.push(...data.result.items);
+        page++;
       }
-
-      assets.push(...data.result.items);
-
-      page++;
     }
 
     return assets;
