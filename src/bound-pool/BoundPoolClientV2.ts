@@ -87,7 +87,7 @@ import { TokenInfo } from "../config/types";
 import { MemechanClientV2 } from "../MemechanClientV2";
 import { MemeTicketClientV2 } from "../memeticket/MemeTicketClientV2";
 import { parseTxV2 } from "../tx-parsing/v2/parsingV2";
-import { getCreateMetadataTransactionV2 } from "../token/createMetadataV2";
+import { findMetadataPDA, getCreateMetadataTransactionV2 } from "../token/createMetadataV2";
 import { ASSOCIATED_PROGRAM_ID } from "@coral-xyz/anchor/dist/cjs/utils/token";
 import { BoundPoolClient } from "./BoundPoolClient";
 import { TargetConfigClientV2 } from "../targetconfig/TargetConfigClientV2";
@@ -1835,6 +1835,14 @@ export class BoundPoolClientV2 {
 
   public getMaxTicketTokens() {
     return MAX_TICKET_TOKENS_V2;
+  }
+
+  public getMetadataAddress() {
+    return BoundPoolClientV2.getMetadataAddress(this.memeTokenMint);
+  }
+
+  public static getMetadataAddress(mint: PublicKey) {
+    return findMetadataPDA(mint);
   }
 
   /**

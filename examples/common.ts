@@ -20,7 +20,7 @@ export const connectionMiddleware = async (
   }
 };
 
-export const connection = new Connection("https://rpc1.memechan.xyz/", {
+export const connection = new Connection("https://georgeanne-ejqyzl-fast-mainnet.helius-rpc.com", {
   httpAgent: IS_TEST_ENV ? false : undefined,
   commitment: "confirmed",
   confirmTransactionInitialTimeout: 30000,

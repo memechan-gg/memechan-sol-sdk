@@ -7,7 +7,7 @@ export const chartsResolutions = z
   .or(z.literal("1h"))
   .or(z.literal("1d"));
 
-export const symbols = z.literal("USD").or(z.literal("SLERF"));
+export const symbols = z.literal("USD").or(z.literal("SLERF")).or(z.literal("SOL"));
 
 export const requestChartSchema = z.object({
   address: z.string(),

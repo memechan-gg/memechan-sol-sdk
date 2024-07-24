@@ -2,30 +2,22 @@ import { TransactionSignature } from "@solana/web3.js";
 import * as base58 from "bs58";
 
 import * as solana from "@solana/web3.js";
-import { NewBPInstructionParsed, parseNewBPInstruction } from "./parsers/bonding-pool-creation-parser";
-import { InitStakingPoolInstructionParsed, parseInitStakingInstruction } from "./parsers/init-staking-parser";
-import { parseSwapXInstruction, SwapXInstructionParsed } from "./parsers/swap-x-parser";
-import { parseSwapYInstruction, SwapYInstructionParsed } from "./parsers/swap-y-parser";
-import { CreateMetadataInstructionParsed, parseCreateMetadataInstruction } from "./parsers/create-metadata-parser";
-import { InitQuoteAmmInstructionParsed, parseInitQuoteAmmInstruction } from "./parsers/init-quote-amm-parser";
-import { InitChanAmmInstructionParsed, parseInitChanAmmInstruction } from "./parsers/init-chan-amm-parser";
+import { parseNewBPInstruction } from "./parsers/bonding-pool-creation-parser";
+import { parseInitStakingInstruction } from "./parsers/init-staking-parser";
+import { parseSwapXInstruction } from "./parsers/swap-x-parser";
+import { parseSwapYInstruction } from "./parsers/swap-y-parser";
+import { parseCreateMetadataInstruction } from "./parsers/create-metadata-parser";
+import { parseInitQuoteAmmInstruction } from "./parsers/init-quote-amm-parser";
+import { parseInitChanAmmInstruction } from "./parsers/init-chan-amm-parser";
 import { MemechanClientV2 } from "../../MemechanClientV2";
+import { parseUnstakesInstruction } from "./parsers/unstake-parser";
+import { parseWithdrawFeesInstruction } from "./parsers/withdraw-fees-parser";
+import { ParsedTransactionDetail } from "./types";
 
 export async function parseTxV2(
   txSig: TransactionSignature,
   client: MemechanClientV2,
-): Promise<
-  | (
-      | NewBPInstructionParsed
-      | SwapYInstructionParsed
-      | SwapXInstructionParsed
-      | InitStakingPoolInstructionParsed
-      | CreateMetadataInstructionParsed
-      | InitQuoteAmmInstructionParsed
-      | InitChanAmmInstructionParsed
-    )[]
-  | undefined
-> {
+): Promise<ParsedTransactionDetail[] | undefined> {
   const pt = await client.connection.getParsedTransaction(txSig, { maxSupportedTransactionVersion: 0 });
   // console.log(pt);
 
@@ -34,15 +26,7 @@ export async function parseTxV2(
     return undefined;
   }
 
-  const res: (
-    | NewBPInstructionParsed
-    | SwapYInstructionParsed
-    | SwapXInstructionParsed
-    | InitStakingPoolInstructionParsed
-    | CreateMetadataInstructionParsed
-    | InitQuoteAmmInstructionParsed
-    | InitChanAmmInstructionParsed
-  )[] = [];
+  const res: ParsedTransactionDetail[] = [];
 
   for (let i = 0; i < ixs.length; i++) {
     const ix = ixs[i];
@@ -96,6 +80,14 @@ async function ptx(
   if (ixBytesSliced.equals(Buffer.from([0x81, 0x08]))) {
     console.log("parsing ix: InitChanAmm");
     return await parseInitChanAmmInstruction(tx, index);
+  }
+  if (ixBytesSliced.equals(Buffer.from([0x5a, 0x5f]))) {
+    console.log("parsing ix: Unstake");
+    return await parseUnstakesInstruction(tx, index);
+  }
+  if (ixBytesSliced.equals(Buffer.from([0xc6, 0xd4]))) {
+    console.log("parsing ix: WithdrawFees");
+    return await parseWithdrawFeesInstruction(tx, index);
   }
 
   return undefined;

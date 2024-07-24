@@ -7,7 +7,7 @@ import BigNumber from "bignumber.js";
 
 dotenv.config();
 
-function getEnvVar<T>(envVar: string, fallback: T): T {
+export function getEnvVar<T>(envVar: string, fallback: T): T {
   const value = process.env[envVar];
   if (value === undefined || value === null) {
     return fallback;
