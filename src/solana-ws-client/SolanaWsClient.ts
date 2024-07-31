@@ -1,11 +1,10 @@
-import WebSocket from "ws";
 import { EventEmitter } from "events";
 import { MEMECHAN_PROGRAM_ID_V2 } from "../config/config";
 import { WebSocketMessage } from "./types";
 
 export class SolanaWsClient extends EventEmitter {
   private ws: WebSocket | null = null;
-  private pingInterval: NodeJS.Timeout | null = null;
+  private pingInterval: number | null = null;
   private reconnectAttempts = 0;
   private readonly maxReconnectAttempts = 5;
   private readonly reconnectInterval = 5000;
@@ -35,7 +34,7 @@ export class SolanaWsClient extends EventEmitter {
   }
 
   private connectWebSocket() {
-    this.ws = new WebSocket(`${this.wsUrl}`);
+    this.ws = new WebSocket(this.wsUrl);
     this.setupWebSocket(this.ws);
   }
 
@@ -52,10 +51,10 @@ export class SolanaWsClient extends EventEmitter {
   }
 
   private setupWebSocket(ws: WebSocket) {
-    ws.on("open", this.handleOpen.bind(this));
-    ws.on("message", this.handleMessage.bind(this));
-    ws.on("error", this.handleError.bind(this));
-    ws.on("close", this.handleClose.bind(this));
+    ws.onopen = this.handleOpen.bind(this);
+    ws.onmessage = this.handleMessage.bind(this);
+    ws.onerror = this.handleError.bind(this);
+    ws.onclose = this.handleClose.bind(this);
   }
 
   private handleOpen() {
@@ -65,8 +64,8 @@ export class SolanaWsClient extends EventEmitter {
     this.startPing();
   }
 
-  private handleMessage(data: WebSocket.Data) {
-    const messageStr = data.toString();
+  private handleMessage(event: MessageEvent) {
+    const messageStr = event.data;
     try {
       const messageObj: WebSocketMessage = JSON.parse(messageStr);
       if (messageObj.method === "logsNotification") {
@@ -79,7 +78,7 @@ export class SolanaWsClient extends EventEmitter {
     }
   }
 
-  private handleError(event: WebSocket.ErrorEvent) {
+  private handleError(event: Event) {
     console.error("WebSocket error:", event);
   }
 
@@ -113,9 +112,9 @@ export class SolanaWsClient extends EventEmitter {
   }
 
   private startPing() {
-    this.pingInterval = setInterval(() => {
+    this.pingInterval = window.setInterval(() => {
       if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-        this.ws.ping();
+        this.ws.send(JSON.stringify({ type: "ping" }));
         console.log("Ping sent");
       }
     }, 30000); // Ping every 30 seconds
