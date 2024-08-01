@@ -51,7 +51,7 @@ export const createNewTokenAndPoolFromBeTx = async () => {
     const createPoolSignature = await connection.sendTransaction(createPoolTransaction);
     console.log("createPoolSignature:", createPoolSignature);
 
-    sleep(15000);
+    await sleep(15000);
 
     const id = BoundPoolClientV2.findBoundPoolPda(
       new PublicKey(res.memeMint),

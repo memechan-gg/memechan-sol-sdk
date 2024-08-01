@@ -41,7 +41,7 @@ export const createNewTokenAndPoolTx = async () => {
     );
     console.log("createPoolSignature:", createPoolSignature);
 
-    sleep(5000);
+    await sleep(5000);
 
     const id = BoundPoolClientV2.findBoundPoolPda(memeMint, TOKEN_INFOS.WSOL.mint, clientV2.memechanProgram.programId);
     console.debug("id: ", id);
