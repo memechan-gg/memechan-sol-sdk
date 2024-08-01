@@ -1,7 +1,7 @@
 import { sendAndConfirmTransaction, PublicKey, Transaction, ComputeBudgetProgram } from "@solana/web3.js";
-import { withdrawAdminFee } from "../../src/schema/codegen/instructions";
-import { BoundPoolClient, COMPUTE_UNIT_PRICE } from "../../src";
-import { client, payer } from "../common";
+import { withdrawAdminFee } from "../../../src/schema/codegen/instructions";
+import { BoundPoolClient, COMPUTE_UNIT_PRICE } from "../../../src";
+import { client, payer } from "../../common";
 
 // BE AWARE! `payer` must be admin keypair for calling this endpoint
 

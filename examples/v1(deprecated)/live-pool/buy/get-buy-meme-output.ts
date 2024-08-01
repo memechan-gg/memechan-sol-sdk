@@ -1,5 +1,5 @@
-import { LivePoolClient } from "../../../src/live-pool/LivePoolClient";
-import { connection } from "../../common";
+import { LivePoolClient } from "../../../../src/live-pool/LivePoolClient";
+import { connection } from "../../../common";
 
 // yarn tsx examples/live-pool/buy/get-buy-meme-output.ts > buy-meme-output.txt 2>&1
 export const getBuyMemeOutput = async () => {

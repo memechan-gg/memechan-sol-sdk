@@ -1,5 +1,5 @@
-import { parseTx } from "../../src/tx-parsing/parsing";
-import { client } from "../common";
+import { parseTx } from "../../../src/tx-parsing/parsing";
+import { client } from "../../common";
 
 // yarn tsx examples/parsing/parse-transaction.ts
 (async () => {

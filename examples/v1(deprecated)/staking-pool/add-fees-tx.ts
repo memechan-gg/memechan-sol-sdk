@@ -1,7 +1,7 @@
 import { PublicKey, sendAndConfirmTransaction } from "@solana/web3.js";
-import { StakingPool as CodegenStakingPool } from "../../src/schema/codegen/accounts";
-import { client, connection, payer } from "../common";
-import { StakingPoolClient } from "../../src";
+import { StakingPool as CodegenStakingPool } from "../../../src/schema/codegen/accounts";
+import { client, connection, payer } from "../../common";
+import { StakingPoolClient } from "../../../src";
 
 // yarn tsx examples/staking-pool/add-fees-tx.ts > add-fees-tx.txt 2>&1
 export const addFeesTx = async () => {

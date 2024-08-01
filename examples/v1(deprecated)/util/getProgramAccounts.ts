@@ -1,4 +1,4 @@
-import { client, connection } from "../common";
+import { client, connection } from "../../common";
 
 // yarn tsx examples/util/getProgramAccounts.ts > getProgramAccounts.txt 2>&1
 export async function getProgramAccounts() {

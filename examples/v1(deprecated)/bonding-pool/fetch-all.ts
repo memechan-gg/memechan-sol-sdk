@@ -1,5 +1,5 @@
-import { BoundPoolClient } from "../../src/bound-pool/BoundPoolClient";
-import { client } from "../common";
+import { BoundPoolClient } from "../../../src/bound-pool/BoundPoolClient";
+import { client } from "../../common";
 
 // yarn tsx examples/bonding-pool/fetch-all.ts > fetch-all-bonding-pool.txt 2>&1
 export async function fetchAll() {

@@ -1,5 +1,5 @@
-import { client } from "../common";
-import { LivePoolClient } from "../../src";
+import { client } from "../../common";
+import { LivePoolClient } from "../../../src";
 import { PublicKey } from "@solana/web3.js";
 
 // yarn tsx examples/live-pool/get-quote-token-display-name.ts > log.txt 2>&1

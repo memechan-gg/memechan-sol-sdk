@@ -1,7 +1,7 @@
 import BigNumber from "bignumber.js";
-import { TargetConfig } from "../../src/schema/codegen/accounts";
-import { connection } from "../common";
-import { TOKEN_INFOS } from "../../src";
+import { TargetConfig } from "../../../src/schema/codegen/accounts";
+import { connection } from "../../common";
+import { TOKEN_INFOS } from "../../../src";
 
 // yarn tsx examples/target-config/fetch-target-config.ts > fetch-target-config.txt 2>&1
 export const fetchTargetConfig = async () => {

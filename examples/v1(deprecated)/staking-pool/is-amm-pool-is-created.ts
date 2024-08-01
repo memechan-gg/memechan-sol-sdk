@@ -1,5 +1,5 @@
-import { client } from "../common";
-import { StakingPoolClient } from "../../src";
+import { client } from "../../common";
+import { StakingPoolClient } from "../../../src";
 import { PublicKey } from "@solana/web3.js";
 
 // yarn tsx examples/staking-pool/is-amm-pool-is-created.ts

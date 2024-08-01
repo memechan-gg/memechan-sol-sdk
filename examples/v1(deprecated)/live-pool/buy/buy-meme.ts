@@ -1,6 +1,6 @@
-import { LivePoolClient } from "../../../src/live-pool/LivePoolClient";
-import { buildAndSendTx, getWalletTokenAccount } from "../../../src/util";
-import { connection, payer } from "../../common";
+import { LivePoolClient } from "../../../../src/live-pool/LivePoolClient";
+import { buildAndSendTx, getWalletTokenAccount } from "../../../../src/util";
+import { connection, payer } from "../../../common";
 
 // yarn tsx examples/live-pool/buy/buy-meme.ts > buy-meme.txt 2>&1
 export const buyMeme = async () => {

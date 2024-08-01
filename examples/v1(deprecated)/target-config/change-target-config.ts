@@ -1,6 +1,6 @@
 import BN from "bn.js";
-import { TOKEN_INFOS, TargetConfigClient } from "../../src";
-import { client, payer } from "../common";
+import { TOKEN_INFOS, TargetConfigClient } from "../../../src";
+import { client, payer } from "../../common";
 import { PublicKey } from "@solana/web3.js";
 
 // yarn tsx examples/target-config/change-target-config.ts > change-target-config.txt 2>&1

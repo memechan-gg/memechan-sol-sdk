@@ -1,6 +1,6 @@
 import { PublicKey } from "@solana/web3.js";
-import { BoundPoolClient } from "../../../src/bound-pool/BoundPoolClient";
-import { client } from "../../common";
+import { BoundPoolClient } from "../../../../src/bound-pool/BoundPoolClient";
+import { client } from "../../../common";
 
 // yarn tsx examples/bonding-pool/trading/get-output-amount-for-sell-meme.ts
 (async () => {

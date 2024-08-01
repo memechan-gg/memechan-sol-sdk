@@ -1,6 +1,6 @@
-import { CHAN_TOKEN, UserVestingData, VestingClient } from "../../src";
-import { connection, payer } from "../common";
-import { readDataFromJsonFile } from "../utils";
+import { CHAN_TOKEN, UserVestingData, VestingClient } from "../../../src";
+import { connection, payer } from "../../common";
+import { readDataFromJsonFile } from "../../utils";
 
 // yarn tsx examples/vesting/create-vestings.ts > create-vestings.txt 2>&1
 const createVesting = async () => {

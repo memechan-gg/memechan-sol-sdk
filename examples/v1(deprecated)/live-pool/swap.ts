@@ -1,8 +1,8 @@
 import { Percent, Token, TokenAmount } from "@raydium-io/raydium-sdk";
-import { MEMECHAN_MEME_TOKEN_DECIMALS, TOKEN_INFOS } from "../../src/config/config";
-import { swapOnlyAmm } from "../../src/raydium/swapOnlyAmm";
-import { client, connection, payer } from "../common";
-import { getWalletTokenAccount } from "../../src/util";
+import { MEMECHAN_MEME_TOKEN_DECIMALS, TOKEN_INFOS } from "../../../src/config/config";
+import { swapOnlyAmm } from "../../../src/raydium/swapOnlyAmm";
+import { client, connection, payer } from "../../common";
+import { getWalletTokenAccount } from "../../../src/util";
 
 // yarn tsx examples/live-pool/swap.ts > swap.txt 2>&1
 export const swap = async () => {

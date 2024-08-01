@@ -1,8 +1,8 @@
 import { PublicKey } from "@solana/web3.js";
-import { StakingPool as CodegenStakingPool } from "../../src/schema/codegen/accounts";
-import { client, connection, payer } from "../common";
+import { StakingPool as CodegenStakingPool } from "../../../src/schema/codegen/accounts";
+import { client, connection, payer } from "../../common";
 import { BN } from "bn.js";
-import { MemeTicketClient, StakingPoolClient } from "../../src";
+import { MemeTicketClient, StakingPoolClient } from "../../../src";
 
 // yarn tsx examples/staking-pool/unstake.ts > unstake.txt 2>&1
 export const unstake = async () => {

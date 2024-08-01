@@ -1,6 +1,6 @@
 import { PublicKey } from "@solana/web3.js";
-import { MemeTicketClient } from "../../src/memeticket/MemeTicketClient";
-import { client, payer } from "../common";
+import { MemeTicketClient } from "../../../src/memeticket/MemeTicketClient";
+import { client, payer } from "../../common";
 
 // yarn tsx examples/meme-ticket/get-all-staked-lp-by-owner-legacy.ts > all-staked-lp.txt 2>&1
 export const getAllStakedLpByOwner = async () => {

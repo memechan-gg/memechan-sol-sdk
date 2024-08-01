@@ -1,6 +1,6 @@
 import { PublicKey } from "@solana/web3.js";
-import { BoundPoolClient } from "../../src/bound-pool/BoundPoolClient";
-import { client } from "../common";
+import { BoundPoolClient } from "../../../src/bound-pool/BoundPoolClient";
+import { client } from "../../common";
 import { BN } from "bn.js";
 
 // yarn tsx examples/bonding-pool/getHoldersMap.ts > getHoldersMap.txt 2>&1

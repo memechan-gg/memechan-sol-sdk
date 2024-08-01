@@ -1,5 +1,5 @@
 // import { PublicKey } from "@solana/web3.js";
-// import { connection } from "../common";
+// import { connection } from "../../common";
 
 // // yarn tsx examples/util/getRecentPrioritizationFees2.ts > getRecentPrioritizationFees2.txt 2>&1
 

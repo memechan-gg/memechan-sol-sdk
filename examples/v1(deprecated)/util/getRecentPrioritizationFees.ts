@@ -1,4 +1,4 @@
-// import { connection } from "../common";
+// import { connection } from "../../common";
 
 // // yarn tsx examples/util/getRecentPrioritizationFees.ts > getRecentPrioritizationFees.txt 2>&1
 // export async function getRecentPrioritizationFees() {

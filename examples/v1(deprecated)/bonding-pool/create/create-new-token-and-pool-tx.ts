@@ -1,8 +1,8 @@
 import { sendAndConfirmTransaction } from "@solana/web3.js";
-import { BoundPoolClient } from "../../../src/bound-pool/BoundPoolClient";
-import { admin, payer, client, DUMMY_TOKEN_METADATA } from "../../common";
-import { getTxSize } from "../../../src/util/get-tx-size";
-import { MemeTicketClient, TOKEN_INFOS, sleep } from "../../../src";
+import { BoundPoolClient } from "../../../../src/bound-pool/BoundPoolClient";
+import { admin, payer, client, DUMMY_TOKEN_METADATA } from "../../../common";
+import { getTxSize } from "../../../../src/util/get-tx-size";
+import { MemeTicketClient, TOKEN_INFOS, sleep } from "../../../../src";
 
 // yarn tsx examples/bonding-pool/create/create-new-token-and-pool-tx.ts > log.txt 2>&1
 export const createNewTokenAndPoolTx = async () => {

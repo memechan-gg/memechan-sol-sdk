@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import BN from "bn.js";
-import { TargetConfigClient, sleep } from "../../src";
-import { TOKEN_INFOS } from "../../src/config/config";
-import { MintUtils } from "../../src/token/mintUtils";
-import { client, payer } from "../common";
+import { TargetConfigClient, sleep } from "../../../src";
+import { TOKEN_INFOS } from "../../../src/config/config";
+import { MintUtils } from "../../../src/token/mintUtils";
+import { client, payer } from "../../common";
 
 // yarn tsx examples/target-config/create-target-config.ts > create-target-config.txt 2>&1
 export const createTargetConfig = async () => {

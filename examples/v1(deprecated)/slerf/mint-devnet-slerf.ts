@@ -1,6 +1,6 @@
-import { client, payer } from "../common";
-import { MintUtils } from "../../src/token/mintUtils";
-import { TOKEN_INFOS } from "../../src";
+import { client, payer } from "../../common";
+import { MintUtils } from "../../../src/token/mintUtils";
+import { TOKEN_INFOS } from "../../../src";
 
 // yarn tsx examples/slerf/mint-devnet-slerf.ts > mint.txt 2>&1
 export const mintSlerf = async () => {

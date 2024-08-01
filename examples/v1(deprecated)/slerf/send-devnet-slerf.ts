@@ -1,7 +1,7 @@
-import { client, payer } from "../common";
-import { MintUtils } from "../../src/token/mintUtils";
+import { client, payer } from "../../common";
+import { MintUtils } from "../../../src/token/mintUtils";
 import { PublicKey, Transaction, sendAndConfirmTransaction } from "@solana/web3.js";
-import { TOKEN_INFOS } from "../../src";
+import { TOKEN_INFOS } from "../../../src";
 
 // yarn tsx examples/slerf/send-devnet-slerf.ts > send-slerf.txt 2>&1
 export const sendSlerf = async () => {
