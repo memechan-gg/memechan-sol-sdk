@@ -1,10 +1,23 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { EventEmitter } from "events";
 import { MEMECHAN_PROGRAM_ID_V2 } from "../config/config";
 import { WebSocketMessage } from "./types";
 
+// Define types for WebSocket and Interval based on environment
+let WebSocketImplementation: typeof WebSocket;
+type IntervalType = ReturnType<typeof setInterval> | null;
+
+if (typeof window === "undefined") {
+  // Running in Node.js environment
+  WebSocketImplementation = require("ws");
+} else {
+  // Running in browser environment
+  WebSocketImplementation = WebSocket;
+}
+
 export class SolanaWsClient extends EventEmitter {
-  private ws: WebSocket | null = null;
-  private pingInterval: number | null = null;
+  private ws: InstanceType<typeof WebSocketImplementation> | null = null;
+  private pingInterval: IntervalType = null;
   private reconnectAttempts = 0;
   private readonly maxReconnectAttempts = 5;
   private readonly reconnectInterval = 5000;
@@ -14,14 +27,14 @@ export class SolanaWsClient extends EventEmitter {
     console.log("SolanaWsClient created. wsUrl:", this.wsUrl);
   }
 
-  start() {
+  start(): void {
     if (!this.ws) {
       this.connectWebSocket();
       console.log("SolanaWsClient started");
     }
   }
 
-  stop() {
+  stop(): void {
     if (this.ws) {
       this.ws.close();
       this.ws = null;
@@ -33,12 +46,16 @@ export class SolanaWsClient extends EventEmitter {
     }
   }
 
-  private connectWebSocket() {
-    this.ws = new WebSocket(this.wsUrl);
+  private connectWebSocket(): void {
+    this.ws = new WebSocketImplementation(this.wsUrl);
+    if (!this.ws) {
+      console.error("Failed to create WebSocket");
+      return;
+    }
     this.setupWebSocket(this.ws);
   }
 
-  private attemptReconnect() {
+  private attemptReconnect(): void {
     if (this.reconnectAttempts < this.maxReconnectAttempts) {
       this.reconnectAttempts++;
       console.log(`Reconnection attempt ${this.reconnectAttempts}/${this.maxReconnectAttempts}...`);
@@ -50,22 +67,22 @@ export class SolanaWsClient extends EventEmitter {
     }
   }
 
-  private setupWebSocket(ws: WebSocket) {
+  private setupWebSocket(ws: InstanceType<typeof WebSocketImplementation>): void {
     ws.onopen = this.handleOpen.bind(this);
     ws.onmessage = this.handleMessage.bind(this);
     ws.onerror = this.handleError.bind(this);
     ws.onclose = this.handleClose.bind(this);
   }
 
-  private handleOpen() {
+  private handleOpen(): void {
     console.log("WebSocket is open");
     this.reconnectAttempts = 0;
     this.sendLogsSubscribeRequest();
     this.startPing();
   }
 
-  private handleMessage(event: MessageEvent) {
-    const messageStr = event.data;
+  private handleMessage(event: MessageEvent): void {
+    const messageStr = event.data.toString();
     try {
       const messageObj: WebSocketMessage = JSON.parse(messageStr);
       if (messageObj.method === "logsNotification") {
@@ -78,11 +95,11 @@ export class SolanaWsClient extends EventEmitter {
     }
   }
 
-  private handleError(event: Event) {
+  private handleError(event: Event): void {
     console.error("WebSocket error:", event);
   }
 
-  private handleClose() {
+  private handleClose(): void {
     console.log("WebSocket is closed");
     if (this.pingInterval) {
       clearInterval(this.pingInterval);
@@ -92,8 +109,8 @@ export class SolanaWsClient extends EventEmitter {
     this.attemptReconnect();
   }
 
-  private sendLogsSubscribeRequest() {
-    if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+  private sendLogsSubscribeRequest(): void {
+    if (this.ws && this.ws.readyState === WebSocketImplementation.OPEN) {
       const request = {
         jsonrpc: "2.0",
         id: 1,
@@ -103,7 +120,7 @@ export class SolanaWsClient extends EventEmitter {
             mentions: [MEMECHAN_PROGRAM_ID_V2],
           },
           {
-            commitment: "commited",
+            commitment: "confirmed",
           },
         ],
       };
@@ -111,9 +128,9 @@ export class SolanaWsClient extends EventEmitter {
     }
   }
 
-  private startPing() {
-    this.pingInterval = window.setInterval(() => {
-      if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+  private startPing(): void {
+    this.pingInterval = setInterval(() => {
+      if (this.ws && this.ws.readyState === WebSocketImplementation.OPEN) {
         this.ws.send(JSON.stringify({ type: "ping" }));
         console.log("Ping sent");
       }
