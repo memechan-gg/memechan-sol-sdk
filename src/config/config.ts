@@ -30,7 +30,7 @@ export function getEnvVar<T>(envVar: string, fallback: T): T {
   throw new Error(`Unsupported type for env var: ${envVar}`);
 }
 
-const isProduction = process.env.NODE_ENV === "production";
+const isProduction = process.env.NEXT_PUBLIC_SDK_ENV === "production";
 const configSource = isProduction ? prodConfig : devConfig;
 
 export const BE_URL = getEnvVar("BE_URL", configSource.BE_URL);
