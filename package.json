@@ -1,7 +1,7 @@
 {
   "name": "@avernikoz/memechan-sol-sdk",
   "description": "Typescript SDK for memechan.gg",
-  "version": "2.2.13",
+  "version": "2.2.14",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "directories": {
@@ -47,6 +47,7 @@
     "bs58": "^5.0.0",
     "date-fns": "^3.6.0",
     "dotenv": "^16.4.5",
+    "isomorphic-ws": "^5.0.0",
     "tweetnacl": "^1.0.3",
     "tweetnacl-util": "^0.15.1",
     "zod": "^3.23.8"
