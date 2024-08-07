@@ -63,12 +63,12 @@
       ],
       "args": [
         {
-          "name": "airdroppedTokens",
+          "name": "vestingPeriod",
           "type": "u64"
         },
         {
-          "name": "vestingPeriod",
-          "type": "u64"
+          "name": "shouldAirdrop",
+          "type": "bool"
         }
       ]
     },
@@ -181,6 +181,11 @@
           "isSigner": false
         },
         {
+          "name": "userStats",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "userSol",
           "isMut": true,
           "isSigner": false
@@ -262,6 +267,11 @@
         },
         {
           "name": "memeTicket",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userStats",
           "isMut": true,
           "isSigner": false
         },
@@ -1146,6 +1156,11 @@
           "isSigner": false
         },
         {
+          "name": "userStats",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "userMeme",
           "isMut": true,
           "isSigner": false
@@ -1202,6 +1217,11 @@
       "name": "withdrawFees",
       "accounts": [
         {
+          "name": "owner",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
           "name": "staking",
           "isMut": false,
           "isSigner": false
@@ -1210,6 +1230,12 @@
           "name": "memeTicket",
           "isMut": true,
           "isSigner": false
+        },
+        {
+          "name": "userStats",
+          "isMut": true,
+          "isSigner": false,
+          "isOptional": true
         },
         {
           "name": "userMeme",
@@ -1242,14 +1268,15 @@
           "isSigner": false
         },
         {
+          "name": "beMeme",
+          "isMut": true,
+          "isSigner": false,
+          "isOptional": true
+        },
+        {
           "name": "stakingSignerPda",
           "isMut": false,
           "isSigner": false
-        },
-        {
-          "name": "signer",
-          "isMut": false,
-          "isSigner": true
         },
         {
           "name": "tokenProgram",
@@ -1394,6 +1421,54 @@
           "type": "u64"
         }
       ]
+    },
+    {
+      "name": "fixAdminTicket",
+      "accounts": [
+        {
+          "name": "sender",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "staking",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "adminTicket",
+          "isMut": true,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "newUserStatsIdempotent",
+      "accounts": [
+        {
+          "name": "sender",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "referral",
+          "isMut": false,
+          "isSigner": false,
+          "isOptional": true
+        },
+        {
+          "name": "userStats",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
     }
   ],
   "accounts": [
@@ -1585,6 +1660,10 @@
           {
             "name": "isActive",
             "type": "bool"
+          },
+          {
+            "name": "adminFeePosition",
+            "type": "u64"
           }
         ]
       }
@@ -1601,6 +1680,51 @@
           {
             "name": "tokenMint",
             "type": "publicKey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "UserStats",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "isInitialized",
+            "type": "bool"
+          },
+          {
+            "name": "referral",
+            "type": "publicKey"
+          },
+          {
+            "name": "memeFees",
+            "type": "u64"
+          },
+          {
+            "name": "quoteFees",
+            "type": "u64"
+          },
+          {
+            "name": "memeReceived",
+            "type": "u64"
+          },
+          {
+            "name": "quoteReceived",
+            "type": "u64"
+          },
+          {
+            "name": "chanReceived",
+            "type": "u64"
+          },
+          {
+            "name": "padding",
+            "type": {
+              "array": [
+                "u8",
+                16
+              ]
+            }
           }
         ]
       }
@@ -1919,9 +2043,18 @@
     {
       "code": 6030,
       "name": "InvalidVestingPeriod"
+    },
+    {
+      "code": 6031,
+      "name": "AdminShouldNotUnstake"
+    },
+    {
+      "code": 6032,
+      "name": "ShouldProvideBackendVault"
+    },
+    {
+      "code": 6033,
+      "name": "ShouldProvideUserStats"
     }
-  ],
-  "metadata": {
-    "address": "chv2ogo3QopnnGctZM9Hxo2VCQ2zEcvQy6Uo6XVpiRH"
-  }
+  ]
 }
