@@ -183,7 +183,8 @@ export type MemechanSol = {
         {
           "name": "userStats",
           "isMut": true,
-          "isSigner": false
+          "isSigner": false,
+          "isOptional": true
         },
         {
           "name": "userSol",
@@ -273,7 +274,8 @@ export type MemechanSol = {
         {
           "name": "userStats",
           "isMut": true,
-          "isSigner": false
+          "isSigner": false,
+          "isOptional": true
         },
         {
           "name": "owner",
@@ -1158,7 +1160,8 @@ export type MemechanSol = {
         {
           "name": "userStats",
           "isMut": true,
-          "isSigner": false
+          "isSigner": false,
+          "isOptional": true
         },
         {
           "name": "userMeme",
@@ -1454,8 +1457,12 @@ export type MemechanSol = {
         {
           "name": "referral",
           "isMut": false,
-          "isSigner": false,
-          "isOptional": true
+          "isSigner": false
+        },
+        {
+          "name": "pool",
+          "isMut": false,
+          "isSigner": false
         },
         {
           "name": "userStats",
@@ -1694,6 +1701,10 @@ export type MemechanSol = {
             "type": "bool"
           },
           {
+            "name": "pool",
+            "type": "publicKey"
+          },
+          {
             "name": "referral",
             "type": "publicKey"
           },
@@ -1722,7 +1733,7 @@ export type MemechanSol = {
             "type": {
               "array": [
                 "u8",
-                16
+                8
               ]
             }
           }
@@ -2051,10 +2062,6 @@ export type MemechanSol = {
     {
       "code": 6032,
       "name": "ShouldProvideBackendVault"
-    },
-    {
-      "code": 6033,
-      "name": "ShouldProvideUserStats"
     }
   ]
 };
@@ -2244,7 +2251,8 @@ export const IDL: MemechanSol = {
         {
           "name": "userStats",
           "isMut": true,
-          "isSigner": false
+          "isSigner": false,
+          "isOptional": true
         },
         {
           "name": "userSol",
@@ -2334,7 +2342,8 @@ export const IDL: MemechanSol = {
         {
           "name": "userStats",
           "isMut": true,
-          "isSigner": false
+          "isSigner": false,
+          "isOptional": true
         },
         {
           "name": "owner",
@@ -3219,7 +3228,8 @@ export const IDL: MemechanSol = {
         {
           "name": "userStats",
           "isMut": true,
-          "isSigner": false
+          "isSigner": false,
+          "isOptional": true
         },
         {
           "name": "userMeme",
@@ -3515,8 +3525,12 @@ export const IDL: MemechanSol = {
         {
           "name": "referral",
           "isMut": false,
-          "isSigner": false,
-          "isOptional": true
+          "isSigner": false
+        },
+        {
+          "name": "pool",
+          "isMut": false,
+          "isSigner": false
         },
         {
           "name": "userStats",
@@ -3755,6 +3769,10 @@ export const IDL: MemechanSol = {
             "type": "bool"
           },
           {
+            "name": "pool",
+            "type": "publicKey"
+          },
+          {
             "name": "referral",
             "type": "publicKey"
           },
@@ -3783,7 +3801,7 @@ export const IDL: MemechanSol = {
             "type": {
               "array": [
                 "u8",
-                16
+                8
               ]
             }
           }
@@ -4112,10 +4130,6 @@ export const IDL: MemechanSol = {
     {
       "code": 6032,
       "name": "ShouldProvideBackendVault"
-    },
-    {
-      "code": 6033,
-      "name": "ShouldProvideUserStats"
     }
   ]
 };

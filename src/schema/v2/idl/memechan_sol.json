@@ -183,7 +183,8 @@
         {
           "name": "userStats",
           "isMut": true,
-          "isSigner": false
+          "isSigner": false,
+          "isOptional": true
         },
         {
           "name": "userSol",
@@ -273,7 +274,8 @@
         {
           "name": "userStats",
           "isMut": true,
-          "isSigner": false
+          "isSigner": false,
+          "isOptional": true
         },
         {
           "name": "owner",
@@ -1158,7 +1160,8 @@
         {
           "name": "userStats",
           "isMut": true,
-          "isSigner": false
+          "isSigner": false,
+          "isOptional": true
         },
         {
           "name": "userMeme",
@@ -1454,8 +1457,12 @@
         {
           "name": "referral",
           "isMut": false,
-          "isSigner": false,
-          "isOptional": true
+          "isSigner": false
+        },
+        {
+          "name": "pool",
+          "isMut": false,
+          "isSigner": false
         },
         {
           "name": "userStats",
@@ -1694,6 +1701,10 @@
             "type": "bool"
           },
           {
+            "name": "pool",
+            "type": "publicKey"
+          },
+          {
             "name": "referral",
             "type": "publicKey"
           },
@@ -1722,7 +1733,7 @@
             "type": {
               "array": [
                 "u8",
-                16
+                8
               ]
             }
           }
@@ -2051,10 +2062,6 @@
     {
       "code": 6032,
       "name": "ShouldProvideBackendVault"
-    },
-    {
-      "code": 6033,
-      "name": "ShouldProvideUserStats"
     }
   ]
 }
