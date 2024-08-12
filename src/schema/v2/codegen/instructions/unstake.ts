@@ -11,6 +11,7 @@ export interface UnstakeArgs {
 export interface UnstakeAccounts {
   staking: PublicKey;
   memeTicket: PublicKey;
+  userStats: PublicKey;
   userMeme: PublicKey;
   userQuote: PublicKey;
   userChan: PublicKey;
@@ -28,6 +29,7 @@ export function unstake(args: UnstakeArgs, accounts: UnstakeAccounts) {
   const keys = [
     { pubkey: accounts.staking, isSigner: false, isWritable: true },
     { pubkey: accounts.memeTicket, isSigner: false, isWritable: true },
+    { pubkey: accounts.userStats, isSigner: false, isWritable: true },
     { pubkey: accounts.userMeme, isSigner: false, isWritable: true },
     { pubkey: accounts.userQuote, isSigner: false, isWritable: true },
     { pubkey: accounts.userChan, isSigner: false, isWritable: true },

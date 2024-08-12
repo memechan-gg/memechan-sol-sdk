@@ -20,6 +20,7 @@ export interface StakingPoolFields {
   feesZTotal: BN;
   toAirdrop: BN;
   isActive: boolean;
+  adminFeePosition: BN;
 }
 
 export interface StakingPoolJSON {
@@ -38,6 +39,7 @@ export interface StakingPoolJSON {
   feesZTotal: string;
   toAirdrop: string;
   isActive: boolean;
+  adminFeePosition: string;
 }
 
 export class StakingPool {
@@ -56,6 +58,7 @@ export class StakingPool {
   readonly feesZTotal: BN;
   readonly toAirdrop: BN;
   readonly isActive: boolean;
+  readonly adminFeePosition: BN;
 
   static readonly discriminator = Buffer.from([203, 19, 214, 220, 220, 154, 24, 102]);
 
@@ -75,6 +78,7 @@ export class StakingPool {
     borsh.u64("feesZTotal"),
     borsh.u64("toAirdrop"),
     borsh.bool("isActive"),
+    borsh.u64("adminFeePosition"),
   ]);
 
   constructor(fields: StakingPoolFields) {
@@ -93,6 +97,7 @@ export class StakingPool {
     this.feesZTotal = fields.feesZTotal;
     this.toAirdrop = fields.toAirdrop;
     this.isActive = fields.isActive;
+    this.adminFeePosition = fields.adminFeePosition;
   }
 
   static async fetch(c: Connection, address: PublicKey): Promise<StakingPool | null> {
@@ -102,7 +107,7 @@ export class StakingPool {
       return null;
     }
     if (!info.owner.equals(PROGRAM_ID)) {
-      throw new Error("account doesn't belong to this program. Program ID: " + PROGRAM_ID.toBase58());
+      throw new Error("account doesn't belong to this program");
     }
 
     return this.decode(info.data);
@@ -146,6 +151,7 @@ export class StakingPool {
       feesZTotal: dec.feesZTotal,
       toAirdrop: dec.toAirdrop,
       isActive: dec.isActive,
+      adminFeePosition: dec.adminFeePosition,
     });
   }
 
@@ -166,6 +172,7 @@ export class StakingPool {
       feesZTotal: this.feesZTotal.toString(),
       toAirdrop: this.toAirdrop.toString(),
       isActive: this.isActive,
+      adminFeePosition: this.adminFeePosition.toString(),
     };
   }
 
@@ -186,6 +193,7 @@ export class StakingPool {
       feesZTotal: new BN(obj.feesZTotal),
       toAirdrop: new BN(obj.toAirdrop),
       isActive: obj.isActive,
+      adminFeePosition: new BN(obj.adminFeePosition),
     });
   }
 }

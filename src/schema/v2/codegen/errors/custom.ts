@@ -29,7 +29,9 @@ export type CustomError =
   | StakingIsNotActive
   | NonZeroInitialMemeSupply
   | AirdroppedTokensOvercap
-  | InvalidVestingPeriod;
+  | InvalidVestingPeriod
+  | AdminShouldNotUnstake
+  | ShouldProvideBackendVault;
 
 export class InvalidAccountInput extends Error {
   readonly code = 6000;
@@ -341,6 +343,26 @@ export class InvalidVestingPeriod extends Error {
   }
 }
 
+export class AdminShouldNotUnstake extends Error {
+  readonly code = 6031;
+  readonly name = "AdminShouldNotUnstake";
+  readonly msg = "undefined";
+
+  constructor() {
+    super("6031: undefined");
+  }
+}
+
+export class ShouldProvideBackendVault extends Error {
+  readonly code = 6032;
+  readonly name = "ShouldProvideBackendVault";
+  readonly msg = "undefined";
+
+  constructor() {
+    super("6032: undefined");
+  }
+}
+
 export function fromCode(code: number): CustomError | null {
   switch (code) {
     case 6000:
@@ -405,6 +427,10 @@ export function fromCode(code: number): CustomError | null {
       return new AirdroppedTokensOvercap();
     case 6030:
       return new InvalidVestingPeriod();
+    case 6031:
+      return new AdminShouldNotUnstake();
+    case 6032:
+      return new ShouldProvideBackendVault();
   }
 
   return null;

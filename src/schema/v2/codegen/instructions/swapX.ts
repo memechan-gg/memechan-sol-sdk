@@ -12,6 +12,7 @@ export interface SwapXArgs {
 export interface SwapXAccounts {
   pool: PublicKey;
   memeTicket: PublicKey;
+  userStats: PublicKey;
   userSol: PublicKey;
   quoteVault: PublicKey;
   owner: PublicKey;
@@ -25,6 +26,7 @@ export function swapX(args: SwapXArgs, accounts: SwapXAccounts) {
   const keys = [
     { pubkey: accounts.pool, isSigner: false, isWritable: true },
     { pubkey: accounts.memeTicket, isSigner: false, isWritable: true },
+    { pubkey: accounts.userStats, isSigner: false, isWritable: true },
     { pubkey: accounts.userSol, isSigner: false, isWritable: true },
     { pubkey: accounts.quoteVault, isSigner: false, isWritable: true },
     { pubkey: accounts.owner, isSigner: true, isWritable: false },

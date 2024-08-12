@@ -5,8 +5,8 @@ import * as types from "../types"; // eslint-disable-line @typescript-eslint/no-
 import { PROGRAM_ID } from "../programId";
 
 export interface NewPoolArgs {
-  airdroppedTokens: BN;
   vestingPeriod: BN;
+  shouldAirdrop: boolean;
 }
 
 export interface NewPoolAccounts {
@@ -23,7 +23,7 @@ export interface NewPoolAccounts {
   tokenProgram: PublicKey;
 }
 
-export const layout = borsh.struct([borsh.u64("airdroppedTokens"), borsh.u64("vestingPeriod")]);
+export const layout = borsh.struct([borsh.u64("vestingPeriod"), borsh.bool("shouldAirdrop")]);
 
 export function newPool(args: NewPoolArgs, accounts: NewPoolAccounts) {
   const keys = [
@@ -43,8 +43,8 @@ export function newPool(args: NewPoolArgs, accounts: NewPoolAccounts) {
   const buffer = Buffer.alloc(1000);
   const len = layout.encode(
     {
-      airdroppedTokens: args.airdroppedTokens,
       vestingPeriod: args.vestingPeriod,
+      shouldAirdrop: args.shouldAirdrop,
     },
     buffer,
   );

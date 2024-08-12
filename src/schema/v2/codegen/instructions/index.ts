@@ -20,3 +20,5 @@ export { stakingMergeTickets, StakingMergeTicketsAccounts } from "./stakingMerge
 export { closeTicket, CloseTicketAccounts } from "./closeTicket";
 export { withdrawAdminFee, WithdrawAdminFeeAccounts } from "./withdrawAdminFee";
 export { increaseVesting, IncreaseVestingArgs, IncreaseVestingAccounts } from "./increaseVesting";
+export { fixAdminTicket, FixAdminTicketAccounts } from "./fixAdminTicket";
+export { newUserStatsIdempotent, NewUserStatsIdempotentAccounts } from "./newUserStatsIdempotent";
