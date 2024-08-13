@@ -92,6 +92,8 @@ const TOKEN_INFOS: { [symbol: string]: TokenInfo } = {
 // Backend Wallet Address
 const ADMIN_PUB_KEY = new PublicKey("5dsHxqEueQ6nvDopUUKihvQtpm7LWcbw2wCSPtRyAEb1");
 
+const POINTS_MINT = new PublicKey("2MbYWYgf3rENFcU2odqJeWrHHJedw4ArpWFDhcrjbzmx");
+
 const config: SdkConfig = {
   BE_URL_DEV,
   BE_URL,
@@ -111,6 +113,7 @@ const config: SdkConfig = {
   TOKEN_INFOS,
   ADMIN_PUB_KEY,
   MERCURIAL_AMM_PROGRAM_ID,
+  POINTS_MINT,
 };
 
 export default config;

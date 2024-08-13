@@ -8,7 +8,7 @@ import { MemeTicketClientV2 } from "../../../../src/memeticket/MemeTicketClientV
   const poolAccountAddressId = new PublicKey("4iagw4iVieJ4jiiG5Mzvrosud87LU28vrAuVdg7tns6s");
   const { boundPoolInstance } = await getBoundPoolClientFromId(poolAccountAddressId, client, clientV2);
 
-  const inputAmount = "0.0005";
+  const inputAmount = "0.0002";
 
   const minOutputAmount = await boundPoolInstance.getOutputAmountForBuyMeme({
     inputAmount: inputAmount,
@@ -17,7 +17,7 @@ import { MemeTicketClientV2 } from "../../../../src/memeticket/MemeTicketClientV
 
   console.debug("minOutputAmount: ", minOutputAmount);
 
-  return;
+  // return;
   const { tickets } = await MemeTicketClientV2.fetchTicketsByUser2(poolAccountAddressId, clientV2, payer.publicKey);
   const memeTicketNumber = tickets.length + MemeTicketClientV2.TICKET_NUMBER_START;
 

@@ -51,6 +51,7 @@ export const PATS_MINT = getEnvVar("PATS_MINT", configSource.PATS_MINT);
 export const SWAP_FEE_WALLET = getEnvVar("SWAP_FEE_WALLET", configSource.SWAP_FEE_WALLET);
 export const TOKEN_INFOS = configSource.TOKEN_INFOS;
 export const MERCURIAL_AMM_PROGRAM_ID = getEnvVar("MERCURIAL_AMM_PROGRAM_ID", configSource.MERCURIAL_AMM_PROGRAM_ID);
+export const POINTS_MINT = getEnvVar("POINTS_MINT", configSource.POINTS_MINT);
 
 export const MEMECHAN_MEME_TOKEN_DECIMALS = 6;
 // Contract constants

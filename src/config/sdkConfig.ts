@@ -21,4 +21,5 @@ export interface SdkConfig {
   SWAP_FEE_WALLET: string;
   TOKEN_INFOS: { [symbol: string]: TokenInfo };
   MERCURIAL_AMM_PROGRAM_ID: string;
+  POINTS_MINT: PublicKey;
 }
