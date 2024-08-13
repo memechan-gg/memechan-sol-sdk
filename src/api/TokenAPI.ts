@@ -12,6 +12,7 @@ import {
   CreateBoundPoolTransactionResponse,
   CreateTokenResponse,
   GetTokenResponse,
+  GetWatchlistForWalletResponse,
   QueryHoldersByTokenAddressResponse,
   QueryTokensResponse,
   UploadFileResponse,
@@ -137,6 +138,79 @@ export class TokenAPI {
     if (!Auth.currentSession) throw new Error("You don't have any active session, please run the Auth.refreshSession");
     return await signedJsonFetch(`${this.url}/sol/private-keys`, Auth.currentSession, {
       method: "POST",
+      body: params,
+    });
+  }
+
+  /**
+   * Add token to watchlist
+   * @param {} params - The add token to watchlist request payload.
+   * @throws Will throw an error if authentication session is not active.
+   * @return {Promise<{ success: boolean }>} A promise that resolves with the addition of token to watchlist.
+   */
+  async addTokenToWatchlist(params: { walletAddress: string; tokenAddress: string }): Promise<{ success: boolean }> {
+    if (!Auth.currentSession) throw new Error("You don't have any active session, please run the Auth.refreshSession");
+    return await signedJsonFetch(`${this.url}/sol/watchlist`, Auth.currentSession, {
+      method: "POST",
+      body: params,
+    });
+  }
+
+  /**
+   * Remove token from watchlist
+   * @param {} params - The remove token from watchlist request payload.
+   * @throws Will throw an error if authentication session is not active.
+   * @return {Promise<{ success: boolean }>} A promise that resolves with the deletion of coin from wallet watchlist.
+   */
+  async removeTokenFromWatchlist(params: {
+    walletAddress: string;
+    tokenAddress: string;
+  }): Promise<{ success: boolean }> {
+    if (!Auth.currentSession) throw new Error("You don't have any active session, please run the Auth.refreshSession");
+    return await signedJsonFetch(`${this.url}/sol/watchlist`, Auth.currentSession, {
+      method: "DELETE",
+      body: params,
+    });
+  }
+
+  /**
+   * Get all tokens that are in a watchlist for a wallet address
+   * @param {} params - The get all tokens request payload.
+   * @throws Will throw an error if authentication session is not active.
+   * @return {Promise<unkown>} A promise that resolves with the queried coin data.
+   */
+  async getAllWatchlistTokensForWallet(params: { walletAddress: string }): Promise<QueryTokensResponse> {
+    if (!Auth.currentSession) throw new Error("You don't have any active session, please run the Auth.refreshSession");
+    return await signedJsonFetch(`${this.url}/sol/watchlist/tokens`, Auth.currentSession, {
+      method: "GET",
+      body: params,
+    });
+  }
+
+  /**
+   * Get watchlist for wallet address
+   * @param {} params - The get watchlist request payload.
+   * @throws Will throw an error if authentication session is not active.
+   * @return {Promise<unkown>} A promise that resolves with the queried watchlist.
+   */
+  async getWatchlistForWallet(params: { walletAddress: string }): Promise<GetWatchlistForWalletResponse> {
+    if (!Auth.currentSession) throw new Error("You don't have any active session, please run the Auth.refreshSession");
+    return await signedJsonFetch(`${this.url}/sol/watchlist`, Auth.currentSession, {
+      method: "GET",
+      body: params,
+    });
+  }
+
+  /**
+   * Checks if token is in watchlist of a wallet
+   * @param {} params - The create coin request payload.
+   * @throws Will throw an error if authentication session is not active.
+   * @return {Promise<unkown>} A promise that resolves with the queried coin data.
+   */
+  async isTokenInWalletWatchlist(params: { walletAddress: string; tokenAddress: string }): Promise<boolean> {
+    if (!Auth.currentSession) throw new Error("You don't have any active session, please run the Auth.refreshSession");
+    return await signedJsonFetch(`${this.url}/sol/watchlist/token`, Auth.currentSession, {
+      method: "GET",
       body: params,
     });
   }

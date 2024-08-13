@@ -72,3 +72,14 @@ export type ConvertedHolderItem = {
 };
 
 export type ConvertedHolderMap = Map<string, ConvertedHolderItem>;
+
+export type GetWatchlistForWalletResponse = {
+  result: {
+    walletAddress: string;
+    tokenAddress: string;
+    deleted: boolean;
+    createdAt: number;
+    updatedAt: number;
+  }[];
+  paginationToken?: string | null | undefined;
+};
