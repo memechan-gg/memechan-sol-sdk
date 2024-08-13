@@ -64,6 +64,7 @@ import {
   FULL_MEME_AMOUNT_CONVERTED_V2,
   MAX_TICKET_TOKENS_V2,
   MEMECHAN_MEME_TOKEN_DECIMALS,
+  POINTS_MINT,
   SWAP_FEE_WALLET,
   TOKEN_INFOS,
 } from "../config/config";
@@ -96,6 +97,7 @@ import { StakingPoolClientV2 } from "../staking-pool/StakingPoolClientV2";
 import { MemechanSol } from "../schema/v2/v2";
 import { AuthorityType, createSetAuthorityInstruction } from "@solana/spl-token";
 import { ensureAssociatedTokenAccountWithIX } from "../util/ensureAssociatedTokenAccountWithIX";
+import { findPointsPda } from "../util/findPointsPda";
 
 export class BoundPoolClientV2 {
   private constructor(
@@ -582,6 +584,8 @@ export class BoundPoolClientV2 {
     // TODO: Check whether user has enough amount of quoute token
     const { tx } = await this.getBuyMemeTransaction(input);
 
+    // console.log("buyMeme tx size", getTxSize(tx, input.signer.publicKey));
+
     const txMethod = getSendAndConfirmTransactionMethod({
       connection: this.client.connection,
       transaction: tx,
@@ -649,8 +653,18 @@ export class BoundPoolClientV2 {
       });
     }
 
+    const pointsAta = await ensureAssociatedTokenAccountWithIdempotentIX({
+      connection: connection,
+      payer: user,
+      mint: POINTS_MINT,
+      owner: user,
+      transaction,
+    });
+
     addWrapSOLInstructionIfNativeMint(this.quoteTokenMint, user, inputTokenAccount, inputAmountBN, transaction);
     const { TOKEN_PROGRAM_ID } = await import("@solana/spl-token");
+    const pointsPda = findPointsPda(this.client.memechanProgram.programId);
+
     const buyMemeInstruction = await this.client.memechanProgram.methods
       .swapY(inputAmountBN, minOutputBN, ticketNumberBN)
       .accounts({
@@ -662,6 +676,9 @@ export class BoundPoolClientV2 {
         systemProgram: SystemProgram.programId,
         tokenProgram: TOKEN_PROGRAM_ID,
         memeTicket: memeTicketPublicKey,
+        pointsMint: POINTS_MINT,
+        pointsPda: pointsPda,
+        userPoints: pointsAta,
       })
       .instruction();
 
