@@ -1,5 +1,5 @@
 import { BE_URL } from "../config/config";
-import { signedJsonFetch } from "../util/fetch";
+import { jsonFetch, signedJsonFetch } from "../util/fetch";
 import { Auth } from "./auth/Auth";
 
 /**
@@ -20,25 +20,20 @@ export class UsernameAPI {
    */
   async setUsername(username: string): Promise<{ success: boolean; message: string }> {
     if (!Auth.currentSession) throw new Error("You don't have any active session, please run the Auth.refreshSession");
-    return await signedJsonFetch(`${this.url}/usernames`, Auth.currentSession, {
+    return await signedJsonFetch(`${this.url}/sol/usernames`, Auth.currentSession, {
       method: "POST",
-      body: JSON.stringify({ username }),
+      body: { username },
     });
   }
 
   /**
    * Retrieves the wallet address associated with a given username.
    * @param {string} username - The username to look up.
-   * @return {Promise<{ walletAddress: string }>} A Promise that resolves with the wallet address.
+   * @return {Promise<string>} A Promise that resolves with the wallet address.
    */
-  async getWalletAddressForUsername(username: string): Promise<{ walletAddress: string }> {
-    if (!Auth.currentSession) throw new Error("You don't have any active session, please run the Auth.refreshSession");
-    return await signedJsonFetch(
-      `${this.url}/usernames/${encodeURIComponent(username)}/wallet-address`,
-      Auth.currentSession,
-      {
-        method: "GET",
-      },
-    );
+  async getWalletAddressForUsername(username: string): Promise<string> {
+    return await jsonFetch(`${this.url}/sol/usernames/wallet-address?username=${username}`, {
+      method: "GET",
+    });
   }
 }

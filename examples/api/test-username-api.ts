@@ -8,14 +8,9 @@ export const testUsernameApi = async () => {
   // Create a new UsernameAPI instance
   const usernameAPI = new UsernameAPI();
 
-  // Generate a keypair for testing
   const keypair = new Keypair();
-
-  // Authenticate
   const messageToSign = await AuthApiInstance.requestMessageToSign(keypair.publicKey.toBase58());
-  console.log("Message to sign:", messageToSign);
-  console.log("Public key:", keypair.publicKey.toBase58());
-
+  console.log("message to sign", messageToSign, keypair.publicKey.toBase58());
   const signature = nacl.sign.detached(Buffer.from(messageToSign), keypair.secretKey);
   await AuthApiInstance.refreshSession({
     walletAddress: keypair.publicKey.toBase58(),
@@ -39,7 +34,7 @@ export const testUsernameApi = async () => {
     console.log("Get wallet address result:", getWalletAddressResult);
 
     // Verify that the returned wallet address matches the public key we used
-    if (getWalletAddressResult.walletAddress === keypair.publicKey.toBase58()) {
+    if (getWalletAddressResult === keypair.publicKey.toBase58()) {
       console.log("Wallet address verification successful!");
     } else {
       console.error("Wallet address verification failed!");
