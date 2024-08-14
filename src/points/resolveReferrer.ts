@@ -8,7 +8,7 @@ export async function resolveReferrer(connection: Connection, referrer: string):
     return refPubKey; // If it's a valid address, return it directly
   } catch (e) {
     // If it's not a valid address, attempt to resolve it as a domain
-    console.log("Referrer is not a valid Solana address, attempting to resolve as domain");
+    // console.log("Referrer is not a valid Solana address, attempting to resolve as domain");
   }
 
   return await resolveDomain(connection, referrer);
