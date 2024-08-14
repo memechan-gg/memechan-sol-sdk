@@ -18,9 +18,9 @@ export class UsernameAPI {
    * @return {Promise<{ success: boolean, message: string }>} A Promise that resolves with the result of the operation.
    * @throws Will throw an error if authentication session is not active.
    */
-  setUsername(username: string): Promise<{ success: boolean; message: string }> {
+  async setUsername(username: string): Promise<{ success: boolean; message: string }> {
     if (!Auth.currentSession) throw new Error("You don't have any active session, please run the Auth.refreshSession");
-    return signedJsonFetch(`${this.url}/usernames`, Auth.currentSession, {
+    return await signedJsonFetch(`${this.url}/usernames`, Auth.currentSession, {
       method: "POST",
       body: JSON.stringify({ username }),
     });
@@ -31,9 +31,9 @@ export class UsernameAPI {
    * @param {string} username - The username to look up.
    * @return {Promise<{ walletAddress: string }>} A Promise that resolves with the wallet address.
    */
-  getWalletAddressForUsername(username: string): Promise<{ walletAddress: string }> {
+  async getWalletAddressForUsername(username: string): Promise<{ walletAddress: string }> {
     if (!Auth.currentSession) throw new Error("You don't have any active session, please run the Auth.refreshSession");
-    return signedJsonFetch(
+    return await signedJsonFetch(
       `${this.url}/usernames/${encodeURIComponent(username)}/wallet-address`,
       Auth.currentSession,
       {
