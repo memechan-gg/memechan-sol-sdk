@@ -661,6 +661,7 @@ export class BoundPoolClientV2 {
       owner: user,
       transaction,
     });
+
     const pointsPda = findPointsPda(this.client.memechanProgram.programId);
     const pointsProgramAta = await ensureAssociatedTokenAccountWithIdempotentIX({
       connection: connection,
@@ -669,6 +670,17 @@ export class BoundPoolClientV2 {
       owner: pointsPda,
       transaction,
     });
+
+    let referrerATA = null;
+    if (referrer) {
+      referrerATA = await ensureAssociatedTokenAccountWithIdempotentIX({
+        connection: connection,
+        payer: user,
+        mint: POINTS_MINT,
+        owner: referrer,
+        transaction,
+      });
+    }
 
     addWrapSOLInstructionIfNativeMint(this.quoteTokenMint, user, inputTokenAccount, inputAmountBN, transaction);
     const { TOKEN_PROGRAM_ID } = await import("@solana/spl-token");
@@ -688,7 +700,7 @@ export class BoundPoolClientV2 {
         pointsPda: pointsPda,
         userPoints: pointsUserAta,
         pointsAcc: pointsProgramAta,
-        referrerPoints: referrer ?? null,
+        referrerPoints: referrerATA,
       })
       .instruction();
 
