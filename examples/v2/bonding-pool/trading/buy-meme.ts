@@ -30,6 +30,7 @@ import { MemeTicketClientV2 } from "../../../../src/memeticket/MemeTicketClientV
     user: payer.publicKey,
     signer: payer,
     memeTicketNumber: memeTicketNumber,
+    referrer: new PublicKey("3UfiokHNzQKup3U7YwYQAiF1yzem2hX2LpgXsHLhcT2L"),
   });
 
   console.debug("res: ");

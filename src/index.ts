@@ -41,6 +41,7 @@ export * from "./api/TokenAPI";
 export * from "./api/social/SocialAPI";
 export * from "./api/social/schemas";
 export * from "./api/ChartApi";
+export * from "./api/UsernameApi";
 
 // API schemas
 export * from "./api/schemas/pools-schema";
@@ -79,6 +80,10 @@ export * from "./util/poolHelpers/getLivePoolClientFromId";
 export * from "./util/poolHelpers/getMemeTicketClientFromId";
 export * from "./util/poolHelpers/types";
 export * from "./util/poolHelpers/livePoolClientCache";
+export * from "./util/getTokenBalance";
+
+// Points
+export * from "./points/getFormattedPointsBalance";
 
 // Metadata
 export * from "./token/createMetadata";
