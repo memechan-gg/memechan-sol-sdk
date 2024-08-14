@@ -15,6 +15,6 @@ export async function getReferrerLink(connection: Connection, walletAddress: str
   } catch (e) {
     console.log("No main domain found");
   }
-  const referrer = mainDomain?.domain || walletAddress;
+  const referrer = mainDomain ? `${mainDomain.domain}${mainDomain.tld}` : walletAddress;
   return `${baseUrl}/?referrer=${referrer}`;
 }
