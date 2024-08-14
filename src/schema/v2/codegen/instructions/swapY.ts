@@ -16,7 +16,9 @@ export interface SwapYAccounts {
   userSol: PublicKey;
   memeTicket: PublicKey;
   userPoints: PublicKey;
+  referrerPoints: PublicKey;
   pointsMint: PublicKey;
+  pointsAcc: PublicKey;
   owner: PublicKey;
   pointsPda: PublicKey;
   poolSignerPda: PublicKey;
@@ -33,7 +35,9 @@ export function swapY(args: SwapYArgs, accounts: SwapYAccounts) {
     { pubkey: accounts.userSol, isSigner: false, isWritable: true },
     { pubkey: accounts.memeTicket, isSigner: false, isWritable: true },
     { pubkey: accounts.userPoints, isSigner: false, isWritable: true },
+    { pubkey: accounts.referrerPoints, isSigner: false, isWritable: true },
     { pubkey: accounts.pointsMint, isSigner: false, isWritable: true },
+    { pubkey: accounts.pointsAcc, isSigner: false, isWritable: true },
     { pubkey: accounts.owner, isSigner: true, isWritable: true },
     { pubkey: accounts.pointsPda, isSigner: false, isWritable: false },
     { pubkey: accounts.poolSignerPda, isSigner: false, isWritable: false },
