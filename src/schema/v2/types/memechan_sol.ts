@@ -267,7 +267,18 @@ export type MemechanSol = {
           isSigner: false;
         },
         {
+          name: "referrerPoints";
+          isMut: true;
+          isSigner: false;
+          isOptional: true;
+        },
+        {
           name: "pointsMint";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "pointsAcc";
           isMut: true;
           isSigner: false;
         },
@@ -2143,7 +2154,18 @@ export const IDL: MemechanSol = {
           isSigner: false,
         },
         {
+          name: "referrerPoints",
+          isMut: true,
+          isSigner: false,
+          isOptional: true,
+        },
+        {
           name: "pointsMint",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "pointsAcc",
           isMut: true,
           isSigner: false,
         },
