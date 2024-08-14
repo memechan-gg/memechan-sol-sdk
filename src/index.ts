@@ -41,6 +41,7 @@ export * from "./api/TokenAPI";
 export * from "./api/social/SocialAPI";
 export * from "./api/social/schemas";
 export * from "./api/ChartApi";
+export * from "./api/UsernameApi";
 
 // API schemas
 export * from "./api/schemas/pools-schema";
