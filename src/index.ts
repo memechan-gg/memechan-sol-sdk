@@ -85,6 +85,7 @@ export * from "./util/getTokenBalance";
 // Points
 export * from "./points/getFormattedPointsBalance";
 export * from "./points/getReferrerLink";
+export * from "./points/resolveReferrer";
 
 // Metadata
 export * from "./token/createMetadata";
