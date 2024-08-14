@@ -612,6 +612,7 @@ export class BoundPoolClientV2 {
       user,
       transaction = new Transaction(),
       memeTicketNumber,
+      referrer,
     } = input;
     let { inputTokenAccount } = input;
 
@@ -653,17 +654,24 @@ export class BoundPoolClientV2 {
       });
     }
 
-    const pointsAta = await ensureAssociatedTokenAccountWithIdempotentIX({
+    const pointsUserAta = await ensureAssociatedTokenAccountWithIdempotentIX({
       connection: connection,
       payer: user,
       mint: POINTS_MINT,
       owner: user,
       transaction,
     });
+    const pointsPda = findPointsPda(this.client.memechanProgram.programId);
+    const pointsProgramAta = await ensureAssociatedTokenAccountWithIdempotentIX({
+      connection: connection,
+      payer: user,
+      mint: POINTS_MINT,
+      owner: pointsPda,
+      transaction,
+    });
 
     addWrapSOLInstructionIfNativeMint(this.quoteTokenMint, user, inputTokenAccount, inputAmountBN, transaction);
     const { TOKEN_PROGRAM_ID } = await import("@solana/spl-token");
-    const pointsPda = findPointsPda(this.client.memechanProgram.programId);
 
     const buyMemeInstruction = await this.client.memechanProgram.methods
       .swapY(inputAmountBN, minOutputBN, ticketNumberBN)
@@ -678,7 +686,9 @@ export class BoundPoolClientV2 {
         memeTicket: memeTicketPublicKey,
         pointsMint: POINTS_MINT,
         pointsPda: pointsPda,
-        userPoints: pointsAta,
+        userPoints: pointsUserAta,
+        pointsAcc: pointsProgramAta,
+        referrerPoints: referrer ?? null,
       })
       .instruction();
 

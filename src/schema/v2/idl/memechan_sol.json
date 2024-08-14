@@ -271,7 +271,18 @@
           "isSigner": false
         },
         {
+          "name": "referrerPoints",
+          "isMut": true,
+          "isSigner": false,
+          "isOptional": true
+        },
+        {
           "name": "pointsMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pointsAcc",
           "isMut": true,
           "isSigner": false
         },

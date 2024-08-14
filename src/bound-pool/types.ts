@@ -28,6 +28,7 @@ export type GetBuyMemeTransactionArgs = {
   slippagePercentage: number;
   transaction?: Transaction;
   memeTicketNumber: number;
+  referrer?: PublicKey;
 };
 
 export type BuyMemeArgs = GetBuyMemeTransactionArgs & { signer: Keypair };

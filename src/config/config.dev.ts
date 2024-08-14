@@ -92,7 +92,7 @@ const TOKEN_INFOS: { [symbol: string]: TokenInfo } = {
 // Backend Wallet Address
 const ADMIN_PUB_KEY = new PublicKey("5dsHxqEueQ6nvDopUUKihvQtpm7LWcbw2wCSPtRyAEb1");
 
-const POINTS_MINT = new PublicKey("2MbYWYgf3rENFcU2odqJeWrHHJedw4ArpWFDhcrjbzmx");
+const POINTS_MINT = new PublicKey("3evNjwM1tg4S9jCvg9vhA8JHcMtu4fVDHYteGGGzquJD");
 
 const config: SdkConfig = {
   BE_URL_DEV,
