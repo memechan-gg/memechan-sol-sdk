@@ -80,6 +80,10 @@ export * from "./util/poolHelpers/getLivePoolClientFromId";
 export * from "./util/poolHelpers/getMemeTicketClientFromId";
 export * from "./util/poolHelpers/types";
 export * from "./util/poolHelpers/livePoolClientCache";
+export * from "./util/getTokenBalance";
+
+// Points
+export * from "./points/getFormattedPointsBalance";
 
 // Metadata
 export * from "./token/createMetadata";

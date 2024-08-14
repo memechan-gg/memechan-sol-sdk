@@ -58,6 +58,7 @@ const FEE_DESTINATION_ID = "7YttLkHDoNj9wyDur5pM1ejNaAvT9X4eqaYcHQqtj2G5";
 const PATS_MINT = new PublicKey("35fN6LMYt6cKsemgbR28nFooiJtcnvaKPCeRXyuMKfoF");
 
 const BOUND_POOL_VESTING_PERIOD = new BN(600);
+const POINTS_MINT = new PublicKey("3evNjwM1tg4S9jCvg9vhA8JHcMtu4fVDHYteGGGzquJD");
 
 const TOKEN_INFOS: { [symbol: string]: TokenInfo } = {
   WSOL: new TokenInfo({
@@ -87,12 +88,19 @@ const TOKEN_INFOS: { [symbol: string]: TokenInfo } = {
     memeChanProgramId: MEMECHAN_PROGRAM_ID_PK,
     memeChanProgramIdV2: MEMECHAN_PROGRAM_ID_V2_PK,
   }),
+  POINT: new TokenInfo({
+    programId: TOKEN_PROGRAM_ID,
+    mint: POINTS_MINT,
+    decimals: 9,
+    symbol: "POINT",
+    name: "point",
+    memeChanProgramId: MEMECHAN_PROGRAM_ID_PK,
+    memeChanProgramIdV2: MEMECHAN_PROGRAM_ID_V2_PK,
+  }),
 };
 
 // Backend Wallet Address
 const ADMIN_PUB_KEY = new PublicKey("5dsHxqEueQ6nvDopUUKihvQtpm7LWcbw2wCSPtRyAEb1");
-
-const POINTS_MINT = new PublicKey("3evNjwM1tg4S9jCvg9vhA8JHcMtu4fVDHYteGGGzquJD");
 
 const config: SdkConfig = {
   BE_URL_DEV,
