@@ -1,21 +1,15 @@
-import { Keypair, sendAndConfirmTransaction } from "@solana/web3.js";
-import { BN } from "@coral-xyz/anchor";
+import { sendAndConfirmTransaction } from "@solana/web3.js";
 import { getAssociatedTokenAddressSync } from "@solana/spl-token";
 import { VeChanStakingClient } from "../../src/vechan-vesting/VeChanStakingClient";
-import { sleep, TOKEN_INFOS } from "../../src";
-import { clientV2, connection } from "../common";
+import { sleep, TOKEN_INFOS, VESTING_PROGRAM_ID } from "../../src";
+import { connection, payer } from "../common";
+import BN from "bn.js";
 
 // yarn tsx examples/vechan-vesting/vechan-staking-example.ts > fetch.txt 2>&1
 async function veChanStakingExample() {
   // Create VeChanStakingClient instance
-  const client = new VeChanStakingClient(clientV2.memechanProgram.programId);
-
-  // Example user
-  const user = Keypair.generate();
-
-  // Airdrop some SOL to the user for transaction fees
-  const airdropSignature = await connection.requestAirdrop(user.publicKey, 1000000000);
-  await connection.confirmTransaction(airdropSignature);
+  const client = new VeChanStakingClient(VESTING_PROGRAM_ID);
+  const user = payer;
 
   try {
     // 1. Stake Tokens
