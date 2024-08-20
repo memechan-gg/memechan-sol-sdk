@@ -1,14 +1,14 @@
-import { PublicKey, Keypair, SystemProgram, Transaction } from "@solana/web3.js";
+import { PublicKey, Keypair, SystemProgram, Transaction, ComputeBudgetProgram } from "@solana/web3.js";
 import { BN, Program } from "@coral-xyz/anchor";
 import { IDL, Staking } from "./schema/types/staking";
 import {
   TOKEN_2022_PROGRAM_ID,
   TOKEN_PROGRAM_ID,
-  createAssociatedTokenAccountInstruction,
+  createAssociatedTokenAccountIdempotentInstruction,
   getAssociatedTokenAddressSync,
 } from "@solana/spl-token";
 import { getStakingStatePDA, getStakingStateSigner, getUserStakeSigner } from "./utils";
-import { TOKEN_INFOS } from "../config/config";
+import { COMPUTE_UNIT_PRICE, TOKEN_INFOS } from "../config/config";
 
 export class VeChanStakingClient {
   public program: Program<Staking>;
@@ -37,7 +37,20 @@ export class VeChanStakingClient {
     const stakeSigner = getUserStakeSigner(stake.publicKey);
     const vault = getAssociatedTokenAddressSync(this.vChanMint, stakeSigner, true);
 
-    const vaultCTX = createAssociatedTokenAccountInstruction(user.publicKey, vault, stakeSigner, this.vChanMint);
+    const vaultCTX = createAssociatedTokenAccountIdempotentInstruction(
+      user.publicKey,
+      vault,
+      stakeSigner,
+      this.vChanMint,
+    );
+
+    const userVeAccCIx = createAssociatedTokenAccountIdempotentInstruction(
+      user.publicKey,
+      userVeAcc,
+      user.publicKey,
+      this.veChanMint,
+      TOKEN_2022_PROGRAM_ID,
+    );
 
     const stakeTokensInstruction = await this.program.methods
       .stakeTokens(time, amount)
@@ -59,7 +72,11 @@ export class VeChanStakingClient {
       })
       .instruction();
 
-    const transaction = new Transaction().add(vaultCTX, stakeTokensInstruction);
+    const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
+      microLamports: COMPUTE_UNIT_PRICE,
+    });
+
+    const transaction = new Transaction().add(addPriorityFee, vaultCTX, userVeAccCIx, stakeTokensInstruction);
 
     return { transaction, signers: [user, stake] };
   }
@@ -91,7 +108,11 @@ export class VeChanStakingClient {
       })
       .instruction();
 
-    const transaction = new Transaction().add(unstakeTokensInstruction);
+    const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
+      microLamports: COMPUTE_UNIT_PRICE,
+    });
+
+    const transaction = new Transaction().add(addPriorityFee, unstakeTokensInstruction);
 
     return { transaction, signers: [user] };
   }
