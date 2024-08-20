@@ -60,6 +60,8 @@ const PATS_MINT = new PublicKey("35fN6LMYt6cKsemgbR28nFooiJtcnvaKPCeRXyuMKfoF");
 const BOUND_POOL_VESTING_PERIOD = new BN(600);
 const POINTS_MINT = new PublicKey("3evNjwM1tg4S9jCvg9vhA8JHcMtu4fVDHYteGGGzquJD");
 
+const VESTING_PROGRAM_ID = new PublicKey("4JDLXnMpPN129YHbGTwn16hW6xt2QgkfdYPMAgMQAcV5");
+
 const TOKEN_INFOS: { [symbol: string]: TokenInfo } = {
   WSOL: new TokenInfo({
     programId: TOKEN_PROGRAM_ID,
@@ -97,6 +99,24 @@ const TOKEN_INFOS: { [symbol: string]: TokenInfo } = {
     memeChanProgramId: MEMECHAN_PROGRAM_ID_PK,
     memeChanProgramIdV2: MEMECHAN_PROGRAM_ID_V2_PK,
   }),
+  vCHAN: new TokenInfo({
+    programId: TOKEN_PROGRAM_ID,
+    mint: new PublicKey("AHgoQRPAdir2vkf7rS374RqiBXU5mfJBDsk3mYm7SEC9"),
+    decimals: 9,
+    symbol: "vCHAN",
+    name: "vCHAN",
+    memeChanProgramId: MEMECHAN_PROGRAM_ID_PK,
+    memeChanProgramIdV2: MEMECHAN_PROGRAM_ID_V2_PK,
+  }),
+  veCHAN: new TokenInfo({
+    programId: TOKEN_PROGRAM_ID,
+    mint: new PublicKey("6wYxAaVw49SZnR1JnSbizZojafqobXa1gd6BqjKc9fAA"),
+    decimals: 9,
+    symbol: "veCHAN",
+    name: "veCHAN",
+    memeChanProgramId: MEMECHAN_PROGRAM_ID_PK,
+    memeChanProgramIdV2: MEMECHAN_PROGRAM_ID_V2_PK,
+  }),
 };
 
 // Backend Wallet Address
@@ -122,6 +142,7 @@ const config: SdkConfig = {
   ADMIN_PUB_KEY,
   MERCURIAL_AMM_PROGRAM_ID,
   POINTS_MINT,
+  VESTING_PROGRAM_ID,
 };
 
 export default config;

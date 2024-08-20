@@ -22,4 +22,5 @@ export interface SdkConfig {
   TOKEN_INFOS: { [symbol: string]: TokenInfo };
   MERCURIAL_AMM_PROGRAM_ID: string;
   POINTS_MINT: PublicKey;
+  VESTING_PROGRAM_ID: PublicKey;
 }

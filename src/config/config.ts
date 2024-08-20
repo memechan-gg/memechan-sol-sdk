@@ -87,7 +87,7 @@ export const TRANSFER_FEE = 60_000_000;
 // These may have to be moved to env based configs
 
 // Vesting
-export const VESTING_PROGRAM_ID = new PublicKey("vestJGg7ZMQoXiAr2pLV5cqgtxFhEWzNoZL5Ngzb8H4");
+export const VESTING_PROGRAM_ID = getEnvVar("VESTING_PROGRAM_ID", configSource.VESTING_PROGRAM_ID);
 
 // Pre-sale
 
