@@ -1,5 +1,12 @@
-import { PublicKey, Keypair, SystemProgram, Transaction, ComputeBudgetProgram } from "@solana/web3.js";
-import { BN, Program } from "@coral-xyz/anchor";
+import {
+  PublicKey,
+  Keypair,
+  SystemProgram,
+  Transaction,
+  ComputeBudgetProgram,
+  GetProgramAccountsFilter,
+} from "@solana/web3.js";
+import { AnchorProvider, BN, Program } from "@coral-xyz/anchor";
 import { IDL, Staking } from "./schema/types/staking";
 import {
   TOKEN_2022_PROGRAM_ID,
@@ -7,8 +14,15 @@ import {
   createAssociatedTokenAccountIdempotentInstruction,
   getAssociatedTokenAddressSync,
 } from "@solana/spl-token";
-import { getStakingStatePDA, getStakingStateSigner, getUserStakeSigner } from "./utils";
+import {
+  getRewardStatePDA,
+  getStakingStatePDA,
+  getStakingStateSigner,
+  getUserRewardsPDA,
+  getUserStakeSigner,
+} from "./utils";
 import { COMPUTE_UNIT_PRICE, TOKEN_INFOS } from "../config/config";
+import { UserRewards, UserStake } from "./schema/codegen/accounts";
 
 export class VeChanStakingClient {
   public program: Program<Staking>;
@@ -17,37 +31,82 @@ export class VeChanStakingClient {
   private stakingState: PublicKey;
   private stakingStateSigner: PublicKey;
 
-  constructor(programId: PublicKey) {
-    this.program = new Program(IDL, programId);
+  constructor(programId: PublicKey, provider?: AnchorProvider) {
+    this.program = new Program(IDL, programId, provider);
     this.vChanMint = TOKEN_INFOS.vCHAN.mint;
     this.veChanMint = TOKEN_INFOS.veCHAN.mint;
     this.stakingState = getStakingStatePDA(this.vChanMint, this.veChanMint);
     this.stakingStateSigner = getStakingStateSigner(this.stakingState);
   }
 
+  public async fetchStakesForUser(user: PublicKey): Promise<{ data: UserStake; address: PublicKey }[]> {
+    const filters: GetProgramAccountsFilter[] = [
+      {
+        memcmp: {
+          bytes: user.toBase58(),
+          offset: 8,
+        },
+      },
+    ];
+    const rawUserStakes = await this.program.account.userStake.all(filters);
+    const stakes = rawUserStakes.map((el) => ({
+      data: new UserStake(el.account),
+      address: el.publicKey,
+    }));
+
+    return stakes;
+  }
+
+  public async fetchRewardsForUserStakes(
+    stakeAddresses: PublicKey[],
+  ): Promise<{ data: UserRewards | null; address: PublicKey }[]> {
+    const rewardState = getRewardStatePDA(TOKEN_INFOS.CHAN.mint);
+
+    const allRewardAddresses = stakeAddresses.map((stakeAddress) => getUserRewardsPDA(rewardState, stakeAddress));
+
+    const raw = await UserRewards.fetchMultiple(this.program.provider.connection, allRewardAddresses);
+
+    // Create a map of addresses to their corresponding data
+    const addressToDataMap = new Map<string, UserRewards | null>();
+    raw.forEach((data, index) => {
+      const addressString = allRewardAddresses[index].toBase58();
+      addressToDataMap.set(addressString, data);
+    });
+
+    // Map the original stake addresses to their reward data
+    return stakeAddresses.map((stakeAddress) => {
+      const rewardAddress = getUserRewardsPDA(rewardState, stakeAddress);
+      const addressString = rewardAddress.toBase58();
+      return {
+        data: addressToDataMap.get(addressString) || null,
+        address: rewardAddress,
+      };
+    });
+  }
+
   async buildStakeTokensTransaction(
-    user: Keypair,
     time: BN,
     amount: BN,
+    userPublicKey: PublicKey,
     userVAcc: PublicKey,
     userVeAcc: PublicKey,
     vesting: PublicKey | null,
-  ): Promise<{ transaction: Transaction; signers: Keypair[] }> {
+  ): Promise<{ transaction: Transaction; stake: Keypair }> {
     const stake = Keypair.generate();
     const stakeSigner = getUserStakeSigner(stake.publicKey);
     const vault = getAssociatedTokenAddressSync(this.vChanMint, stakeSigner, true);
 
     const vaultCTX = createAssociatedTokenAccountIdempotentInstruction(
-      user.publicKey,
+      userPublicKey,
       vault,
       stakeSigner,
       this.vChanMint,
     );
 
     const userVeAccCIx = createAssociatedTokenAccountIdempotentInstruction(
-      user.publicKey,
+      userPublicKey,
       userVeAcc,
-      user.publicKey,
+      userPublicKey,
       this.veChanMint,
       TOKEN_2022_PROGRAM_ID,
     );
@@ -55,7 +114,7 @@ export class VeChanStakingClient {
     const stakeTokensInstruction = await this.program.methods
       .stakeTokens(time, amount)
       .accounts({
-        signer: user.publicKey,
+        signer: userPublicKey,
         stake: stake.publicKey,
         stakeSigner: stakeSigner,
         stakingState: this.stakingState,
@@ -78,22 +137,19 @@ export class VeChanStakingClient {
 
     const transaction = new Transaction().add(addPriorityFee, vaultCTX, userVeAccCIx, stakeTokensInstruction);
 
-    return { transaction, signers: [user, stake] };
+    return { transaction, stake };
   }
 
-  async buildUnstakeTokensTransaction(
-    user: Keypair,
-    stake: PublicKey,
-  ): Promise<{ transaction: Transaction; signers: Keypair[] }> {
+  async buildUnstakeTokensTransaction(userPublicKey: PublicKey, stake: PublicKey): Promise<Transaction> {
     const stakeSigner = getUserStakeSigner(stake);
-    const userVAcc = getAssociatedTokenAddressSync(this.vChanMint, user.publicKey);
-    const userVeAcc = getAssociatedTokenAddressSync(this.veChanMint, user.publicKey, false, TOKEN_2022_PROGRAM_ID);
+    const userVAcc = getAssociatedTokenAddressSync(this.vChanMint, userPublicKey);
+    const userVeAcc = getAssociatedTokenAddressSync(this.veChanMint, userPublicKey, false, TOKEN_2022_PROGRAM_ID);
     const vault = getAssociatedTokenAddressSync(this.vChanMint, stakeSigner, true);
 
     const unstakeTokensInstruction = await this.program.methods
       .unstakeTokens()
       .accounts({
-        signer: user.publicKey,
+        signer: userPublicKey,
         stake,
         stakeSigner: stakeSigner,
         stakingState: this.stakingState,
@@ -114,6 +170,6 @@ export class VeChanStakingClient {
 
     const transaction = new Transaction().add(addPriorityFee, unstakeTokensInstruction);
 
-    return { transaction, signers: [user] };
+    return transaction;
   }
 }

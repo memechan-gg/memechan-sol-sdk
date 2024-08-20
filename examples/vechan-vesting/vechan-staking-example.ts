@@ -1,7 +1,7 @@
 import { sendAndConfirmTransaction } from "@solana/web3.js";
 import { getAssociatedTokenAddressSync, TOKEN_2022_PROGRAM_ID, TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import { VeChanStakingClient } from "../../src/vechan-vesting/VeChanStakingClient";
-import { sleep, TOKEN_INFOS, VESTING_PROGRAM_ID } from "../../src";
+import { getUserStakeSigner, sleep, TOKEN_INFOS, VESTING_PROGRAM_ID } from "../../src";
 import { connection, payer } from "../common";
 import BN from "bn.js";
 
@@ -35,24 +35,27 @@ async function veChanStakingExample() {
 
     console.log("User veAcc:", userVeAcc.toBase58());
 
-    const { transaction: stakeTokensTx, signers: stakeTokensSigners } = await client.buildStakeTokensTransaction(
-      user,
+    const { transaction: stakeTokensTx, stake } = await client.buildStakeTokensTransaction(
       stakeTime,
       stakeAmount,
+      user.publicKey,
       userVAcc,
       userVeAcc,
       null, // No vesting account in this example
     );
 
+    console.log("Stake public key:", stake.publicKey.toBase58());
+    const stakeSigner = getUserStakeSigner(stake.publicKey);
+    console.log("Stake signer:", stakeSigner.toBase58());
+    const vault = getAssociatedTokenAddressSync(TOKEN_INFOS.vCHAN.mint, stakeSigner, true);
+    console.log("Vault:", vault.toBase58());
+
     console.log("Sending Stake Tokens Transaction...");
-    const stakeTokensTxId = await sendAndConfirmTransaction(connection, stakeTokensTx, stakeTokensSigners, {
+    const stakeTokensTxId = await sendAndConfirmTransaction(connection, stakeTokensTx, [payer, stake], {
       commitment: "confirmed",
       // skipPreflight: true,
     });
     console.log("Tokens staked. Transaction ID:", stakeTokensTxId);
-
-    // Store the stake public key for unstaking later
-    const stakePublicKey = stakeTokensSigners[1].publicKey;
 
     // Wait for a while before unstaking
     console.log("Waiting for 5 seconds before unstaking...");
@@ -60,13 +63,10 @@ async function veChanStakingExample() {
 
     // 2. Unstake Tokens
     console.log("\nPreparing Unstake Tokens Transaction...");
-    const { transaction: unstakeTokensTx, signers: unstakeTokensSigners } = await client.buildUnstakeTokensTransaction(
-      user,
-      stakePublicKey,
-    );
+    const unstakeTokensTx = await client.buildUnstakeTokensTransaction(user.publicKey, stake.publicKey);
 
     console.log("Sending Unstake Tokens Transaction...");
-    const unstakeTokensTxId = await sendAndConfirmTransaction(connection, unstakeTokensTx, unstakeTokensSigners);
+    const unstakeTokensTxId = await sendAndConfirmTransaction(connection, unstakeTokensTx, [payer]);
     console.log("Tokens unstaked. Transaction ID:", unstakeTokensTxId);
   } catch (error) {
     console.error("An error occurred:", error);
