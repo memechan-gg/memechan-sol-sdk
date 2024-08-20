@@ -59,10 +59,6 @@ export function getRewardSigner(reward: PublicKey): PublicKey {
   return PublicKey.findProgramAddressSync([Buffer.from("reward_signer"), reward.toBytes()], programId)[0];
 }
 
-export async function sleep(ms: number) {
-  await new Promise((r) => setTimeout(r, ms));
-}
-
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function tryDisplayFetched(object: any) {
   let fieldsConcat = "";

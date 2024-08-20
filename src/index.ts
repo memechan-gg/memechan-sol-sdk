@@ -101,3 +101,7 @@ export * from "./token/validation/validation";
 export * from "./bound-pool/errors";
 
 export * from "./api/helpers/TokenApiHelper";
+
+// Vesting
+export * from "./vechan-vesting/VeChanStakingClient";
+export * from "./vechan-vesting/utils";
