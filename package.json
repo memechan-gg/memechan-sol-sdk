@@ -26,6 +26,8 @@
     "fix:generated": "yarn run eslint src/schema/v2/ --fix && yarn run prettier --write src/schema/v2/**/*.ts",
     "codegen:vesting": "yarn run rimraf src/vesting/schema/codegen/ && yarn run anchor-client-gen src/vesting/schema/idl/lockup.json src/vesting/schema/codegen/ && yarn run fix:generated:vesting",
     "fix:generated:vesting": "ESLINT_USE_FLAT_CONFIG=false yarn run eslint src/vesting/schema/codegen/ --fix && yarn run prettier --write src/vesting/schema/codegen/**/*.ts",
+    "codegen:vechan-vesting": "yarn run rimraf src/vechan-vesting/schema/codegen/ && yarn run anchor-client-gen src/vechan-vesting/schema/idl/staking.json src/vechan-vesting/schema/codegen/ && yarn run fix:generated:vechan-vesting",
+    "fix:generated:vechan-vesting": "ESLINT_USE_FLAT_CONFIG=false yarn run eslint src/vechan-vesting/schema/codegen/ --fix && yarn run prettier --write src/vechan-vesting/schema/codegen/**/*.ts",
     "deploy": "yarn lint && yarn build && yarn publish --access restricted"
   },
   "dependencies": {
