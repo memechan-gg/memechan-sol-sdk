@@ -27,7 +27,7 @@ import {
   getUserStakeSigner,
 } from "./utils";
 import { COMPUTE_UNIT_PRICE, TOKEN_INFOS, WSOL_DECIMALS } from "../config/config";
-import { Reward, UserRewards, UserStake } from "./schema/codegen/accounts";
+import { Reward, UserRewards, UserStake, UserStakeFields } from "./schema/codegen/accounts";
 import BigNumber from "bignumber.js";
 import { ParsedReward } from "./types";
 
@@ -66,9 +66,9 @@ export class VeChanStakingClient {
     return stakes;
   }
 
-  public async fetchRewardsForUserStakes(
+  public async fetchUserRewardsForStakes(
     stakeAddresses: PublicKey[],
-  ): Promise<{ data: UserRewards | null; address: PublicKey }[]> {
+  ): Promise<{ data: UserRewards | null; address: PublicKey; stakeAddress: PublicKey }[]> {
     const rewardState = this.rewardState;
 
     const allRewardAddresses = stakeAddresses.map((stakeAddress) => getUserRewardsPDA(rewardState, stakeAddress));
@@ -89,6 +89,7 @@ export class VeChanStakingClient {
       return {
         data: addressToDataMap.get(addressString) || null,
         address: rewardAddress,
+        stakeAddress,
       };
     });
   }
@@ -131,7 +132,46 @@ export class VeChanStakingClient {
       };
     });
 
-    return { rewards: parsedRewards };
+    return parsedRewards;
+  }
+
+  /// Gets the first eligible reward from parsed rewards array.
+  /// Returns the first eligible reward's number or -1 if there are no eligible reward in the array.
+  /// For reward to be eligible is to
+  /// 1. Reward timestamp is after the stake timestamp
+  /// 2. Reward timestamp is before the unstake timestamp if any
+  /// 3. Reward is not withdrawn from already
+  public static getNextEligibleRewardNumber(rewards: ParsedReward[], userStake: UserStake, userRewards: UserRewards) {
+    const eligible = this.getEligibleRewardNumbers(rewards, userStake, userRewards);
+
+    if (eligible.length > 0) {
+      return eligible[0];
+    }
+
+    return -1;
+  }
+
+  /// Gets all eligible rewards from parsed rewards array.
+  /// Returns all eligible reward's number or -1 if there are no eligible reward in the array.
+  /// For reward to be eligible is to
+  /// 1. Reward timestamp is after the stake timestamp
+  /// 2. Reward timestamp is before the unstake timestamp if any
+  /// 3. Reward is not withdrawn from already
+  public static getEligibleRewardNumbers(rewards: ParsedReward[], userStake: UserStake, userRewards: UserRewards) {
+    const eligibleNumbers = [];
+    for (let i = 0; i < rewards.length; i++) {
+      const reward = rewards[i];
+      const rts = reward.fields.timestamp;
+
+      const eligibleStakedBefore = rts.gt(userStake.stakedAt);
+      const eligibleUnstakedAfter = userStake.withdrawnAt.eq(new BN(0)) || userStake.withdrawnAt.gt(rts);
+      const eligibleNotWithdrawnFrom = userRewards.withdrawnNumber.lt(reward.fields.number);
+
+      if (eligibleStakedBefore && eligibleUnstakedAfter && eligibleNotWithdrawnFrom) {
+        eligibleNumbers.push(reward.fields.number.toNumber());
+      }
+    }
+    return eligibleNumbers;
   }
 
   /// Creates UserRewards account
@@ -245,7 +285,7 @@ export class VeChanStakingClient {
 
     const transaction = new Transaction().add(addPriorityFee, createUserVaultInstuction, withdrawRewardInstruction);
 
-    return { transaction };
+    return transaction;
   }
 
   async buildStakeTokensTransaction(
