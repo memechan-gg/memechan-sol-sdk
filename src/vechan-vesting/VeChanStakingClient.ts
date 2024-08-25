@@ -27,7 +27,7 @@ import {
   getUserStakeSigner,
 } from "./utils";
 import { COMPUTE_UNIT_PRICE, TOKEN_INFOS, WSOL_DECIMALS } from "../config/config";
-import { Reward, UserRewards, UserStake, UserStakeFields } from "./schema/codegen/accounts";
+import { Reward, UserRewards, UserStake } from "./schema/codegen/accounts";
 import BigNumber from "bignumber.js";
 import { ParsedReward } from "./types";
 
@@ -135,12 +135,14 @@ export class VeChanStakingClient {
     return parsedRewards;
   }
 
-  /// Gets the first eligible reward from parsed rewards array.
-  /// Returns the first eligible reward's number or -1 if there are no eligible reward in the array.
-  /// For reward to be eligible is to
-  /// 1. Reward timestamp is after the stake timestamp
-  /// 2. Reward timestamp is before the unstake timestamp if any
-  /// 3. Reward is not withdrawn from already
+  /** Gets the first eligible reward from parsed rewards array.
+   *
+   * Returns the first eligible reward's number or -1 if there are no eligible reward in the array.
+   * To be eligible, a reward needs to satisfy all of the following conditions
+   * 1. Reward timestamp is after the stake timestamp
+   * 2. Reward timestamp is before the unstake timestamp if any
+   * 3. Reward is not withdrawn from already
+   **/
   public static getNextEligibleRewardNumber(rewards: ParsedReward[], userStake: UserStake, userRewards: UserRewards) {
     const eligible = this.getEligibleRewardNumbers(rewards, userStake, userRewards);
 
@@ -151,12 +153,14 @@ export class VeChanStakingClient {
     return -1;
   }
 
-  /// Gets all eligible rewards from parsed rewards array.
-  /// Returns all eligible reward's number or -1 if there are no eligible reward in the array.
-  /// For reward to be eligible is to
-  /// 1. Reward timestamp is after the stake timestamp
-  /// 2. Reward timestamp is before the unstake timestamp if any
-  /// 3. Reward is not withdrawn from already
+  /** Gets all eligible rewards from parsed rewards array.
+   *
+   * Returns all eligible reward's number or -1 if there are no eligible reward in the array.
+   * To be eligible, a reward needs to satisfy all of the following conditions
+   * 1. Reward timestamp is after the stake timestamp
+   * 2. Reward timestamp is before the unstake timestamp if any
+   * 3. Reward is not withdrawn from already
+   **/
   public static getEligibleRewardNumbers(rewards: ParsedReward[], userStake: UserStake, userRewards: UserRewards) {
     const eligibleNumbers = [];
     for (let i = 0; i < rewards.length; i++) {
@@ -174,9 +178,10 @@ export class VeChanStakingClient {
     return eligibleNumbers;
   }
 
-  /// Creates UserRewards account
-  ///
-  /// UserRewards should be created alongside Stake
+  /** Creates UserRewards account
+   *
+   *  UserRewards should be created alongside Stake
+   **/
   async getCreateUserRewardsInstuction(userPublicKey: PublicKey, stake: PublicKey) {
     const userRewards = getUserRewardsPDA(this.rewardState, stake);
 
@@ -195,11 +200,12 @@ export class VeChanStakingClient {
     return createUserRewardsInstruction;
   }
 
-  /// Skips rewards the stake is ineligible for
-  ///
-  /// Skip rewards should be used when userRewards account's withdrawn_number field is less than the first eligible reward number
-  /// e.g. first eligible (stake timestamp < rewards timestamp < unstake timestamp) reward for said mint is number 5, and
-  /// our user just created their userRewards so it has 0 in the withdrawn_number field
+  /** Skips rewards the stake is ineligible for
+   *
+   * Skip rewards should be used when userRewards account's withdrawn_number field is less than the first eligible reward number
+   * e.g. first eligible (stake timestamp < rewards timestamp < unstake timestamp) reward for said mint is number 5, and
+   * our user just created their userRewards so it has 0 in the withdrawn_number field
+   */
   async buildSkipRewardsTransaction(userRewards: PublicKey, stake: PublicKey, lastRewardNumber: number) {
     const skipRewardsInstruction = await this.program.methods
       .userSkipRewards(new BN(lastRewardNumber - 1), new BN(lastRewardNumber))
@@ -222,7 +228,7 @@ export class VeChanStakingClient {
     return { transaction };
   }
 
-  /// Get WithdrawReward instruction
+  /**  Get WithdrawReward instruction*/
   async getWithdrawRewardInstuction(
     userPublicKey: PublicKey,
     stake: PublicKey,
@@ -253,10 +259,11 @@ export class VeChanStakingClient {
     return withdrawRewardInstruction;
   }
 
-  /// Get WithdrawReward transaction
-  ///
-  /// WithdrawReward should be called on the first of the currently eligible (stake timestamp < rewards timestamp < unstake timestamp) rewards.
-  /// You can add multiple WithdrawRewards to the same transaction to withdraw from multiple reward accounts consecutively.
+  /** Get WithdrawReward transaction
+   *
+   * WithdrawReward should be called on the first of the currently eligible (stake timestamp < rewards timestamp < unstake timestamp) rewards.
+   * You can add multiple WithdrawRewards to the same transaction to withdraw from multiple reward accounts consecutively.
+   */
   async buildWithdrawRewardTransaction(
     userPublicKey: PublicKey,
     stake: PublicKey,
