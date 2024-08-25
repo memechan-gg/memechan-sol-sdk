@@ -5,24 +5,31 @@ import {
   Transaction,
   ComputeBudgetProgram,
   GetProgramAccountsFilter,
+  Connection,
+  AccountInfo,
 } from "@solana/web3.js";
 import { AnchorProvider, BN, Program } from "@coral-xyz/anchor";
 import { IDL, Staking } from "./schema/types/staking";
 import {
+  NATIVE_MINT,
   TOKEN_2022_PROGRAM_ID,
   TOKEN_PROGRAM_ID,
   createAssociatedTokenAccountIdempotentInstruction,
   getAssociatedTokenAddressSync,
 } from "@solana/spl-token";
 import {
+  getRewardPDA,
+  getRewardSigner,
   getRewardStatePDA,
   getStakingStatePDA,
   getStakingStateSigner,
   getUserRewardsPDA,
   getUserStakeSigner,
 } from "./utils";
-import { COMPUTE_UNIT_PRICE, TOKEN_INFOS } from "../config/config";
-import { UserRewards, UserStake } from "./schema/codegen/accounts";
+import { COMPUTE_UNIT_PRICE, TOKEN_INFOS, WSOL_DECIMALS } from "../config/config";
+import { Reward, UserRewards, UserStake } from "./schema/codegen/accounts";
+import BigNumber from "bignumber.js";
+import { ParsedReward } from "./types";
 
 export class VeChanStakingClient {
   public program: Program<Staking>;
@@ -30,6 +37,7 @@ export class VeChanStakingClient {
   private veChanMint: PublicKey;
   private stakingState: PublicKey;
   private stakingStateSigner: PublicKey;
+  private rewardState: PublicKey;
 
   constructor(programId: PublicKey, provider?: AnchorProvider) {
     this.program = new Program(IDL, programId, provider);
@@ -37,6 +45,7 @@ export class VeChanStakingClient {
     this.veChanMint = TOKEN_INFOS.veCHAN.mint;
     this.stakingState = getStakingStatePDA(this.vChanMint, this.veChanMint);
     this.stakingStateSigner = getStakingStateSigner(this.stakingState);
+    this.rewardState = getRewardStatePDA(NATIVE_MINT, this.stakingState);
   }
 
   public async fetchStakesForUser(user: PublicKey): Promise<{ data: UserStake; address: PublicKey }[]> {
@@ -60,7 +69,7 @@ export class VeChanStakingClient {
   public async fetchRewardsForUserStakes(
     stakeAddresses: PublicKey[],
   ): Promise<{ data: UserRewards | null; address: PublicKey }[]> {
-    const rewardState = getRewardStatePDA(TOKEN_INFOS.CHAN.mint);
+    const rewardState = this.rewardState;
 
     const allRewardAddresses = stakeAddresses.map((stakeAddress) => getUserRewardsPDA(rewardState, stakeAddress));
 
@@ -82,6 +91,161 @@ export class VeChanStakingClient {
         address: rewardAddress,
       };
     });
+  }
+
+  public async fetchRewards() {
+    return this.fetchRewardsByMintState(this.stakingState, NATIVE_MINT);
+  }
+
+  public async fetchRewardsByMintState(stakingState: PublicKey, mint: PublicKey) {
+    const batchSize = 100;
+    const rewardState = getRewardStatePDA(mint, stakingState);
+    const rewardAddresses = Array.from(Array(batchSize).keys()).map((i) => getRewardPDA(rewardState, i));
+    return VeChanStakingClient.fetchRewardsByIds(rewardAddresses, this.program.provider.connection);
+  }
+
+  public static async fetchRewardsByIds(rewardPubkeys: PublicKey[], connection: Connection) {
+    const accountInfos = await connection.getMultipleAccountsInfo(rewardPubkeys);
+
+    const foundAccountsData: { accountInfo: AccountInfo<Buffer>; index: number }[] = accountInfos.reduce(
+      (dataArray: { accountInfo: AccountInfo<Buffer>; index: number }[], accountInfo, index) => {
+        if (accountInfo !== null) {
+          dataArray.push({ accountInfo, index });
+        }
+
+        return dataArray;
+      },
+      [],
+    );
+
+    const parsedRewards: ParsedReward[] = foundAccountsData.map(({ accountInfo, index }) => {
+      const id = rewardPubkeys[index];
+      const decodedTicket = Reward.decode(accountInfo.data);
+      const jsonReward = decodedTicket.toJSON();
+
+      return {
+        id,
+        jsonFields: jsonReward,
+        fields: decodedTicket,
+        rewardAmountWithDecimals: new BigNumber(jsonReward.rewardAmount).dividedBy(WSOL_DECIMALS).toString(),
+      };
+    });
+
+    return { rewards: parsedRewards };
+  }
+
+  /// Creates UserRewards account
+  ///
+  /// UserRewards should be created alongside Stake
+  async getCreateUserRewardsInstuction(userPublicKey: PublicKey, stake: PublicKey) {
+    const userRewards = getUserRewardsPDA(this.rewardState, stake);
+
+    const createUserRewardsInstruction = await this.program.methods
+      .createUserRewards()
+      .accounts({
+        userRewards,
+        mint: NATIVE_MINT,
+        rewardState: this.rewardState,
+        signer: userPublicKey,
+        stake: stake,
+        systemProgram: SystemProgram.programId,
+      })
+      .instruction();
+
+    return createUserRewardsInstruction;
+  }
+
+  /// Skips rewards the stake is ineligible for
+  ///
+  /// Skip rewards should be used when userRewards account's withdrawn_number field is less than the first eligible reward number
+  /// e.g. first eligible (stake timestamp < rewards timestamp < unstake timestamp) reward for said mint is number 5, and
+  /// our user just created their userRewards so it has 0 in the withdrawn_number field
+  async buildSkipRewardsTransaction(userRewards: PublicKey, stake: PublicKey, lastRewardNumber: number) {
+    const skipRewardsInstruction = await this.program.methods
+      .userSkipRewards(new BN(lastRewardNumber - 1), new BN(lastRewardNumber))
+      .accounts({
+        userRewards,
+        rewardPrev: getRewardPDA(this.rewardState, lastRewardNumber - 1),
+        rewardNext: getRewardPDA(this.rewardState, lastRewardNumber),
+        rewardState: this.rewardState,
+        stake,
+        systemProgram: SystemProgram.programId,
+      })
+      .instruction();
+
+    const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
+      microLamports: COMPUTE_UNIT_PRICE,
+    });
+
+    const transaction = new Transaction().add(addPriorityFee, skipRewardsInstruction);
+
+    return { transaction };
+  }
+
+  /// Get WithdrawReward instruction
+  async getWithdrawRewardInstuction(
+    userPublicKey: PublicKey,
+    stake: PublicKey,
+    userRewards: PublicKey,
+    rewardNumber: number,
+  ) {
+    const reward = getRewardPDA(this.rewardState, rewardNumber);
+    const rewardSigner = getRewardSigner(reward);
+    const vault = getAssociatedTokenAddressSync(NATIVE_MINT, rewardSigner, true);
+    const userVault = getAssociatedTokenAddressSync(NATIVE_MINT, userPublicKey, false);
+
+    const withdrawRewardInstruction = await this.program.methods
+      .userWithdrawReward(new BN(rewardNumber))
+      .accounts({
+        userRewards,
+        userVault,
+        vault,
+        reward,
+        rewardSigner,
+        rewardState: this.rewardState,
+        signer: userPublicKey,
+        stake,
+        systemProgram: SystemProgram.programId,
+        tokenProgram: TOKEN_PROGRAM_ID,
+      })
+      .instruction();
+
+    return withdrawRewardInstruction;
+  }
+
+  /// Get WithdrawReward transaction
+  ///
+  /// WithdrawReward should be called on the first of the currently eligible (stake timestamp < rewards timestamp < unstake timestamp) rewards.
+  /// You can add multiple WithdrawRewards to the same transaction to withdraw from multiple reward accounts consecutively.
+  async buildWithdrawRewardTransaction(
+    userPublicKey: PublicKey,
+    stake: PublicKey,
+    userRewards: PublicKey,
+    rewardNumber: number,
+  ) {
+    const userVault = getAssociatedTokenAddressSync(NATIVE_MINT, userPublicKey, false);
+
+    const createUserVaultInstuction = createAssociatedTokenAccountIdempotentInstruction(
+      userPublicKey,
+      userVault,
+      userPublicKey,
+      NATIVE_MINT,
+    );
+
+    const withdrawRewardInstruction = await this.getWithdrawRewardInstuction(
+      userPublicKey,
+      stake,
+      userRewards,
+      rewardNumber,
+    );
+
+    const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
+      microLamports: COMPUTE_UNIT_PRICE,
+    });
+
+    const transaction = new Transaction().add(addPriorityFee, createUserVaultInstuction, withdrawRewardInstruction);
+
+    return { transaction };
   }
 
   async buildStakeTokensTransaction(
@@ -131,11 +295,19 @@ export class VeChanStakingClient {
       })
       .instruction();
 
+    const createUserRewardsInstruction = await this.getCreateUserRewardsInstuction(userPublicKey, stake.publicKey);
+
     const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({
       microLamports: COMPUTE_UNIT_PRICE,
     });
 
-    const transaction = new Transaction().add(addPriorityFee, vaultCTX, userVeAccCIx, stakeTokensInstruction);
+    const transaction = new Transaction().add(
+      addPriorityFee,
+      vaultCTX,
+      userVeAccCIx,
+      stakeTokensInstruction,
+      createUserRewardsInstruction,
+    );
 
     return { transaction, stake };
   }

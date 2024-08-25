@@ -38,8 +38,11 @@ export function getUserRewardsPDA(rewardState: PublicKey, stake: PublicKey): Pub
   )[0];
 }
 
-export function getRewardStatePDA(mint: PublicKey): PublicKey {
-  return PublicKey.findProgramAddressSync([Buffer.from("reward_state"), mint.toBytes()], programId)[0];
+export function getRewardStatePDA(mint: PublicKey, stakingState: PublicKey): PublicKey {
+  return PublicKey.findProgramAddressSync(
+    [Buffer.from("reward_state"), mint.toBytes(), stakingState.toBytes()],
+    programId,
+  )[0];
 }
 
 export function getRewardPDA(rewardState: PublicKey, rewardNumber: number): PublicKey {
