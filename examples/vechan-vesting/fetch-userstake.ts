@@ -15,6 +15,6 @@ import { AnchorProvider, Wallet } from "@coral-xyz/anchor";
   const userStakes = await client.fetchStakesForUser(user);
   console.log("User Stakes:", userStakes);
 
-  const rewards = await client.fetchRewardsForUserStakes(userStakes.map((el) => el.address));
+  const rewards = await client.fetchUserRewardsForStakes(userStakes.map((el) => el.address));
   console.log("User Rewards:", rewards);
 })();
