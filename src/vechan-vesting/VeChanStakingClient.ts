@@ -26,7 +26,7 @@ import {
   getUserRewardsPDA,
   getUserStakeSigner,
 } from "./utils";
-import { COMPUTE_UNIT_PRICE, TOKEN_INFOS, WSOL_DECIMALS } from "../config/config";
+import { COMPUTE_UNIT_PRICE, TOKEN_INFOS, VCHAN_TOKEN_DECIMALS, WSOL_DECIMALS } from "../config/config";
 import { Reward, UserRewards, UserStake } from "./schema/codegen/accounts";
 import BigNumber from "bignumber.js";
 import { ParsedReward } from "./types";
@@ -137,9 +137,13 @@ export class VeChanStakingClient {
 
   public static getRewardAPR(reward: ParsedReward, vChanPrice: BigNumber, solPrice: BigNumber) {
     const timeTotalDays = new BigNumber(30);
-    const totalRewardUsdValue = new BigNumber(reward.fields.rewardAmount.toString()).multipliedBy(solPrice);
+    const totalRewardUsdValue = new BigNumber(reward.fields.rewardAmount.toString())
+      .multipliedBy(solPrice)
+      .dividedBy(WSOL_DECIMALS);
 
-    const totalStakeUsdValue = new BigNumber(reward.fields.stakesTotal.toString()).multipliedBy(vChanPrice);
+    const totalStakeUsdValue = new BigNumber(reward.fields.stakesTotal.toString())
+      .multipliedBy(vChanPrice)
+      .dividedBy(10 ** VCHAN_TOKEN_DECIMALS);
 
     return totalRewardUsdValue.multipliedBy(new BigNumber(365)).dividedBy(totalStakeUsdValue).dividedBy(timeTotalDays);
   }
@@ -162,9 +166,11 @@ export class VeChanStakingClient {
 
     const timeTotal = allRewards[allRewards.length - 1].fields.timestamp.sub(allRewards[0].fields.timestamp);
     const timeTotalDays = new BigNumber(timeTotal.div(new BN(3600 * 24)).toString());
-    const totalRewardUsdValue = new BigNumber(rewardTotal.toString()).multipliedBy(solPrice);
+    const totalRewardUsdValue = new BigNumber(rewardTotal.toString()).dividedBy(WSOL_DECIMALS).multipliedBy(solPrice);
 
-    const totalStakeUsdValue = new BigNumber(stakeTotalAvg.toString()).multipliedBy(vChanPrice);
+    const totalStakeUsdValue = new BigNumber(stakeTotalAvg.toString())
+      .dividedBy(10 ** VCHAN_TOKEN_DECIMALS)
+      .multipliedBy(vChanPrice);
 
     return totalRewardUsdValue.multipliedBy(new BigNumber(365)).dividedBy(totalStakeUsdValue).dividedBy(timeTotalDays);
   }
