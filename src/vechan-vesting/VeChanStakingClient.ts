@@ -135,6 +135,40 @@ export class VeChanStakingClient {
     return parsedRewards;
   }
 
+  public static getRewardAPR(reward: ParsedReward, vChanPrice: BigNumber, solPrice: BigNumber) {
+    const timeTotalDays = new BigNumber(30);
+    const totalRewardUsdValue = new BigNumber(reward.fields.rewardAmount.toString()).multipliedBy(solPrice);
+
+    const totalStakeUsdValue = new BigNumber(reward.fields.stakesTotal.toString()).multipliedBy(vChanPrice);
+
+    return totalRewardUsdValue.multipliedBy(new BigNumber(365)).dividedBy(totalStakeUsdValue).dividedBy(timeTotalDays);
+  }
+
+  public static getRewardsAvgAPR(rewards: ParsedReward[], vChanPrice: BigNumber, solPrice: BigNumber) {
+    const aprs: BigNumber[] = rewards.map((reward) => VeChanStakingClient.getRewardAPR(reward, vChanPrice, solPrice));
+    const totalAPR = aprs.reduce((sum, current) => sum.plus(current), new BigNumber(0));
+    return totalAPR.dividedBy(rewards.length);
+  }
+
+  public static getAvgAPR(allRewards: ParsedReward[], vChanPrice: BigNumber, solPrice: BigNumber) {
+    let rewardTotal = new BN(0);
+    let stakeTotalAvg = new BN(0);
+    for (const reward of allRewards) {
+      rewardTotal = rewardTotal.add(reward.fields.rewardAmount);
+      stakeTotalAvg = stakeTotalAvg.add(reward.fields.stakesTotal);
+    }
+
+    stakeTotalAvg = stakeTotalAvg.div(new BN(allRewards.length));
+
+    const timeTotal = allRewards[allRewards.length - 1].fields.timestamp.sub(allRewards[0].fields.timestamp);
+    const timeTotalDays = new BigNumber(timeTotal.div(new BN(3600 * 24)).toString());
+    const totalRewardUsdValue = new BigNumber(rewardTotal.toString()).multipliedBy(solPrice);
+
+    const totalStakeUsdValue = new BigNumber(stakeTotalAvg.toString()).multipliedBy(vChanPrice);
+
+    return totalRewardUsdValue.multipliedBy(new BigNumber(365)).dividedBy(totalStakeUsdValue).dividedBy(timeTotalDays);
+  }
+
   /**
    * Get the number of tokens that can be withdrawn by user for the provided userRewards account
    */
