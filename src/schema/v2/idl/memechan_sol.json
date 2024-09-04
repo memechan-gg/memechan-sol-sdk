@@ -266,35 +266,9 @@
           "isSigner": false
         },
         {
-          "name": "userPoints",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "referrerPoints",
-          "isMut": true,
-          "isSigner": false,
-          "isOptional": true
-        },
-        {
-          "name": "pointsMint",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
-          "name": "pointsAcc",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
           "name": "owner",
           "isMut": true,
           "isSigner": true
-        },
-        {
-          "name": "pointsPda",
-          "isMut": false,
-          "isSigner": false
         },
         {
           "name": "poolSignerPda",
@@ -1946,8 +1920,5 @@
       "code": 6030,
       "name": "InvalidVestingPeriod"
     }
-  ],
-  "metadata": {
-    "address": "chv2ogo3QopnnGctZM9Hxo2VCQ2zEcvQy6Uo6XVpiRH"
-  }
+  ]
 }
