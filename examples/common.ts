@@ -21,7 +21,7 @@ export const connectionMiddleware = async (
   }
 };
 
-export const connection = new Connection("https://lusa-4nbpxk-fast-devnet.helius-rpc.com", {
+export const connection = new Connection("https://georgeanne-ejqyzl-fast-mainnet.helius-rpc.com", {
   httpAgent: IS_TEST_ENV ? false : undefined,
   commitment: "confirmed",
   confirmTransactionInitialTimeout: 30000,

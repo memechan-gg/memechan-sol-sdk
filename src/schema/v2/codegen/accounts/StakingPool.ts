@@ -102,7 +102,7 @@ export class StakingPool {
       return null;
     }
     if (!info.owner.equals(PROGRAM_ID)) {
-      throw new Error("account doesn't belong to this program. Program ID: " + PROGRAM_ID.toBase58());
+      throw new Error("account doesn't belong to this program");
     }
 
     return this.decode(info.data);
