@@ -262,35 +262,9 @@ export type MemechanSol = {
           isSigner: false;
         },
         {
-          name: "userPoints";
-          isMut: true;
-          isSigner: false;
-        },
-        {
-          name: "referrerPoints";
-          isMut: true;
-          isSigner: false;
-          isOptional: true;
-        },
-        {
-          name: "pointsMint";
-          isMut: true;
-          isSigner: false;
-        },
-        {
-          name: "pointsAcc";
-          isMut: true;
-          isSigner: false;
-        },
-        {
           name: "owner";
           isMut: true;
           isSigner: true;
-        },
-        {
-          name: "pointsPda";
-          isMut: false;
-          isSigner: false;
         },
         {
           name: "poolSignerPda";
@@ -2149,35 +2123,9 @@ export const IDL: MemechanSol = {
           isSigner: false,
         },
         {
-          name: "userPoints",
-          isMut: true,
-          isSigner: false,
-        },
-        {
-          name: "referrerPoints",
-          isMut: true,
-          isSigner: false,
-          isOptional: true,
-        },
-        {
-          name: "pointsMint",
-          isMut: true,
-          isSigner: false,
-        },
-        {
-          name: "pointsAcc",
-          isMut: true,
-          isSigner: false,
-        },
-        {
           name: "owner",
           isMut: true,
           isSigner: true,
-        },
-        {
-          name: "pointsPda",
-          isMut: false,
-          isSigner: false,
         },
         {
           name: "poolSignerPda",

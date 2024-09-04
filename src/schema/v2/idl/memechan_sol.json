@@ -1920,5 +1920,8 @@
       "code": 6030,
       "name": "InvalidVestingPeriod"
     }
-  ]
+  ],
+  "metadata": {
+    "address": "chv2ogo3QopnnGctZM9Hxo2VCQ2zEcvQy6Uo6XVpiRH"
+  }
 }

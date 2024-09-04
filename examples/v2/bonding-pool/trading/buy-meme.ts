@@ -5,10 +5,10 @@ import { MemeTicketClientV2 } from "../../../../src/memeticket/MemeTicketClientV
 
 // yarn tsx examples/v2/bonding-pool/trading/buy-meme.ts
 (async () => {
-  const poolAccountAddressId = new PublicKey("4iagw4iVieJ4jiiG5Mzvrosud87LU28vrAuVdg7tns6s");
+  const poolAccountAddressId = new PublicKey("EEK2keRNciwoCEYZjNcWdy4Cb2guPgNziLKvfztVLL1r");
   const { boundPoolInstance } = await getBoundPoolClientFromId(poolAccountAddressId, client, clientV2);
 
-  const inputAmount = "0.0002";
+  const inputAmount = "0.00001";
 
   const minOutputAmount = await boundPoolInstance.getOutputAmountForBuyMeme({
     inputAmount: inputAmount,

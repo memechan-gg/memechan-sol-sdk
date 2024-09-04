@@ -654,33 +654,33 @@ export class BoundPoolClientV2 {
       });
     }
 
-    const pointsUserAta = await ensureAssociatedTokenAccountWithIdempotentIX({
-      connection: connection,
-      payer: user,
-      mint: POINTS_MINT,
-      owner: user,
-      transaction,
-    });
+    // const pointsUserAta = await ensureAssociatedTokenAccountWithIdempotentIX({
+    //   connection: connection,
+    //   payer: user,
+    //   mint: POINTS_MINT,
+    //   owner: user,
+    //   transaction,
+    // });
 
-    const pointsPda = findPointsPda(this.client.memechanProgram.programId);
-    const pointsProgramAta = await ensureAssociatedTokenAccountWithIdempotentIX({
-      connection: connection,
-      payer: user,
-      mint: POINTS_MINT,
-      owner: pointsPda,
-      transaction,
-    });
+    // const pointsPda = findPointsPda(this.client.memechanProgram.programId);
+    // const pointsProgramAta = await ensureAssociatedTokenAccountWithIdempotentIX({
+    //   connection: connection,
+    //   payer: user,
+    //   mint: POINTS_MINT,
+    //   owner: pointsPda,
+    //   transaction,
+    // });
 
-    let referrerATA = null;
-    if (referrer) {
-      referrerATA = await ensureAssociatedTokenAccountWithIdempotentIX({
-        connection: connection,
-        payer: user,
-        mint: POINTS_MINT,
-        owner: referrer,
-        transaction,
-      });
-    }
+    // let referrerATA = null;
+    // if (referrer) {
+    //   referrerATA = await ensureAssociatedTokenAccountWithIdempotentIX({
+    //     connection: connection,
+    //     payer: user,
+    //     mint: POINTS_MINT,
+    //     owner: referrer,
+    //     transaction,
+    //   });
+    // }
 
     addWrapSOLInstructionIfNativeMint(this.quoteTokenMint, user, inputTokenAccount, inputAmountBN, transaction);
     const { TOKEN_PROGRAM_ID } = await import("@solana/spl-token");
@@ -696,11 +696,11 @@ export class BoundPoolClientV2 {
         systemProgram: SystemProgram.programId,
         tokenProgram: TOKEN_PROGRAM_ID,
         memeTicket: memeTicketPublicKey,
-        pointsMint: POINTS_MINT,
-        pointsPda: pointsPda,
-        userPoints: pointsUserAta,
-        pointsAcc: pointsProgramAta,
-        referrerPoints: referrerATA,
+        // pointsMint: POINTS_MINT,
+        // pointsPda: pointsPda,
+        // userPoints: pointsUserAta,
+        // pointsAcc: pointsProgramAta,
+        // referrerPoints: referrerATA,
       })
       .instruction();
 
