@@ -4,6 +4,7 @@ import { ADMIN_PUB_KEY, Auth, BE_URL, MemechanClient, TokenAPI } from "../src";
 import { HELIUS_API_KEY, HELIUS_API_URL, IS_TEST_ENV, TEST_USER_SECRET_KEY } from "./env";
 import { HeliusApi } from "../src/helius-api/HeliusApi";
 import { MemechanClientV2 } from "../src/MemechanClientV2";
+import bs58 from "bs58";
 
 export const connectionMiddleware = async (
   urlAddress: Parameters<FetchMiddleware>[0],
@@ -20,7 +21,7 @@ export const connectionMiddleware = async (
   }
 };
 
-export const connection = new Connection("https://georgeanne-ejqyzl-fast-mainnet.helius-rpc.com", {
+export const connection = new Connection("https://lusa-4nbpxk-fast-devnet.helius-rpc.com", {
   httpAgent: IS_TEST_ENV ? false : undefined,
   commitment: "confirmed",
   confirmTransactionInitialTimeout: 30000,
@@ -28,7 +29,14 @@ export const connection = new Connection("https://georgeanne-ejqyzl-fast-mainnet
 });
 
 export const admin = ADMIN_PUB_KEY;
-export const payer = Keypair.fromSecretKey(Buffer.from(JSON.parse(TEST_USER_SECRET_KEY)));
+
+const base58SecretKey = "65AqFqdJVEBCdE5rWzPK2ajtgNQ8hdUBhA6L5vLBvy3WErpAybaHJNiiibC4mXfFitBp6RWHWX9ePSrUQvn3cexj";
+
+// Decode the base58 private key
+const secretKeyArray = bs58.decode(base58SecretKey);
+
+// Create the Keypair from the secret key
+export const payer = Keypair.fromSecretKey(secretKeyArray);
 export const wallet = new Wallet(payer);
 
 export const client = new MemechanClient({

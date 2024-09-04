@@ -9,14 +9,14 @@ import {
 import { UserRewards, UserStake } from "../../src/vechan-vesting/schema/codegen/accounts";
 import { connection, payer } from "../common";
 import { AnchorProvider, Wallet } from "@coral-xyz/anchor";
-import { sendAndConfirmTransaction } from "@solana/web3.js";
+import { PublicKey, sendAndConfirmTransaction } from "@solana/web3.js";
 
 // yarn tsx examples/vechan-vesting/fetch-userstake.ts
 (async () => {
-  const user = payer.publicKey;
+  const user = new PublicKey("J6dVHbVHiJXb46cSt2XdtAoTTt9NFD8yy889UAEdutf6");
 
   const client = new VeChanStakingClient(
-    VESTING_PROGRAM_ID,
+    new PublicKey("vestJGg7ZMQoXiAr2pLV5cqgtxFhEWzNoZL5Ngzb8H4"),
     new AnchorProvider(connection, new Wallet(payer), { commitment: "confirmed" }),
   );
 

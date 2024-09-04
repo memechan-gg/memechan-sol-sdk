@@ -39,7 +39,7 @@ const MEMECHAN_PROGRAM_ID_PK = new PublicKey(MEMECHAN_PROGRAM_ID);
  *
  * @constant {string}
  */
-const MEMECHAN_PROGRAM_ID_V2 = "chv2ogo3QopnnGctZM9Hxo2VCQ2zEcvQy6Uo6XVpiRH";
+const MEMECHAN_PROGRAM_ID_V2 = "CaR9ciDnNnE6WX35tZWrjeGdKUPaft7r4oQGF4JhwVxZ";
 
 const MEMECHAN_PROGRAM_ID_V2_PK = new PublicKey(MEMECHAN_PROGRAM_ID_V2);
 
