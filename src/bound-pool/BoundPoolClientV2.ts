@@ -64,7 +64,6 @@ import {
   FULL_MEME_AMOUNT_CONVERTED_V2,
   MAX_TICKET_TOKENS_V2,
   MEMECHAN_MEME_TOKEN_DECIMALS,
-  POINTS_MINT,
   SWAP_FEE_WALLET,
   TOKEN_INFOS,
 } from "../config/config";
@@ -97,7 +96,6 @@ import { StakingPoolClientV2 } from "../staking-pool/StakingPoolClientV2";
 import { MemechanSol } from "../schema/v2/v2";
 import { AuthorityType, createSetAuthorityInstruction } from "@solana/spl-token";
 import { ensureAssociatedTokenAccountWithIX } from "../util/ensureAssociatedTokenAccountWithIX";
-import { findPointsPda } from "../util/findPointsPda";
 
 export class BoundPoolClientV2 {
   private constructor(
@@ -612,7 +610,6 @@ export class BoundPoolClientV2 {
       user,
       transaction = new Transaction(),
       memeTicketNumber,
-      referrer,
     } = input;
     let { inputTokenAccount } = input;
 
