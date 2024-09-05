@@ -69,8 +69,8 @@ const TOKEN_INFOS: { [symbol: string]: TokenInfo } = {
     decimals: 9,
     name: "SOL",
     symbol: "SOL",
-    memeChanProgramId: MEMECHAN_PROGRAM_ID_PK,
-    memeChanProgramIdV2: MEMECHAN_PROGRAM_ID_V2_PK,
+    memeChanProgramId: new PublicKey(MEMECHAN_PROGRAM_ID),
+    memeChanProgramIdV2: new PublicKey(MEMECHAN_PROGRAM_ID_V2),
   }),
   SLERF: new TokenInfo({
     programId: TOKEN_PROGRAM_ID,
@@ -78,8 +78,8 @@ const TOKEN_INFOS: { [symbol: string]: TokenInfo } = {
     decimals: 9,
     name: "SLERF",
     symbol: "SLERF",
-    memeChanProgramId: MEMECHAN_PROGRAM_ID_PK,
-    memeChanProgramIdV2: MEMECHAN_PROGRAM_ID_V2_PK,
+    memeChanProgramId: new PublicKey(MEMECHAN_PROGRAM_ID),
+    memeChanProgramIdV2: new PublicKey(MEMECHAN_PROGRAM_ID_V2),
   }),
   CHAN: new TokenInfo({
     programId: TOKEN_PROGRAM_ID,
@@ -87,8 +87,8 @@ const TOKEN_INFOS: { [symbol: string]: TokenInfo } = {
     decimals: 9,
     symbol: "CHAN",
     name: "memechan",
-    memeChanProgramId: MEMECHAN_PROGRAM_ID_PK,
-    memeChanProgramIdV2: MEMECHAN_PROGRAM_ID_V2_PK,
+    memeChanProgramId: new PublicKey(MEMECHAN_PROGRAM_ID),
+    memeChanProgramIdV2: new PublicKey(MEMECHAN_PROGRAM_ID_V2),
   }),
   POINT: new TokenInfo({
     programId: TOKEN_PROGRAM_ID,
@@ -96,8 +96,8 @@ const TOKEN_INFOS: { [symbol: string]: TokenInfo } = {
     decimals: 9,
     symbol: "POINT",
     name: "point",
-    memeChanProgramId: MEMECHAN_PROGRAM_ID_PK,
-    memeChanProgramIdV2: MEMECHAN_PROGRAM_ID_V2_PK,
+    memeChanProgramId: new PublicKey(MEMECHAN_PROGRAM_ID),
+    memeChanProgramIdV2: new PublicKey(MEMECHAN_PROGRAM_ID_V2),
   }),
   vCHAN: new TokenInfo({
     programId: TOKEN_PROGRAM_ID,
@@ -105,8 +105,8 @@ const TOKEN_INFOS: { [symbol: string]: TokenInfo } = {
     decimals: 9,
     symbol: "vCHAN",
     name: "vCHAN",
-    memeChanProgramId: MEMECHAN_PROGRAM_ID_PK,
-    memeChanProgramIdV2: MEMECHAN_PROGRAM_ID_V2_PK,
+    memeChanProgramId: new PublicKey(MEMECHAN_PROGRAM_ID),
+    memeChanProgramIdV2: new PublicKey(MEMECHAN_PROGRAM_ID_V2),
   }),
   veCHAN: new TokenInfo({
     programId: TOKEN_PROGRAM_ID,
@@ -114,8 +114,8 @@ const TOKEN_INFOS: { [symbol: string]: TokenInfo } = {
     decimals: 9,
     symbol: "veCHAN",
     name: "veCHAN",
-    memeChanProgramId: MEMECHAN_PROGRAM_ID_PK,
-    memeChanProgramIdV2: MEMECHAN_PROGRAM_ID_V2_PK,
+    memeChanProgramId: new PublicKey(MEMECHAN_PROGRAM_ID),
+    memeChanProgramIdV2: new PublicKey(MEMECHAN_PROGRAM_ID_V2),
   }),
 };
 

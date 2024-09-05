@@ -31,6 +31,7 @@ export function getEnvVar<T>(envVar: string, fallback: T): T {
 }
 
 const isProduction = process.env.NEXT_PUBLIC_SDK_ENV === "production";
+console.log("isProduction", isProduction);
 const configSource = isProduction ? prodConfig : devConfig;
 
 export const BE_URL = getEnvVar("BE_URL", configSource.BE_URL);
