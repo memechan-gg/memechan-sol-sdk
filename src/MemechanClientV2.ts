@@ -33,7 +33,7 @@ export class MemechanClientV2 {
     setProvider(provider);
     this.anchorProvider = provider;
 
-    console.log(`MemechanClientV2 init. Program id: ${MEMECHAN_PROGRAM_ID_V2}, RPC: ${connection.rpcEndpoint}`);
+    console.log(`MemechanClientV2 init2. Program id: ${MEMECHAN_PROGRAM_ID_V2}, RPC: ${connection.rpcEndpoint}`);
 
     // Initialize the program with v2 schema
     this.memechanProgram = new Program<MemechanSolv2>(IDLv2, new PublicKey(MEMECHAN_PROGRAM_ID_V2), provider);
