@@ -29,7 +29,7 @@ const API_GATEWAY_FQDN = "h9crl8krnj.execute-api.us-east-1.amazonaws.com";
  */
 const MEMECHAN_PROGRAM_ID = "memeVtsr1AqAjfRzW2PuzymQdP2m7SgL6FQ1xgMc9MR";
 
-const MEMECHAN_PROGRAM_ID_PK = new PublicKey(MEMECHAN_PROGRAM_ID);
+const MEMECHAN_PROGRAM_ID_PK = new PublicKey("memeVtsr1AqAjfRzW2PuzymQdP2m7SgL6FQ1xgMc9MR");
 
 /**
  * The Memechan program ID on Solana.
@@ -41,7 +41,7 @@ const MEMECHAN_PROGRAM_ID_PK = new PublicKey(MEMECHAN_PROGRAM_ID);
  */
 const MEMECHAN_PROGRAM_ID_V2 = "chv2ogo3QopnnGctZM9Hxo2VCQ2zEcvQy6Uo6XVpiRH";
 
-const MEMECHAN_PROGRAM_ID_V2_PK = new PublicKey(MEMECHAN_PROGRAM_ID_V2);
+const MEMECHAN_PROGRAM_ID_V2_PK = new PublicKey("chv2ogo3QopnnGctZM9Hxo2VCQ2zEcvQy6Uo6XVpiRH");
 
 /**
  * The Memechan fee wallet id.
@@ -70,8 +70,8 @@ const TOKEN_INFOS: { [symbol: string]: TokenInfo } = {
     decimals: 9,
     name: "SOL",
     symbol: "SOL",
-    memeChanProgramId: new PublicKey(MEMECHAN_PROGRAM_ID),
-    memeChanProgramIdV2: new PublicKey(MEMECHAN_PROGRAM_ID_V2),
+    memeChanProgramId: new PublicKey("memeVtsr1AqAjfRzW2PuzymQdP2m7SgL6FQ1xgMc9MR"),
+    memeChanProgramIdV2: new PublicKey("chv2ogo3QopnnGctZM9Hxo2VCQ2zEcvQy6Uo6XVpiRH"),
   }),
   SLERF: new TokenInfo({
     programId: TOKEN_PROGRAM_ID,
@@ -79,8 +79,8 @@ const TOKEN_INFOS: { [symbol: string]: TokenInfo } = {
     decimals: 9,
     name: "SLERF",
     symbol: "SLERF",
-    memeChanProgramId: new PublicKey(MEMECHAN_PROGRAM_ID),
-    memeChanProgramIdV2: new PublicKey(MEMECHAN_PROGRAM_ID_V2),
+    memeChanProgramId: new PublicKey("memeVtsr1AqAjfRzW2PuzymQdP2m7SgL6FQ1xgMc9MR"),
+    memeChanProgramIdV2: new PublicKey("chv2ogo3QopnnGctZM9Hxo2VCQ2zEcvQy6Uo6XVpiRH"),
   }),
   CHAN: new TokenInfo({
     programId: TOKEN_PROGRAM_ID,
@@ -88,8 +88,8 @@ const TOKEN_INFOS: { [symbol: string]: TokenInfo } = {
     decimals: 9,
     symbol: "CHAN",
     name: "memechan",
-    memeChanProgramId: new PublicKey(MEMECHAN_PROGRAM_ID),
-    memeChanProgramIdV2: new PublicKey(MEMECHAN_PROGRAM_ID_V2),
+    memeChanProgramId: new PublicKey("memeVtsr1AqAjfRzW2PuzymQdP2m7SgL6FQ1xgMc9MR"),
+    memeChanProgramIdV2: new PublicKey("chv2ogo3QopnnGctZM9Hxo2VCQ2zEcvQy6Uo6XVpiRH"),
   }),
   POINT: new TokenInfo({
     programId: TOKEN_PROGRAM_ID,
@@ -97,8 +97,8 @@ const TOKEN_INFOS: { [symbol: string]: TokenInfo } = {
     decimals: 9,
     symbol: "POINT",
     name: "point",
-    memeChanProgramId: new PublicKey(MEMECHAN_PROGRAM_ID),
-    memeChanProgramIdV2: new PublicKey(MEMECHAN_PROGRAM_ID_V2),
+    memeChanProgramId: new PublicKey("memeVtsr1AqAjfRzW2PuzymQdP2m7SgL6FQ1xgMc9MR"),
+    memeChanProgramIdV2: new PublicKey("chv2ogo3QopnnGctZM9Hxo2VCQ2zEcvQy6Uo6XVpiRH"),
   }),
   vCHAN: new TokenInfo({
     programId: TOKEN_PROGRAM_ID,
@@ -106,8 +106,8 @@ const TOKEN_INFOS: { [symbol: string]: TokenInfo } = {
     decimals: 9,
     symbol: "vCHAN",
     name: "vCHAN",
-    memeChanProgramId: new PublicKey(MEMECHAN_PROGRAM_ID),
-    memeChanProgramIdV2: new PublicKey(MEMECHAN_PROGRAM_ID_V2),
+    memeChanProgramId: new PublicKey("memeVtsr1AqAjfRzW2PuzymQdP2m7SgL6FQ1xgMc9MR"),
+    memeChanProgramIdV2: new PublicKey("chv2ogo3QopnnGctZM9Hxo2VCQ2zEcvQy6Uo6XVpiRH"),
   }),
   veCHAN: new TokenInfo({
     programId: TOKEN_PROGRAM_ID,
@@ -115,8 +115,8 @@ const TOKEN_INFOS: { [symbol: string]: TokenInfo } = {
     decimals: 9,
     symbol: "veCHAN",
     name: "veCHAN",
-    memeChanProgramId: new PublicKey(MEMECHAN_PROGRAM_ID),
-    memeChanProgramIdV2: new PublicKey(MEMECHAN_PROGRAM_ID_V2),
+    memeChanProgramId: new PublicKey("memeVtsr1AqAjfRzW2PuzymQdP2m7SgL6FQ1xgMc9MR"),
+    memeChanProgramIdV2: new PublicKey("chv2ogo3QopnnGctZM9Hxo2VCQ2zEcvQy6Uo6XVpiRH"),
   }),
 };
 
