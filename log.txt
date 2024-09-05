@@ -1,0 +1,54 @@
+yarn run v1.22.21
+$ /Users/kitakitsune/Documents/Code/memechan-sol-sdk/node_modules/.bin/tsx examples/v2/bonding-pool/getBoundPoolClientFromId.ts
+MemechanClientV2 init. Program id: vestJGg7ZMQoXiAr2pLV5cqgtxFhEWzNoZL5Ngzb8H4, RPC: https://georgeanne-ejqyzl-fast-mainnet.helius-rpc.com
+[connectionMiddleware] urlAddress:  https://georgeanne-ejqyzl-fast-mainnet.helius-rpc.com
+accountInfo.owner: PublicKey [PublicKey(CaR9ciDnNnE6WX35tZWrjeGdKUPaft7r4oQGF4JhwVxZ)] {
+  _bn: <BN: ac000719d6c17ca7fce5003858b467106b873f1086e3bcc97d7a823b38c185d6>
+}
+boundPool: {
+  boundPoolInstance: BoundPoolClient {
+    id: PublicKey [PublicKey(nmVPzadrsF1Af7dpvMEC87ozetCU9tUy8rAQhcB186Z)] {
+      _bn: <BN: bb970e23e3c4b4127ef0012d77a3042eaf4189c2575c0ba9f05c17b4f360f3e>
+    },
+    client: MemechanClient {
+      wallet: [NodeWallet],
+      connection: [Connection],
+      memechanProgram: [Program],
+      anchorProvider: [AnchorProvider],
+      heliusApiUrl: 'https://devnet.helius-rpc.com/?api-key=bfd713ef-c9a7-404f-804c-e682c2bd0d3b',
+      simulationKeypair: [Keypair]
+    },
+    memeVault: PublicKey [PublicKey(2o4N6XzeRrH7kVfZDHf1GF9ZK8t53pyVjnSvzPRzppHd)] {
+      _bn: <BN: 1aa8351f36561f69f61ce8949086215406941e2063cbb58a9eec46a3b5244d48>
+    },
+    quoteVault: PublicKey [PublicKey(42VD9mjYEeCizZUdtbqa1oGP9Da2zeZcrC6d6EvFnje8)] {
+      _bn: <BN: 2cf489c5e5ced2e83bcf2652906afc9e2eae64fb0d94d3873ea5e07a8fd2aa19>
+    },
+    memeTokenMint: PublicKey [PublicKey(BBWr61tjinzWqz4FECqZKmQxjdXFx5s5sQt19FgMDx6t)] {
+      _bn: <BN: 97466cb8c1dbdb485265392304605bd621372eccfb3952103c7596235cdc8411>
+    },
+    quoteTokenMint: PublicKey [PublicKey(So11111111111111111111111111111111111111112)] {
+      _bn: <BN: 69b8857feab8184fb687f634618c035dac439dc1aeb3b5598a0f00000000001>
+    },
+    memeToken: Token {
+      decimals: 6,
+      symbol: 'UNKNOWN',
+      name: 'UNKNOWN',
+      programId: [PublicKey [PublicKey(TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA)]],
+      mint: [PublicKey [PublicKey(BBWr61tjinzWqz4FECqZKmQxjdXFx5s5sQt19FgMDx6t)]]
+    },
+    poolObjectData: BoundPool {
+      memeReserve: [Reserve],
+      quoteReserve: [Reserve],
+      adminFeesMeme: <BN: 0>,
+      adminFeesQuote: <BN: 0>,
+      feeVaultQuote: [PublicKey [PublicKey(HiUyuwe4Uezuqq4mhGqugdzVQT3mA3ZzBQsUW2x1H3Ri)]],
+      creatorAddr: [PublicKey [PublicKey(8SvkUtJZCyJwSQGkiszwcRcPv7c8pPSr8GVEppGNN7DV)]],
+      fees: [Fees],
+      config: [Config],
+      locked: false
+    }
+  },
+  version: 'V1'
+}
+Done in 3.13s.
