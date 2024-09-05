@@ -1,6 +1,6 @@
 import { PublicKey } from "@solana/web3.js";
 import BN from "bn.js";
-import devConfig from "./config.dev";
+// import devConfig from "./config.dev";
 import prodConfig from "./config.prod";
 import dotenv from "dotenv";
 import BigNumber from "bignumber.js";
@@ -32,27 +32,47 @@ export function getEnvVar<T>(envVar: string, fallback: T): T {
 
 const isProduction = process.env.NEXT_PUBLIC_SDK_ENV === "production";
 console.log("isProduction", isProduction);
-const configSource = isProduction ? prodConfig : devConfig;
+// const configSource = isProduction ? prodConfig : devConfig;
 
-export const BE_URL = getEnvVar("BE_URL", configSource.BE_URL);
-export const API_GATEWAY_FQDN = getEnvVar("API_GATEWAY_FQDN", configSource.API_GATEWAY_FQDN);
-export const FEE_DESTINATION_ID = getEnvVar("FEE_DESTINATION_ID", configSource.FEE_DESTINATION_ID);
-export const ADMIN_PUB_KEY = getEnvVar("ADMIN_PUB_KEY", configSource.ADMIN_PUB_KEY);
-export const MEMECHAN_PROGRAM_ID_PK = getEnvVar("MEMECHAN_PROGRAM_ID_PK", configSource.MEMECHAN_PROGRAM_ID_PK);
-export const BE_REGION = getEnvVar("BE_REGION", configSource.BE_REGION);
-export const BE_URL_DEV = getEnvVar("BE_URL_DEV", configSource.BE_URL_DEV);
-export const BOUND_POOL_FEE_WALLET = getEnvVar("BOUND_POOL_FEE_WALLET", configSource.BOUND_POOL_FEE_WALLET);
-export const BOUND_POOL_VESTING_PERIOD = getEnvVar("BOUND_POOL_VESTING_PERIOD", configSource.BOUND_POOL_VESTING_PERIOD);
-export const LP_FEE_WALLET = getEnvVar("LP_FEE_WALLET", configSource.LP_FEE_WALLET);
-export const MEMECHAN_FEE_WALLET_ID = getEnvVar("MEMECHAN_FEE_WALLET_ID", configSource.MEMECHAN_FEE_WALLET_ID);
-export const MEMECHAN_PROGRAM_ID = getEnvVar("MEMECHAN_PROGRAM_ID", configSource.MEMECHAN_PROGRAM_ID);
-export const MEMECHAN_PROGRAM_ID_V2 = getEnvVar("MEMECHAN_PROGRAM_ID_V2", configSource.MEMECHAN_PROGRAM_ID_V2);
-export const MEMECHAN_PROGRAM_ID_V2_PK = getEnvVar("MEMECHAN_PROGRAM_ID_V2_PK", configSource.MEMECHAN_PROGRAM_ID_V2_PK);
-export const PATS_MINT = getEnvVar("PATS_MINT", configSource.PATS_MINT);
-export const SWAP_FEE_WALLET = getEnvVar("SWAP_FEE_WALLET", configSource.SWAP_FEE_WALLET);
-export const TOKEN_INFOS = configSource.TOKEN_INFOS;
-export const MERCURIAL_AMM_PROGRAM_ID = getEnvVar("MERCURIAL_AMM_PROGRAM_ID", configSource.MERCURIAL_AMM_PROGRAM_ID);
-export const POINTS_MINT = getEnvVar("POINTS_MINT", configSource.POINTS_MINT);
+// export const BE_URL = getEnvVar("BE_URL", configSource.BE_URL);
+// export const API_GATEWAY_FQDN = getEnvVar("API_GATEWAY_FQDN", configSource.API_GATEWAY_FQDN);
+// export const FEE_DESTINATION_ID = getEnvVar("FEE_DESTINATION_ID", configSource.FEE_DESTINATION_ID);
+// export const ADMIN_PUB_KEY = getEnvVar("ADMIN_PUB_KEY", configSource.ADMIN_PUB_KEY);
+// export const MEMECHAN_PROGRAM_ID_PK = getEnvVar("MEMECHAN_PROGRAM_ID_PK", configSource.MEMECHAN_PROGRAM_ID_PK);
+// export const BE_REGION = getEnvVar("BE_REGION", configSource.BE_REGION);
+// export const BE_URL_DEV = getEnvVar("BE_URL_DEV", configSource.BE_URL_DEV);
+// export const BOUND_POOL_FEE_WALLET = getEnvVar("BOUND_POOL_FEE_WALLET", configSource.BOUND_POOL_FEE_WALLET);
+// export const BOUND_POOL_VESTING_PERIOD = getEnvVar("BOUND_POOL_VESTING_PERIOD", configSource.BOUND_POOL_VESTING_PERIOD);
+// export const LP_FEE_WALLET = getEnvVar("LP_FEE_WALLET", configSource.LP_FEE_WALLET);
+// export const MEMECHAN_FEE_WALLET_ID = getEnvVar("MEMECHAN_FEE_WALLET_ID", configSource.MEMECHAN_FEE_WALLET_ID);
+// export const MEMECHAN_PROGRAM_ID = getEnvVar("MEMECHAN_PROGRAM_ID", configSource.MEMECHAN_PROGRAM_ID);
+// export const MEMECHAN_PROGRAM_ID_V2 = getEnvVar("MEMECHAN_PROGRAM_ID_V2", configSource.MEMECHAN_PROGRAM_ID_V2);
+// export const MEMECHAN_PROGRAM_ID_V2_PK = getEnvVar("MEMECHAN_PROGRAM_ID_V2_PK", configSource.MEMECHAN_PROGRAM_ID_V2_PK);
+// export const PATS_MINT = getEnvVar("PATS_MINT", configSource.PATS_MINT);
+// export const SWAP_FEE_WALLET = getEnvVar("SWAP_FEE_WALLET", configSource.SWAP_FEE_WALLET);
+// export const TOKEN_INFOS = configSource.TOKEN_INFOS;
+// export const MERCURIAL_AMM_PROGRAM_ID = getEnvVar("MERCURIAL_AMM_PROGRAM_ID", configSource.MERCURIAL_AMM_PROGRAM_ID);
+// export const POINTS_MINT = getEnvVar("POINTS_MINT", configSource.POINTS_MINT);
+
+export const BE_URL = prodConfig.BE_URL;
+export const API_GATEWAY_FQDN = prodConfig.API_GATEWAY_FQDN;
+export const FEE_DESTINATION_ID = prodConfig.FEE_DESTINATION_ID;
+export const ADMIN_PUB_KEY = prodConfig.ADMIN_PUB_KEY;
+export const MEMECHAN_PROGRAM_ID_PK = prodConfig.MEMECHAN_PROGRAM_ID_PK;
+export const BE_REGION = prodConfig.BE_REGION;
+export const BE_URL_DEV = prodConfig.BE_URL_DEV;
+export const BOUND_POOL_FEE_WALLET = prodConfig.BOUND_POOL_FEE_WALLET;
+export const BOUND_POOL_VESTING_PERIOD = prodConfig.BOUND_POOL_VESTING_PERIOD;
+export const LP_FEE_WALLET = prodConfig.LP_FEE_WALLET;
+export const MEMECHAN_FEE_WALLET_ID = prodConfig.MEMECHAN_FEE_WALLET_ID;
+export const MEMECHAN_PROGRAM_ID = prodConfig.MEMECHAN_PROGRAM_ID;
+export const MEMECHAN_PROGRAM_ID_V2 = prodConfig.MEMECHAN_PROGRAM_ID_V2;
+export const MEMECHAN_PROGRAM_ID_V2_PK = prodConfig.MEMECHAN_PROGRAM_ID_V2_PK;
+export const PATS_MINT = prodConfig.PATS_MINT;
+export const SWAP_FEE_WALLET = prodConfig.SWAP_FEE_WALLET;
+export const TOKEN_INFOS = prodConfig.TOKEN_INFOS;
+export const MERCURIAL_AMM_PROGRAM_ID = prodConfig.MERCURIAL_AMM_PROGRAM_ID;
+export const POINTS_MINT = prodConfig.POINTS_MINT;
 
 export const MEMECHAN_MEME_TOKEN_DECIMALS = 6;
 // Contract constants
@@ -88,7 +108,7 @@ export const TRANSFER_FEE = 60_000_000;
 // These may have to be moved to env based configs
 
 // Vesting
-export const VESTING_PROGRAM_ID = getEnvVar("VESTING_PROGRAM_ID", configSource.VESTING_PROGRAM_ID);
+export const VESTING_PROGRAM_ID = prodConfig.VESTING_PROGRAM_ID;
 
 // Pre-sale
 
