@@ -13,6 +13,7 @@ export interface SdkConfig {
   BOUND_POOL_FEE_WALLET: string;
   BOUND_POOL_VESTING_PERIOD: BN;
   LP_FEE_WALLET: string;
+  TH_FEE_WALLET: string;
   MEMECHAN_FEE_WALLET_ID: string;
   MEMECHAN_PROGRAM_ID: string;
   MEMECHAN_PROGRAM_ID_V2: string;

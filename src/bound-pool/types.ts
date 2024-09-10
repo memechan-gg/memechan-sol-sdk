@@ -165,6 +165,7 @@ export interface BoundPoolArgs {
 
 export type BoundPoolArgsV2 = Omit<BoundPoolArgs, "client"> & {
   client: MemechanClientV2;
+  topHolderFeeBps: number;
 };
 
 export interface BoundPoolWithBuyMemeArgs {
@@ -179,6 +180,7 @@ export interface BoundPoolWithBuyMemeArgs {
 
 export type BoundPoolWithBuyMemeArgsV2 = Omit<BoundPoolWithBuyMemeArgs, "client"> & {
   client: MemechanClientV2;
+  topHolderFeeBps: number;
 };
 
 export type GetCreateNewBondingPoolAndTokenTransactionArgs = Omit<BoundPoolArgs, "payer"> & {

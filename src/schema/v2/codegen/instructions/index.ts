@@ -18,5 +18,6 @@ export { withdrawFees, WithdrawFeesAccounts } from "./withdrawFees";
 export { boundMergeTickets, BoundMergeTicketsAccounts } from "./boundMergeTickets";
 export { stakingMergeTickets, StakingMergeTicketsAccounts } from "./stakingMergeTickets";
 export { closeTicket, CloseTicketAccounts } from "./closeTicket";
+export { changePointsEpoch, ChangePointsEpochArgs, ChangePointsEpochAccounts } from "./changePointsEpoch";
 export { withdrawAdminFee, WithdrawAdminFeeAccounts } from "./withdrawAdminFee";
 export { increaseVesting, IncreaseVestingArgs, IncreaseVestingAccounts } from "./increaseVesting";

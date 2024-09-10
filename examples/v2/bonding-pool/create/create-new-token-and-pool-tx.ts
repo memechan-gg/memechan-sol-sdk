@@ -21,6 +21,7 @@ export const createNewTokenAndPoolTx = async () => {
         user: payer.publicKey,
         memeTicketNumber: MemeTicketClientV2.TICKET_NUMBER_START,
       },
+      topHolderFeeBps: 0,
     });
 
   const memeMint = memeMintKeypair.publicKey;

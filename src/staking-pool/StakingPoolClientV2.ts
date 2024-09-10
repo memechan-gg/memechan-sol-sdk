@@ -20,6 +20,7 @@ import {
   MAX_MEME_TOKENS,
   MEMECHAN_PROGRAM_ID_V2,
   MEME_TOKEN_DECIMALS,
+  TH_FEE_WALLET,
   TOKEN_INFOS,
 } from "../config/config";
 import { MemeTicketClientV2 } from "../memeticket/MemeTicketClientV2";
@@ -253,6 +254,22 @@ export class StakingPoolClientV2 {
       transaction: tx,
     });
 
+    const memeThFeeVault = await ensureAssociatedTokenAccountWithIdempotentIX({
+      connection: this.client.connection,
+      payer: payer,
+      mint: this.memeMint,
+      owner: new PublicKey(TH_FEE_WALLET),
+      transaction: tx,
+    });
+
+    const quoteThFeeVault = await ensureAssociatedTokenAccountWithIdempotentIX({
+      connection: this.client.connection,
+      payer: payer,
+      mint: tokenBMint,
+      owner: new PublicKey(TH_FEE_WALLET),
+      transaction: tx,
+    });
+
     const quoteVault =
       tokenInfoB.mint === TOKEN_INFOS.CHAN.mint ? this.poolObjectData.chanVault : this.poolObjectData.quoteVault;
 
@@ -263,6 +280,8 @@ export class StakingPoolClientV2 {
       .accounts({
         memeFeeVault,
         quoteFeeVault,
+        memeThFeeVault,
+        quoteThFeeVault,
         ammPool: args.ammPoolId,
         aTokenVault,
         aVault,
@@ -291,7 +310,7 @@ export class StakingPoolClientV2 {
       .instruction();
 
     const modifyComputeUnits = ComputeBudgetProgram.setComputeUnitLimit({
-      units: 250_000,
+      units: 400_000,
     });
 
     const addPriorityFee = ComputeBudgetProgram.setComputeUnitPrice({

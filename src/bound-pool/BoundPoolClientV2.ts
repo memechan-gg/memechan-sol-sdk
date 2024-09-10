@@ -44,13 +44,10 @@ import {
   GetOutputAmountForBuyMeme,
   GetOutputAmountForSellMemeArgs,
   GetSellMemeTransactionArgs,
-  GetSellMemeTransactionArgsLegacy,
   GetSellMemeTransactionOutput,
   InitStakingPoolArgsV2,
   InitStakingPoolResultV2,
   SellMemeArgs,
-  SwapXArgs,
-  SwapYArgs,
   TransferCreatorBonusChanFundsArgs,
 } from "./types";
 
@@ -64,6 +61,7 @@ import {
   FULL_MEME_AMOUNT_CONVERTED_V2,
   MAX_TICKET_TOKENS_V2,
   MEMECHAN_MEME_TOKEN_DECIMALS,
+  POINTS_MINT,
   SWAP_FEE_WALLET,
   TOKEN_INFOS,
 } from "../config/config";
@@ -96,6 +94,7 @@ import { StakingPoolClientV2 } from "../staking-pool/StakingPoolClientV2";
 import { MemechanSol } from "../schema/v2/v2";
 import { AuthorityType, createSetAuthorityInstruction } from "@solana/spl-token";
 import { ensureAssociatedTokenAccountWithIX } from "../util/ensureAssociatedTokenAccountWithIX";
+import { findPointsPda } from "../util/findPointsPda";
 
 export class BoundPoolClientV2 {
   private constructor(
@@ -224,6 +223,10 @@ export class BoundPoolClientV2 {
     )[0];
   }
 
+  public static findPointsEpochPDA(memechanProgramId: PublicKey): PublicKey {
+    return PublicKey.findProgramAddressSync([Buffer.from("points_epoch")], memechanProgramId)[0];
+  }
+
   public static async getCreateNewBondingPoolAndBuyAndTokenWithBuyMemeTransaction(
     args: GetCreateNewBondingPoolAndTokenWithBuyMemeTransactionArgsV2,
     isSimulated = false,
@@ -241,6 +244,7 @@ export class BoundPoolClientV2 {
       transaction: createPoolTransaction = new Transaction(),
       feeQuoteVaultPk,
       tokenMetadata,
+      topHolderFeeBps,
     } = args;
     const { connection, memechanProgram } = client;
     const airdroppedTokens = new BN(0); // TODO: Add airdropped tokens
@@ -300,7 +304,7 @@ export class BoundPoolClientV2 {
     const quoteInfo = getTokenInfoByMint(quoteToken.mint);
     const { TOKEN_PROGRAM_ID } = await import("@solana/spl-token");
     const createPoolInstruction = await memechanProgram.methods
-      .newPool(airdroppedTokens, BOUND_POOL_VESTING_PERIOD)
+      .newPool(airdroppedTokens, BOUND_POOL_VESTING_PERIOD, new BN(topHolderFeeBps))
       .accounts({
         feeQuoteVault: feeQuoteVault,
         memeVault: launchVault,
@@ -519,58 +523,6 @@ export class BoundPoolClientV2 {
     return mintTo(provider.connection, payer, mint, wallet, authority, amount);
   }
 
-  public async swapY(input: SwapYArgs): Promise<MemeTicketClientV2> {
-    // const id = Keypair.generate();
-    const user = input.user!;
-    const payer = input.payer!;
-    const memeTicketNumber = input.memeTicketNumber!;
-
-    const pool = input.pool ?? this.id;
-    const poolSignerPda = BoundPoolClientV2.findSignerPda(pool, this.client.memechanProgram.programId);
-    const solIn = input.quoteAmountIn;
-    const memeOut = input.memeTokensOut;
-
-    const memeTicketPublicKey = MemeTicketClientV2.getMemeTicketPDA({
-      ticketNumber: memeTicketNumber,
-      poolId: pool,
-      userId: user.publicKey,
-    });
-    const { getOrCreateAssociatedTokenAccount } = await import("@solana/spl-token");
-    const userQuoteAcc =
-      input.userSolAcc ??
-      (
-        await getOrCreateAssociatedTokenAccount(
-          this.client.connection,
-          payer,
-          input.quoteMint,
-          user.publicKey,
-          true,
-          "confirmed",
-          { skipPreflight: true },
-        )
-      ).address;
-
-    console.log("solIn: ", solIn);
-    console.log("memeOut: ", memeOut);
-    const { TOKEN_PROGRAM_ID } = await import("@solana/spl-token");
-    await this.client.memechanProgram.methods
-      .swapY(new BN(solIn), new BN(memeOut), new BN(memeTicketNumber))
-      .accounts({
-        memeTicket: memeTicketPublicKey,
-        owner: user.publicKey,
-        pool: pool,
-        poolSignerPda: poolSignerPda,
-        quoteVault: this.quoteVault,
-        userSol: userQuoteAcc,
-        systemProgram: SystemProgram.programId,
-        tokenProgram: TOKEN_PROGRAM_ID,
-      })
-      .signers([user])
-      .rpc({ skipPreflight: true, commitment: "confirmed", preflightCommitment: "confirmed" });
-
-    return new MemeTicketClientV2(memeTicketPublicKey, this.client);
-  }
-
   /**
    * Swaps a Y token (expecting `SLERF` token) for another asset by executing a buy meme transaction.
    * @param {SwapYArgs} input - The input arguments required for the swap.
@@ -610,6 +562,7 @@ export class BoundPoolClientV2 {
       user,
       transaction = new Transaction(),
       memeTicketNumber,
+      referrer,
     } = input;
     let { inputTokenAccount } = input;
 
@@ -651,33 +604,33 @@ export class BoundPoolClientV2 {
       });
     }
 
-    // const pointsUserAta = await ensureAssociatedTokenAccountWithIdempotentIX({
-    //   connection: connection,
-    //   payer: user,
-    //   mint: POINTS_MINT,
-    //   owner: user,
-    //   transaction,
-    // });
+    const pointsUserAta = await ensureAssociatedTokenAccountWithIdempotentIX({
+      connection: connection,
+      payer: user,
+      mint: POINTS_MINT,
+      owner: user,
+      transaction,
+    });
 
-    // const pointsPda = findPointsPda(this.client.memechanProgram.programId);
-    // const pointsProgramAta = await ensureAssociatedTokenAccountWithIdempotentIX({
-    //   connection: connection,
-    //   payer: user,
-    //   mint: POINTS_MINT,
-    //   owner: pointsPda,
-    //   transaction,
-    // });
+    const pointsPda = findPointsPda(this.client.memechanProgram.programId);
+    const pointsProgramAta = await ensureAssociatedTokenAccountWithIdempotentIX({
+      connection: connection,
+      payer: user,
+      mint: POINTS_MINT,
+      owner: pointsPda,
+      transaction,
+    });
 
-    // let referrerATA = null;
-    // if (referrer) {
-    //   referrerATA = await ensureAssociatedTokenAccountWithIdempotentIX({
-    //     connection: connection,
-    //     payer: user,
-    //     mint: POINTS_MINT,
-    //     owner: referrer,
-    //     transaction,
-    //   });
-    // }
+    let referrerATA = null;
+    if (referrer) {
+      referrerATA = await ensureAssociatedTokenAccountWithIdempotentIX({
+        connection: connection,
+        payer: user,
+        mint: POINTS_MINT,
+        owner: referrer,
+        transaction,
+      });
+    }
 
     addWrapSOLInstructionIfNativeMint(this.quoteTokenMint, user, inputTokenAccount, inputAmountBN, transaction);
     const { TOKEN_PROGRAM_ID } = await import("@solana/spl-token");
@@ -693,11 +646,12 @@ export class BoundPoolClientV2 {
         systemProgram: SystemProgram.programId,
         tokenProgram: TOKEN_PROGRAM_ID,
         memeTicket: memeTicketPublicKey,
-        // pointsMint: POINTS_MINT,
-        // pointsPda: pointsPda,
-        // userPoints: pointsUserAta,
-        // pointsAcc: pointsProgramAta,
-        // referrerPoints: referrerATA,
+        pointsMint: POINTS_MINT,
+        pointsPda: pointsPda,
+        userPoints: pointsUserAta,
+        pointsAcc: pointsProgramAta,
+        referrerPoints: referrerATA,
+        pointsEpoch: BoundPoolClientV2.findPointsEpochPDA(this.client.memechanProgram.programId),
       })
       .instruction();
 
@@ -736,6 +690,7 @@ export class BoundPoolClientV2 {
       client,
       memeTicketNumber,
       quoteMint,
+      referrer,
     } = input;
     let { inputTokenAccount } = input;
 
@@ -773,8 +728,38 @@ export class BoundPoolClientV2 {
         transaction,
       });
     }
+
+    const pointsUserAta = await ensureAssociatedTokenAccountWithIdempotentIX({
+      connection: client.connection,
+      payer: user,
+      mint: POINTS_MINT,
+      owner: user,
+      transaction,
+    });
+
+    const pointsPda = findPointsPda(client.memechanProgram.programId);
+    const pointsProgramAta = await ensureAssociatedTokenAccountWithIdempotentIX({
+      connection: client.connection,
+      payer: user,
+      mint: POINTS_MINT,
+      owner: pointsPda,
+      transaction,
+    });
+
+    let referrerATA = null;
+    if (referrer) {
+      referrerATA = await ensureAssociatedTokenAccountWithIdempotentIX({
+        connection: client.connection,
+        payer: user,
+        mint: POINTS_MINT,
+        owner: referrer,
+        transaction,
+      });
+    }
+
     addWrapSOLInstructionIfNativeMint(quoteMint, user, inputTokenAccount, inputAmountBN, transaction);
     const { TOKEN_PROGRAM_ID } = await import("@solana/spl-token");
+
     const buyMemeInstruction = await client.memechanProgram.methods
       .swapY(inputAmountBN, minOutputBN, ticketNumberBN)
       .accounts({
@@ -784,6 +769,11 @@ export class BoundPoolClientV2 {
         poolSignerPda: poolSignerPda,
         quoteVault: quoteVault,
         userSol: inputTokenAccount,
+        pointsMint: POINTS_MINT,
+        pointsPda: pointsPda,
+        userPoints: pointsUserAta,
+        pointsAcc: pointsProgramAta,
+        referrerPoints: referrerATA,
         systemProgram: SystemProgram.programId,
         tokenProgram: TOKEN_PROGRAM_ID,
       })
@@ -1004,48 +994,6 @@ export class BoundPoolClientV2 {
     const isPoolLocked = poolData.locked;
 
     return isPoolLocked;
-  }
-
-  public async swapX(input: SwapXArgs): Promise<string> {
-    const sellMemeCoinTransaction = await this.getSellMemeTransactionLegacy(input);
-
-    const txId = await sendAndConfirmTransaction(this.client.connection, sellMemeCoinTransaction, [input.user], {
-      skipPreflight: true,
-      commitment: "confirmed",
-      preflightCommitment: "confirmed",
-    });
-
-    return txId;
-  }
-
-  public async getSellMemeTransactionLegacy(input: GetSellMemeTransactionArgsLegacy): Promise<Transaction> {
-    const tx = input.transaction ?? new Transaction();
-    const user = input.user;
-
-    const pool = this.id;
-    const poolSignerPda = this.findSignerPda();
-    const memeIn = input.memeAmountIn;
-    const minQuoteAmountOut = input.minQuoteAmountOut;
-
-    const memeTicket = input.userMemeTicket;
-    const userSolAcc = input.userQuoteAcc;
-    const { TOKEN_PROGRAM_ID } = await import("@solana/spl-token");
-    const sellMemeTransactionInstruction = await this.client.memechanProgram.methods
-      .swapX(new BN(memeIn), new BN(minQuoteAmountOut))
-      .accounts({
-        memeTicket: memeTicket.id,
-        owner: user.publicKey,
-        pool: pool,
-        poolSigner: poolSignerPda,
-        quoteVault: this.quoteVault,
-        userSol: userSolAcc,
-        tokenProgram: TOKEN_PROGRAM_ID,
-      })
-      .instruction();
-
-    tx.add(sellMemeTransactionInstruction);
-
-    return tx;
   }
 
   public async getInitStakingPoolTransaction(input: GetInitStakingPoolTransactionArgsV2): Promise<{
@@ -2011,6 +1959,7 @@ export class BoundPoolClientV2 {
         user: client.simulationKeypair.publicKey,
         memeTicketNumber: MemeTicketClientV2.TICKET_NUMBER_START,
       },
+      topHolderFeeBps: 0,
     });
 
     console.log("soldMemeSimulated: " + soldMemeSimulated);

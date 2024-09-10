@@ -29,7 +29,8 @@ export type CustomError =
   | StakingIsNotActive
   | NonZeroInitialMemeSupply
   | AirdroppedTokensOvercap
-  | InvalidVestingPeriod;
+  | InvalidVestingPeriod
+  | InvalidTHFeeBps;
 
 export class InvalidAccountInput extends Error {
   readonly code = 6000;
@@ -341,6 +342,16 @@ export class InvalidVestingPeriod extends Error {
   }
 }
 
+export class InvalidTHFeeBps extends Error {
+  readonly code = 6031;
+  readonly name = "InvalidTHFeeBps";
+  readonly msg = "undefined";
+
+  constructor() {
+    super("6031: undefined");
+  }
+}
+
 export function fromCode(code: number): CustomError | null {
   switch (code) {
     case 6000:
@@ -405,6 +416,8 @@ export function fromCode(code: number): CustomError | null {
       return new AirdroppedTokensOvercap();
     case 6030:
       return new InvalidVestingPeriod();
+    case 6031:
+      return new InvalidTHFeeBps();
   }
 
   return null;

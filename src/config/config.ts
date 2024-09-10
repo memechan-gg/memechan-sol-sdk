@@ -64,6 +64,7 @@ export const BE_URL_DEV = prodConfig.BE_URL_DEV;
 export const BOUND_POOL_FEE_WALLET = prodConfig.BOUND_POOL_FEE_WALLET;
 export const BOUND_POOL_VESTING_PERIOD = prodConfig.BOUND_POOL_VESTING_PERIOD;
 export const LP_FEE_WALLET = prodConfig.LP_FEE_WALLET;
+export const TH_FEE_WALLET = prodConfig.TH_FEE_WALLET;
 export const MEMECHAN_FEE_WALLET_ID = prodConfig.MEMECHAN_FEE_WALLET_ID;
 export const MEMECHAN_PROGRAM_ID = prodConfig.MEMECHAN_PROGRAM_ID;
 export const MEMECHAN_PROGRAM_ID_V2 = prodConfig.MEMECHAN_PROGRAM_ID_V2;

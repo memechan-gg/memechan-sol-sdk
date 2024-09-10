@@ -12,6 +12,8 @@ export interface AddFeesAccounts {
   quoteMint: PublicKey;
   memeFeeVault: PublicKey;
   quoteFeeVault: PublicKey;
+  memeThFeeVault: PublicKey;
+  quoteThFeeVault: PublicKey;
   stakingSignerPda: PublicKey;
   ammPool: PublicKey;
   lpMint: PublicKey;
@@ -42,6 +44,8 @@ export function addFees(accounts: AddFeesAccounts) {
     { pubkey: accounts.quoteMint, isSigner: false, isWritable: false },
     { pubkey: accounts.memeFeeVault, isSigner: false, isWritable: true },
     { pubkey: accounts.quoteFeeVault, isSigner: false, isWritable: true },
+    { pubkey: accounts.memeThFeeVault, isSigner: false, isWritable: true },
+    { pubkey: accounts.quoteThFeeVault, isSigner: false, isWritable: true },
     { pubkey: accounts.stakingSignerPda, isSigner: false, isWritable: true },
     { pubkey: accounts.ammPool, isSigner: false, isWritable: true },
     { pubkey: accounts.lpMint, isSigner: false, isWritable: true },

@@ -20,6 +20,8 @@ export interface StakingPoolFields {
   feesZTotal: BN;
   toAirdrop: BN;
   isActive: boolean;
+  topHolderFeesBps: BN;
+  padding: Array<number>;
 }
 
 export interface StakingPoolJSON {
@@ -38,6 +40,8 @@ export interface StakingPoolJSON {
   feesZTotal: string;
   toAirdrop: string;
   isActive: boolean;
+  topHolderFeesBps: string;
+  padding: Array<number>;
 }
 
 export class StakingPool {
@@ -56,6 +60,8 @@ export class StakingPool {
   readonly feesZTotal: BN;
   readonly toAirdrop: BN;
   readonly isActive: boolean;
+  readonly topHolderFeesBps: BN;
+  readonly padding: Array<number>;
 
   static readonly discriminator = Buffer.from([203, 19, 214, 220, 220, 154, 24, 102]);
 
@@ -75,6 +81,8 @@ export class StakingPool {
     borsh.u64("feesZTotal"),
     borsh.u64("toAirdrop"),
     borsh.bool("isActive"),
+    borsh.u64("topHolderFeesBps"),
+    borsh.array(borsh.u8(), 15, "padding"),
   ]);
 
   constructor(fields: StakingPoolFields) {
@@ -93,6 +101,8 @@ export class StakingPool {
     this.feesZTotal = fields.feesZTotal;
     this.toAirdrop = fields.toAirdrop;
     this.isActive = fields.isActive;
+    this.topHolderFeesBps = fields.topHolderFeesBps;
+    this.padding = fields.padding;
   }
 
   static async fetch(c: Connection, address: PublicKey): Promise<StakingPool | null> {
@@ -116,7 +126,7 @@ export class StakingPool {
         return null;
       }
       if (!info.owner.equals(PROGRAM_ID)) {
-        throw new Error("account doesn't belong to this program");
+        throw new Error("account doesn't belong to this program. Program ID: " + PROGRAM_ID.toBase58());
       }
 
       return this.decode(info.data);
@@ -146,6 +156,8 @@ export class StakingPool {
       feesZTotal: dec.feesZTotal,
       toAirdrop: dec.toAirdrop,
       isActive: dec.isActive,
+      topHolderFeesBps: dec.topHolderFeesBps,
+      padding: dec.padding,
     });
   }
 
@@ -166,6 +178,8 @@ export class StakingPool {
       feesZTotal: this.feesZTotal.toString(),
       toAirdrop: this.toAirdrop.toString(),
       isActive: this.isActive,
+      topHolderFeesBps: this.topHolderFeesBps.toString(),
+      padding: this.padding,
     };
   }
 
@@ -186,6 +200,8 @@ export class StakingPool {
       feesZTotal: new BN(obj.feesZTotal),
       toAirdrop: new BN(obj.toAirdrop),
       isActive: obj.isActive,
+      topHolderFeesBps: new BN(obj.topHolderFeesBps),
+      padding: obj.padding,
     });
   }
 }

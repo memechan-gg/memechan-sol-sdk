@@ -70,6 +70,10 @@ export type MemechanSol = {
           name: "vestingPeriod";
           type: "u64";
         },
+        {
+          name: "topHolderFeesBps";
+          type: "u64";
+        },
       ];
     },
     {
@@ -262,9 +266,40 @@ export type MemechanSol = {
           isSigner: false;
         },
         {
+          name: "userPoints";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "referrerPoints";
+          isMut: true;
+          isSigner: false;
+          isOptional: true;
+        },
+        {
+          name: "pointsEpoch";
+          isMut: false;
+          isSigner: false;
+        },
+        {
+          name: "pointsMint";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "pointsAcc";
+          isMut: true;
+          isSigner: false;
+        },
+        {
           name: "owner";
           isMut: true;
           isSigner: true;
+        },
+        {
+          name: "pointsPda";
+          isMut: false;
+          isSigner: false;
         },
         {
           name: "poolSignerPda";
@@ -975,6 +1010,16 @@ export type MemechanSol = {
           isSigner: false;
         },
         {
+          name: "memeThFeeVault";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "quoteThFeeVault";
+          isMut: true;
+          isSigner: false;
+        },
+        {
           name: "stakingSignerPda";
           isMut: true;
           isSigner: false;
@@ -1273,6 +1318,40 @@ export type MemechanSol = {
       args: [];
     },
     {
+      name: "changePointsEpoch";
+      accounts: [
+        {
+          name: "sender";
+          isMut: true;
+          isSigner: true;
+        },
+        {
+          name: "pointsEpoch";
+          isMut: true;
+          isSigner: false;
+        },
+        {
+          name: "systemProgram";
+          isMut: false;
+          isSigner: false;
+        },
+      ];
+      args: [
+        {
+          name: "epochNumber";
+          type: "u64";
+        },
+        {
+          name: "pointsPerSolNum";
+          type: "u64";
+        },
+        {
+          name: "pointsPerSolDenom";
+          type: "u64";
+        },
+      ];
+    },
+    {
       name: "withdrawAdminFee";
       accounts: [
         {
@@ -1390,6 +1469,16 @@ export type MemechanSol = {
             name: "vestingPeriod";
             type: "i64";
           },
+          {
+            name: "topHolderFeesBps";
+            type: "u64";
+          },
+          {
+            name: "padding";
+            type: {
+              array: ["u8", 15];
+            };
+          },
         ];
       };
     },
@@ -1409,6 +1498,32 @@ export type MemechanSol = {
           {
             name: "chanVault";
             type: "publicKey";
+          },
+        ];
+      };
+    },
+    {
+      name: "pointsEpoch";
+      type: {
+        kind: "struct";
+        fields: [
+          {
+            name: "epochNumber";
+            type: "u64";
+          },
+          {
+            name: "pointsPerSolNum";
+            type: "u64";
+          },
+          {
+            name: "pointsPerSolDenom";
+            type: "u64";
+          },
+          {
+            name: "padding";
+            type: {
+              array: ["u8", 8];
+            };
           },
         ];
       };
@@ -1521,6 +1636,16 @@ export type MemechanSol = {
           {
             name: "isActive";
             type: "bool";
+          },
+          {
+            name: "topHolderFeesBps";
+            type: "u64";
+          },
+          {
+            name: "padding";
+            type: {
+              array: ["u8", 15];
+            };
           },
         ];
       };
@@ -1856,7 +1981,14 @@ export type MemechanSol = {
       code: 6030;
       name: "InvalidVestingPeriod";
     },
+    {
+      code: 6031;
+      name: "InvalidTHFeeBps";
+    },
   ];
+  metadata: {
+    address: "chv2ogo3QopnnGctZM9Hxo2VCQ2zEcvQy6Uo6XVpiRH";
+  };
 };
 
 export const IDL: MemechanSol = {
@@ -1929,6 +2061,10 @@ export const IDL: MemechanSol = {
         },
         {
           name: "vestingPeriod",
+          type: "u64",
+        },
+        {
+          name: "topHolderFeesBps",
           type: "u64",
         },
       ],
@@ -2123,9 +2259,40 @@ export const IDL: MemechanSol = {
           isSigner: false,
         },
         {
+          name: "userPoints",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "referrerPoints",
+          isMut: true,
+          isSigner: false,
+          isOptional: true,
+        },
+        {
+          name: "pointsEpoch",
+          isMut: false,
+          isSigner: false,
+        },
+        {
+          name: "pointsMint",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "pointsAcc",
+          isMut: true,
+          isSigner: false,
+        },
+        {
           name: "owner",
           isMut: true,
           isSigner: true,
+        },
+        {
+          name: "pointsPda",
+          isMut: false,
+          isSigner: false,
         },
         {
           name: "poolSignerPda",
@@ -2836,6 +3003,16 @@ export const IDL: MemechanSol = {
           isSigner: false,
         },
         {
+          name: "memeThFeeVault",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "quoteThFeeVault",
+          isMut: true,
+          isSigner: false,
+        },
+        {
           name: "stakingSignerPda",
           isMut: true,
           isSigner: false,
@@ -3134,6 +3311,40 @@ export const IDL: MemechanSol = {
       args: [],
     },
     {
+      name: "changePointsEpoch",
+      accounts: [
+        {
+          name: "sender",
+          isMut: true,
+          isSigner: true,
+        },
+        {
+          name: "pointsEpoch",
+          isMut: true,
+          isSigner: false,
+        },
+        {
+          name: "systemProgram",
+          isMut: false,
+          isSigner: false,
+        },
+      ],
+      args: [
+        {
+          name: "epochNumber",
+          type: "u64",
+        },
+        {
+          name: "pointsPerSolNum",
+          type: "u64",
+        },
+        {
+          name: "pointsPerSolDenom",
+          type: "u64",
+        },
+      ],
+    },
+    {
       name: "withdrawAdminFee",
       accounts: [
         {
@@ -3251,6 +3462,16 @@ export const IDL: MemechanSol = {
             name: "vestingPeriod",
             type: "i64",
           },
+          {
+            name: "topHolderFeesBps",
+            type: "u64",
+          },
+          {
+            name: "padding",
+            type: {
+              array: ["u8", 15],
+            },
+          },
         ],
       },
     },
@@ -3270,6 +3491,32 @@ export const IDL: MemechanSol = {
           {
             name: "chanVault",
             type: "publicKey",
+          },
+        ],
+      },
+    },
+    {
+      name: "pointsEpoch",
+      type: {
+        kind: "struct",
+        fields: [
+          {
+            name: "epochNumber",
+            type: "u64",
+          },
+          {
+            name: "pointsPerSolNum",
+            type: "u64",
+          },
+          {
+            name: "pointsPerSolDenom",
+            type: "u64",
+          },
+          {
+            name: "padding",
+            type: {
+              array: ["u8", 8],
+            },
           },
         ],
       },
@@ -3382,6 +3629,16 @@ export const IDL: MemechanSol = {
           {
             name: "isActive",
             type: "bool",
+          },
+          {
+            name: "topHolderFeesBps",
+            type: "u64",
+          },
+          {
+            name: "padding",
+            type: {
+              array: ["u8", 15],
+            },
           },
         ],
       },
@@ -3717,5 +3974,12 @@ export const IDL: MemechanSol = {
       code: 6030,
       name: "InvalidVestingPeriod",
     },
+    {
+      code: 6031,
+      name: "InvalidTHFeeBps",
+    },
   ],
+  metadata: {
+    address: "chv2ogo3QopnnGctZM9Hxo2VCQ2zEcvQy6Uo6XVpiRH",
+  },
 };

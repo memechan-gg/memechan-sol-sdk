@@ -16,6 +16,8 @@ export interface BoundPoolFields {
   airdroppedTokens: BN;
   locked: boolean;
   vestingPeriod: BN;
+  topHolderFeesBps: BN;
+  padding: Array<number>;
 }
 
 export interface BoundPoolJSON {
@@ -30,6 +32,8 @@ export interface BoundPoolJSON {
   airdroppedTokens: string;
   locked: boolean;
   vestingPeriod: string;
+  topHolderFeesBps: string;
+  padding: Array<number>;
 }
 
 export class BoundPool {
@@ -44,6 +48,8 @@ export class BoundPool {
   readonly airdroppedTokens: BN;
   readonly locked: boolean;
   readonly vestingPeriod: BN;
+  readonly topHolderFeesBps: BN;
+  readonly padding: Array<number>;
 
   static readonly discriminator = Buffer.from([191, 233, 118, 178, 14, 139, 241, 36]);
 
@@ -59,6 +65,8 @@ export class BoundPool {
     borsh.u64("airdroppedTokens"),
     borsh.bool("locked"),
     borsh.i64("vestingPeriod"),
+    borsh.u64("topHolderFeesBps"),
+    borsh.array(borsh.u8(), 15, "padding"),
   ]);
 
   constructor(fields: BoundPoolFields) {
@@ -73,6 +81,8 @@ export class BoundPool {
     this.airdroppedTokens = fields.airdroppedTokens;
     this.locked = fields.locked;
     this.vestingPeriod = fields.vestingPeriod;
+    this.topHolderFeesBps = fields.topHolderFeesBps;
+    this.padding = fields.padding;
   }
 
   static async fetch(c: Connection, address: PublicKey): Promise<BoundPool | null> {
@@ -122,6 +132,8 @@ export class BoundPool {
       airdroppedTokens: dec.airdroppedTokens,
       locked: dec.locked,
       vestingPeriod: dec.vestingPeriod,
+      topHolderFeesBps: dec.topHolderFeesBps,
+      padding: dec.padding,
     });
   }
 
@@ -138,6 +150,8 @@ export class BoundPool {
       airdroppedTokens: this.airdroppedTokens.toString(),
       locked: this.locked,
       vestingPeriod: this.vestingPeriod.toString(),
+      topHolderFeesBps: this.topHolderFeesBps.toString(),
+      padding: this.padding,
     };
   }
 
@@ -154,6 +168,8 @@ export class BoundPool {
       airdroppedTokens: new BN(obj.airdroppedTokens),
       locked: obj.locked,
       vestingPeriod: new BN(obj.vestingPeriod),
+      topHolderFeesBps: new BN(obj.topHolderFeesBps),
+      padding: obj.padding,
     });
   }
 }

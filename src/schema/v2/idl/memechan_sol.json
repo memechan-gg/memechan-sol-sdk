@@ -69,6 +69,10 @@
         {
           "name": "vestingPeriod",
           "type": "u64"
+        },
+        {
+          "name": "topHolderFeesBps",
+          "type": "u64"
         }
       ]
     },
@@ -266,9 +270,40 @@
           "isSigner": false
         },
         {
+          "name": "userPoints",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "referrerPoints",
+          "isMut": true,
+          "isSigner": false,
+          "isOptional": true
+        },
+        {
+          "name": "pointsEpoch",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "pointsMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "pointsAcc",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "owner",
           "isMut": true,
           "isSigner": true
+        },
+        {
+          "name": "pointsPda",
+          "isMut": false,
+          "isSigner": false
         },
         {
           "name": "poolSignerPda",
@@ -1035,6 +1070,16 @@
           "isSigner": false
         },
         {
+          "name": "memeThFeeVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "quoteThFeeVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "stakingSignerPda",
           "isMut": true,
           "isSigner": false
@@ -1333,6 +1378,40 @@
       "args": []
     },
     {
+      "name": "changePointsEpoch",
+      "accounts": [
+        {
+          "name": "sender",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "pointsEpoch",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "epochNumber",
+          "type": "u64"
+        },
+        {
+          "name": "pointsPerSolNum",
+          "type": "u64"
+        },
+        {
+          "name": "pointsPerSolDenom",
+          "type": "u64"
+        }
+      ]
+    },
+    {
       "name": "withdrawAdminFee",
       "accounts": [
         {
@@ -1453,6 +1532,19 @@
           {
             "name": "vestingPeriod",
             "type": "i64"
+          },
+          {
+            "name": "topHolderFeesBps",
+            "type": "u64"
+          },
+          {
+            "name": "padding",
+            "type": {
+              "array": [
+                "u8",
+                15
+              ]
+            }
           }
         ]
       }
@@ -1473,6 +1565,35 @@
           {
             "name": "chanVault",
             "type": "publicKey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "PointsEpoch",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "epochNumber",
+            "type": "u64"
+          },
+          {
+            "name": "pointsPerSolNum",
+            "type": "u64"
+          },
+          {
+            "name": "pointsPerSolDenom",
+            "type": "u64"
+          },
+          {
+            "name": "padding",
+            "type": {
+              "array": [
+                "u8",
+                8
+              ]
+            }
           }
         ]
       }
@@ -1585,6 +1706,19 @@
           {
             "name": "isActive",
             "type": "bool"
+          },
+          {
+            "name": "topHolderFeesBps",
+            "type": "u64"
+          },
+          {
+            "name": "padding",
+            "type": {
+              "array": [
+                "u8",
+                15
+              ]
+            }
           }
         ]
       }
@@ -1919,6 +2053,10 @@
     {
       "code": 6030,
       "name": "InvalidVestingPeriod"
+    },
+    {
+      "code": 6031,
+      "name": "InvalidTHFeeBps"
     }
   ],
   "metadata": {
