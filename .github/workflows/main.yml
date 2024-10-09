@@ -91,6 +91,6 @@ jobs:
         run: yarn config set registry https://registry.npmjs.org/
 
       - name: Publish
-        run: yarn publish --access restricted
+        run: yarn publish --access public
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
