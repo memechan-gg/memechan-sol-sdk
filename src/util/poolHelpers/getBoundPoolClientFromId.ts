@@ -22,7 +22,9 @@ export async function getBoundPoolClientFromId(
 
   console.log("accountInfo.owner:", accountInfo.owner);
 
-  if (accountInfo.owner.toBase58() == MEMECHAN_PROGRAM_ID_V2) {
+  const ownerAddress = accountInfo.owner.toBase58();
+
+  if (ownerAddress === MEMECHAN_PROGRAM_ID_V2) {
     const boundPoolInstance = BoundPoolClientV2.fromAccountInfo({
       client: clientV2,
       poolAccountAddressId: poolAddressId,
@@ -32,16 +34,17 @@ export async function getBoundPoolClientFromId(
       boundPoolInstance: boundPoolInstance,
       version: "V2",
     };
+  } else if (ownerAddress === MEMECHAN_PROGRAM_ID) {
+    const boundPoolInstance = BoundPoolClient.fromAccountInfo({
+      client: client,
+      poolAccountAddressId: poolAddressId,
+      accountInfo,
+    });
+    return {
+      boundPoolInstance: boundPoolInstance,
+      version: "V1",
+    };
+  } else {
+    throw new Error(`Unknown program ID: ${ownerAddress}. Expected either ${MEMECHAN_PROGRAM_ID} (V1) or ${MEMECHAN_PROGRAM_ID_V2} (V2)`);
   }
-
-  const boundPoolInstance = BoundPoolClient.fromAccountInfo({
-    client: client,
-    poolAccountAddressId: poolAddressId,
-    accountInfo,
-  });
-
-  return {
-    boundPoolInstance: boundPoolInstance,
-    version: "V1",
-  };
 }
