@@ -1,0 +1,549 @@
+# Directory snapshot before SpecKit execution
+# 1771269039677506082
+
+/tmp/claudev-pr-67377
+├── env.d.ts
+├── examples
+│   ├── api
+│   │   ├── create-bound-pool-tx.ts
+│   │   ├── create-coin.ts
+│   │   ├── getHoldersMapFromBackend.ts
+│   │   ├── getLivePoolPrice.ts
+│   │   ├── insert-solana-private-keys.ts
+│   │   └── test-username-api.ts
+│   ├── common.ts
+│   ├── env.ts
+│   ├── helius-api
+│   │   ├── from-json
+│   │   │   ├── get-applied-bonus-data.ts
+│   │   │   └── get-processed-transactions-by-address-from-json.ts
+│   │   ├── get-parsed-transactions-by-address.ts
+│   │   ├── get-pats-token-holders.ts
+│   │   ├── get-processed-transactions-by-address.ts
+│   │   └── get-transactions-by-pre-sale-address.ts
+│   ├── utils.ts
+│   ├── v1(deprecated)
+│   │   ├── bonding-pool
+│   │   │   ├── create
+│   │   │   │   ├── create-new-token-and-pool.ts
+│   │   │   │   └── create-new-token-and-pool-tx.ts
+│   │   │   ├── fetch-all.ts
+│   │   │   ├── fetch.ts
+│   │   │   ├── from
+│   │   │   │   ├── bound-pool-from-pool-id.ts
+│   │   │   │   └── bound-pool-from-tx-signature.ts
+│   │   │   ├── getHoldersList.ts
+│   │   │   ├── getHoldersMap.ts
+│   │   │   ├── get-meme-price-and-market-cap.ts
+│   │   │   ├── get-quote-token-display-name.ts
+│   │   │   ├── go-live-exact.ts
+│   │   │   ├── go-live.ts
+│   │   │   ├── is-memecoin-ready-to-live-phase.ts
+│   │   │   └── trading
+│   │   │       ├── buy-meme.ts
+│   │   │       ├── get-output-amount-for-buy-meme.ts
+│   │   │       ├── get-output-amount-for-sell-meme.ts
+│   │   │       └── sell-meme.ts
+│   │   ├── fee
+│   │   │   └── withdraw-admin-fee.ts
+│   │   ├── live-pool
+│   │   │   ├── buy
+│   │   │   │   ├── buy-meme-by-output.ts
+│   │   │   │   ├── buy-meme.ts
+│   │   │   │   └── get-buy-meme-output.ts
+│   │   │   ├── get-meme-price-and-mcap.ts
+│   │   │   ├── get-pool-info.ts
+│   │   │   ├── get-quote-token-display-name.ts
+│   │   │   ├── sell
+│   │   │   │   ├── get-sell-meme-output.ts
+│   │   │   │   ├── sell-meme-by-output.ts
+│   │   │   │   └── sell-meme.ts
+│   │   │   └── swap.ts
+│   │   ├── meme-ticket
+│   │   │   ├── bound-merge.ts
+│   │   │   ├── get-all-staked-lp-by-owner-legacy.ts
+│   │   │   ├── get-all-staked-lp-by-owner.ts
+│   │   │   ├── get-available-staked-lp-by-owner.ts
+│   │   │   ├── get-user-tickets-2.ts
+│   │   │   └── staking-merge.ts
+│   │   ├── parsing
+│   │   │   └── parse-transaction.ts
+│   │   ├── raydium
+│   │   │   └── swap.ts
+│   │   ├── slerf
+│   │   │   ├── mint-devnet-slerf.ts
+│   │   │   └── send-devnet-slerf.ts
+│   │   ├── staking-pool
+│   │   │   ├── add-fees-tx.ts
+│   │   │   ├── fetch-all.ts
+│   │   │   ├── fetch.ts
+│   │   │   ├── get-available-unstake-amount.ts
+│   │   │   ├── get-available-unstake-amount-v2.ts
+│   │   │   ├── get-available-withdraw-fees-amount.ts
+│   │   │   ├── get-available-withdraw-fees-amount-tx.ts
+│   │   │   ├── get-holders.ts
+│   │   │   ├── is-amm-pool-is-created.ts
+│   │   │   ├── unstake.ts
+│   │   │   ├── unstake-tx.ts
+│   │   │   └── withdrawfees.ts
+│   │   ├── target-config
+│   │   │   ├── change-target-config.ts
+│   │   │   ├── create-target-config.ts
+│   │   │   └── fetch-target-config.ts
+│   │   ├── util
+│   │   │   ├── getProgramAccounts.ts
+│   │   │   ├── getRecentPrioritizationFees2.ts
+│   │   │   └── getRecentPrioritizationFees.ts
+│   │   └── vesting
+│   │       ├── check-vesting.ts
+│   │       ├── create-vestings.ts
+│   │       ├── get-claimable-amount.ts
+│   │       └── get-users-vesting-data.ts
+│   ├── v2
+│   │   ├── bonding-pool
+│   │   │   ├── create
+│   │   │   │   ├── create-new-token-and-pool-from-be-tx.ts
+│   │   │   │   ├── create-new-token-and-pool-on-be.ts
+│   │   │   │   └── create-new-token-and-pool-tx.ts
+│   │   │   ├── from
+│   │   │   │   ├── bound-pool-from-meme-mint.ts
+│   │   │   │   ├── bound-pool-from-pool-id.ts
+│   │   │   │   └── bound-pool-from-tx-signature.ts
+│   │   │   ├── getBoundPoolClientFromId.ts
+│   │   │   ├── getHoldersMap.ts
+│   │   │   ├── get-meme-price-and-market-cap.ts
+│   │   │   ├── init-amm
+│   │   │   │   └── init-amm-pools.ts
+│   │   │   ├── init-staking
+│   │   │   │   └── init-staking-pool.ts
+│   │   │   ├── trading
+│   │   │   │   ├── buy-meme.ts
+│   │   │   │   ├── get-output-amount-for-buy-meme.ts
+│   │   │   │   ├── get-output-amount-for-sell-meme.ts
+│   │   │   │   └── sell-meme.ts
+│   │   │   └── transfer-creator-funds.ts
+│   │   ├── get-account-info.ts
+│   │   ├── live-pool
+│   │   │   ├── buy
+│   │   │   │   ├── buy-meme-by-output.ts
+│   │   │   │   ├── buy-meme.ts
+│   │   │   │   └── get-buy-meme-output.ts
+│   │   │   ├── get-meme-price-and-mcap.ts
+│   │   │   ├── get-quote-token-display-name.ts
+│   │   │   ├── live-pool-from-pool-id.ts
+│   │   │   ├── sell
+│   │   │   │   ├── get-sell-meme-output.ts
+│   │   │   │   ├── sell-meme-by-output.ts
+│   │   │   │   └── sell-meme.ts
+│   │   │   └── swap.ts
+│   │   ├── meme-ticket
+│   │   │   └── fetch-tickets-by-user-2.ts
+│   │   ├── parsers
+│   │   │   └── parse-transaction.ts
+│   │   ├── points
+│   │   │   ├── get-formatted-points-balance.ts
+│   │   │   ├── get-referrer-link.ts
+│   │   │   ├── get-token-balance.ts
+│   │   │   └── resolve-referrer.ts
+│   │   ├── running-line
+│   │   │   └── running-line.ts
+│   │   ├── staking-pool
+│   │   │   ├── add-fees-tx.ts
+│   │   │   ├── fetch-all.ts
+│   │   │   ├── fetch.ts
+│   │   │   ├── get-available-unstake-amount.ts
+│   │   │   ├── get-available-withdraw-fees-amount.ts
+│   │   │   ├── get-available-withdraw-fees-amount-tx.ts
+│   │   │   ├── get-holders.ts
+│   │   │   ├── is-amm-pool-is-created.ts
+│   │   │   ├── unstake-prepared-tx.ts
+│   │   │   ├── unstake.ts
+│   │   │   ├── unstake-tx.ts
+│   │   │   ├── withdraw-fees-prepared-tx.ts
+│   │   │   └── withdraw-fees-tx.ts
+│   │   ├── target-config
+│   │   │   ├── change-target-config.ts
+│   │   │   ├── create-target-config.ts
+│   │   │   └── fetch-target-config.ts
+│   │   └── token-info
+│   │       └── get-token-info.ts
+│   ├── vechan-vesting
+│   │   ├── fetch-userstake.ts
+│   │   ├── vechan-staking-example.ts
+│   │   └── withdraw-rewards.ts
+│   └── wallet
+│       ├── convert-private-key-to-pair.ts
+│       ├── convert-wallet-private-key.ts
+│       └── get-token-account-balance.ts
+├── jest.config.js
+├── LICENSE
+├── package.json
+├── README.md
+├── src
+│   ├── api
+│   │   ├── auth
+│   │   │   └── Auth.ts
+│   │   ├── ChartApi.ts
+│   │   ├── helpers
+│   │   │   └── TokenApiHelper.ts
+│   │   ├── PoolApi.ts
+│   │   ├── schemas
+│   │   │   ├── chart-schema.ts
+│   │   │   ├── pools-schema.ts
+│   │   │   ├── solana-create-bound-pool-tx-schema.ts
+│   │   │   ├── token-schemas.ts
+│   │   │   └── token-status-schema.ts
+│   │   ├── social
+│   │   │   ├── schemas.ts
+│   │   │   └── SocialAPI.ts
+│   │   ├── TokenAPI.ts
+│   │   ├── types.ts
+│   │   ├── uploadMetadataToIpfs.ts
+│   │   └── UsernameApi.ts
+│   ├── bound-pool
+│   │   ├── BoundPoolClient.ts
+│   │   ├── BoundPoolClientV2.ts
+│   │   ├── errors.ts
+│   │   └── types.ts
+│   ├── chan-swap
+│   │   └── ChanSwapClient.ts
+│   ├── common
+│   │   └── helpers.ts
+│   ├── config
+│   │   ├── config.dev.ts
+│   │   ├── config.prod.ts
+│   │   ├── config.ts
+│   │   ├── consts.ts
+│   │   ├── helpers.ts
+│   │   ├── sdkConfig.ts
+│   │   └── types.ts
+│   ├── helius-api
+│   │   ├── HeliusApi.ts
+│   │   ├── typeguards
+│   │   │   ├── txTypeguard.ts
+│   │   │   └── typeguard.ts
+│   │   ├── types.ts
+│   │   └── utils
+│   │       ├── aggregateAmountByOwner.ts
+│   │       ├── getSignatures.ts
+│   │       ├── printMissingTransactions.ts
+│   │       └── sortByAmount.ts
+│   ├── index.ts
+│   ├── live-pool
+│   │   ├── LivePoolClient.ts
+│   │   ├── LivePoolClientV2.ts
+│   │   ├── types.ts
+│   │   └── utils.ts
+│   ├── MemechanClient.ts
+│   ├── MemechanClientV2.ts
+│   ├── memeticket
+│   │   ├── MemeTicketClient.ts
+│   │   ├── MemeTicketClientV2.ts
+│   │   ├── types.ts
+│   │   ├── typesV2.ts
+│   │   └── utils.ts
+│   ├── meteora
+│   │   └── AmmPool.ts
+│   ├── points
+│   │   ├── getFormattedPointsBalance.ts
+│   │   ├── getReferrerLink.ts
+│   │   └── resolveReferrer.ts
+│   ├── raydium
+│   │   ├── ammCreatePool.ts
+│   │   ├── config.ts
+│   │   ├── formatAmmKeysByAccountInfo.ts
+│   │   ├── formatAmmKeysById.ts
+│   │   ├── openBookCreateMarket.ts
+│   │   ├── raydiumMarket.ts
+│   │   └── swapOnlyAmm.ts
+│   ├── running-line
+│   │   ├── RunningLineEventsEmitter.ts
+│   │   └── types.ts
+│   ├── schema
+│   │   ├── codegen
+│   │   │   ├── accounts
+│   │   │   │   ├── AmmConfig.ts
+│   │   │   │   ├── BoundPool.ts
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── MarketState.ts
+│   │   │   │   ├── MemeTicket.ts
+│   │   │   │   ├── OpenOrders.ts
+│   │   │   │   ├── StakingPool.ts
+│   │   │   │   ├── TargetConfig.ts
+│   │   │   │   └── TargetOrders.ts
+│   │   │   ├── errors
+│   │   │   │   ├── anchor.ts
+│   │   │   │   ├── custom.ts
+│   │   │   │   └── index.ts
+│   │   │   ├── instructions
+│   │   │   │   ├── addFees.ts
+│   │   │   │   ├── boundMergeTickets.ts
+│   │   │   │   ├── changeTargetConfig.ts
+│   │   │   │   ├── closeTicket.ts
+│   │   │   │   ├── createMetadata.ts
+│   │   │   │   ├── getSwapXAmt.ts
+│   │   │   │   ├── getSwapYAmt.ts
+│   │   │   │   ├── goLive.ts
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── initStakingPool.ts
+│   │   │   │   ├── newPool.ts
+│   │   │   │   ├── newTargetConfig.ts
+│   │   │   │   ├── stakingMergeTickets.ts
+│   │   │   │   ├── swapX.ts
+│   │   │   │   ├── swapY.ts
+│   │   │   │   ├── unstake.ts
+│   │   │   │   ├── withdrawAdminFee.ts
+│   │   │   │   └── withdrawFees.ts
+│   │   │   ├── programId.ts
+│   │   │   └── types
+│   │   │       ├── Config.ts
+│   │   │       ├── DecimalError.ts
+│   │   │       ├── Decimals.ts
+│   │   │       ├── Fees.ts
+│   │   │       ├── index.ts
+│   │   │       ├── RaydiumAmmFees.ts
+│   │   │       ├── RaydiumFees.ts
+│   │   │       ├── Reserve.ts
+│   │   │       ├── StateData.ts
+│   │   │       ├── TargetOrder.ts
+│   │   │       ├── TokenAmount.ts
+│   │   │       ├── TokenLimit.ts
+│   │   │       ├── VestingConfig.ts
+│   │   │       └── VestingData.ts
+│   │   ├── idl
+│   │   │   └── memechan_sol.json
+│   │   ├── types
+│   │   │   └── memechan_sol.ts
+│   │   ├── v1.ts
+│   │   └── v2
+│   │       ├── codegen
+│   │       │   ├── accounts
+│   │       │   │   ├── BoundPool.ts
+│   │       │   │   ├── ChanSwap.ts
+│   │       │   │   ├── index.ts
+│   │       │   │   ├── MemeTicket.ts
+│   │       │   │   ├── StakingPool.ts
+│   │       │   │   └── TargetConfig.ts
+│   │       │   ├── errors
+│   │       │   │   ├── anchor.ts
+│   │       │   │   ├── custom.ts
+│   │       │   │   └── index.ts
+│   │       │   ├── instructions
+│   │       │   │   ├── addFees.ts
+│   │       │   │   ├── boundMergeTickets.ts
+│   │       │   │   ├── changeChanPrice.ts
+│   │       │   │   ├── changeTargetConfig.ts
+│   │       │   │   ├── closeTicket.ts
+│   │       │   │   ├── createMetadata.ts
+│   │       │   │   ├── getSwapXAmt.ts
+│   │       │   │   ├── getSwapYAmt.ts
+│   │       │   │   ├── increaseVesting.ts
+│   │       │   │   ├── index.ts
+│   │       │   │   ├── initChanAmmPool.ts
+│   │       │   │   ├── initMemeAmmPool.ts
+│   │       │   │   ├── initStakingPool.ts
+│   │       │   │   ├── newChanSwap.ts
+│   │       │   │   ├── newPool.ts
+│   │       │   │   ├── newTargetConfig.ts
+│   │       │   │   ├── sendAirdropFunds.ts
+│   │       │   │   ├── stakingMergeTickets.ts
+│   │       │   │   ├── swapX.ts
+│   │       │   │   ├── swapY.ts
+│   │       │   │   ├── unstake.ts
+│   │       │   │   ├── withdrawAdminFee.ts
+│   │       │   │   └── withdrawFees.ts
+│   │       │   ├── programId.ts
+│   │       │   └── types
+│   │       │       ├── Config.ts
+│   │       │       ├── DecimalError.ts
+│   │       │       ├── Decimals.ts
+│   │       │       ├── Fees.ts
+│   │       │       ├── index.ts
+│   │       │       ├── Reserve.ts
+│   │       │       ├── TokenAmount.ts
+│   │       │       ├── TokenLimit.ts
+│   │       │       ├── VestingConfig.ts
+│   │       │       └── VestingData.ts
+│   │       ├── idl
+│   │       │   └── memechan_sol.json
+│   │       ├── types
+│   │       │   └── memechan_sol.ts
+│   │       └── v2.ts
+│   ├── solana-ws-client
+│   │   ├── SolanaWsClient.ts
+│   │   └── types.ts
+│   ├── staking-pool
+│   │   ├── StakingPoolClient.ts
+│   │   ├── StakingPoolClientV2.ts
+│   │   └── types.ts
+│   ├── targetconfig
+│   │   ├── TargetConfigClient.ts
+│   │   ├── TargetConfigClientV2.ts
+│   │   └── types.ts
+│   ├── token
+│   │   ├── createMetadata.ts
+│   │   ├── createMetadataV2.ts
+│   │   ├── createMintWithPriority.ts
+│   │   ├── deriveAndFetchTokenDetailsWithMetadata.ts
+│   │   ├── getBurnTransaction.ts
+│   │   ├── getCreateMintWithPriorityTransaction.ts
+│   │   ├── MetadataClient.ts
+│   │   ├── mintUtils.ts
+│   │   └── validation
+│   │       ├── consts.ts
+│   │       ├── CreateCoinTransactionParams.ts
+│   │       ├── invalidParamErrors.ts
+│   │       ├── validateCreateCoinParams.ts
+│   │       └── validation.ts
+│   ├── tx-parsing
+│   │   ├── parsers
+│   │   │   ├── bonding-pool-creation-parser.ts
+│   │   │   ├── create-metadata-parser.ts
+│   │   │   ├── go-live-parser.ts
+│   │   │   ├── init-staking-parser.ts
+│   │   │   ├── swap-x-parser.ts
+│   │   │   └── swap-y-parser.ts
+│   │   ├── parsing.ts
+│   │   └── v2
+│   │       ├── parsers
+│   │       │   ├── bonding-pool-creation-parser.ts
+│   │       │   ├── create-metadata-parser.ts
+│   │       │   ├── index.ts
+│   │       │   ├── init-chan-amm-parser.ts
+│   │       │   ├── init-quote-amm-parser.ts
+│   │       │   ├── init-staking-parser.ts
+│   │       │   ├── swap-x-parser.ts
+│   │       │   ├── swap-y-parser.ts
+│   │       │   ├── unstake-parser.ts
+│   │       │   └── withdraw-fees-parser.ts
+│   │       ├── parsingV2.ts
+│   │       └── types.ts
+│   ├── util
+│   │   ├── addUnwrapSOLInstructionIfNativeMint.ts
+│   │   ├── addWrapSOLInstructionIfNativeMint.ts
+│   │   ├── ensureAssociatedTokenAccountWithIdempotentIX.ts
+│   │   ├── ensureAssociatedTokenAccountWithIX.ts
+│   │   ├── fetchs.ts
+│   │   ├── fetch.ts
+│   │   ├── findPointsPda.ts
+│   │   ├── getCreateAccountInstruction.ts
+│   │   ├── get-fetch.ts
+│   │   ├── get-headers.ts
+│   │   ├── getMultipleTokenBalances.ts
+│   │   ├── getSendAndConfirmTransactionMethod.ts
+│   │   ├── getTokenAccountBalance.ts
+│   │   ├── getTokenBalance.ts
+│   │   ├── getTxCopy.ts
+│   │   ├── get-tx-size.ts
+│   │   ├── index.ts
+│   │   ├── poolHelpers
+│   │   │   ├── getBoundPoolClientFromId.ts
+│   │   │   ├── getLivePoolClientFromId.ts
+│   │   │   ├── getMemeTicketClientFromId.ts
+│   │   │   ├── getStakingPoolClientFromId.ts
+│   │   │   ├── livePoolClientCache.ts
+│   │   │   └── types.ts
+│   │   ├── retry.ts
+│   │   ├── safeBNToNumber.ts
+│   │   ├── signMessage.ts
+│   │   ├── sigv4.ts
+│   │   ├── splitByChunk.ts
+│   │   ├── toMap.ts
+│   │   ├── trading
+│   │   │   ├── deductSlippage.ts
+│   │   │   ├── extractSwapDataFromSimulation.ts
+│   │   │   ├── normalizeInputCoinAmountBN.ts
+│   │   │   ├── normalizeInputCoinAmount.ts
+│   │   │   └── removeDecimalPart.ts
+│   │   ├── unwrapSOLInstruction.ts
+│   │   ├── wallet
+│   │   │   └── NoWalletAdapter.ts
+│   │   └── wrapSOLInstruction.ts
+│   ├── vechan-vesting
+│   │   ├── schema
+│   │   │   ├── codegen
+│   │   │   │   ├── accounts
+│   │   │   │   │   ├── index.ts
+│   │   │   │   │   ├── RewardState.ts
+│   │   │   │   │   ├── Reward.ts
+│   │   │   │   │   ├── StakingState.ts
+│   │   │   │   │   ├── UserRewards.ts
+│   │   │   │   │   ├── UserStake.ts
+│   │   │   │   │   └── Vesting.ts
+│   │   │   │   ├── errors
+│   │   │   │   │   ├── anchor.ts
+│   │   │   │   │   ├── custom.ts
+│   │   │   │   │   └── index.ts
+│   │   │   │   ├── instructions
+│   │   │   │   │   ├── availableForWithdrawal.ts
+│   │   │   │   │   ├── convertVestingToVchan.ts
+│   │   │   │   │   ├── createRewardState.ts
+│   │   │   │   │   ├── createReward.ts
+│   │   │   │   │   ├── createStakingState.ts
+│   │   │   │   │   ├── createUserRewards.ts
+│   │   │   │   │   ├── createVestingDebug.ts
+│   │   │   │   │   ├── index.ts
+│   │   │   │   │   ├── stakeTokens.ts
+│   │   │   │   │   ├── unstakeTokens.ts
+│   │   │   │   │   ├── userSkipRewards.ts
+│   │   │   │   │   └── userWithdrawReward.ts
+│   │   │   │   └── programId.ts
+│   │   │   ├── idl
+│   │   │   │   └── staking.json
+│   │   │   └── types
+│   │   │       └── staking.ts
+│   │   ├── types.ts
+│   │   ├── utils.ts
+│   │   └── VeChanStakingClient.ts
+│   └── vesting
+│       ├── check-vestings.ts
+│       ├── schema
+│       │   ├── codegen
+│       │   │   ├── accounts
+│       │   │   │   ├── index.ts
+│       │   │   │   └── Vesting.ts
+│       │   │   ├── errors
+│       │   │   │   ├── anchor.ts
+│       │   │   │   ├── custom.ts
+│       │   │   │   └── index.ts
+│       │   │   ├── instructions
+│       │   │   │   ├── availableForWithdrawal.ts
+│       │   │   │   ├── createVesting.ts
+│       │   │   │   ├── index.ts
+│       │   │   │   └── withdraw.ts
+│       │   │   └── programId.ts
+│       │   ├── idl
+│       │   │   └── lockup.json
+│       │   └── types
+│       │       └── lockup.ts
+│       ├── types.ts
+│       └── VestingClient.ts
+├── test
+│   ├── AuthService.test.ts
+│   ├── BoundPool.Creation.test.ts
+│   ├── BoundPool.test.ts
+│   ├── BoundPool.Trading.test.ts
+│   ├── ChartApi.test.ts
+│   ├── common
+│   │   ├── common.ts
+│   │   └── env.ts
+│   ├── Holders.test.ts
+│   ├── index.test.ts
+│   ├── MemeTicket.test.ts
+│   ├── PoolService.test.ts
+│   ├── QuoteTokenMint.test.ts
+│   ├── SocialAPI.test.ts
+│   ├── StakingPool.test.ts
+│   ├── SwapX.test.ts
+│   ├── SwapY.test.ts
+│   ├── TargetConfig.test.ts
+│   ├── TokenAPI.test.ts
+│   ├── TxParsing.test.ts
+│   ├── utils.ts
+│   └── Validation.test.ts
+├── tsconfig.json
+├── tsconfig.production.json
+├── tsup.config.json
+└── yarn.lock
+
+107 directories, 437 files
