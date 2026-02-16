@@ -26,7 +26,7 @@ import {
   getUserRewardsPDA,
   getUserStakeSigner,
 } from "./utils";
-import { COMPUTE_UNIT_PRICE, TOKEN_INFOS, WSOL_DECIMALS } from "../config/config";
+import { COMPUTE_UNIT_PRICE, TOKEN_INFOS, VCHAN_TOKEN_DECIMALS, WSOL_DECIMALS } from "../config/config";
 import { Reward, UserRewards, UserStake } from "./schema/codegen/accounts";
 import BigNumber from "bignumber.js";
 import { ParsedReward } from "./types";
@@ -133,6 +133,46 @@ export class VeChanStakingClient {
     });
 
     return parsedRewards;
+  }
+
+  public static getRewardAPR(reward: ParsedReward, vChanPrice: BigNumber, solPrice: BigNumber) {
+    const timeTotalDays = new BigNumber(30);
+    const totalRewardUsdValue = new BigNumber(reward.fields.rewardAmount.toString())
+      .multipliedBy(solPrice)
+      .dividedBy(WSOL_DECIMALS);
+
+    const totalStakeUsdValue = new BigNumber(reward.fields.stakesTotal.toString())
+      .multipliedBy(vChanPrice)
+      .dividedBy(10 ** VCHAN_TOKEN_DECIMALS);
+
+    return totalRewardUsdValue.multipliedBy(new BigNumber(365)).dividedBy(totalStakeUsdValue).dividedBy(timeTotalDays);
+  }
+
+  public static getRewardsAvgAPR(rewards: ParsedReward[], vChanPrice: BigNumber, solPrice: BigNumber) {
+    const aprs: BigNumber[] = rewards.map((reward) => VeChanStakingClient.getRewardAPR(reward, vChanPrice, solPrice));
+    const totalAPR = aprs.reduce((sum, current) => sum.plus(current), new BigNumber(0));
+    return totalAPR.dividedBy(rewards.length);
+  }
+
+  public static getAvgAPR(allRewards: ParsedReward[], vChanPrice: BigNumber, solPrice: BigNumber) {
+    let rewardTotal = new BN(0);
+    let stakeTotalAvg = new BN(0);
+    for (const reward of allRewards) {
+      rewardTotal = rewardTotal.add(reward.fields.rewardAmount);
+      stakeTotalAvg = stakeTotalAvg.add(reward.fields.stakesTotal);
+    }
+
+    stakeTotalAvg = stakeTotalAvg.div(new BN(allRewards.length));
+
+    const timeTotal = allRewards[allRewards.length - 1].fields.timestamp.sub(allRewards[0].fields.timestamp);
+    const timeTotalDays = new BigNumber(timeTotal.div(new BN(3600 * 24)).toString());
+    const totalRewardUsdValue = new BigNumber(rewardTotal.toString()).dividedBy(WSOL_DECIMALS).multipliedBy(solPrice);
+
+    const totalStakeUsdValue = new BigNumber(stakeTotalAvg.toString())
+      .dividedBy(10 ** VCHAN_TOKEN_DECIMALS)
+      .multipliedBy(vChanPrice);
+
+    return totalRewardUsdValue.multipliedBy(new BigNumber(365)).dividedBy(totalStakeUsdValue).dividedBy(timeTotalDays);
   }
 
   /**
