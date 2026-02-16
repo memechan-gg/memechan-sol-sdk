@@ -1,0 +1,10 @@
+{
+  "success": false,
+  "tasks_total": 3,
+  "tasks_completed": 1,
+  "tasks_failed": 1,
+  "planning_ms": 100248,
+  "execution_ms": 128963,
+  "total_ms": 229383,
+  "error": "Max retries exceeded for task: Build fails because \"rimraf\" command is not found\n\nPartial progress:\n1 of 3 tasks completed successfully before failure.\nCompleted:\n  - Bash\nFailed at: Max retries exceeded for task: Build fails because \"rimraf\" command is not found"
+}
