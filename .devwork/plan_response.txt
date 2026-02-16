@@ -1,0 +1,26 @@
+{
+"summary": "Verify the bug fix in getBoundPoolClientFromId.ts is correctly implemented. The fix adds proper program ID validation with explicit V1/V2 checks and error handling for unknown program IDs. Tasks include checking the current file state, building the project, and running tests.",
+"tasks": [
+{
+"id": "T001",
+"tool": "Bash",
+"args": { "command": "cat /tmp/claudev-pr-34234/src/util/poolHelpers/getBoundPoolClientFromId.ts" },
+"depends_on": [],
+"description": "View the current state of the fixed file to verify the fix is applied"
+},
+{
+"id": "T002",
+"tool": "Bash",
+"args": { "command": "cd /tmp/claudev-pr-34234 && yarn build 2>&1" },
+"depends_on": ["T001"],
+"description": "Build the project to ensure the fixed code compiles correctly"
+},
+{
+"id": "T003",
+"tool": "Bash",
+"args": { "command": "cd /tmp/claudev-pr-34234 && yarn test 2>&1 || echo \"No test script or tests failed\"" },
+"depends_on": ["T002"],
+"description": "Run tests to verify the fix works correctly"
+}
+]
+}
